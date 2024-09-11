@@ -34,7 +34,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/athena-e2e/**/*"]
+      "exclude": ["apps/newsletter-e2e/**/*"]
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
-  "name": "athena",
+  "name": "newsletter",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/athena/src",
+  "sourceRoot": "apps/newsletter/src",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -11,12 +11,12 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/athena",
+        "outputPath": "dist/apps/newsletter",
         "format": ["cjs"],
         "bundle": false,
-        "main": "apps/athena/src/main.ts",
-        "tsConfig": "apps/athena/tsconfig.app.json",
-        "assets": ["apps/athena/src/assets"],
+        "main": "apps/newsletter/src/main.ts",
+        "tsConfig": "apps/newsletter/tsconfig.app.json",
+        "assets": ["apps/newsletter/src/assets"],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -42,15 +42,15 @@
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "athena:build",
+        "buildTarget": "newsletter:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "athena:build:development"
+          "buildTarget": "newsletter:build:development"
         },
         "production": {
-          "buildTarget": "athena:build:production"
+          "buildTarget": "newsletter:build:production"
         }
       }
     }
