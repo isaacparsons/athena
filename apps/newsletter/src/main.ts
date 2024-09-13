@@ -1,40 +1,41 @@
 import express from 'express';
-import { Firestore } from '@google-cloud/firestore';
-
-const firestore = new Firestore({
-  host: '127.0.0.1',
-  port: 8080,
-  projectId: 'dummy-project',
-  ssl: false,
-  credentials: {
-    client_email:
-      'firebase-adminsdk-vsq2r@dummy-project.iam.gserviceaccount.com',
-    private_key:
-      '-----BEGIN PRIVATE KEY-----\nsdfjklsfglasjkfghaskljgakljsghklasjdghlaksjghklajsdghlaksghakjlsdgklasfglkasdgh=\n-----END PRIVATE KEY-----\n',
-  },
-});
+import dbMiddleware from './middleware/db';
+import { getUser } from './db/queries/user';
+import {
+  createTables,
+  truncateTables,
+  dropTables,
+  initialData,
+} from './db/init-db';
+import db from './db/db';
+import routes from './routes/index';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-const app = express();
+// initialData(db);
+// createTables(db);
 
-app.get('/', (req, res) => {
-  res.send({ message: 'Hello API' });
+// dropTables(db);
+// truncateTables(db);
+
+const app = express();
+app.use(express.json());
+app.use(dbMiddleware);
+
+app.use(async (req, res, next) => {
+  const user = await req.db<User[]>`
+    select * from users where first_name = 'isaac'
+  `;
+  req.userId = user[0].id;
+  next();
 });
 
-app.get('/test', async (req, res) => {
-  const document = firestore.doc('/test/WnN44Gp2HIDZI5pDlLGO');
+app.use('/v1', routes);
 
-  // Update an existing document.
-  await document.update({
-    body: 'My first Firestore app',
-  });
-
-  // Read the document.
-  const doc = await document.get();
-
-  res.send({ doc });
+app.get('/', async (req, res) => {
+  console.log(req.body);
+  res.send({ message: req.body });
 });
 
 app.listen(port, host, () => {
