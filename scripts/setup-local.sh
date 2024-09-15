@@ -1,1 +1,1 @@
-docker-compose -f ./docker-compose.sql.yaml up -d
+docker-compose -f ../local/docker-compose.sql.yaml up -d

@@ -1,84 +1,98 @@
-interface User {
+interface DBUser {
   id: number;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
 }
 
-interface Country {
+interface DBNewsletter {
+  id: number;
+  name: string;
+  created: string;
+  modified: string;
+  ownerId: int;
+  startDate?: string;
+  endDate?: string;
+}
+
+interface DBUserNewsletter {
+  userId: number;
+  newsletterId: number;
+}
+
+interface DBCountry {
   code: string;
   name: string;
   longitude: number;
   lattitude: number;
 }
 
-interface Location {
+interface DBLocation {
   id: number;
   name: string;
-  countr_code: string;
-  longitude: number;
-  lattitude: number;
+  country_code?: string;
+  longitude?: number;
+  lattitude?: number;
 }
 
-interface Newsletter {
-  id: number;
-  name: string;
-  created: string;
-  modified: string;
-  ownerId: int;
-}
-
-interface NewsletterItem {
+interface DBNewsletterItem {
   id: number;
   title: string;
   created: string;
   modified: string;
 }
 
-interface NewsletterItemPhoto {
+interface DBNewsletterItemPhoto {
   id: number;
   newsletterItemId: number;
   name: string;
-  caption: string;
-  locationId: number;
-  format: string;
-  size: number;
+  caption?: string;
+  locationId?: number;
+  format?: string;
+  size?: number;
 }
 
-interface NewsletterItemMovieTvReview {
+interface DBNewsletterItemMovieTvReview {
   id: number;
   newsletterItemId: number;
   name: string;
   rating: number;
-  notes: string;
-  link: string;
-  whereToWatch: string[];
+  notes?: string;
+  link?: string;
+  whereToWatch?: string[];
 }
 
-interface NewsletterItemText {
+interface DBNewsletterItemText {
   id: number;
   newsletterItemId: number;
   title: string;
-  description: string;
-  link: string;
+  description?: string;
+  link?: string;
 }
 
-interface NewsletterItemVideo {
+interface DBNewsletterItemVideo {
   id: number;
   newsletterItemId: number;
   title: string;
-  caption: string;
-  locationId: number;
-  format: string;
-  size: number;
+  caption?: string;
+  locationId?: number;
+  format?: string;
+  size?: number;
 }
 
-interface Tag {
+interface DBTag {
   id: number;
   name: string;
 }
 
-interface NewsletterItemTag {
+interface DBNewsletterItemTag {
   tagId: number;
   newsletterItemId: number;
+}
+
+interface DBFederatedCredentials {
+  id: number;
+  provider: string;
+  subjectId: string;
+  userId: number;
 }
