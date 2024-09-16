@@ -1,6 +1,12 @@
 import * as React from 'react';
 
-import { SignInPage, AppProvider, SupportedAuthProvider } from '@toolpad/core';
+import {
+  SignInPage,
+  AppProvider,
+  SupportedAuthProvider,
+  AuthProvider,
+  AuthResponse,
+} from '@toolpad/core';
 
 const googleId = 'google' as SupportedAuthProvider;
 const providers = [{ id: googleId, name: 'Google' }];
@@ -19,8 +25,13 @@ export default function Login() {
   return (
     <AppProvider branding={BRANDING}>
       <SignInPage
-        signIn={() => {
-          console.log('hi');
+        signIn={(
+          provider: AuthProvider,
+          formData?: any,
+          callbackUrl?: string
+        ) => {
+          console.log(provider);
+          console.log(formData);
         }}
         providers={providers}
       />

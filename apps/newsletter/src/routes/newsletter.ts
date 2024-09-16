@@ -1,126 +1,154 @@
-import { Router } from 'express';
-import postgres from 'postgres';
+import { Request, Response, Router } from 'express';
+import { AuthenticatedRequest, isAuthenticated } from '../middleware/auth';
+import { first } from 'remeda';
+import multer from 'multer';
+import fs from 'node:fs';
 
-import { google } from 'googleapis';
+const upload = multer({ dest: 'photos/' });
 
 const router = Router();
 
-interface NewsletterInput {
-  name: string;
-  userId: string;
-}
+const BASE_NEWSLETTERS_FOLDER_NAME = 'Newsletters';
 
-async function createNewsletter(db: postgres.Sql, input: NewsletterInput) {
-  const now = new Date().toISOString();
-
-  // const res = await drive_v3.files.create({
-  //   requestBody: {
-  //     name: 'Test',
-  //     mimeType: 'text/plain'
-  //   },
-  //   media: {
-  //     mimeType: 'text/plain',
-  //     body: 'Hello World'
-  //   }
-  // });
-
-  // const [newsletter, userNewsletter] = await db.begin(async (sql) => {
-  //   const [newsletter] = await sql`
-  //   insert into public.newsletters ${sql(
-  //     { ...input, created: now, modified: now },
-  //     'name',
-  //     'created',
-  //     'modified'
-  //   )}
-  //   returning *
-  // `;
-
-  //   const [userNewsletter] = await sql`
-  //     insert into public.user_newsletters (
-  //       user_id,
-  //       newsletter_id
-  //     ) values (
-  //       ${input.userId},
-  //        ${newsletter.id}
-  //     )
-  //     returning *
-  //   `;
-  //   return [newsletter, userNewsletter];
-  // });
-  // console.log(newsletter);
-  // console.log(userNewsletter);
-
-  //   return await db`
-  //     insert into public.newsletters ${db(
-  //       { ...input, created: now, modified: now },
-  //       'name',
-  //       'created',
-  //       'modified'
-  //     )}
-  //   `;
-}
-
-async function getNewsletters(db: postgres.Sql, input: NewsletterInput) {
-  const now = new Date().toISOString();
-  return await db`
-      insert into public.newsletters ${db(
-        { ...input, created: now, modified: now },
-        'name',
-        'created',
-        'modified'
-      )}
-    `;
-}
-
-async function getNewsletterById(db: postgres.Sql, input: NewsletterInput) {
-  const now = new Date().toISOString();
-  return await db`
-      insert into public.newsletters ${db(
-        { ...input, created: now, modified: now },
-        'name',
-        'created',
-        'modified'
-      )}
-    `;
-}
-
-function isAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/');
-}
-
-router.get('/', isAuthenticated, async (req, res) => {
-  res.send('GET: newsletters');
-  console.log(req.user);
-  const oauth2Client = new google.auth.OAuth2();
-  oauth2Client.setCredentials({ access_token: req.user['accessToken'] });
-  const drive = google.drive({ version: 'v3', auth: oauth2Client });
-
-  // Example: List files in the user's Google Drive
-  const response = await drive.files.list({
-    pageSize: 10,
-    fields: 'files(id, name)',
+router.get('/', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  const newsletters = await req.db.getNewslettersForUserId(req.user.userId);
+  res.send({
+    data: newsletters,
   });
-
-  const files = response.data.files;
-  console.log(files);
 });
 
-router.post('/', (req, res) => {
-  console.log(req.body);
+router.post(
+  '/',
+  isAuthenticated,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const input = req.body;
 
-  // createNewsletter(req.db, {
-  //   userId: req.userId,
-  //   ...req.body,
-  // });
+    // if the newsletter folder does not exist, create it.
+    const newslettersFolder = await req.googleDrive.files.list({
+      q: `name='${BASE_NEWSLETTERS_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      fields: 'files(id, name)',
+      spaces: 'drive',
+    });
 
-  res.send('POST: newsletters');
-});
+    const _files = first(newslettersFolder.data.files ?? []);
+    let newslettersFolderId = _files?.id;
 
-router.get('/:newsletterId', (req, res) => {
-  res.send(req.params);
-});
+    if (!newslettersFolderId) {
+      const createdNewslettersFolder = await req.googleDrive.files.create({
+        requestBody: {
+          name: BASE_NEWSLETTERS_FOLDER_NAME,
+          mimeType: 'application/vnd.google-apps.folder',
+        },
+      });
+      newslettersFolderId = createdNewslettersFolder.data.id;
+      if (!newslettersFolderId) {
+        throw new Error(
+          `Unable to create folder: ${BASE_NEWSLETTERS_FOLDER_NAME}`
+        );
+      }
+    }
+    const folder = await req.googleDrive.files.create({
+      requestBody: {
+        name: input.name,
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: newslettersFolderId ? [newslettersFolderId] : [],
+      },
+    });
+    const folderId = folder.data.id;
+    if (!folderId) {
+      throw new Error(`Unable to create folder: ${input.name}`);
+    }
+
+    const dbNewsletter = await req.db.createNewsletter({
+      name: input.name,
+      userId: req.user.userId,
+      googleDriveFolderId: folderId,
+    });
+    res.send({ data: dbNewsletter });
+  }
+);
+
+//TODO:  implement
+router.get(
+  '/:newsletterId',
+  isAuthenticated,
+  async (req: AuthenticatedRequest, res: Response) => {
+    res.send(req.params);
+  }
+);
+
+//TODO:  implement
+router.delete(
+  '/:newsletterId',
+  isAuthenticated,
+  async (req: AuthenticatedRequest, res: Response) => {
+    //only owner should be able  to delete
+    res.send(req.params);
+  }
+);
+
+// fieldname: 'photo',
+// originalname: 'Screenshot 2024-09-15 at 3.45.38 PM.png',
+// encoding: '7bit',
+// mimetype: 'image/png',
+// destination: 'photos/',
+// filename: '766d1c682223fdb971282aa6d14ee1f0',
+// path: 'photos/766d1c682223fdb971282aa6d14ee1f0',
+// size: 330027
+
+interface ImageUploadRequest {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  destination: string;
+  filename: string;
+  path: string;
+  size: number;
+}
+
+router.post(
+  '/:newsletterId/items',
+  isAuthenticated,
+  upload.single('photo'),
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { newsletterId: _newsletterId } = req.params;
+    const newsletterId = parseInt(_newsletterId);
+    const file = req.file as ImageUploadRequest;
+
+    const newsletter = await req.db.getNewsletterById(newsletterId);
+    if (!newsletter) {
+      throw new Error(`no newsletter with id: ${newsletterId}`);
+    }
+
+    const photo = await req.googleDrive.files.create({
+      requestBody: {
+        name: file.originalname,
+        parents: [newsletter.googleDriveFolderId],
+      },
+      media: {
+        mimeType: file.mimetype,
+        body: fs.createReadStream(file.path),
+      },
+      fields: 'id, webViewLink',
+    });
+
+    await fs.promises.unlink(file.path);
+
+    if (!photo.data.id || !photo.data.webViewLink) {
+      throw new Error('unable to upload photo');
+    }
+
+    const item = await req.db.createNewsletterPhotoItem({
+      newsletterId: newsletterId,
+      link: photo.data.webViewLink,
+      googleDriveFileId: photo.data.id,
+      name: file.originalname,
+    });
+    res.send({
+      data: item,
+    });
+  }
+);
 
 export default router;

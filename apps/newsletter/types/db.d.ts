@@ -13,6 +13,7 @@ interface DBNewsletter {
   ownerId: int;
   startDate?: string;
   endDate?: string;
+  googleDriveFolderId: string;
 }
 
 interface DBUserNewsletter {
@@ -37,6 +38,7 @@ interface DBLocation {
 
 interface DBNewsletterItem {
   id: number;
+  newsletterId: number;
   title: string;
   created: string;
   modified: string;
@@ -45,6 +47,8 @@ interface DBNewsletterItem {
 interface DBNewsletterItemPhoto {
   id: number;
   newsletterItemId: number;
+  link: string;
+  googleDriveFileId: string;
   name: string;
   caption?: string;
   locationId?: number;

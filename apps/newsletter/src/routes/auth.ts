@@ -1,46 +1,32 @@
-import { Router, Express } from 'express';
-import db from '../db/db';
+import { Router, Express, Request } from 'express';
 import passport from 'passport';
-import { Strategy } from 'passport-google-oauth20';
-import session from 'express-session';
 import {
-  createCredentialsForProvider,
-  getCredentialsForProvider,
-} from '../db/queries/auth';
-import { createUser, getUserByEmail } from '../db/queries/user';
+  Profile,
+  Strategy,
+  StrategyOptionsWithRequest,
+} from 'passport-google-oauth20';
+import { isDefined, first } from 'remeda';
+import session from 'express-session';
+import { parseEnv } from '../util/parse-env';
 
-interface GoogleCredentials {
-  id: string;
-  displayName: string;
-  name: {
-    familyName: string;
-    givenName: string;
-  };
-  emails: { value: string }[];
-}
-
-interface UserSession {
+export interface UserSession {
   email: string;
   userId: number;
   accessToken: string;
   refreshToken: string;
 }
 
-// const SCOPES = [
-//     'https://www.googleapis.com/auth/drive.file',
-//     'https://www.googleapis.com/auth/drive.photos.readonly',
-//     'https://www.googleapis.com/auth/userinfo.email',
-//     'https://www.googleapis.com/auth/userinfo.profile',
-//   ];
+const env = parseEnv();
 
 const SCOPES = ['profile', 'email', 'https://www.googleapis.com/auth/drive'];
 
-const GOOGLE_AUTH = {
-  clientID: process.env['GOOGLE_CLIENT_ID'],
-  clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
-  callbackURL: '/v1/auth/google/redirect',
+const GOOGLE_AUTH: StrategyOptionsWithRequest = {
+  clientID: env.google.clientId,
+  clientSecret: env.google.clientSecret,
+  callbackURL: env.google.callbackUrl,
   scope: SCOPES,
   state: true,
+  passReqToCallback: true,
   // accessType: 'offline', // Request offline access to get a refresh token
   // prompt: 'consent',
 };
@@ -67,7 +53,7 @@ router.get(
 export function initPassport(app: Express) {
   app.use(
     session({
-      secret: 'your_secret_key',
+      secret: env.app.sessionSecret,
       resave: false,
       saveUninitialized: true,
     })
@@ -77,35 +63,48 @@ export function initPassport(app: Express) {
   app.use(passport.session());
   passport.use(
     new Strategy(GOOGLE_AUTH, async function verify(
-      accessToken,
-      refreshToken,
-      profile,
+      req: Request,
+      accessToken: string,
+      refreshToken: string,
+      profile: Profile,
       done
     ) {
       try {
-        const email = profile.emails[0].value;
-        let user = await getUserByEmail(db, email);
+        console.log('google authorization success!');
+        console.log('checking for user in db...');
+
+        const _email = first(profile.emails ?? []);
+        const email = _email ? _email.value : null;
+        if (!email) {
+          throw new Error('No email');
+        }
+
+        let user = await req.db.getUserByEmail(email);
 
         if (!user) {
-          user = await createUser(db, {
-            firstName: profile.name.givenName,
-            lastName: profile.name.givenName,
+          user = await req.db.createUser({
+            firstName: profile.name?.givenName,
+            lastName: profile.name?.givenName,
             email,
           });
         }
 
-        const credentials = await getCredentialsForProvider(db, {
+        const credentials = await req.db.getCredentialsForProvider({
           subjectId: profile.id,
           provider: 'google',
         });
 
         if (!credentials) {
-          await createCredentialsForProvider(db, {
+          await req.db.createCredentialsForProvider({
             subjectId: profile.id,
             provider: 'google',
             userId: user.id,
           });
         }
+        console.log('user found or created');
+        console.log(user);
+        console.log('credentials');
+        console.log(credentials);
         return done(null, {
           email: user.email,
           userId: user.id,
@@ -119,11 +118,13 @@ export function initPassport(app: Express) {
     })
   );
 
-  passport.serializeUser((req, user, done) => {
+  passport.serializeUser((req: Request, user: UserSession, done) => {
     done(null, user);
   });
 
-  passport.deserializeUser(async (user, done) => {
+  passport.deserializeUser(async (user: UserSession, done) => {
+    console.log('session found');
+    console.log(user);
     done(null, user);
   });
   return app;

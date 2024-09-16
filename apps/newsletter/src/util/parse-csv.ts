@@ -3,7 +3,8 @@ import { parse } from 'csv-parse';
 import { finished } from 'stream/promises';
 
 export async function parseCsvFile(file: string) {
-  const records = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const records: any[] = [];
   const parser = fs.createReadStream(file).pipe(parse({}));
   parser.on('readable', function () {
     let record;

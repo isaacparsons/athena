@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import db from '../db/db';
+import { DBClient } from '../db/db';
 
-export default (req: Request, res: Response, next: NextFunction) => {
-  req.db = db;
-  next();
-};
+export default (dbClient: DBClient) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    req.db = dbClient;
+    next();
+  };

@@ -1,19 +1,31 @@
 import express from 'express';
 import dbMiddleware from './middleware/db';
-import { setupDb, truncateTables, dropTables } from './db/init-db';
-import db from './db/db';
+import postgres from 'postgres';
+
+import { DBSetup } from './db/init-db';
 import routes from './routes/index';
 import { initPassport } from './routes/auth';
+import { DBClient } from './db/db';
+import { parseEnv } from './util/parse-env';
 
-const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const env = parseEnv();
 
-// dropTables(db);
-// setupDb(db);
+const db = postgres(
+  `postgres://${env.db.username}:${env.db.password}@${env.db.host}:${env.db.port}/${env.db.name}`,
+  {
+    transform: postgres.camel,
+  }
+);
+
+const dbClient = new DBClient(db);
+
+const dbSetup = new DBSetup(db);
+// dbSetup.setup();
+// dbSetup.teardown();
 
 let app = express();
 app.use(express.json());
-app.use(dbMiddleware);
+app.use(dbMiddleware(dbClient));
 app = initPassport(app);
 
 app.get('/', (req, res) => {
@@ -22,6 +34,6 @@ app.get('/', (req, res) => {
 
 app.use('/v1', routes);
 
-app.listen(port, host, () => {
-  console.log(`[ ready ] http://${host}:${port}`);
+app.listen(env.app.port, env.app.host, () => {
+  console.log(`[ ready ] http://${env.app.host}:${env.app.port}`);
 });
