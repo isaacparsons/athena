@@ -1,6 +1,7 @@
 import express from 'express';
 import dbMiddleware from './middleware/db';
 import postgres from 'postgres';
+import cors from 'cors';
 
 import { DBSetup } from './db/init-db';
 import routes from './routes/index';
@@ -18,12 +19,23 @@ const db = postgres(
 );
 
 const dbClient = new DBClient(db);
-
 const dbSetup = new DBSetup(db);
 // dbSetup.setup();
 // dbSetup.teardown();
 
+// var corsOptions = {
+//   origin: 'http://example.com',
+// }
+
 let app = express();
+app.use(
+  cors({
+    credentials: true,
+    origin: `http://${env.client.host}:${env.client.port}`,
+    AccessControlAllowOrigin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  })
+);
 app.use(express.json());
 app.use(dbMiddleware(dbClient));
 app = initPassport(app);

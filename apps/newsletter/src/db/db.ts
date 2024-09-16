@@ -77,14 +77,6 @@ export class DBClient {
     });
     return newsletter;
   }
-  async getUserByEmail(email: string) {
-    const [user]: [DBUser?] = await this.db`
-      select *
-      from public.users
-      where email=${email}
-    `;
-    return user;
-  }
 
   async createNewsletterPhotoItem(input: NewsletterItemPhotoInput) {
     const now = new Date().toISOString();
@@ -140,6 +132,24 @@ export class DBClient {
       }
     );
     return newsletterPhotoItem;
+  }
+
+  async getUserByEmail(email: string) {
+    const [user]: [DBUser?] = await this.db`
+      select *
+      from public.users
+      where email=${email}
+    `;
+    return user;
+  }
+
+  async getUserById(id: number) {
+    const [user]: [DBUser?] = await this.db`
+      select *
+      from public.users
+      where id=${id}
+    `;
+    return user;
   }
 
   async createUser(userInput: Omit<DBUser, 'id'>) {

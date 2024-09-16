@@ -1,15 +1,13 @@
 import { Router } from 'express';
+import { AuthenticatedRequest, isAuthenticated } from '../middleware/auth';
 
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.send('GET: users');
+router.get('/me', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  const user = await req.db.getUserById(req.user.userId);
+  res.send({
+    data: user,
+  });
 });
-//   .post((req, res) => {
-//     res.send('Add a book')
-//   })
-//   .put((req, res) => {
-//     res.send('Update the book')
-//   })
 
 export default router;

@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import {
   SignInPage,
   AppProvider,
@@ -32,6 +31,9 @@ export default function Login() {
         ) => {
           console.log(provider);
           console.log(formData);
+
+          window.location.href = 'http://localhost:3000/v1/auth/google';
+          // window.open('http://localhost:3000/v1/auth/google', '_blank');
         }}
         providers={providers}
       />

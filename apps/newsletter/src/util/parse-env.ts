@@ -21,6 +21,11 @@ export function parseEnv() {
   const DB_USERNAME = checkEnvVariable('DB_USERNAME', process.env.DB_USERNAME);
   const DB_PASSWORD = checkEnvVariable('DB_PASSWORD', process.env.DB_PASSWORD);
 
+  const CLIENT_HOST = checkEnvVariable('CLIENT_HOST', process.env.CLIENT_HOST);
+  const CLIENT_PORT = getInt(
+    checkEnvVariable('CLIENT_PORT', process.env.CLIENT_PORT)
+  );
+
   const GOOGLE_CLIENT_ID = checkEnvVariable(
     'GOOGLE_CLIENT_ID',
     process.env.GOOGLE_CLIENT_ID
@@ -34,11 +39,17 @@ export function parseEnv() {
     process.env.GOOGLE_CALLBACK_URL
   );
 
+  const APP_SESSION_COOKIE_NAME = checkEnvVariable(
+    'APP_SESSION_COOKIE_NAME',
+    process.env.APP_SESSION_COOKIE_NAME
+  );
+
   return {
     app: {
       host: APP_HOST,
       port: APP_PORT,
       sessionSecret: APP_SESSION_SECRET,
+      sessionCookieName: APP_SESSION_COOKIE_NAME,
     },
     db: {
       host: DB_HOST,
@@ -51,6 +62,10 @@ export function parseEnv() {
       clientId: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackUrl: GOOGLE_CALLBACK_URL,
+    },
+    client: {
+      host: CLIENT_HOST,
+      port: CLIENT_PORT,
     },
   };
 }

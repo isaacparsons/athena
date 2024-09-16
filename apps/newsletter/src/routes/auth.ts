@@ -1,11 +1,11 @@
-import { Router, Express, Request } from 'express';
+import { Router, Express, Request, Response } from 'express';
 import passport from 'passport';
 import {
   Profile,
   Strategy,
   StrategyOptionsWithRequest,
 } from 'passport-google-oauth20';
-import { isDefined, first } from 'remeda';
+import { first } from 'remeda';
 import session from 'express-session';
 import { parseEnv } from '../util/parse-env';
 
@@ -27,7 +27,7 @@ const GOOGLE_AUTH: StrategyOptionsWithRequest = {
   scope: SCOPES,
   state: true,
   passReqToCallback: true,
-  // accessType: 'offline', // Request offline access to get a refresh token
+  // accessType: 'offline',
   // prompt: 'consent',
 };
 
@@ -37,7 +37,7 @@ router.get(
   '/google',
   passport.authenticate('google', {
     scope: SCOPES,
-    accessType: 'offline', // Request offline access to get a refresh token
+    accessType: 'offline',
     prompt: 'consent',
   })
 );
@@ -45,17 +45,27 @@ router.get(
 router.get(
   '/google/redirect',
   passport.authenticate('google', {
-    successRedirect: '/',
+    successRedirect: 'http://localhost:4200',
     failureRedirect: '/',
   })
 );
 
+router.get('/logout', (req: Request, res: Response) => {
+  req.logout(() => {
+    res.send('OK');
+  });
+});
+
 export function initPassport(app: Express) {
   app.use(
     session({
+      name: env.app.sessionCookieName,
       secret: env.app.sessionSecret,
       resave: false,
       saveUninitialized: true,
+      cookie: {
+        httpOnly: false,
+      },
     })
   );
 

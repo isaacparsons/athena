@@ -1,23 +1,16 @@
 import { Route, Routes, Link } from 'react-router-dom';
 import Login from './pages/login';
+import Home from './pages/home';
+import AuthProvider from './context/auth';
 
 export function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <div>
-            <ul>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-            </ul>
-          </div>
-        }
-      />
-      <Route path="/login" element={<Login />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
