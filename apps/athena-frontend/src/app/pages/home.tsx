@@ -1,28 +1,28 @@
-import { Route, Routes, Link, useNavigate } from 'react-router-dom';
-import {
-  AppBar,
-  Toolbar,
-  BoxProps,
-  IconButton,
-  Button,
-  Typography,
-  Box,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { useNavigate } from 'react-router-dom';
+import { Button, Box } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Appbar from '../common/Appbar';
+import { useAuthContext } from '../context/auth';
+import Newsletters from '../components/newsletters';
 
 export function Home() {
   const navigate = useNavigate();
+  const user = useAuthContext();
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Appbar
         title="Newsletter"
         right={
-          <Button color="inherit" onClick={() => navigate('/login')}>
-            Login
-          </Button>
+          user ? (
+            <AccountCircleIcon />
+          ) : (
+            <Button color="inherit" onClick={() => navigate('/login')}>
+              Login
+            </Button>
+          )
         }
       />
+      <Newsletters />
     </Box>
   );
 }

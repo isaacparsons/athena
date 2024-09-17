@@ -68,12 +68,16 @@ router.post(
   }
 );
 
-//TODO:  implement
 router.get(
   '/:newsletterId',
   isAuthenticated,
   async (req: AuthenticatedRequest, res: Response) => {
-    res.send(req.params);
+    const { newsletterId } = req.params;
+    const id = parseInt(newsletterId);
+    const newsletter = await req.db.getNewsletterById(req.user.userId, id);
+    res.send({
+      data: newsletter,
+    });
   }
 );
 
@@ -116,7 +120,10 @@ router.post(
     const newsletterId = parseInt(_newsletterId);
     const file = req.file as ImageUploadRequest;
 
-    const newsletter = await req.db.getNewsletterById(newsletterId);
+    const newsletter = await req.db.getNewsletterById(
+      req.user.userId,
+      newsletterId
+    );
     if (!newsletter) {
       throw new Error(`no newsletter with id: ${newsletterId}`);
     }

@@ -1,9 +1,13 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-// axios.defaults.withCredentials = true
+import { api } from '../../api';
 
 const SESSION_COOKIE_NAME = 'newsletter_session';
+const API_HOST = 'http://localhost';
+const API_PORT = 3000;
+
+const path = `${API_HOST}:${API_PORT}`;
 
 interface User {
   id: number;
@@ -27,23 +31,17 @@ const AuthProvider: React.FC<Props> = (props) => {
 
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
+  const checkSession = async () => {
     const sessionId = Cookies.get(SESSION_COOKIE_NAME);
     if (sessionId) {
-      axios
-        .get('http://localhost:3000/v1/users/me', { withCredentials: true })
-        .then(function (response) {
-          console.log(response);
-        });
+      const response = await api.users.getMe();
+      setUser(response.data);
     }
-  }, []);
+  };
 
-  //   const login = () => {
-  //     setAuthenticated(true);
-  //   };
-  //   const logout = () => {
-  //     setAuthenticated(false);
-  //   };
+  useEffect(() => {
+    checkSession();
+  }, []);
 
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 };

@@ -1,4 +1,4 @@
-import { DBClient } from '../src/db/db';
+import { DBClient } from '../apps/newsletter/src/db/db';
 import { drive_v3 } from 'googleapis';
 
 declare global {
