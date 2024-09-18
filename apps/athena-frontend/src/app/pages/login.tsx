@@ -29,11 +29,7 @@ export default function Login() {
           formData?: any,
           callbackUrl?: string
         ) => {
-          console.log(provider);
-          console.log(formData);
-
           window.location.href = 'http://localhost:3000/v1/auth/google';
-          // window.open('http://localhost:3000/v1/auth/google', '_blank');
         }}
         providers={providers}
       />

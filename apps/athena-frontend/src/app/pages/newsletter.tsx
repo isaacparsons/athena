@@ -2,9 +2,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Chip, List, ListItem, Avatar } from '@mui/material';
 
 import { useAuthContext } from '../context/auth';
-import { useEffect, useState } from 'react';
+import {
+  JSXElementConstructor,
+  ReactElement,
+  ReactNode,
+  ReactPortal,
+  useEffect,
+  useState,
+} from 'react';
 import { api } from '../../api';
 import BackBtn from '../components/back-btn';
+import { Newsletter as INewsletter } from 'types/types';
 
 export function Newsletter() {
   const { newsletterId } = useParams();
@@ -12,7 +20,7 @@ export function Newsletter() {
   const user = useAuthContext();
 
   const [loading, setLoading] = useState(true);
-  const [newsletter, setNewsletter] = useState<Newsletter | null>(null);
+  const [newsletter, setNewsletter] = useState<INewsletter | null>(null);
 
   console.log(newsletter);
 
@@ -34,23 +42,34 @@ export function Newsletter() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <BackBtn />
-      <Box>
-        {newsletter?.members.map((user) => {
-          return <Chip label={user.email} variant="outlined" />;
-        })}
+      {/* <Box>
+        {newsletter?.members.map(
+          (user: {
+            email:
+              | string
+              | number
+              | boolean
+              | ReactElement<any, string | JSXElementConstructor<any>>
+              | Iterable<ReactNode>
+              | ReactPortal
+              | null
+              | undefined;
+          }) => {
+            return <Chip label={user.email} variant="outlined" />;
+          }
+        )}
       </Box>
       <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-        {newsletter.items.map((newsletterItem) => {
+        {newsletter.items.map((newsletterItem: any) => {
           return (
             <ListItem alignItems="flex-start">
-              <Avatar src="https://drive.google.com/file/d/1KjycmjMRsyFjKHhRqMuf9Gxe9iCRlFm3/view?usp=drivesdk" />
-              {/* <Button onClick={() => navigate(`/newsletters/${newsletter.id}`)}>
+              <Button onClick={() => navigate(`/newsletters/${newsletter.id}`)}>
         <ListItemText primary={newsletter.name} />
-      </Button> */}
+      </Button>
             </ListItem>
           );
         })}
-      </List>
+      </List> */}
     </Box>
   );
 }

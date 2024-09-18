@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
-import { DBClient } from '../db/db';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Kysely } from 'kysely';
+import { Database } from '../db/db';
 
-export default (dbClient: DBClient) =>
+export default (db: Kysely<Database>): RequestHandler =>
   (req: Request, res: Response, next: NextFunction) => {
-    req.db = dbClient;
+    req.db = db;
     next();
   };

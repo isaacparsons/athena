@@ -1,104 +1,29 @@
-import { Request, Response, Router } from 'express';
+import { Response, Router } from 'express';
 import { AuthenticatedRequest, isAuthenticated } from '../middleware/auth';
-import { first } from 'remeda';
 import multer from 'multer';
 import fs from 'node:fs';
+import { NewNewsletter, Newsletter } from '../db/tables/newsletter';
+import { AthenaResponseBuilder } from '../util/response-format';
+import { NewsletterItemType, NewsletterItem, User } from '../db/tables';
+import { Storage } from '@google-cloud/storage';
+import { parseEnv } from '../util/parse-env';
+
+const env = parseEnv();
+
+const storage = new Storage();
+const bucket = storage.bucket(env.gcs.bucketName);
 
 const upload = multer({ dest: 'photos/' });
-
 const router = Router();
 
-const BASE_NEWSLETTERS_FOLDER_NAME = 'Newsletters';
-
-router.get('/', isAuthenticated, async (req: AuthenticatedRequest, res) => {
-  const newsletters = await req.db.getNewslettersForUserId(req.user.userId);
-  res.send({
-    data: newsletters,
-  });
-});
-
-router.post(
-  '/',
-  isAuthenticated,
-  async (req: AuthenticatedRequest, res: Response) => {
-    const input = req.body;
-
-    // if the newsletter folder does not exist, create it.
-    const newslettersFolder = await req.googleDrive.files.list({
-      q: `name='${BASE_NEWSLETTERS_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-      fields: 'files(id, name)',
-      spaces: 'drive',
-    });
-
-    const _files = first(newslettersFolder.data.files ?? []);
-    let newslettersFolderId = _files?.id;
-
-    if (!newslettersFolderId) {
-      const createdNewslettersFolder = await req.googleDrive.files.create({
-        requestBody: {
-          name: BASE_NEWSLETTERS_FOLDER_NAME,
-          mimeType: 'application/vnd.google-apps.folder',
-        },
-      });
-      newslettersFolderId = createdNewslettersFolder.data.id;
-      if (!newslettersFolderId) {
-        throw new Error(
-          `Unable to create folder: ${BASE_NEWSLETTERS_FOLDER_NAME}`
-        );
-      }
-    }
-    const folder = await req.googleDrive.files.create({
-      requestBody: {
-        name: input.name,
-        mimeType: 'application/vnd.google-apps.folder',
-        parents: newslettersFolderId ? [newslettersFolderId] : [],
-      },
-    });
-    const folderId = folder.data.id;
-    if (!folderId) {
-      throw new Error(`Unable to create folder: ${input.name}`);
-    }
-
-    const dbNewsletter = await req.db.createNewsletter({
-      name: input.name,
-      userId: req.user.userId,
-      googleDriveFolderId: folderId,
-    });
-    res.send({ data: dbNewsletter });
-  }
-);
-
-router.get(
-  '/:newsletterId',
-  isAuthenticated,
-  async (req: AuthenticatedRequest, res: Response) => {
-    const { newsletterId } = req.params;
-    const id = parseInt(newsletterId);
-    const newsletter = await req.db.getNewsletterById(req.user.userId, id);
-    res.send({
-      data: newsletter,
-    });
-  }
-);
-
-//TODO:  implement
-router.delete(
-  '/:newsletterId',
-  isAuthenticated,
-  async (req: AuthenticatedRequest, res: Response) => {
-    //only owner should be able  to delete
-    res.send(req.params);
-  }
-);
-
-// fieldname: 'photo',
-// originalname: 'Screenshot 2024-09-15 at 3.45.38 PM.png',
-// encoding: '7bit',
-// mimetype: 'image/png',
-// destination: 'photos/',
-// filename: '766d1c682223fdb971282aa6d14ee1f0',
-// path: 'photos/766d1c682223fdb971282aa6d14ee1f0',
-// size: 330027
+export type GetNewsletterResponse = {
+  newsletter: Newsletter;
+  members: User[];
+  items: {
+    item: NewsletterItem;
+    details: NewsletterItemType;
+  }[];
+};
 
 interface ImageUploadRequest {
   fieldname: string;
@@ -111,6 +36,102 @@ interface ImageUploadRequest {
   size: number;
 }
 
+export type CreateNewsletterPhotoItemResponse = {
+  item: NewsletterItem;
+  details: NewsletterItemType;
+};
+
+router.get('/', isAuthenticated, async (req: AuthenticatedRequest, res) => {
+  const newsletters = await req.db
+    .selectFrom('userNewsletter as un')
+    .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
+    .where('un.userId', '=', req.user.userId)
+    .selectAll('n')
+    .execute();
+
+  res.send(
+    new AthenaResponseBuilder<Newsletter[]>().setData(newsletters).build()
+  );
+});
+
+router.post(
+  '/',
+  isAuthenticated,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const input: Pick<NewNewsletter, 'name'> = req.body;
+
+    const newsletter = await req.db.transaction().execute(async (trx) => {
+      const newsletter = await trx
+        .insertInto('newsletter')
+        .values({
+          ...input,
+          ownerId: req.user.userId,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      await trx
+        .insertInto('userNewsletter')
+        .values({
+          userId: req.user.userId,
+          newsletterId: newsletter.id,
+        })
+        .executeTakeFirstOrThrow();
+
+      return newsletter;
+    });
+
+    res.send(
+      new AthenaResponseBuilder<Newsletter>().setData(newsletter).build()
+    );
+  }
+);
+
+router.get(
+  '/:newsletterId',
+  isAuthenticated,
+  async (req: AuthenticatedRequest, res: Response) => {
+    const { newsletterId } = req.params;
+    const id = parseInt(newsletterId);
+    const newsletter = await req.db
+      .selectFrom('userNewsletter as un')
+      .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
+      .where('un.userId', '=', req.user.userId)
+      .where('un.newsletterId', '=', id)
+      .selectAll('n')
+      .executeTakeFirst();
+
+    const members = await req.db
+      .selectFrom('userNewsletter as un')
+      .innerJoin('user as u', 'u.id', 'un.userId')
+      .where('un.newsletterId', '=', id)
+      .selectAll('u')
+      .execute();
+
+    const response = new AthenaResponseBuilder<GetNewsletterResponse>();
+    if (!newsletter) {
+      response.setError(new Error(`no newsletter found with id: ${id}`));
+    } else {
+      response.setData({
+        newsletter,
+        members,
+        items: [],
+      });
+    }
+    res.send(response.build());
+  }
+);
+
+// //TODO:  implement
+// router.delete(
+//   '/:newsletterId',
+//   isAuthenticated,
+//   async (req: AuthenticatedRequest, res: Response) => {
+//     //only owner should be able  to delete
+//     res.send(req.params);
+//   }
+// );
+
 router.post(
   '/:newsletterId/items',
   isAuthenticated,
@@ -118,43 +139,74 @@ router.post(
   async (req: AuthenticatedRequest, res: Response) => {
     const { newsletterId: _newsletterId } = req.params;
     const newsletterId = parseInt(_newsletterId);
+
+    console.log(req.file);
+    if (!req.file) {
+      res.send(
+        new AthenaResponseBuilder<CreateNewsletterPhotoItemResponse>()
+          .setError(new Error('a file must be include'))
+          .build()
+      );
+    }
     const file = req.file as ImageUploadRequest;
 
-    const newsletter = await req.db.getNewsletterById(
-      req.user.userId,
-      newsletterId
-    );
+    const newsletter = await req.db
+      .selectFrom('userNewsletter as un')
+      .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
+      .where('un.userId', '=', req.user.userId)
+      .where('un.newsletterId', '=', newsletterId)
+      .selectAll('n')
+      .executeTakeFirst();
+
     if (!newsletter) {
       throw new Error(`no newsletter with id: ${newsletterId}`);
     }
 
-    const photo = await req.googleDrive.files.create({
-      requestBody: {
-        name: file.originalname,
-        parents: [newsletter.googleDriveFolderId],
-      },
-      media: {
-        mimeType: file.mimetype,
-        body: fs.createReadStream(file.path),
-      },
-      fields: 'id, webViewLink',
+    const result = await req.db.transaction().execute(async (trx) => {
+      const newsletterItem = await trx
+        .insertInto('newsletterItem')
+        .values({
+          newsletterId,
+          title: file.originalname,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      const newsletterItemPhoto = await trx
+        .insertInto('newsletterItemPhoto')
+        .values({
+          newsletterItemId: newsletterItem.id,
+          link: '123',
+          name: file.originalname,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
+
+      // create object in gcs
+      const photoPath =
+        '/Users/isaacparsons/Documents/projects/athena/' + file.path;
+
+      const gcsFile = (
+        await bucket.upload(photoPath, {
+          destination: newsletterItemPhoto.id.toString(),
+          public: true,
+        })
+      )[0];
+      console.log(gcsFile);
+      console.log(gcsFile.cloudStorageURI);
+      return {
+        item: newsletterItem,
+        details: newsletterItemPhoto,
+      };
     });
 
     await fs.promises.unlink(file.path);
 
-    if (!photo.data.id || !photo.data.webViewLink) {
-      throw new Error('unable to upload photo');
-    }
-
-    const item = await req.db.createNewsletterPhotoItem({
-      newsletterId: newsletterId,
-      link: photo.data.webViewLink,
-      googleDriveFileId: photo.data.id,
-      name: file.originalname,
-    });
-    res.send({
-      data: item,
-    });
+    res.send(
+      new AthenaResponseBuilder<CreateNewsletterPhotoItemResponse>()
+        .setData(result)
+        .build()
+    );
   }
 );
 

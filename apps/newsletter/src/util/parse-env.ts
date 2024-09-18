@@ -44,6 +44,11 @@ export function parseEnv() {
     process.env.APP_SESSION_COOKIE_NAME
   );
 
+  const GOOGLE_STORAGE_BUCKET_NAME = checkEnvVariable(
+    'GOOGLE_STORAGE_BUCKET_NAME',
+    process.env.GOOGLE_STORAGE_BUCKET_NAME
+  );
+
   return {
     app: {
       host: APP_HOST,
@@ -62,6 +67,9 @@ export function parseEnv() {
       clientId: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackUrl: GOOGLE_CALLBACK_URL,
+    },
+    gcs: {
+      bucketName: GOOGLE_STORAGE_BUCKET_NAME,
     },
     client: {
       host: CLIENT_HOST,

@@ -1,31 +1,34 @@
 import express from 'express';
+import { Pool } from 'pg';
+import { Kysely, PostgresDialect } from 'kysely';
 import dbMiddleware from './middleware/db';
-import postgres from 'postgres';
 import cors from 'cors';
-
-import { DBSetup } from './db/init-db';
 import routes from './routes/index';
 import { initPassport } from './routes/auth';
-import { DBClient } from './db/db';
 import { parseEnv } from './util/parse-env';
+import { Database } from './db/db';
+import { DBClient } from './db/client';
 
 const env = parseEnv();
 
-const db = postgres(
-  `postgres://${env.db.username}:${env.db.password}@${env.db.host}:${env.db.port}/${env.db.name}`,
-  {
-    transform: postgres.camel,
-  }
-);
+const dialect = new PostgresDialect({
+  pool: new Pool({
+    database: env.db.name,
+    host: env.db.host,
+    user: env.db.username,
+    password: env.db.password,
+    port: env.db.port,
+    max: 10,
+  }),
+});
+
+export const db = new Kysely<Database>({
+  dialect,
+});
 
 const dbClient = new DBClient(db);
-const dbSetup = new DBSetup(db);
-// dbSetup.setup();
-// dbSetup.teardown();
-
-// var corsOptions = {
-//   origin: 'http://example.com',
-// }
+// dbClient.dropTables();
+dbClient.createTables();
 
 let app = express();
 app.use(
@@ -37,7 +40,7 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(dbMiddleware(dbClient));
+app.use(dbMiddleware(db));
 app = initPassport(app);
 
 app.get('/', (req, res) => {

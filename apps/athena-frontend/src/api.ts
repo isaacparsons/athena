@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Newsletter, AthenaResponse } from 'types/types';
 
 const API_HOST = 'http://localhost';
 const API_PORT = 3000;
@@ -16,13 +17,17 @@ const users = {
 };
 
 const newsletters = {
-  async getMyNewsletters(): Promise<{ data: DBNewsletter[] }> {
-    const result = await axios.get(`${path}/v1/newsletters`, {
-      withCredentials: true,
-    });
-    return result.data;
+  async getMyNewsletters(): Promise<Newsletter[]> {
+    const result = await axios.get<AthenaResponse<Newsletter[]>>(
+      `${path}/v1/newsletters`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return result.data.data ?? [];
   },
-  async getNewsletterById(id: number): Promise<{ data: Newsletter }> {
+  async getNewsletterById(id: number): Promise<{ data: any }> {
     const result = await axios.get(`${path}/v1/newsletters/${id}`, {
       withCredentials: true,
     });

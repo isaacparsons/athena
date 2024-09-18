@@ -27,8 +27,6 @@ const GOOGLE_AUTH: StrategyOptionsWithRequest = {
   scope: SCOPES,
   state: true,
   passReqToCallback: true,
-  // accessType: 'offline',
-  // prompt: 'consent',
 };
 
 const router = Router();
@@ -80,41 +78,52 @@ export function initPassport(app: Express) {
       done
     ) {
       try {
-        console.log('google authorization success!');
-        console.log('checking for user in db...');
-
         const _email = first(profile.emails ?? []);
         const email = _email ? _email.value : null;
         if (!email) {
           throw new Error('No email');
         }
 
-        let user = await req.db.getUserByEmail(email);
+        let user = await req.db
+          .selectFrom('user')
+          .where('email', '=', email)
+          .selectAll()
+          .executeTakeFirst();
 
         if (!user) {
-          user = await req.db.createUser({
-            firstName: profile.name?.givenName,
-            lastName: profile.name?.givenName,
-            email,
-          });
+          user = await req.db
+            .insertInto('user')
+            .values({
+              firstName: profile.name?.givenName,
+              lastName: profile.name?.givenName,
+              email: email,
+            })
+            .returningAll()
+            .executeTakeFirstOrThrow();
         }
 
-        const credentials = await req.db.getCredentialsForProvider({
-          subjectId: profile.id,
-          provider: 'google',
-        });
+        const credentials = await req.db
+          .selectFrom('federatedCredential')
+          .where((eb) =>
+            eb.and([
+              eb('subjectId', '=', profile.id),
+              eb('provider', '=', 'google'),
+            ])
+          )
+          .selectAll()
+          .executeTakeFirst();
 
         if (!credentials) {
-          await req.db.createCredentialsForProvider({
-            subjectId: profile.id,
-            provider: 'google',
-            userId: user.id,
-          });
+          await req.db
+            .insertInto('federatedCredential')
+            .values({
+              subjectId: profile.id,
+              provider: 'google',
+              userId: user.id,
+            })
+            .returningAll()
+            .executeTakeFirstOrThrow();
         }
-        console.log('user found or created');
-        console.log(user);
-        console.log('credentials');
-        console.log(credentials);
         return done(null, {
           email: user.email,
           userId: user.id,
@@ -133,8 +142,6 @@ export function initPassport(app: Express) {
   });
 
   passport.deserializeUser(async (user: UserSession, done) => {
-    console.log('session found');
-    console.log(user);
     done(null, user);
   });
   return app;

@@ -1,31 +1,23 @@
-import { List, ListItem, ListItemText, Divider, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { api } from '../../api';
+import { List, ListItem, ListItemText, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { Newsletter } from 'types/types';
 
-export default function Newsletters() {
-  const [loading, setLoading] = useState(true);
-  const [newsletters, setNewsletters] = useState<DBNewsletter[]>([]);
+interface NewslettersProps {
+  newsletters: Newsletter[];
+}
 
-  const getNewsletters = async () => {
-    const response = await api.newsletters.getMyNewsletters();
-    setNewsletters(response.data);
-    setLoading(false);
-  };
-  useEffect(() => {
-    getNewsletters();
-  }, []);
-
+export function Newsletters(props: NewslettersProps) {
+  const { newsletters } = props;
   return (
     <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
       {newsletters.map((newsletter) => {
-        return <NewsletterItem newsletter={newsletter} />;
+        return <NewsletterItem key={newsletter.id} newsletter={newsletter} />;
       })}
     </List>
   );
 }
 interface NewsletterItemProps {
-  newsletter: DBNewsletter;
+  newsletter: Newsletter;
 }
 
 function NewsletterItem(props: NewsletterItemProps) {
@@ -37,6 +29,5 @@ function NewsletterItem(props: NewsletterItemProps) {
         <ListItemText primary={newsletter.name} />
       </Button>
     </ListItem>
-    //   <Divider variant="inset" component="li" />
   );
 }
