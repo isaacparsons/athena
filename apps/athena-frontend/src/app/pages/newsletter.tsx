@@ -1,5 +1,14 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Chip, List, ListItem, Avatar } from '@mui/material';
+import {
+  Box,
+  Chip,
+  List,
+  ListItem,
+  Avatar,
+  ImageList,
+  ImageListItem,
+  CircularProgress,
+} from '@mui/material';
 
 import { useAuthContext } from '../context/auth';
 import {
@@ -12,7 +21,7 @@ import {
 } from 'react';
 import { api } from '../../api';
 import BackBtn from '../components/back-btn';
-import { Newsletter as INewsletter } from 'types/types';
+import { GetNewsletterResponse } from 'types/types';
 
 export function Newsletter() {
   const { newsletterId } = useParams();
@@ -20,7 +29,9 @@ export function Newsletter() {
   const user = useAuthContext();
 
   const [loading, setLoading] = useState(true);
-  const [newsletter, setNewsletter] = useState<INewsletter | null>(null);
+  const [newsletter, setNewsletter] = useState<GetNewsletterResponse | null>(
+    null
+  );
 
   console.log(newsletter);
 
@@ -37,7 +48,7 @@ export function Newsletter() {
   }, [newsletterId]);
 
   if (!newsletter) {
-    return null;
+    return <CircularProgress />;
   }
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -70,6 +81,13 @@ export function Newsletter() {
           );
         })}
       </List> */}
+      <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
+        {newsletter.items.map((item) => (
+          <ImageListItem key={item.id}>
+            <img src={`${item.link}`} alt={item.title} loading="lazy" />
+          </ImageListItem>
+        ))}
+      </ImageList>
     </Box>
   );
 }

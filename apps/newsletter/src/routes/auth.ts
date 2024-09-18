@@ -1,4 +1,5 @@
 import { Router, Express, Request, Response } from 'express';
+
 import passport from 'passport';
 import {
   Profile,
@@ -8,13 +9,7 @@ import {
 import { first } from 'remeda';
 import session from 'express-session';
 import { parseEnv } from '../util/parse-env';
-
-export interface UserSession {
-  email: string;
-  userId: number;
-  accessToken: string;
-  refreshToken: string;
-}
+import { UserSession } from '../../types/express';
 
 const env = parseEnv();
 
@@ -129,7 +124,7 @@ export function initPassport(app: Express) {
           userId: user.id,
           accessToken,
           refreshToken,
-        });
+        } as UserSession);
       } catch (error) {
         console.log(error);
         return done(new Error('unable to resolve user'));
@@ -137,13 +132,24 @@ export function initPassport(app: Express) {
     })
   );
 
-  passport.serializeUser((req: Request, user: UserSession, done) => {
-    done(null, user);
-  });
-
-  passport.deserializeUser(async (user: UserSession, done) => {
-    done(null, user);
-  });
+  passport.serializeUser(
+    (
+      req: Request,
+      user: UserSession,
+      done: (err: unknown, user: UserSession) => void
+    ) => {
+      done(null, user);
+    }
+  );
+  passport.Authenticator;
+  passport.deserializeUser(
+    async (
+      user: UserSession,
+      done: (err: unknown, user: UserSession) => void
+    ) => {
+      done(null, user);
+    }
+  );
   return app;
 }
 

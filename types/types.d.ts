@@ -1,3 +1,4 @@
+export { GetNewsletterResponse } from '../apps/newsletter/src/routes/newsletter';
 export {
   Newsletter,
   Country,
