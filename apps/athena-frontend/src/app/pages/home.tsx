@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Box, CircularProgress } from '@mui/material';
+import { Button, Box, CircularProgress, Container } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Appbar, Newsletters } from '../components/index';
 import { useAuthContext } from '../context/auth';
@@ -16,7 +16,6 @@ export function Home() {
 
   const getNewsletters = async () => {
     const response = await api.newsletters.getMyNewsletters();
-    console.log(response);
     setNewsletters(response);
     setLoading(false);
   };
@@ -25,7 +24,7 @@ export function Home() {
   }, []);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ height: '100vh' }}>
       <Appbar
         title="Newsletter"
         right={
@@ -38,11 +37,13 @@ export function Home() {
           )
         }
       />
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <Newsletters newsletters={newsletters} />
-      )}
+      <Container sx={{ flex: 1, minHeight: '100vh' }} maxWidth="md">
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <Newsletters newsletters={newsletters} />
+        )}
+      </Container>
     </Box>
   );
 }

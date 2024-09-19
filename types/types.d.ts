@@ -1,4 +1,7 @@
-export { GetNewsletterResponse } from '../apps/newsletter/src/routes/newsletter';
+export {
+  GetNewsletterResponse,
+  Item,
+} from '../apps/newsletter/src/routes/newsletter';
 export {
   Newsletter,
   Country,

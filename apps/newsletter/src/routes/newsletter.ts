@@ -4,12 +4,7 @@ import multer from 'multer';
 import fs from 'node:fs';
 import { NewNewsletter, Newsletter } from '../db/tables/newsletter';
 import { AthenaResponseBuilder } from '../util/response-format';
-import {
-  NewsletterItemType,
-  NewsletterItem,
-  User,
-  NewsletterItemPhoto,
-} from '../db/tables';
+import { NewsletterItemType, NewsletterItem, User } from '../db/tables';
 import { Storage } from '@google-cloud/storage';
 import { parseEnv } from '../util/parse-env';
 import { Kysely, Transaction } from 'kysely';
@@ -26,7 +21,7 @@ const bucket = storage.bucket(env.gcs.bucketName);
 const upload = multer({ dest: 'photos/' });
 const router = Router();
 
-type Item = NewsletterItem &
+export type Item = NewsletterItem &
   Omit<NewsletterItemType, 'id' | 'newsletterItemId'> & {
     newsletterItemTypeId: number;
   };
@@ -186,26 +181,42 @@ const getPhotoItems = async (
   );
 };
 
-// //TODO:  implement
-// router.delete(
-//   '/:newsletterId',
-//   isAuthenticated,
-//   async (req: AuthenticatedRequest, res: Response) => {
-//     //only owner should be able  to delete
-//     res.send(req.params);
-//   }
-// );
+router.delete(
+  '/:newsletterId',
+  isAuthenticated(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      const { newsletterId } = req.params;
+      const newsletter = await req.db
+        .selectFrom('newsletter')
+        .where('id', '=', parseInt(newsletterId))
+        .selectAll()
+        .executeTakeFirstOrThrow(
+          () => new Error(`newsletter with id: ${newsletterId} does not exist`)
+        );
 
-// upload a photo item
+      if (newsletter.ownerId == req.user.userId) {
+        throw new Error(`Only an owner can delete a newsletter`);
+      }
+
+      await req.db
+        .deleteFrom('newsletter')
+        .where('id', '=', parseInt(newsletterId))
+        .where('ownerId', '=', req.user.userId)
+        .execute();
+
+      res.send(new AthenaResponseBuilder().build());
+    }
+  )
+);
+
 router.post(
-  '/:newsletterId/items',
+  '/:newsletterId/items/photo',
   upload.single('photo'),
   isAuthenticated(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       const { newsletterId: _newsletterId } = req.params;
       const newsletterId = parseInt(_newsletterId);
 
-      console.log(req.file);
       if (!req.file) {
         res.send(
           new AthenaResponseBuilder<CreateNewsletterPhotoItemResponse>()
@@ -279,6 +290,32 @@ router.post(
           .setData(result)
           .build()
       );
+    }
+  )
+);
+
+router.delete(
+  '/:newsletterId/items/:newsletterItemId',
+  isAuthenticated(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      const { newsletterId, newsletterItemId } = req.params;
+      // check if user is a member of the newsletter
+      await req.db
+        .selectFrom('userNewsletter as un')
+        .innerJoin('user as u', 'u.id', 'un.userId')
+        .where('un.newsletterId', '=', parseInt(newsletterId))
+        .selectAll()
+        .executeTakeFirstOrThrow(
+          () =>
+            new Error(`must be a member of the newsletter to delete an item`)
+        );
+
+      await req.db
+        .deleteFrom('newsletterItem')
+        .where('id', '=', parseInt(newsletterItemId))
+        .execute();
+
+      res.send(new AthenaResponseBuilder().build());
     }
   )
 );

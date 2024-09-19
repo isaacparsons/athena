@@ -4,7 +4,6 @@ import {
   AppProvider,
   SupportedAuthProvider,
   AuthProvider,
-  AuthResponse,
 } from '@toolpad/core';
 
 const googleId = 'google' as SupportedAuthProvider;
@@ -26,7 +25,7 @@ export default function Login() {
       <SignInPage
         signIn={(
           provider: AuthProvider,
-          formData?: any,
+          formData?: unknown,
           callbackUrl?: string
         ) => {
           window.location.href = 'http://localhost:3000/v1/auth/google';

@@ -10,19 +10,6 @@ export interface AuthenticatedRequest extends Request {
 
 const env = parseEnv();
 
-// export function isAuthenticated(
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) {
-//   if (req.isAuthenticated()) {
-//     return next();
-//   }
-//   console.log('Not authenticated!!!');
-//   res.clearCookie(env.app.sessionCookieName);
-//   res.send(formatResponseError('Not authenticated'));
-// }
-
 export function isAuthenticated(
   handler: (
     req: AuthenticatedRequest,
@@ -39,10 +26,4 @@ export function isAuthenticated(
     res.clearCookie(env.app.sessionCookieName);
     res.send(formatResponseError('Not authenticated'));
   };
-  // if (req.isAuthenticated()) {
-  //   return next();
-  // }
-  // console.log('Not authenticated!!!');
-  // res.clearCookie(env.app.sessionCookieName);
-  // res.send(formatResponseError('Not authenticated'));
 }
