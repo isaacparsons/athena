@@ -1,11 +1,11 @@
 import { Button } from '@mui/material';
 import ArrowbackBtn from '@mui/icons-material/ArrowBack';
 
-interface BackBtnProps {
+interface BackButtonProps {
   onClick: () => void;
 }
 
-export default function BackBtn(props: BackBtnProps) {
+export default function BackButton(props: BackButtonProps) {
   return (
     <Button
       onClick={props.onClick}

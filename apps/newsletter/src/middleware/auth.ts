@@ -24,6 +24,6 @@ export function isAuthenticated(
     }
     console.log('Not authenticated!!!');
     res.clearCookie(env.app.sessionCookieName);
-    res.send(formatResponseError('Not authenticated'));
+    res.send(formatResponseError(new Error('Not authenticated')));
   };
 }

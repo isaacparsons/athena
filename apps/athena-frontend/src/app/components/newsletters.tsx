@@ -1,25 +1,47 @@
 import {
   List,
   ListItem,
-  ListItemText,
-  Button,
   Card,
   CardActionArea,
   CardContent,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { Newsletter } from 'types/types';
+import { ReadNewsletters } from 'types/types';
+import { useStateContext, useStateDispatchContext } from '../context/state';
+import { useEffect, useState } from 'react';
+import { mapToArray } from '../../util/helpers';
+import { useAPI } from '../context/api';
 
-interface NewslettersProps {
-  newsletters: Newsletter[];
-}
+export function Newsletters() {
+  const api = useAPI();
+  const state = useStateContext();
+  const dispatch = useStateDispatchContext();
 
-export function Newsletters(props: NewslettersProps) {
-  const { newsletters } = props;
+  const [loading, setLoading] = useState(true);
+
+  const getNewsletters = async () => {
+    setLoading(true);
+    const response = await api.read<ReadNewsletters>(`/newsletters`);
+    dispatch({
+      entityType: 'newsletters',
+      action: 'fetched',
+      payload: response ?? [],
+    });
+    setLoading(false);
+  };
+  useEffect(() => {
+    getNewsletters();
+  }, []);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
   return (
     <List sx={{ width: '100%' }}>
-      {newsletters.map((newsletter) => {
+      {mapToArray(state.newsletters).map((newsletter) => {
         return <NewsletterItem key={newsletter.id} newsletter={newsletter} />;
       })}
     </List>
@@ -27,7 +49,7 @@ export function Newsletters(props: NewslettersProps) {
 }
 
 interface NewsletterItemProps {
-  newsletter: Newsletter;
+  newsletter: ReadNewsletters[number];
 }
 
 function NewsletterItem(props: NewsletterItemProps) {
@@ -46,13 +68,13 @@ function NewsletterItem(props: NewsletterItemProps) {
               </Typography>
               {newsletter.startDate && (
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {newsletter.startDate.toDateString()}
+                  {newsletter.startDate}
                 </Typography>
               )}
 
               {newsletter.endDate && (
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  {newsletter.endDate.toDateString()}
+                  {newsletter.endDate}
                 </Typography>
               )}
             </CardContent>

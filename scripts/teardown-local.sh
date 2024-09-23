@@ -1,0 +1,1 @@
+sudo docker-compose -f ./local/docker-compose.yaml down --volumes

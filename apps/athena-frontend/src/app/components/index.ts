@@ -1,3 +1,3 @@
 export * from './common/index';
-export * from './back-btn';
-export * from './newsletters';
+export * from './BackButton';
+export * from './Newsletters';

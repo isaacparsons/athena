@@ -1,11 +1,13 @@
 import { Insertable, Selectable, Updateable, Kysely } from 'kysely';
 import { IDbTable, DbTable } from './db-table';
 import { Database } from '../db';
+import { ImmutableNumber } from '.';
 
 export interface UserNewsletterTable {
-  userId: number;
-  newsletterId: number;
+  userId: ImmutableNumber;
+  newsletterId: ImmutableNumber;
 }
+
 export type UserNewsletter = Selectable<UserNewsletterTable>;
 export type NewUserNewsletter = Insertable<UserNewsletterTable>;
 export type UserNewsletterUpdate = Updateable<UserNewsletterTable>;

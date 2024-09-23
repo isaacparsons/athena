@@ -1,8 +1,8 @@
 import { Box, Chip } from '@mui/material';
-import { User } from 'types/types';
+import { ReadUser } from 'types/types';
 
 interface NewsletterMembersProps {
-  members: User[];
+  members: ReadUser[];
 }
 
 export default function NewsletterMembers(props: NewsletterMembersProps) {

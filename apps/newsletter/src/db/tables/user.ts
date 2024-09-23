@@ -1,12 +1,13 @@
-import { Generated, Insertable, Kysely, Selectable, Updateable } from 'kysely';
+import { Insertable, Kysely, Selectable, Updateable } from 'kysely';
 import { DbTable, IDbTable } from './db-table';
 import { Database } from '../db';
+import { ImmutableString, UniqueId } from '.';
 
 export interface UserTable {
-  id: Generated<number>;
+  id: UniqueId;
   firstName: string | null;
   lastName: string | null;
-  email: string;
+  email: ImmutableString;
 }
 export type User = Selectable<UserTable>;
 export type NewUser = Insertable<UserTable>;

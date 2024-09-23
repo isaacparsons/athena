@@ -2,20 +2,23 @@ import {
   Insertable,
   Selectable,
   Updateable,
-  Generated,
   ColumnType,
   sql,
   Kysely,
 } from 'kysely';
 import { DbTable, IDbTable } from './db-table';
 import { Database } from '../db';
+import { Created, Modified, UniqueId } from '.';
 
 export interface NewsletterItemTable {
-  id: Generated<number>;
-  newsletterId: number;
+  id: UniqueId;
+  newsletterId: ColumnType<number, number, never>;
   title: string;
-  created: ColumnType<Date, string | undefined, never>;
-  modified: ColumnType<Date, string | undefined, never>;
+  date: string | null;
+  created: Created;
+  modified: Modified;
+  creatorId: ColumnType<number, number, never>;
+  modifierId: ColumnType<number | null, never, number>;
 }
 export type NewsletterItem = Selectable<NewsletterItemTable>;
 export type NewNewsletterItem = Insertable<NewsletterItemTable>;
@@ -30,15 +33,20 @@ export class DbNewsletterItem extends DbTable implements IDbTable {
     await this.db.schema
       .createTable(this.name)
       .ifNotExists()
-      .addColumn('id', 'serial', (cb) => cb.primaryKey())
+      .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
       .addColumn('title', 'varchar', (cb) => cb.notNull())
       .addColumn('newsletterId', 'integer', (col) =>
-        col.references('newsletter.id').onDelete('cascade')
+        col.references('newsletter.id').notNull().onDelete('cascade')
       )
+      .addColumn('date', 'timestamp')
       .addColumn('created', 'timestamp', (cb) =>
         cb.notNull().defaultTo(sql`now()`)
       )
+      .addColumn('creatorId', 'integer', (cb) =>
+        cb.references('user.id').notNull()
+      )
       .addColumn('modified', 'timestamp')
+      .addColumn('modifierId', 'integer', (cb) => cb.references('user.id'))
       .execute();
     return;
   }

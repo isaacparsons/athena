@@ -1,17 +1,12 @@
-import { Newsletter, User } from '../db/tables/index';
 export const formatResponseSuccess = <T>(data: T) => {
-  return {
-    data: data,
-  };
+  return new AthenaResponseBuilder<T>().setData(data).build();
 };
 
-export const formatResponseError = (title: string) => {
-  return {
-    error: new Error(title),
-  };
+export const formatResponseError = <T>(error: Error) => {
+  return new AthenaResponseBuilder<T>().setError(error).build();
 };
 
-export interface AthenaResponse<T> {
+export interface AthenaResponse<T = undefined> {
   data: null | T;
   error: null | Error;
 }

@@ -26,9 +26,9 @@ export const db = new Kysely<Database>({
   dialect,
 });
 
-const dbClient = new DBClient(db);
+// const dbClient = new DBClient(db);
 // dbClient.dropTables();
-dbClient.createTables();
+// dbClient.createTables();
 
 let app = express();
 app.use(
@@ -40,6 +40,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(dbMiddleware(db));
 app = initPassport(app);
 

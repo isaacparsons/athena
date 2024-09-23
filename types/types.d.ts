@@ -1,8 +1,4 @@
 export {
-  GetNewsletterResponse,
-  Item,
-} from '../apps/newsletter/src/routes/newsletter';
-export {
   Newsletter,
   Country,
   NewCountry,
@@ -25,5 +21,7 @@ export {
   UserUpdate,
   Entity,
 } from '../apps/newsletter/src/db/tables/index';
+
+export * from '../apps/newsletter/src/api';
 
 export { AthenaResponse } from '../apps/newsletter/src/util/response-format';

@@ -1,29 +1,31 @@
-import {
-  Box,
-  Backdrop,
-  SpeedDial,
-  SpeedDialIcon,
-  SpeedDialAction,
-  SvgIcon,
-} from '@mui/material';
+import { Box, SpeedDial, SpeedDialIcon, SpeedDialAction } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 
-import { useAuthContext } from '../context/auth';
-import { useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
+import { red } from '@mui/material/colors';
 
 interface Action {
-  icon: React.ReactNode;
+  icon: ReactNode;
   name: string;
   onClick: () => void;
 }
 
 interface CustomSpeedDialProps {
   actions: Action[];
+  overrideIcon?: ReactNode;
+  onOverrideIconClick?: () => void;
 }
 
 export default function CustomSpeedDial(props: CustomSpeedDialProps) {
-  const { actions } = props;
+  const { actions, overrideIcon, onOverrideIconClick } = props;
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {
+    if (overrideIcon && onOverrideIconClick) {
+      onOverrideIconClick();
+    } else {
+      setOpen(true);
+    }
+  };
   const handleClose = () => setOpen(false);
 
   const handleClick = (action: Action) => {
@@ -45,7 +47,7 @@ export default function CustomSpeedDial(props: CustomSpeedDialProps) {
       <SpeedDial
         sx={{ position: 'absolute', bottom: 16, right: 16 }}
         ariaLabel="SpeedDial tooltip example"
-        icon={<SpeedDialIcon />}
+        icon={overrideIcon ?? <MenuIcon />}
         onClose={handleClose}
         onOpen={handleOpen}
         open={open}

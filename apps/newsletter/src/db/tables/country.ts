@@ -1,13 +1,14 @@
-import { Insertable, Selectable, Kysely, Generated } from 'kysely';
+import { Insertable, Selectable, Kysely } from 'kysely';
 import { IDbTable, DbTable } from './db-table';
 import { Database } from '../db';
+import { ImmutableNumber, ImmutableString, UniqueId } from '.';
 
 export interface CountryTable {
-  id: Generated<number>;
-  code: string;
-  name: string;
-  longitude: number;
-  lattitude: number;
+  id: UniqueId;
+  code: ImmutableString;
+  name: ImmutableString;
+  longitude: ImmutableNumber;
+  lattitude: ImmutableNumber;
 }
 export type Country = Selectable<CountryTable>;
 export type NewCountry = Insertable<CountryTable>;
@@ -21,7 +22,7 @@ export class DbCountry extends DbTable implements IDbTable {
     this.db.schema
       .createTable(this.name)
       .ifNotExists()
-      .addColumn('id', 'serial', (cb) => cb.primaryKey())
+      .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
       .addColumn('code', 'varchar', (col) => col.notNull())
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('longitude', 'double precision', (col) => col.notNull())

@@ -4,11 +4,14 @@ import multer from 'multer';
 import fs from 'node:fs';
 import { NewNewsletter, Newsletter } from '../db/tables/newsletter';
 import { AthenaResponseBuilder } from '../util/response-format';
-import { NewsletterItemType, NewsletterItem, User } from '../db/tables';
+import { NewsletterItemType, NewsletterItem } from '../db/tables';
 import { Storage } from '@google-cloud/storage';
 import { parseEnv } from '../util/parse-env';
 import { Kysely, Transaction } from 'kysely';
+import { jsonObjectFrom } from 'kysely/helpers/postgres';
 import { Database } from '../db/db';
+import { ReadNewsletter, ReadNewsletterItem } from '../api';
+import { nullify } from '../util/helpers';
 
 const env = parseEnv();
 
@@ -21,16 +24,16 @@ const bucket = storage.bucket(env.gcs.bucketName);
 const upload = multer({ dest: 'photos/' });
 const router = Router();
 
-export type Item = NewsletterItem &
-  Omit<NewsletterItemType, 'id' | 'newsletterItemId'> & {
-    newsletterItemTypeId: number;
-  };
+// export type Item = NewsletterItem &
+//   Omit<NewsletterItemType, 'id' | 'newsletterItemId'> & {
+//     newsletterItemTypeId: number;
+//   };
 
-export type GetNewsletterResponse = {
-  newsletter: Newsletter;
-  members: User[];
-  items: Item[];
-};
+// export type GetNewsletterResponse = {
+//   newsletter: Newsletter;
+//   members: User[];
+//   items: Item[];
+// };
 
 interface ImageUploadRequest {
   fieldname: string;
@@ -80,6 +83,7 @@ router.post(
             .values({
               ...input,
               ownerId: req.user.userId,
+              created: new Date().toISOString(),
             })
             .returningAll()
             .executeTakeFirstOrThrow();
@@ -124,7 +128,7 @@ router.get(
         .execute();
 
       const items = await getPhotoItems(req.db, id);
-      const response = new AthenaResponseBuilder<GetNewsletterResponse>();
+      const response = new AthenaResponseBuilder<ReadNewsletter>();
       if (!newsletter) {
         response.setError(new Error(`no newsletter found with id: ${id}`));
       } else {
@@ -139,46 +143,125 @@ router.get(
   )
 );
 
+// type NewsletterItemPhotoWithLocation = Omit<
+//   NewsletterItemPhoto,
+//   'newsletterItemId' | 'locationId'
+// > & {
+//   location: Location | null;
+// };
+
+// type NewsletterItemWithDetails = NewsletterItem & {
+//   details: NewsletterItemPhotoWithLocation;
+// };
+
 const getPhotoItems = async (
   db: Kysely<Database>,
   newsletterId: number
-): Promise<Item[]> => {
+): Promise<ReadNewsletterItem[]> => {
   const items = await db
     .selectFrom('newsletterItem as ni')
-    .innerJoin('newsletterItemPhoto as nip', 'ni.id', 'nip.newsletterItemId')
-    .where('ni.newsletterId', '=', newsletterId)
-    .select([
-      'ni.id',
-      'ni.newsletterId',
-      'ni.title',
-      'ni.created',
-      'ni.modified',
-      'nip.id as newsletterItemTypeId',
-      'nip.link',
-      'nip.name',
-      'nip.caption',
-      'nip.locationId',
-      'nip.format',
-      'nip.size',
+    .select((eb) => [
+      'id',
+      'newsletterId',
+      'title',
+      'created',
+      'modified',
+      'creatorId',
+      'modifierId',
+      jsonObjectFrom(
+        eb
+          .selectFrom('newsletterItemPhoto as nip')
+          .select((eb2) => [
+            'nip.id',
+            'nip.link',
+            'nip.name',
+            'nip.name',
+            'nip.caption',
+            'nip.format',
+            'nip.size',
+            jsonObjectFrom(
+              eb2
+                .selectFrom('location as l')
+                .select([
+                  'l.id',
+                  'l.name',
+                  'l.countryCode',
+                  'l.longitude',
+                  'l.lattitude',
+                ])
+                .whereRef('nip.locationId', '=', 'l.id')
+            ).as('location'),
+          ])
+          .whereRef('nip.newsletterItemId', '=', 'ni.id')
+      ).as('details'),
     ])
+    .where('ni.newsletterId', '=', newsletterId)
     .execute();
 
+  const filteredItems = items.filter(
+    (item): item is ReadNewsletterItem =>
+      item.details !== null && item.details !== undefined
+  );
+
   return Promise.all(
-    items.map(async (item) => {
-      const [url] = await storage
-        .bucket(env.gcs.bucketName)
-        .file(item.newsletterItemTypeId.toString())
-        .getSignedUrl({
-          version: 'v4',
-          action: 'read',
-          expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-        });
+    filteredItems.map(async (item) => {
+      let link = item.details?.link;
+      if (item.details?.id) {
+        const [url] = await storage
+          .bucket(env.gcs.bucketName)
+          .file(item.details.id.toString())
+          .getSignedUrl({
+            version: 'v4',
+            action: 'read',
+            expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+          });
+        link = url;
+      }
+
       return {
         ...item,
-        link: url,
+        details: {
+          ...item.details,
+          link,
+        },
       };
     })
   );
+  // const items = await db
+  //   .selectFrom('newsletterItem as ni')
+  //   .innerJoin('newsletterItemPhoto as nip', 'ni.id', 'nip.newsletterItemId')
+  //   .where('ni.newsletterId', '=', newsletterId)
+  //   .select([
+  //     'ni.id',
+  //     'ni.title',
+  //     'ni.created',
+  //     'ni.modified',
+  //     'nip.id as newsletterItemTypeId',
+  //     'nip.link',
+  //     'nip.name',
+  //     'nip.caption',
+  //     'nip.locationId',
+  //     'nip.format',
+  //     'nip.size',
+  //   ])
+  //   .execute();
+
+  // return Promise.all(
+  //   items.map(async (item) => {
+  //     const [url] = await storage
+  //       .bucket(env.gcs.bucketName)
+  //       .file(item.newsletterItemTypeId.toString())
+  //       .getSignedUrl({
+  //         version: 'v4',
+  //         action: 'read',
+  //         expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+  //       });
+  //     return {
+  //       ...item,
+  //       link: url,
+  //     };
+  //   })
+  // );
 };
 
 router.delete(
@@ -217,6 +300,21 @@ router.post(
       const { newsletterId: _newsletterId } = req.params;
       const newsletterId = parseInt(_newsletterId);
 
+      const name = req.body.name ? req.body.name : null;
+      const date = req.body.date ? req.body.date : null;
+      const title = req.body.title ? req.body.req.body.title : null;
+      const caption = req.body.caption ? req.body.caption : null;
+      const format = req.body.format ? req.body.format : null;
+      const size = req.body.size ? parseInt(req.body.size) : null;
+      const locationName = req.body.locationName ? req.body.locationName : null;
+      const countryCode = req.body.countryCode ? req.body.countryCode : null;
+      const longitude = req.body.longitude
+        ? parseFloat(req.body.longitude)
+        : null;
+      const lattitude = req.body.lattitude
+        ? parseFloat(req.body.lattitude)
+        : null;
+
       if (!req.file) {
         res.send(
           new AthenaResponseBuilder<CreateNewsletterPhotoItemResponse>()
@@ -238,58 +336,78 @@ router.post(
         throw new Error(`no newsletter with id: ${newsletterId}`);
       }
 
-      const result = await req.db
-        .transaction()
-        .execute(async (trx: Transaction<Database>) => {
-          const newsletterItem = await trx
-            .insertInto('newsletterItem')
-            .values({
-              newsletterId,
-              title: file.originalname,
-            })
-            .returningAll()
-            .executeTakeFirstOrThrow();
-
-          const newsletterItemPhoto = await trx
-            .insertInto('newsletterItemPhoto')
-            .values({
-              newsletterItemId: newsletterItem.id,
-              link: '123',
-              name: file.originalname,
-            })
-            .returningAll()
-            .executeTakeFirstOrThrow();
-
-          // TODO: fix this so its not using my local path
-          const photoPath =
-            '/Users/isaacparsons/Documents/projects/athena/' + file.path;
-
-          try {
-            const gcsFile = (
-              await bucket.upload(photoPath, {
-                destination: newsletterItemPhoto.id.toString(),
+      try {
+        const result = await req.db
+          .transaction()
+          .execute(async (trx: Transaction<Database>) => {
+            const location = await trx
+              .insertInto('location')
+              .values({
+                countryCode: countryCode,
+                name: locationName,
+                longitude: longitude,
+                lattitude: lattitude,
               })
-            )[0];
-            console.log(gcsFile);
-            console.log(gcsFile.cloudStorageURI);
-          } catch (error) {
-            console.log(error);
-            throw error;
-          }
+              .returningAll()
+              .executeTakeFirstOrThrow();
 
-          return {
-            item: newsletterItem,
-            details: newsletterItemPhoto,
-          };
-        });
+            const newsletterItem = await trx
+              .insertInto('newsletterItem')
+              .values({
+                newsletterId,
+                title: title,
+                date: date,
+                created: new Date().toISOString(),
+                creatorId: req.user.userId,
+              })
+              .returningAll()
+              .executeTakeFirstOrThrow();
 
-      await fs.promises.unlink(file.path);
+            const newsletterItemPhoto = await trx
+              .insertInto('newsletterItemPhoto')
+              .values({
+                newsletterItemId: newsletterItem.id,
+                link: '123',
+                caption: caption,
+                name: name,
+                size: size,
+                format: format,
+                locationId: location.id,
+              })
+              .returningAll()
+              .executeTakeFirstOrThrow();
 
-      res.send(
-        new AthenaResponseBuilder<CreateNewsletterPhotoItemResponse>()
-          .setData(result)
-          .build()
-      );
+            // TODO: fix this so its not using my local path
+            const photoPath =
+              '/Users/isaacparsons/Documents/projects/athena/' + file.path;
+
+            try {
+              const gcsFile = (
+                await bucket.upload(photoPath, {
+                  destination: newsletterItemPhoto.id.toString(),
+                })
+              )[0];
+            } catch (error) {
+              console.log(error);
+              throw error;
+            }
+
+            return {
+              item: newsletterItem,
+              details: newsletterItemPhoto,
+            };
+          });
+
+        await fs.promises.unlink(file.path);
+
+        res.send(
+          new AthenaResponseBuilder<CreateNewsletterPhotoItemResponse>()
+            .setData(result)
+            .build()
+        );
+      } catch (error) {
+        console.log(error);
+      }
     }
   )
 );

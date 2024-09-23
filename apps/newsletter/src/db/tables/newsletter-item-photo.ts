@@ -1,11 +1,12 @@
-import { Insertable, Selectable, Updateable, Generated, Kysely } from 'kysely';
+import { Insertable, Selectable, Updateable, Kysely, ColumnType } from 'kysely';
 import { DbTable, IDbTable } from './db-table';
 import { Database } from '../db';
+import { UniqueId } from '.';
 
 export interface NewsletterItemPhotoTable {
-  id: Generated<number>;
-  newsletterItemId: number;
-  link: string;
+  id: UniqueId;
+  newsletterItemId: ColumnType<number, number, never>;
+  link: ColumnType<string, string, never>;
   name: string;
   caption: string | null;
   locationId: number | null;
