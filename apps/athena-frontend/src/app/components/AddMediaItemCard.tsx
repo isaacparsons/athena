@@ -1,13 +1,13 @@
 import { Box, Card, CardContent, CardMedia, IconButton } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { CreateNewsletterItemWithId } from '../../../../context/AddNewsletterItemsProvider';
+import { CreateNewsletterItemWithId } from '../context/AddNewsletterItemsProvider';
 import { useState } from 'react';
 
-import EditItemLocation from '../EditItemLocation';
-import DateInput from './components/DateInput';
-import NameInput from './components/NameInput';
-import LocationInput from './components/LocationInput';
-import { useAddNewsletterItemsDispatchContext } from '../../../../context/addNewsletterItemsContext';
+import EditItemLocation from './EditItemLocation';
+import DateInput from './common/DateInput';
+import NameInput from './common/NameInput';
+import LocationInput from './LocationInput';
+import { useAddNewsletterItemsDispatchContext } from '../context/addNewsletterItemsContext';
 
 interface AddMediaItemCardProps {
   item: CreateNewsletterItemWithId;

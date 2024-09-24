@@ -6,8 +6,10 @@ import {
   DialogContent,
   DialogTitle,
   Box,
+  CircularProgress,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import RoomIcon from '@mui/icons-material/Room';
 
 const GOOGLE_API_KEY = 'AIzaSyCQJxFCjWTq0wD0rZgKNWva92xJ2oDiuCU';
 
@@ -18,13 +20,16 @@ interface EditItemLocationProps {
 
 function EditItemLocation(props: EditItemLocationProps) {
   const { open, handleClose } = props;
+  const [loading, setLoading] = useState(false);
   const [currentLocation, setCurrentLocation] =
     useState<GeolocationCoordinates | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     window.navigator.geolocation.getCurrentPosition((position) => {
       setCurrentLocation(position.coords);
     });
+    setLoading(false);
   }, []);
 
   return (
@@ -47,7 +52,7 @@ function EditItemLocation(props: EditItemLocationProps) {
       <DialogContent>
         <Box>
           <Box sx={{ width: 400, height: 400 }}>
-            {currentLocation ? (
+            {currentLocation && !loading ? (
               <GoogleMap
                 bootstrapURLKeys={{
                   key: GOOGLE_API_KEY,
@@ -56,10 +61,19 @@ function EditItemLocation(props: EditItemLocationProps) {
                   lat: currentLocation.latitude,
                   lng: currentLocation.longitude,
                 }}
-                zoom={9}
+                zoom={12}
                 //options={createMapOptions}
-              ></GoogleMap>
-            ) : null}
+              >
+                {/* <div
+                  lat={currentLocation.latitude}
+                  lng={currentLocation.longitude}
+                >
+                  <RoomIcon />
+                </div> */}
+              </GoogleMap>
+            ) : (
+              <CircularProgress />
+            )}
           </Box>
         </Box>
       </DialogContent>

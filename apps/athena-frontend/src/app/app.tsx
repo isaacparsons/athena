@@ -3,7 +3,7 @@ import { NotificationsProvider } from '@toolpad/core/useNotifications';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import AuthProvider from './context/AuthProvider';
-import Newsletter from './pages/newsletter/Newsletter';
+import Newsletter from './pages/Newsletter';
 import { ThemeProvider } from '@emotion/react';
 import theme from '../theme';
 import { Box } from '@mui/material';

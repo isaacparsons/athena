@@ -2,20 +2,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, Container, useTheme } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import BackBtn from '../../components/BackButton';
-import CustomSpeedDial from '../../components/CustomSpeedDial';
+import BackBtn from '../components/BackButton';
+import CustomSpeedDial from '../components/CustomSpeedDial';
 import EditIcon from '@mui/icons-material/Edit';
-import NewsletterMembers from './components/NewsletterMembers';
-import NewsletterItemsList from './components/NewsletterItemsList';
-import AddMediaItemsDialog from './components/AddMediaItemsDialog';
+import NewsletterMembers from '../components/NewsletterMembers';
+import NewsletterItemsList from '../components/NewsletterItemsList';
+import AddMediaItemsDialog from '../components/AddMediaItemsDialog';
 import { ReadNewsletter } from 'types/types';
-import { useStateContext, useStateDispatchContext } from '../../context/state';
-import { AddNewsletterItemsProvider } from '../../context/AddNewsletterItemsProvider';
-import { useAPI } from '../../context/api';
+import { useStateContext, useStateDispatchContext } from '../context/state';
+import { AddNewsletterItemsProvider } from '../context/AddNewsletterItemsProvider';
+import { useAPI } from '../context/api';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ConfirmationDialog from '../../components/ConfirmationDialog';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 import { useNotifications } from '@toolpad/core';
+import { successNotificationOptions } from '../../config';
 
 export function Newsletter() {
   const { newsletterId } = useParams();
@@ -85,6 +85,7 @@ export function Newsletter() {
       return newSelectedItemIds;
     });
   };
+
   const handleToggleSelectAll = () => {
     setSelectedItemIds((prev) => {
       const newSelectedItemIds = new Set(prev);
@@ -115,10 +116,7 @@ export function Newsletter() {
     setDeletingItems(false);
     handleMakeUnSelectable();
 
-    notifications.show('Item(s) deleted!', {
-      autoHideDuration: 3000,
-      severity: 'success',
-    });
+    notifications.show('Item(s) deleted!', successNotificationOptions);
   };
 
   const handleCloseConfirmDeleteDialog = () => {
@@ -181,6 +179,7 @@ export function Newsletter() {
             />
             <NewsletterMembers members={members} />
             <NewsletterItemsList
+              onDelete={handleDeleteItemsClick}
               items={items}
               selectable={selectable}
               selectedItemIds={selectedItemIds}
@@ -188,8 +187,8 @@ export function Newsletter() {
               onToggleSelect={handleToggleSelect}
             />
             <CustomSpeedDial
-              overrideIcon={selectable ? <DeleteIcon /> : null}
-              onOverrideIconClick={handleDeleteItemsClick}
+              overrideIcon={selectable ? <CloseIcon /> : null}
+              onOverrideIconClick={handleMakeUnSelectable}
               actions={[
                 {
                   icon: <FileUploadIcon />,

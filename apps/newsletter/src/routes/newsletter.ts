@@ -302,7 +302,7 @@ router.post(
 
       const name = req.body.name ? req.body.name : null;
       const date = req.body.date ? req.body.date : null;
-      const title = req.body.title ? req.body.req.body.title : null;
+      const title = req.body.title ? req.body.title : null;
       const caption = req.body.caption ? req.body.caption : null;
       const format = req.body.format ? req.body.format : null;
       const size = req.body.size ? parseInt(req.body.size) : null;

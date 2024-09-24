@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { useAddNewsletterItemsDispatchContext } from '../../../../../context/addNewsletterItemsContext';
+import { useAddNewsletterItemsDispatchContext } from '../../context/addNewsletterItemsContext';
 import { useEffect, useState } from 'react';
 
 interface NameInputProps {

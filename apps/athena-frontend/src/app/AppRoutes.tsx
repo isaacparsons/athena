@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';
 import Home from './pages/Home';
-import Newsletter from './pages/newsletter/Newsletter';
+import Newsletter from './pages/Newsletter';
 import { useAuthContext } from './context/auth';
 
 function AppRoutes() {

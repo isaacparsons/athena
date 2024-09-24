@@ -1,9 +1,9 @@
 import { Box, MobileStepper, TextField, Typography } from '@mui/material';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSnapCarousel } from 'react-snap-carousel';
-import AddMediaItemCard from './add-media-item-card/AddMediaItemCard';
-import { useAddNewsletterItemsContext } from '../../../context/addNewsletterItemsContext';
-import { mapToArray } from '../../../../util/helpers';
+import AddMediaItemCard from './AddMediaItemCard';
+import { useAddNewsletterItemsContext } from '../context/addNewsletterItemsContext';
+import { mapToArray } from '../../util/helpers';
 
 function Carousel() {
   const { scrollRef, activePageIndex, snapPointIndexes } = useSnapCarousel();

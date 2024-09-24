@@ -11,9 +11,9 @@ import { useEffect, useState } from 'react';
 import {
   useAddNewsletterItemsContext,
   useAddNewsletterItemsDispatchContext,
-} from '../../../context/addNewsletterItemsContext';
-import { CreateNewsletterItemWithId } from '../../../context/AddNewsletterItemsProvider';
-import { useAPI } from '../../../context/api';
+} from '../context/addNewsletterItemsContext';
+import { CreateNewsletterItemWithId } from '../context/AddNewsletterItemsProvider';
+import { useAPI } from '../context/api';
 import { useNotifications } from '@toolpad/core';
 
 interface AddMediaItemsDialogProps {

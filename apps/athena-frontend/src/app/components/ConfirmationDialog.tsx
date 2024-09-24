@@ -33,7 +33,7 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCloseDialog}>Cancel</Button>
+        <Button onClick={() => onCloseDialog()}>Cancel</Button>
         {loading ? (
           <CircularProgress />
         ) : (
