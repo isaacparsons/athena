@@ -11,6 +11,7 @@ import {
 } from './tables/index';
 import { Database } from './db';
 import { IDbTable } from './tables/db-table';
+import { DbNewsletterItemText } from './tables/newsletter-item-text';
 
 export class DBClient {
   db: Kysely<Database>;
@@ -26,6 +27,7 @@ export class DBClient {
       new DbUserNewsletter(this.db, 'userNewsletter'),
       new DbNewsletterItem(this.db, 'newsletterItem'),
       new DbNewsletterItemPhoto(this.db, 'newsletterItemPhoto'),
+      new DbNewsletterItemText(this.db, 'newsletterItemText'),
     ];
   }
   async createTables() {
