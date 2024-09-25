@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import NewsletterCard from './NewsletterCard';
+import NewsletterCard from '../components/NewsletterCard';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

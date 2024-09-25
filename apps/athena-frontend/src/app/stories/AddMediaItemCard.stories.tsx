@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import AddMediaItemCard from './AddMediaItemCard';
+import AddMediaItemCard from '../components/AddMediaItemCard';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

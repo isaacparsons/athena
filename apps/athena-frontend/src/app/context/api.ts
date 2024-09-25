@@ -2,6 +2,7 @@ import axios from 'axios';
 import { createContext, useContext } from 'react';
 import {
   AthenaResponse,
+  CreateNewsletter,
   CreateUser,
   ReadNewsletter,
   ReadNewsletters,
@@ -12,7 +13,7 @@ import {
 
 axios.defaults.withCredentials = true;
 
-export type CreateEntity = CreateUser;
+export type CreateEntity = CreateUser | CreateNewsletter;
 export type ReadEntity = ReadUser | ReadNewsletters | ReadNewsletter;
 export type UpdateEntity = UpdateUser | UpdateNewsletter;
 

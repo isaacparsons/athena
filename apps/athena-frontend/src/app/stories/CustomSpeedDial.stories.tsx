@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import CustomSpeedDial from './CustomSpeedDial';
+import CustomSpeedDial from '../components/CustomSpeedDial';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

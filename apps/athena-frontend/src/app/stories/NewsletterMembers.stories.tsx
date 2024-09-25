@@ -1,28 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { AuthProvider } from './AuthProvider';
+import NewsletterMembers from '../components/NewsletterMembers';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
-const meta: Meta<typeof AuthProvider> = {
-  component: AuthProvider,
-  title: 'AuthProvider',
+const meta: Meta<typeof NewsletterMembers> = {
+  component: NewsletterMembers,
+  title: 'NewsletterMembers',
 };
 export default meta;
-type Story = StoryObj<typeof AuthProvider>;
+type Story = StoryObj<typeof NewsletterMembers>;
 
 export const Primary = {
   args: {
-    children: '',
+    members: '',
   },
 };
 
 export const Heading: Story = {
   args: {
-    children: '',
+    members: '',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByText(/Welcome to AuthProvider!/gi)).toBeTruthy();
+    expect(canvas.getByText(/Welcome to NewsletterMembers!/gi)).toBeTruthy();
   },
 };

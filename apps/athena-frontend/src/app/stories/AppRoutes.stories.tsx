@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import AppRoutes from './AppRoutes';
+import AppRoutes from '../AppRoutes';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

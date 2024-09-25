@@ -35,14 +35,14 @@ function NewsletterCard(props: NewsletterCardProps) {
 
   return (
     <ListItem>
-      <Card>
+      <Card sx={{ width: '100%' }}>
         <CardActionArea onClick={() => onClick()}>
           <CardContent>
             <Typography gutterBottom variant="h4" component="div">
               {newsletter.name}
             </Typography>
             <CustomHorizontalBox>
-              <CalendarMonthIcon />
+              {formattedDate && <CalendarMonthIcon />}
               <Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
                 {formattedDate}
               </Typography>

@@ -1,30 +1,33 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import NameInput from './NameInput';
+import DateInput from '../components/common/DateInput';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
-const meta: Meta<typeof NameInput> = {
-  component: NameInput,
-  title: 'NameInput',
+const meta: Meta<typeof DateInput> = {
+  component: DateInput,
+  title: 'DateInput',
+  argTypes: {
+    onChange: { action: 'onChange executed!' },
+  },
 };
 export default meta;
-type Story = StoryObj<typeof NameInput>;
+type Story = StoryObj<typeof DateInput>;
 
 export const Primary = {
   args: {
     id: 0,
-    name: '',
+    date: '',
   },
 };
 
 export const Heading: Story = {
   args: {
     id: 0,
-    name: '',
+    date: '',
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByText(/Welcome to NameInput!/gi)).toBeTruthy();
+    expect(canvas.getByText(/Welcome to DateInput!/gi)).toBeTruthy();
   },
 };

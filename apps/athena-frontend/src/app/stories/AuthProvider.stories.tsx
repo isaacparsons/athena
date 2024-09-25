@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { StateProvider } from './StateProvider';
+import { AuthProvider } from '../context/AuthProvider';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
-const meta: Meta<typeof StateProvider> = {
-  component: StateProvider,
-  title: 'StateProvider',
+const meta: Meta<typeof AuthProvider> = {
+  component: AuthProvider,
+  title: 'AuthProvider',
 };
 export default meta;
-type Story = StoryObj<typeof StateProvider>;
+type Story = StoryObj<typeof AuthProvider>;
 
 export const Primary = {
   args: {
@@ -23,6 +23,6 @@ export const Heading: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByText(/Welcome to StateProvider!/gi)).toBeTruthy();
+    expect(canvas.getByText(/Welcome to AuthProvider!/gi)).toBeTruthy();
   },
 };

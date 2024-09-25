@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { AddNewsletterItemsProvider } from './AddNewsletterItemsProvider';
+import { AddNewsletterItemsProvider } from '../context/AddNewsletterItemsProvider';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

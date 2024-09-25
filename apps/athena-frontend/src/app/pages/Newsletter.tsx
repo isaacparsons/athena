@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, Container, useTheme } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import BackBtn from '../components/BackButton';
+import BackBtn from '../components/common/BackButton';
 import CustomSpeedDial from '../components/CustomSpeedDial';
 import EditIcon from '@mui/icons-material/Edit';
 import NewsletterMembers from '../components/NewsletterMembers';

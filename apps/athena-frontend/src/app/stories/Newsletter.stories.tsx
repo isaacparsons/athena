@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Carousel from './Carousel';
+import Newsletter from '../pages/Newsletter';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
-const meta: Meta<typeof Carousel> = {
-  component: Carousel,
-  title: 'Carousel',
+const meta: Meta<typeof Newsletter> = {
+  component: Newsletter,
+  title: 'Newsletter',
 };
 export default meta;
-type Story = StoryObj<typeof Carousel>;
+type Story = StoryObj<typeof Newsletter>;
 
 export const Primary = {
   args: {},
@@ -19,6 +19,6 @@ export const Heading: Story = {
   args: {},
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByText(/Welcome to Carousel!/gi)).toBeTruthy();
+    expect(canvas.getByText(/Welcome to Newsletter!/gi)).toBeTruthy();
   },
 };

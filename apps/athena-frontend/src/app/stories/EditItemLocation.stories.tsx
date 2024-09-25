@@ -1,33 +1,31 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import AddMediaItemsDialog from './AddMediaItemsDialog';
+import EditItemLocation from '../components/EditItemLocation';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
-const meta: Meta<typeof AddMediaItemsDialog> = {
-  component: AddMediaItemsDialog,
-  title: 'AddMediaItemsDialog',
+const meta: Meta<typeof EditItemLocation> = {
+  component: EditItemLocation,
+  title: 'EditItemLocation',
   argTypes: {
     handleClose: { action: 'handleClose executed!' },
   },
 };
 export default meta;
-type Story = StoryObj<typeof AddMediaItemsDialog>;
+type Story = StoryObj<typeof EditItemLocation>;
 
 export const Primary = {
   args: {
-    open: false,
-    newsletterId: 0,
+    open: true,
   },
 };
 
 export const Heading: Story = {
   args: {
     open: false,
-    newsletterId: 0,
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByText(/Welcome to AddMediaItemsDialog!/gi)).toBeTruthy();
+    expect(canvas.getByText(/Welcome to EditItemLocation!/gi)).toBeTruthy();
   },
 };

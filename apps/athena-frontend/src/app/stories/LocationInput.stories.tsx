@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import LocationInput from './LocationInput';
+import LocationInput from '../components/LocationInput';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

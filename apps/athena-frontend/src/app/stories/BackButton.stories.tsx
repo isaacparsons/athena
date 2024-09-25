@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import BackButton from './BackButton';
+import BackButton from '../components/common/BackButton';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

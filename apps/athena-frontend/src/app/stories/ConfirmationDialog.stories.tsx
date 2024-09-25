@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ConfirmationDialog from './ConfirmationDialog';
+import ConfirmationDialog from '../components/ConfirmationDialog';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';

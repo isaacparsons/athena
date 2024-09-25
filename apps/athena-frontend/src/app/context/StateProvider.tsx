@@ -24,12 +24,6 @@ export type State = {
   newsletterMembers: Map<number, User>;
 };
 
-type CreateNewsletterAction = {
-  entityType: 'newsletter';
-  action: 'created';
-  payload: Newsletter;
-};
-
 type FetchNewslettersAction = {
   entityType: 'newsletters';
   action: 'fetched';
@@ -76,7 +70,6 @@ type FetchedNewsletterAction = {
 };
 
 export type Actions =
-  | CreateNewsletterAction
   | CreateNewsletterItemsAction
   | ReadUserAction
   | ReadNewsletterAction
@@ -100,20 +93,6 @@ export function stateReducer(prevState: State, action: Actions): State {
       });
     });
     return newState;
-  } else if (
-    action.entityType === 'newsletter' &&
-    action.action === 'created'
-  ) {
-    const newsletters = prevState.newsletters;
-    newsletters.set(action.payload.id, {
-      ...action.payload,
-      itemIds: [],
-    });
-
-    return {
-      ...prevState,
-      newsletters,
-    };
   } else if (
     action.entityType === 'newsletter' &&
     action.action === 'fetched'

@@ -1,24 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { App } from './App';
+import { APIProvider } from '../context/APIProvider';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 
-const meta: Meta<typeof App> = {
-  component: App,
-  title: 'App',
+const meta: Meta<typeof APIProvider> = {
+  component: APIProvider,
+  title: 'APIProvider',
 };
 export default meta;
-type Story = StoryObj<typeof App>;
+type Story = StoryObj<typeof APIProvider>;
 
 export const Primary = {
-  args: {},
+  args: {
+    children: '',
+  },
 };
 
 export const Heading: Story = {
-  args: {},
+  args: {
+    children: '',
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByText(/Welcome to App!/gi)).toBeTruthy();
+    expect(canvas.getByText(/Welcome to APIProvider!/gi)).toBeTruthy();
   },
 };
