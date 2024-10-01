@@ -25,10 +25,17 @@ export class GCSManager {
     return url;
   }
 
-  async uploadPhoto(photoPath: string, id: number) {
+  async uploadPhoto(photoPath: string, name: string) {
     return (
       await this.bucket.upload(photoPath, {
-        destination: id.toString(),
+        destination: name,
+      })
+    )[0];
+  }
+  async uploadVideo(path: string, name: string) {
+    return (
+      await this.bucket.upload(path, {
+        destination: name,
       })
     )[0];
   }

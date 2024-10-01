@@ -11,8 +11,8 @@ function checkEnvVariable(name: string, value: string | undefined) {
 }
 
 export function parseEnv() {
-  const APP_HOST = process.env.APP_HOST ?? 'localhost';
-  const APP_PORT = process.env.APP_PORT ? Number(process.env.APP_PORT) : 3000;
+  const API_HOST = process.env.API_HOST ?? 'localhost';
+  const API_PORT = process.env.API_PORT ? Number(process.env.API_PORT) : 3000;
   const APP_SESSION_SECRET = process.env.APP_SESSION_SECRET ?? '123456789';
 
   const DB_HOST = checkEnvVariable('DB_HOST', process.env.DB_HOST);
@@ -49,12 +49,15 @@ export function parseEnv() {
     process.env.GOOGLE_STORAGE_BUCKET_NAME
   );
 
+  const ADMIN_SECRET = process.env.ADMIN_SECRET;
+
   return {
     app: {
-      host: APP_HOST,
-      port: APP_PORT,
+      host: API_HOST,
+      port: API_PORT,
       sessionSecret: APP_SESSION_SECRET,
       sessionCookieName: APP_SESSION_COOKIE_NAME,
+      adminSecret: ADMIN_SECRET,
     },
     db: {
       host: DB_HOST,

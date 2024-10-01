@@ -1,20 +1,19 @@
 import { Box, Card, CardContent, CardMedia, IconButton } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { CreateNewsletterItemWithId } from '../context/AddNewsletterItemsProvider';
 import { useState } from 'react';
 
-import EditItemLocation from './EditItemLocation';
-import DateInput from './common/DateInput';
-import NameInput from './common/NameInput';
-import LocationInput from './LocationInput';
-import { useAddNewsletterItemsDispatchContext } from '../context/addNewsletterItemsContext';
+import { EditItemLocation, DateInput, NameInput, LocationInput } from './index';
+import {
+  useAddNewsletterItemsDispatchContext,
+  CreateNewsletterItemWithId,
+} from '../context/index';
 
 interface AddMediaItemCardProps {
   item: CreateNewsletterItemWithId;
   isSnapPoint: boolean;
 }
 
-function AddMediaItemCard(props: AddMediaItemCardProps) {
+export function AddMediaItemCard(props: AddMediaItemCardProps) {
   const { item, isSnapPoint } = props;
   const addNewsletterItemsDispatchContext =
     useAddNewsletterItemsDispatchContext();
@@ -91,5 +90,3 @@ function AddMediaItemCard(props: AddMediaItemCardProps) {
     );
   }
 }
-
-export default AddMediaItemCard;

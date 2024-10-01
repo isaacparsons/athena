@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useContext } from 'react';
-import { StateContext, StateDispatchContext } from './StateProvider';
+import { StateContext, StateDispatchContext } from './index';
 
 axios.defaults.withCredentials = true;
 

@@ -1,13 +1,4 @@
-import { Route, Routes, Link } from 'react-router-dom';
-import {
-  AppBar,
-  Toolbar,
-  BoxProps,
-  IconButton,
-  Button,
-  Typography,
-  Box,
-} from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 interface AppbarProps {
@@ -37,5 +28,3 @@ export function Appbar(props: AppbarProps) {
     </AppBar>
   );
 }
-
-export default Appbar;

@@ -6,7 +6,7 @@ interface CustomHorizontalBoxProps {
   sx?: any;
 }
 
-function CustomHorizontalBox(props: CustomHorizontalBoxProps) {
+export function CustomHorizontalBox(props: CustomHorizontalBoxProps) {
   const { children, sx } = props;
   return (
     <Box display="flex" flexDirection="row" alignItems="center" sx={sx}>
@@ -14,5 +14,3 @@ function CustomHorizontalBox(props: CustomHorizontalBoxProps) {
     </Box>
   );
 }
-
-export default CustomHorizontalBox;

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   SignInPage,
   AppProvider,
@@ -19,7 +18,7 @@ const BRANDING = {
   title: 'Athena',
 };
 
-export default function Login() {
+export function Login() {
   return (
     <AppProvider branding={BRANDING}>
       <SignInPage

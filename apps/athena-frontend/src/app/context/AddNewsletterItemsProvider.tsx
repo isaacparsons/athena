@@ -1,61 +1,29 @@
 import { createContext, useReducer } from 'react';
-import { CreateNewsletterItem } from 'types/types';
+import { CreateNewsletterItemInput } from '../types';
 import { addArrayItemsToMap } from '../../util/helpers';
 
-export type CreateNewsletterItemWithId = CreateNewsletterItem & {
-  id: number;
-  file: File;
-};
-
-export type AddNewsletterItemsState = Map<number, CreateNewsletterItemWithId>;
+export type AddNewsletterItemsState = Map<number, CreateNewsletterItemInput>;
 
 type NewsletterItemsAddedAction = {
-  entityType: 'newsletter-items';
-  action: 'added';
-  payload: CreateNewsletterItemWithId[];
+  type: 'added';
+  payload: CreateNewsletterItemInput | CreateNewsletterItemInput[];
 };
 
 type NewsletterItemRemovedAction = {
-  entityType: 'newsletter-item';
-  action: 'removed';
-  payload: number;
+  type: 'removed';
+  key: number;
 };
 
-type NewsletterItemNameUpdatedAction = {
-  entityType: 'newsletter-item';
-  action: 'name-updated';
-  id: number;
-  payload: string;
-};
-
-type NewsletterItemCaptionUpdatedAction = {
-  entityType: 'newsletter-item';
-  action: 'caption-updated';
-  id: number;
-  payload: string | null;
-};
-
-type NewsletterItemDateUpdatedAction = {
-  entityType: 'newsletter-item';
-  action: 'date-updated';
-  id: number;
-  payload: string | null;
-};
-
-type NewsletterItemLocationUpdatedAction = {
-  entityType: 'newsletter-item';
-  action: 'location-updated';
-  id: number;
-  payload: string;
+type NewsletterItemUpdatedAction = {
+  type: 'updated';
+  key: number;
+  payload: CreateNewsletterItemInput;
 };
 
 export type Actions =
   | NewsletterItemsAddedAction
   | NewsletterItemRemovedAction
-  | NewsletterItemNameUpdatedAction
-  | NewsletterItemDateUpdatedAction
-  | NewsletterItemCaptionUpdatedAction
-  | NewsletterItemLocationUpdatedAction;
+  | NewsletterItemUpdatedAction;
 
 type Reducer<S, A> = (prevState: S, action: A) => S;
 
@@ -63,12 +31,12 @@ export function addNewsletterItemsReducer(
   prevState: AddNewsletterItemsState,
   action: Actions
 ): AddNewsletterItemsState {
-  if (action.entityType === 'newsletter-items' && action.action === 'added') {
+  if (action.entityType === 'newsletter-items' && action.type === 'added') {
     const newState = addArrayItemsToMap(action.payload, prevState);
     return newState;
   } else if (
     action.entityType === 'newsletter-item' &&
-    action.action === 'name-updated'
+    action.type === 'name-updated'
   ) {
     const newState = new Map(prevState);
     const item = prevState.get(action.id);
@@ -85,7 +53,7 @@ export function addNewsletterItemsReducer(
     return newState;
   } else if (
     action.entityType === 'newsletter-item' &&
-    action.action === 'date-updated'
+    action.type === 'date-updated'
   ) {
     const newState = new Map(prevState);
     const item = prevState.get(action.id);
@@ -102,7 +70,7 @@ export function addNewsletterItemsReducer(
     return newState;
   } else if (
     action.entityType === 'newsletter-item' &&
-    action.action === 'removed'
+    action.type === 'removed'
   ) {
     const newState = new Map(prevState);
     newState.delete(action.payload);
@@ -113,7 +81,7 @@ export function addNewsletterItemsReducer(
   }
 }
 
-export type Props = {
+export type AddNewsletterItemsProviderProps = {
   children: React.ReactNode;
 };
 
@@ -125,7 +93,9 @@ export const AddNewsletterItemsDispatchContext = createContext<
   React.Dispatch<Actions>
 >(() => null);
 
-export function AddNewsletterItemsProvider(props: Props) {
+export function AddNewsletterItemsProvider(
+  props: AddNewsletterItemsProviderProps
+) {
   const { children } = props;
   const [state, dispatch] = useReducer<
     Reducer<AddNewsletterItemsState, Actions>,

@@ -18,7 +18,7 @@ interface EditItemLocationProps {
   handleClose: () => void;
 }
 
-function EditItemLocation(props: EditItemLocationProps) {
+export function EditItemLocation(props: EditItemLocationProps) {
   const { open, handleClose } = props;
   const [loading, setLoading] = useState(false);
   const [currentLocation, setCurrentLocation] =
@@ -84,5 +84,3 @@ function EditItemLocation(props: EditItemLocationProps) {
     </Dialog>
   );
 }
-
-export default EditItemLocation;

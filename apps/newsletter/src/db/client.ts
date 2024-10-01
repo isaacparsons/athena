@@ -1,33 +1,57 @@
-import { Kysely } from 'kysely';
 import {
-  DbCountry,
-  DbUserNewsletter,
-  DbNewsletter,
-  DbUser,
-  DbFederatedCredential,
-  DbLocation,
-  DbNewsletterItem,
-  DbNewsletterItemPhoto,
-} from './tables/index';
-import { Database } from './db';
-import { IDbTable } from './tables/db-table';
-import { DbNewsletterItemText } from './tables/newsletter-item-text';
+  CountryTable,
+  UserNewsletterTable,
+  NewsletterTable,
+  UserTable,
+  FederatedCredentialTable,
+  LocationTable,
+  NewsletterItemTable,
+  NewsletterItemPhotoTable,
+  NewsletterItemTextTable,
+  NewsletterItemVideoTable,
+} from '../db/tables';
+import {
+  ITable,
+  Connection as DBConnection,
+  PostgresDialect,
+  Pool,
+  DB,
+  Database,
+} from '../types/db';
+import { NewsletterDAO } from '../dao/newsletter';
+import { parseEnv } from '../util/parse-env';
 
-export class DBClient {
-  db: Kysely<Database>;
-  tables: IDbTable[];
-  constructor(db: Kysely<Database>) {
-    this.db = db;
+const env = process.env as any; //parseEnv();
+
+const dialect = new PostgresDialect({
+  pool: new Pool({
+    database: env['DB_NAME'],
+    host: env['DB_HOST'],
+    user: env['DB_USERNAME'],
+    password: env['DB_PASSWORD'],
+    port: env['DB_PORT'],
+    max: 10,
+  }),
+});
+
+export const dbClient = new DB<Database>({
+  dialect,
+});
+
+export class DBManagerClient {
+  tables: ITable[];
+  constructor() {
     this.tables = [
-      new DbLocation(this.db, 'location'),
-      new DbCountry(this.db, 'country'),
-      new DbUser(this.db, 'user'),
-      new DbFederatedCredential(this.db, 'federatedCredential'),
-      new DbNewsletter(this.db, 'newsletter'),
-      new DbUserNewsletter(this.db, 'userNewsletter'),
-      new DbNewsletterItem(this.db, 'newsletterItem'),
-      new DbNewsletterItemPhoto(this.db, 'newsletterItemPhoto'),
-      new DbNewsletterItemText(this.db, 'newsletterItemText'),
+      new LocationTable(dbClient, 'location'),
+      new CountryTable(dbClient, 'country'),
+      new UserTable(dbClient, 'user'),
+      new FederatedCredentialTable(dbClient, 'federatedCredential'),
+      new NewsletterTable(dbClient, 'newsletter'),
+      new UserNewsletterTable(dbClient, 'userNewsletter'),
+      new NewsletterItemTable(dbClient, 'newsletterItem'),
+      new NewsletterItemPhotoTable(dbClient, 'newsletterItemPhoto'),
+      new NewsletterItemVideoTable(dbClient, 'newsletterItemVideo'),
+      new NewsletterItemTextTable(dbClient, 'newsletterItemText'),
     ];
   }
   async createTables() {
@@ -40,5 +64,28 @@ export class DBClient {
     for (let i = 0; i < this.tables.length; i++) {
       await this.tables[i].deleteTable();
     }
+  }
+
+  async seed() {
+    console.log('seeding...');
+    const user = await dbClient
+      .insertInto('user')
+      .values({
+        firstName: 'SUPER',
+        lastName: 'USER',
+        email: 'isaac.2962@gmail.com',
+      })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+
+    console.log('user created!');
+    console.log(user);
+    // const newsletter = await new NewsletterDAO(dbClient).post({
+    //   name: 'Test newsletter 1',
+    //   startDate: new Date(2024, 1, 1).toISOString(),
+    //   endDate: new Date(2024, 1, 30).toISOString(),
+    // });
+    // console.log('newsletter created!');
+    // console.log(newsletter);
   }
 }

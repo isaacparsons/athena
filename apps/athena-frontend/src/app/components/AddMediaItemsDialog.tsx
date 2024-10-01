@@ -6,15 +6,15 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import Carousel from './Carousel';
 import { useEffect, useState } from 'react';
+import { useNotifications } from '@toolpad/core';
+import { Carousel } from '../components/index';
 import {
+  useAPI,
+  CreateNewsletterItemWithId,
   useAddNewsletterItemsContext,
   useAddNewsletterItemsDispatchContext,
-} from '../context/addNewsletterItemsContext';
-import { CreateNewsletterItemWithId } from '../context/AddNewsletterItemsProvider';
-import { useAPI } from '../context/api';
-import { useNotifications } from '@toolpad/core';
+} from '../context/index';
 
 interface AddMediaItemsDialogProps {
   open: boolean;
@@ -69,7 +69,7 @@ const items: CreateNewsletterItemWithId[] = [
   },
 ];
 
-export default function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
+export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
   const { open, handleClose, newsletterId } = props;
   const api = useAPI();
   const addNewsletterItemsDispatch = useAddNewsletterItemsDispatchContext();

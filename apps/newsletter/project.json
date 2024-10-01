@@ -53,6 +53,40 @@
           "buildTarget": "newsletter:build:production"
         }
       }
+    },
+    "db": {
+      "executor": "nx:run-commands",
+      "configurations": {
+        "start": {
+          "commands": [
+            "docker-compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml up -d"
+          ]
+        },
+        "stop": {
+          "commands": [
+            "docker-compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml down"
+          ]
+        },
+        "destroy": {
+          "commands": [
+            "docker-compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml down -v"
+          ]
+        },
+        "reset": {
+          "commands": ["nx run newsletter:db:destroy && nx newsletter:db:start"]
+        },
+        "create-tables": {
+          "commands": ["npx tsx apps/newsletter/src/scripts/create-tables.ts"]
+        },
+        "seed": {
+          "commands": ["npx tsx apps/newsletter/src/scripts/seed.ts"]
+        },
+        "init": {
+          "commands": [
+            "nx run newsletter:db:start  && nx run newsletter:db:create-tables && nx run newsletter:db:seed"
+          ]
+        }
+      }
     }
   }
 }

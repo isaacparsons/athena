@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
-import { User } from 'types/types';
+import { ReadUser } from '../types';
 
-export const AuthContext = createContext<User | null>(null);
+export const AuthContext = createContext<ReadUser | null>(null);
 
 export const useAuthContext = () => {
   return useContext(AuthContext);

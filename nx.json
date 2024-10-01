@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
@@ -15,16 +18,25 @@
       "!{projectRoot}/.storybook/**/*",
       "!{projectRoot}/tsconfig.storybook.json"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml"
+    ]
   },
   "targetDefaults": {
     "@nx/esbuild:esbuild": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "e2e-ci--**/*": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     }
   },
   "plugins": [
@@ -39,7 +51,18 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/newsletter-e2e/**/*"]
+      "exclude": [
+        "apps/newsletter-e2e/**/*"
+      ]
+    },
+    {
+      "plugin": "@nx/jest/plugin",
+      "include": [
+        "apps/newsletter/**/*"
+      ],
+      "options": {
+        "targetName": "backend-test"
+      }
     },
     {
       "plugin": "@nx/webpack/plugin",

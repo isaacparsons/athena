@@ -5,7 +5,7 @@ interface CustomFabProps {
   onClick: () => void;
 }
 
-export default function CustomFab(props: CustomFabProps) {
+export function CustomFab(props: CustomFabProps) {
   const { onClick } = props;
   return (
     <Fab

@@ -5,7 +5,7 @@ interface BackButtonProps {
   onClick: () => void;
 }
 
-export default function BackButton(props: BackButtonProps) {
+export function BackButton(props: BackButtonProps) {
   return (
     <Button
       onClick={props.onClick}

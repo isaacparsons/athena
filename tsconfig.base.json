@@ -15,7 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "strictNullChecks": true,
-    "paths": {}
+    "paths": {
+      "@athena/api": ["apps/newsletter/src/types/api.ts"],
+      "@athena/util": ["util/*.ts"],
+      "@athena/backend": ["apps/newsletter/src/main.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

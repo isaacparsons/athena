@@ -1,14 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import { Button, Box, Container } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Appbar, Newsletters } from '../components/index';
-import { useAuthContext } from '../context/auth';
-import CustomFab from '../components/common/CustomFab';
 import { useEffect, useMemo, useState } from 'react';
-import AddNewsletterDialog from '../components/AddNewsletterDialog';
-import { useAPI } from '../context/api';
-import { useStateContext, useStateDispatchContext } from '../context/state';
-import { ReadNewsletters } from 'types/types';
+import {
+  AddNewsletterDialog,
+  CustomFab,
+  Appbar,
+  Newsletters,
+} from '../components/index';
+import {
+  useStateContext,
+  useStateDispatchContext,
+  useAPI,
+  useAuthContext,
+} from '../context/index';
+import { ReadUserNewsletter } from '../types';
 
 export function Home() {
   const navigate = useNavigate();
@@ -21,10 +27,10 @@ export function Home() {
 
   const getNewsletters = async () => {
     setLoading(true);
-    const response = await api.read<ReadNewsletters>(`/newsletters`);
+    const response = await api.read<ReadUserNewsletter[]>(`/users/newsletters`);
     dispatch({
       entityType: 'newsletters',
-      action: 'fetched',
+      type: 'fetched',
       payload: response ?? [],
     });
     setLoading(false);
@@ -74,5 +80,3 @@ export function Home() {
     </Box>
   );
 }
-
-export default Home;

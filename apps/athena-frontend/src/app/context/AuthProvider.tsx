@@ -1,22 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
-import { User } from 'types/types';
+import { ReadUser } from '../types';
 import Cookies from 'js-cookie';
-import { useAPI } from './api';
-import { AuthContext } from './auth';
+import { AuthContext, useAPI } from './index';
 import { useNavigate } from 'react-router-dom';
 
 const SESSION_COOKIE_NAME = 'newsletter_session';
 
-export type Props = {
+export type AuthProviderProps = {
   children: React.ReactNode;
 };
 
-function AuthProvider(props: Props) {
+export function AuthProvider(props: AuthProviderProps) {
   const { children } = props;
   const api = useAPI();
   const navigate = useNavigate();
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<ReadUser | null>(null);
 
   const checkSession = useCallback(async () => {
     const sessionId = Cookies.get(SESSION_COOKIE_NAME);
@@ -24,7 +23,7 @@ function AuthProvider(props: Props) {
       navigate('/login');
     }
     if (sessionId && !user) {
-      const response = await api.read<User>(`/users/`);
+      const response = await api.read<ReadUser>(`/users/`);
       setUser(response);
     }
   }, [api, navigate, user]);
@@ -35,5 +34,3 @@ function AuthProvider(props: Props) {
 
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 }
-
-export default AuthProvider;

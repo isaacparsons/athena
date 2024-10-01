@@ -14,7 +14,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
-import { ReadNewsletterItem } from 'types/types';
+import { ReadNewsletterItem } from '../types';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface NewsletterItemsListProps {
@@ -26,7 +26,7 @@ interface NewsletterItemsListProps {
   onDelete: () => void;
 }
 
-export default function NewsletterItemsList(props: NewsletterItemsListProps) {
+export function NewsletterItemsList(props: NewsletterItemsListProps) {
   const {
     items,
     selectable,
@@ -118,11 +118,11 @@ function NewsletterItem(props: NewsletterItemProps) {
           />
         </Box>
 
-        <CardMedia component="img" image={`${item.details.link}`} />
+        {/* <CardMedia component="img" image={`${item.details.link}`} /> */}
         <CardContent>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {/* <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {item.details.caption}
-          </Typography>
+          </Typography> */}
         </CardContent>
       </Card>
       {/* <Box component="img" sx={{ height: 200 }} src={`${item.link}`} /> */}

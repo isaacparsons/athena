@@ -1,8 +1,7 @@
-import { Box, SpeedDial, SpeedDialIcon, SpeedDialAction } from '@mui/material';
+import { Box, SpeedDial, SpeedDialAction } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
 import { ReactNode, useState } from 'react';
-import { red } from '@mui/material/colors';
 
 interface Action {
   icon: ReactNode;
@@ -16,7 +15,7 @@ interface CustomSpeedDialProps {
   onOverrideIconClick?: () => void;
 }
 
-export default function CustomSpeedDial(props: CustomSpeedDialProps) {
+export function CustomSpeedDial(props: CustomSpeedDialProps) {
   const { actions, overrideIcon, onOverrideIconClick } = props;
   const [open, setOpen] = useState(false);
   const handleOpen = () => {

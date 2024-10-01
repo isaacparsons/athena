@@ -1,7 +1,7 @@
 import { List } from '@mui/material';
-import { Newsletter } from 'types/types';
+import { Newsletter } from '../types';
 import { useNavigate } from 'react-router-dom';
-import NewsletterCard from './NewsletterCard';
+import { NewsletterCard } from './index';
 
 interface NewslettersProps {
   newsletters: Newsletter[];

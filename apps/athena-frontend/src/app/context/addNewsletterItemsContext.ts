@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import {
   AddNewsletterItemsContext,
   AddNewsletterItemsDispatchContext,
-} from './AddNewsletterItemsProvider';
+} from './index';
 
 export const useAddNewsletterItemsContext = () => {
   return useContext(AddNewsletterItemsContext);

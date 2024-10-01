@@ -1,8 +1,12 @@
 import { useNotifications } from '@toolpad/core';
 import axios from 'axios';
-import { UpdateEntity } from './api';
-import { APIContext, IAPIClient, CreateEntity, ReadEntity } from './api';
-import { AthenaResponse } from 'types/types';
+import { APIContext, IAPIClient } from './index';
+import {
+  CreateEntityInput,
+  AthenaResponse,
+  UpdateEntityInput,
+  ReadEntity,
+} from '../types';
 
 axios.defaults.withCredentials = true;
 
@@ -10,11 +14,24 @@ const API_HOST = 'http://localhost';
 const API_PORT = 3000;
 const host = `${API_HOST}:${API_PORT}/v1`;
 
-export type Props = {
+const devHeaders = {
+  'admin-secret': '123456',
+};
+
+const createRequestConfig = (config?: { headers?: object }) => {
+  return {
+    headers: {
+      ...config?.headers,
+      ...devHeaders,
+    },
+  };
+};
+
+export type APIProviderProps = {
   children: React.ReactNode;
 };
 
-function APIProvider(props: Props) {
+export function APIProvider(props: APIProviderProps) {
   const { children } = props;
   const notifications = useNotifications();
 
@@ -30,9 +47,9 @@ function APIProvider(props: Props) {
       const result = await axios.post<AthenaResponse>(
         `${host}${path}`,
         formData,
-        {
+        createRequestConfig({
           headers: { 'content-type': 'multipart/form-data' },
-        }
+        })
       );
       const data = result.data;
       if (data.error) {
@@ -40,19 +57,28 @@ function APIProvider(props: Props) {
         showError('Unable to upload');
       }
     },
-    async create<T extends CreateEntity>(
+    async create<T extends CreateEntityInput>(
       path: string,
       entity: T
     ): Promise<void> {
-      const result = await axios.post<AthenaResponse>(`${host}${path}`, entity);
+      const result = await axios.post<AthenaResponse>(
+        `${host}${path}`,
+        entity,
+        createRequestConfig()
+      );
       const data = result.data;
       if (data.error) {
         console.error(`API error: :${data.error}`);
         showError('Unable to create');
       }
     },
-    async read<T extends ReadEntity>(path: string): Promise<T | null> {
-      const result = await axios.get<AthenaResponse<T>>(`${host}${path}`);
+    async read<T extends ReadEntity | ReadEntity[]>(
+      path: string
+    ): Promise<T | null> {
+      const result = await axios.get<AthenaResponse<T>>(
+        `${host}${path}`,
+        createRequestConfig()
+      );
       const data = result.data;
       if (data.error) {
         console.error(`API error: :${data.error}`);
@@ -60,11 +86,15 @@ function APIProvider(props: Props) {
       }
       return data.data;
     },
-    async update<T extends UpdateEntity>(
+    async update<T extends UpdateEntityInput>(
       path: string,
       entity: T
     ): Promise<void> {
-      const result = await axios.put<AthenaResponse>(`${host}${path}`, entity);
+      const result = await axios.put<AthenaResponse>(
+        `${host}${path}`,
+        entity,
+        createRequestConfig()
+      );
       const data = result.data;
       if (data.error) {
         console.error(`API error: :${data.error}`);
@@ -72,7 +102,10 @@ function APIProvider(props: Props) {
       }
     },
     async delete(path: string): Promise<void> {
-      const result = await axios.delete<AthenaResponse>(`${host}${path}`);
+      const result = await axios.delete<AthenaResponse>(
+        `${host}${path}`,
+        createRequestConfig()
+      );
       const data = result.data;
       if (data.error) {
         console.error(`API error: :${data.error}`);
@@ -87,5 +120,3 @@ function APIProvider(props: Props) {
     </APIContext.Provider>
   );
 }
-
-export default APIProvider;

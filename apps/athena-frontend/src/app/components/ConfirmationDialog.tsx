@@ -17,7 +17,7 @@ interface ConfirmationDialogProps {
   content: string;
 }
 
-export default function ConfirmationDialog(props: ConfirmationDialogProps) {
+export function ConfirmationDialog(props: ConfirmationDialogProps) {
   const { open, onCloseDialog, onConfirm, title, content, loading } = props;
   return (
     <Dialog

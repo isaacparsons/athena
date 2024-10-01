@@ -1,27 +1,20 @@
 import axios from 'axios';
 import { createContext, useContext } from 'react';
+
 import {
+  CreateEntityInput,
+  UpdateEntityInput,
+  ReadEntity,
   AthenaResponse,
-  CreateNewsletter,
-  CreateUser,
-  ReadNewsletter,
-  ReadNewsletters,
-  ReadUser,
-  UpdateNewsletter,
-  UpdateUser,
-} from 'types/types';
+} from '../types';
 
 axios.defaults.withCredentials = true;
 
-export type CreateEntity = CreateUser | CreateNewsletter;
-export type ReadEntity = ReadUser | ReadNewsletters | ReadNewsletter;
-export type UpdateEntity = UpdateUser | UpdateNewsletter;
-
 export interface IAPIClient {
   upload(path: string, formData: FormData): Promise<void>;
-  create<T extends CreateEntity>(path: string, entity: T): Promise<void>;
-  read<T extends ReadEntity>(path: string): Promise<T | null>;
-  update<T extends UpdateEntity>(path: string, entity: T): Promise<void>;
+  create<T extends CreateEntityInput>(path: string, entity: T): Promise<void>;
+  read<T extends ReadEntity | ReadEntity[]>(path: string): Promise<T | null>;
+  update<T extends UpdateEntityInput>(path: string, entity: T): Promise<void>;
   delete(path: string): Promise<void>;
 }
 export class APIClient implements IAPIClient {
@@ -42,7 +35,10 @@ export class APIClient implements IAPIClient {
       throw data.error;
     }
   }
-  async create<T extends CreateEntity>(path: string, entity: T): Promise<void> {
+  async create<T extends CreateEntityInput>(
+    path: string,
+    entity: T
+  ): Promise<void> {
     const result = await axios.post<AthenaResponse>(
       `${this.host}${path}`,
       entity
@@ -52,7 +48,9 @@ export class APIClient implements IAPIClient {
       throw data.error;
     }
   }
-  async read<T extends ReadEntity>(path: string): Promise<T | null> {
+  async read<T extends ReadEntity | ReadEntity[]>(
+    path: string
+  ): Promise<T | null> {
     const result = await axios.get<AthenaResponse<T>>(`${this.host}${path}`);
     const data = result.data;
     if (data.error) {
@@ -60,7 +58,10 @@ export class APIClient implements IAPIClient {
     }
     return data.data;
   }
-  async update<T extends UpdateEntity>(path: string, entity: T): Promise<void> {
+  async update<T extends UpdateEntityInput>(
+    path: string,
+    entity: T
+  ): Promise<void> {
     const result = await axios.put<AthenaResponse>(
       `${this.host}${path}`,
       entity

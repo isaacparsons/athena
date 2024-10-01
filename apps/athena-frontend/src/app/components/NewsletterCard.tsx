@@ -6,16 +6,16 @@ import {
   Typography,
 } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { ReadNewsletters } from 'types/types';
+import { ReadUserNewsletter } from '../types';
 import { useMemo } from 'react';
-import CustomHorizontalBox from './CustomHorizontalBox';
+import { CustomHorizontalBox } from './index';
 
 interface NewsletterCardProps {
-  newsletter: ReadNewsletters[number];
+  newsletter: ReadUserNewsletter;
   onClick: () => void;
 }
 
-function NewsletterCard(props: NewsletterCardProps) {
+export function NewsletterCard(props: NewsletterCardProps) {
   const { newsletter, onClick } = props;
 
   const formattedDate = useMemo(() => {
@@ -61,5 +61,3 @@ function NewsletterCard(props: NewsletterCardProps) {
     </ListItem>
   );
 }
-
-export default NewsletterCard;

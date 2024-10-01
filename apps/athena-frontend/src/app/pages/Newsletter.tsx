@@ -1,20 +1,25 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, Container, useTheme } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import { useEffect, useMemo, useState, useCallback } from 'react';
-import BackBtn from '../components/common/BackButton';
-import CustomSpeedDial from '../components/CustomSpeedDial';
-import EditIcon from '@mui/icons-material/Edit';
-import NewsletterMembers from '../components/NewsletterMembers';
-import NewsletterItemsList from '../components/NewsletterItemsList';
-import AddMediaItemsDialog from '../components/AddMediaItemsDialog';
-import { ReadNewsletter } from 'types/types';
-import { useStateContext, useStateDispatchContext } from '../context/state';
-import { AddNewsletterItemsProvider } from '../context/AddNewsletterItemsProvider';
-import { useAPI } from '../context/api';
 import CloseIcon from '@mui/icons-material/Close';
-import ConfirmationDialog from '../components/ConfirmationDialog';
 import { useNotifications } from '@toolpad/core';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import {
+  BackButton,
+  CustomSpeedDial,
+  NewsletterMembers,
+  NewsletterItemsList,
+  AddMediaItemsDialog,
+  ConfirmationDialog,
+} from '../components/index';
+import EditIcon from '@mui/icons-material/Edit';
+import { ReadNewsletter } from '../types';
+import {
+  useAPI,
+  AddNewsletterItemsProvider,
+  useStateContext,
+  useStateDispatchContext,
+} from '../context/index';
 import { successNotificationOptions } from '../../config';
 
 export function Newsletter() {
@@ -129,9 +134,9 @@ export function Newsletter() {
       const response = await api.read<ReadNewsletter>(`/newsletters/${id}`);
       if (response) {
         dispatch({
-          entityType: 'newsletter',
-          action: 'fetched',
-          payload: response,
+          entityType: 'newsletters',
+          type: 'fetched',
+          payload: [response],
         });
       }
       setLoading(false);
@@ -157,7 +162,7 @@ export function Newsletter() {
       }}
       maxWidth="md"
     >
-      <BackBtn onClick={() => navigate('/')} />
+      <BackButton onClick={() => navigate('/')} />
 
       {loading ? (
         <CircularProgress />
@@ -208,5 +213,3 @@ export function Newsletter() {
     </Container>
   );
 }
-
-export default Newsletter;

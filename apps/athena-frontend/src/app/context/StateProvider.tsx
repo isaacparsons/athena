@@ -1,132 +1,56 @@
 import { createContext, useReducer } from 'react';
-import {
-  ReadNewsletter,
-  ReadNewsletterItem,
-  ReadNewsletters,
-  ReadUser,
-  User,
-} from 'types/types';
-import { Newsletter as INewsletter } from 'types/types';
 import { addArrayItemsToMap } from '../../util/helpers';
-
-type NewsletterItems = Map<number, ReadNewsletterItem>;
-
-type Newsletter = INewsletter & {
-  itemIds: number[];
-  memberIds: number[];
-};
-
-type Newsletters = Map<number, Newsletter>;
-
-export type State = {
-  newsletters: Newsletters;
-  newsletterItems: NewsletterItems;
-  newsletterMembers: Map<number, User>;
-};
-
-type FetchNewslettersAction = {
-  entityType: 'newsletters';
-  action: 'fetched';
-  payload: ReadNewsletters;
-};
-
-type CreateNewsletterItemsAction = {
-  entityType: 'newsletter-items';
-  action: 'created';
-  payload: ReadNewsletterItem[];
-};
-
-type ReadUserAction = {
-  entityType: 'user' | 'newsletter' | 'newsletters' | 'newsletter-items';
-  action: 'read';
-};
-type ReadNewsletterAction = {
-  entityType: 'newsletter';
-  action: 'read';
-};
-type ReadNewslettersAction = {
-  entityType: 'newsletters';
-  action: 'read';
-};
-type ReadNewsletterItemsAction = {
-  entityType: 'newsletter-items';
-  action: 'read';
-};
-
-type UpdateAction = {
-  entityType: 'user' | 'newsletter' | 'newsletters' | 'newsletter-items';
-  action: 'update';
-};
-
-type DeleteAction = {
-  entityType: 'user' | 'newsletter' | 'newsletters' | 'newsletter-items';
-  action: 'delete';
-};
-
-type FetchedNewsletterAction = {
-  entityType: 'newsletter';
-  action: 'fetched';
-  payload: ReadNewsletter;
-};
-
-export type Actions =
-  | CreateNewsletterItemsAction
-  | ReadUserAction
-  | ReadNewsletterAction
-  | ReadNewslettersAction
-  | ReadNewsletterItemsAction
-  | UpdateAction
-  | DeleteAction
-  | FetchNewslettersAction
-  | FetchedNewsletterAction;
+import { Action, State } from '../types';
 
 type Reducer<S, A> = (prevState: S, action: A) => S;
 
-export function stateReducer(prevState: State, action: Actions): State {
-  if (action.entityType === 'newsletters' && action.action === 'fetched') {
+export function stateReducer(prevState: State, action: Action): State {
+  if (action.entityType === 'newsletters' && action.type === 'fetched') {
     const newState = { ...prevState };
-    action.payload.forEach((newsletter) => {
-      newState?.newsletters?.set(newsletter.id, {
-        ...newsletter,
-        itemIds: [],
-        memberIds: [],
-      });
-    });
+    // action.payload.forEach((newsletter) => {
+    //   newState?.newsletters?.set(newsletter.id, {
+    //     ...newsletter,
+    //     itemIds: [],
+    //     memberIds: [],
+    //   });
+    // });
     return newState;
-  } else if (
-    action.entityType === 'newsletter' &&
-    action.action === 'fetched'
-  ) {
-    const { newsletter, items, members } = action.payload;
-    const newsletters = new Map(prevState.newsletters);
+  }
+  // else if (
+  //   action.entityType === 'newsletter' &&
+  //   action.action === 'fetched'
+  // ) {
+  //   const { newsletter, items, members } = action.payload;
+  //   const newsletters = new Map(prevState.newsletters);
 
-    const newsletterMembers = addArrayItemsToMap(
-      members,
-      prevState.newsletterMembers
-    );
-    const newsletterItems = addArrayItemsToMap(
-      items,
-      prevState.newsletterItems
-    );
+  //   const newsletterMembers = addArrayItemsToMap(
+  //     members,
+  //     prevState.newsletterMembers
+  //   );
+  //   const newsletterItems = addArrayItemsToMap(
+  //     items,
+  //     prevState.newsletterItems
+  //   );
 
-    const itemIds = items.map((item) => item.id);
-    const memberIds = members.map((member) => member.id);
+  //   const itemIds = items.map((item) => item.id);
+  //   const memberIds = members.map((member) => member.id);
 
-    newsletters.set(newsletter.id, {
-      ...newsletter,
-      itemIds,
-      memberIds,
-    });
+  //   newsletters.set(newsletter.id, {
+  //     ...newsletter,
+  //     itemIds,
+  //     memberIds,
+  //   });
 
-    return {
-      ...prevState,
-      newsletters,
-      newsletterItems,
-      newsletterMembers,
-    };
-  } else {
-    console.error(`Unknown action:  ${action.action}, ${action.entityType}`);
-    throw Error('Unknown action: ' + action.action + ', ' + action.entityType);
+  //   return {
+  //     ...prevState,
+  //     newsletters,
+  //     newsletterItems,
+  //     newsletterMembers,
+  //   };
+  // }
+  else {
+    console.error(`Unknown action:  ${action.type}, ${action.entityType}`);
+    throw Error('Unknown action: ' + action.type + ', ' + action.entityType);
   }
 }
 
@@ -134,20 +58,21 @@ export type Props = {
   children: React.ReactNode;
 };
 
-const initialState = {
+const initialState: State = {
   newsletters: new Map(),
   newsletterItems: new Map(),
   newsletterMembers: new Map(),
+  locations: new Map(),
 };
 
 export const StateContext = createContext<State>(initialState);
-export const StateDispatchContext = createContext<React.Dispatch<Actions>>(
+export const StateDispatchContext = createContext<React.Dispatch<Action>>(
   () => null
 );
 
 export function StateProvider(props: Props) {
   const { children } = props;
-  const [state, dispatch] = useReducer<Reducer<State, Actions>, State>(
+  const [state, dispatch] = useReducer<Reducer<State, Action>, State>(
     stateReducer,
     initialState,
     (arg: State) => initialState

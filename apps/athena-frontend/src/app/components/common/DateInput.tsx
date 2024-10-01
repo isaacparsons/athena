@@ -9,7 +9,7 @@ interface DateInputProps {
   date: string | null | undefined;
   onChange: (date: string | null) => void;
 }
-function DateInput(props: DateInputProps) {
+export function DateInput(props: DateInputProps) {
   const { date, onChange } = props;
 
   const [value, setValue] = useState<Dayjs | null>(dayjs(date));
@@ -32,4 +32,3 @@ function DateInput(props: DateInputProps) {
     </LocalizationProvider>
   );
 }
-export default DateInput;

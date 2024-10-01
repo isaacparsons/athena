@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { useAddNewsletterItemsDispatchContext } from '../../context/addNewsletterItemsContext';
+import { useAddNewsletterItemsDispatchContext } from '../../context/index';
 import { useEffect, useState } from 'react';
 
 interface NameInputProps {
@@ -7,7 +7,7 @@ interface NameInputProps {
   name: string;
 }
 
-function NameInput(props: NameInputProps) {
+export function NameInput(props: NameInputProps) {
   const { name: inputName, id } = props;
   const [name, setName] = useState('');
 
@@ -47,5 +47,3 @@ function NameInput(props: NameInputProps) {
     />
   );
 }
-
-export default NameInput;

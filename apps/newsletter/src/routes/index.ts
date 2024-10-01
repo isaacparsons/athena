@@ -1,18 +1,11 @@
-import { Router } from 'express';
-import userRoutes from './user';
+import { userRouter } from './user';
 import newsletterRoutes from './newsletter';
-import newsletterItemRoutes from './newsletter-item';
-import newsletterItemPhotoRoutes from './newsletter-item-photo';
-import newsletterItemTextRoutes from './newsletter-item-text';
-import authRoutes from './auth';
+// import authRoutes from './auth';
+import { trpc } from '../trpc/trpc';
 
-const router = Router({ mergeParams: true });
+export const appRouter = trpc.router({
+  users: userRouter,
+  newsletters: newsletterRoutes,
+});
 
-router.use('/newsletters', newsletterRoutes);
-router.use('/:newsletterId/items', newsletterItemRoutes);
-router.use('/:newsletterId/items/photo', newsletterItemPhotoRoutes);
-router.use('/:newsletterId/items/text', newsletterItemTextRoutes);
-router.use('/users', userRoutes);
-router.use('/auth', authRoutes);
-
-export default router;
+export type AppRouter = typeof appRouter;

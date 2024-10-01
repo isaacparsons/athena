@@ -15,16 +15,16 @@ import {
   PickerChangeHandlerContext,
   DateRangeValidationError,
 } from '@mui/x-date-pickers-pro';
-import React, { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import dayjs from 'dayjs';
-import { useAPI } from '../context/api';
+import { useAPI } from '../context/index';
 
 interface AddNewsletterDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export default function AddNewsletterDialog(props: AddNewsletterDialogProps) {
+export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
   const { open, onClose } = props;
   const api = useAPI();
 
