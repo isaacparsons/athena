@@ -100,14 +100,18 @@ export class NewsletterItemTable extends Table implements ITable {
       )
       .addColumn('modified', 'timestamp')
       .addColumn('modifierId', 'integer', (cb) => cb.references('user.id'))
-      .addColumn('newsletterItemDetailsId', 'integer') //TODO: should reference
-      .addColumn('detailsType', 'varchar')
+      .addColumn('type', 'varchar')
+      .addColumn('parentId', 'integer', (col) =>
+        col.references('newsletterItem.id').onDelete('cascade')
+      )
+      .addColumn('nextItemId', 'integer', (col) =>
+        col.references('newsletterItem.id').onDelete('set null')
+      )
       .execute();
     return;
   }
 }
-
-//TODO: add below check to details type
+//TODO: add below check to item type
 // (col) =>
 //   col.check(
 //     sql`(detailsType='text') OR (detailsType='video') OR (detailsType='photo')`

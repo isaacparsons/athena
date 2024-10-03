@@ -7,7 +7,7 @@ import { createUser } from '../fixtures/users';
 const now = new Date(2024, 1, 1);
 Date.now = jest.fn(() => now.getTime());
 
-const get = async (userId: number, id: number) => {
+const getNewsletter = async (userId: number, id: number) => {
   return router.newsletters.get({
     ctx: createContext({
       req: {
@@ -36,7 +36,7 @@ describe('newsletter routes', () => {
       newsletterInput.name
     );
 
-    const newsletter = await get(user1.id, existingNewsletter.id);
+    const newsletter = await getNewsletter(user1.id, existingNewsletter.id);
     expect(newsletter).toEqual({
       meta: {
         creator: user1,
@@ -115,7 +115,7 @@ describe('newsletter routes', () => {
         type: router.newsletters.update._type,
       });
 
-      const newsletter = await get(user1.id, existingNewsletter.id);
+      const newsletter = await getNewsletter(user1.id, existingNewsletter.id);
       expect(newsletter).toEqual({
         meta: {
           creator: user1,
@@ -136,7 +136,6 @@ describe('newsletter routes', () => {
       });
     });
   });
-
   test('delete', async () => {
     const newsletterInput = {
       name: 'test newsletter 1',
@@ -162,7 +161,7 @@ describe('newsletter routes', () => {
       },
       type: router.newsletters.delete._type,
     });
-    const newsletter = get(user1.id, existingNewsletter.id);
+    const newsletter = getNewsletter(user1.id, existingNewsletter.id);
     expect(newsletter).rejects.toEqual(
       new Error(`newsletter with id: ${existingNewsletter.id} does not exist`)
     );

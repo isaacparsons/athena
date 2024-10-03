@@ -1,47 +1,58 @@
-import { trpc } from '../trpc/trpc';
+import { loggedInProcedure, trpc } from '../trpc/trpc';
 import { z } from 'zod';
 
-const getNewsletterInput = trpc.procedure.input(
-  z.object({
-    newsletterId: z.coerce.number(),
-  })
-);
+const getNewsletterInput = z.object({
+  newsletterId: z.coerce.number(),
+});
 
-const postNewsletterInput = trpc.procedure.input(
-  z.object({
-    name: z.string(),
-    startDate: z.string(),
-    endDate: z.string(),
-  })
-);
+const postNewsletterInput = z.object({
+  name: z.string(),
+  startDate: z.string(),
+  endDate: z.string(),
+});
 
-const updateNewsletterInput = trpc.procedure.input(
-  z.object({
-    id: z.coerce.number(),
-    name: z.string().optional(),
-    startDate: z.string().optional().nullable(),
-    endDate: z.string().optional().nullable(),
-  })
-);
+const updateNewsletterInput = z.object({
+  id: z.coerce.number(),
+  name: z.string().optional(),
+  startDate: z.string().optional().nullable(),
+  endDate: z.string().optional().nullable(),
+});
 
-const deleteNewsletterInput = trpc.procedure.input(
-  z.object({ id: z.coerce.number() })
-);
+const deleteNewsletterInput = z.object({ id: z.coerce.number() });
+
+export type CreateNewsletterInput = z.infer<typeof postNewsletterInput>;
+export type ReadNewsletterInput = z.infer<typeof getNewsletterInput>;
+export type UpdateNewsletterInput = z.infer<typeof updateNewsletterInput>;
+export type DeleteNewsletterInput = z.infer<typeof deleteNewsletterInput>;
+
+export type NewsletterInput =
+  | CreateNewsletterInput
+  | ReadNewsletterInput
+  | UpdateNewsletterInput
+  | DeleteNewsletterInput;
 
 const router = trpc.router({
-  get: getNewsletterInput.query(({ input, ctx }) => {
+  get: loggedInProcedure.input(getNewsletterInput).query(({ input, ctx }) => {
     return ctx.dao.newsletter.get(input.newsletterId);
   }),
-  post: postNewsletterInput.mutation(({ ctx, input }) => {
-    return ctx.dao.newsletter.post(ctx.req.user.id, input);
-  }),
-  update: updateNewsletterInput.mutation(({ ctx, input }) => {
-    return ctx.dao.newsletter.update(ctx.req.user.id, input);
-  }),
-  delete: deleteNewsletterInput.mutation(({ ctx, input }) => {
-    return ctx.dao.newsletter.delete(ctx.req.user.id, input.id);
-  }),
+  post: loggedInProcedure
+    .input(postNewsletterInput)
+    .mutation(({ ctx, input }) => {
+      return ctx.dao.newsletter.post(ctx.user.userId, input);
+    }),
+  update: loggedInProcedure
+    .input(updateNewsletterInput)
+    .mutation(({ ctx, input }) => {
+      return ctx.dao.newsletter.update(ctx.user.userId, input);
+    }),
+  delete: loggedInProcedure
+    .input(deleteNewsletterInput)
+    .mutation(({ ctx, input }) => {
+      return ctx.dao.newsletter.delete(ctx.user.userId, input.id);
+    }),
 });
+
+export default router;
 
 // router.use('/:newsletterId/items/:detailsType', newsletterItemRoutes);
 
@@ -124,5 +135,3 @@ const router = trpc.router({
 //     }
 //   )
 // );
-
-export default router;

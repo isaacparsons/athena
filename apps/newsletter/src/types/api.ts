@@ -40,7 +40,12 @@ export interface User {
   newsletters: [];
 }
 
-type NewsletterItemType = 'photo' | 'video' | 'data-point' | 'text';
+export type NewsletterItemType =
+  | 'photo'
+  | 'video'
+  | 'data-point'
+  | 'text'
+  | 'node';
 type NewsletterTemplate = {
   // examples: 'album', 'review', 'experience', 'celebration', 'notable-mention',
   name: string;
@@ -65,15 +70,21 @@ export interface Newsletter {
   items: NewsletterItem[];
 }
 
-export type CreateNewsletterInput = Omit<
-  DB.InsertNewsletter,
-  'creatorId' | 'ownerId' | 'created'
->;
+export {
+  CreateNewsletterInput,
+  ReadNewsletterInput,
+  UpdateNewsletterInput,
+  DeleteNewsletterInput,
+  CreateNewsletterItemInput,
+  ReadNewsletterItemInput,
+  UpdateNewsletterItemInput,
+  DeleteNewsletterItemInput,
+  LocationInput,
+} from '../routes/index';
 
-export type UpdateNewsletterInput = Omit<
-  DB.UpdateNewsletter,
-  'modified' | 'modifier'
-> & { id: number };
+// export type LocationInput = Omit<DB.SelectLocation, 'name' | 'id'> & {
+//   locationName: string | null;
+// };
 
 // export type ReadUser = User;
 // export type ReadUserNewsletter = Newsletter;

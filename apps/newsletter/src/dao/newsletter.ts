@@ -10,17 +10,14 @@ import {
   Newsletter,
   UpdateNewsletterInput,
 } from '../types/api';
-import { parseDateRange, removeUndefinedProperties } from '../util/helpers';
+import { parseDateRange } from '../util/helpers';
 import { creator, modifier, user } from '../util/db';
 
 export class NewsletterDAO {
-  newsletterItemDAO: NewsletterItemDAO;
   constructor(
     readonly db: DBConnection,
-    newsletterItemDAO?: NewsletterItemDAO
-  ) {
-    this.newsletterItemDAO = newsletterItemDAO ?? new NewsletterItemDAO(db);
-  }
+    readonly newsletterItemDAO: NewsletterItemDAO
+  ) {}
 
   async get(id: number): Promise<Newsletter> {
     const newsletter = await this.db

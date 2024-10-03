@@ -1,18 +1,80 @@
-import { trpc } from '../trpc/trpc';
+import { loggedInProcedure, trpc } from '../trpc/trpc';
+import { z } from 'zod';
+
+const ItemTypeEnum = z.enum(['text', 'photo', 'video', 'data-point', 'node']);
+
+const locationInput = z
+  .object({
+    name: z.string().optional(),
+    countryCode: z.string().optional(),
+    lattitude: z.coerce.number().optional(),
+    longitude: z.coerce.number().optional(),
+  })
+  .optional();
+
+const getNewsletterItemInput = z.object({
+  newsletterItemId: z.coerce.number(),
+});
+
+const postNewsletterItemInput = z.object({
+  newsletterId: z.coerce.number(),
+  title: z.string(),
+  type: ItemTypeEnum,
+  parentId: z.coerce.number().optional(),
+  nextItemId: z.coerce.number().optional(),
+  date: z.string().optional(),
+  location: locationInput,
+});
+
+const updateNewsletterItemInput = z.object({
+  newsletterItemId: z.coerce.number(),
+  title: z.string(),
+  date: z.string().optional().nullable(),
+  parentId: z.coerce.number().optional(),
+  nextItemId: z.coerce.number().optional(),
+  location: locationInput,
+});
+
+const deleteNewsletterItemInput = z.object({
+  newsletterItemId: z.coerce.number(),
+});
+export type LocationInput = z.infer<typeof locationInput>;
+export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
+export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
+export type UpdateNewsletterItemInput = z.infer<
+  typeof updateNewsletterItemInput
+>;
+export type DeleteNewsletterItemInput = z.infer<
+  typeof deleteNewsletterItemInput
+>;
+
+export type NewsletterItemInput =
+  | CreateNewsletterItemInput
+  | ReadNewsletterItemInput
+  | UpdateNewsletterItemInput
+  | DeleteNewsletterItemInput;
 
 const router = trpc.router({
-  get: trpc.procedure.query(() => {
-    return '';
-  }),
-  create: trpc.procedure.mutation(() => {
-    return '';
-  }),
-  update: trpc.procedure.mutation(() => {
-    return '';
-  }),
-  delete: trpc.procedure.mutation(() => {
-    return '';
-  }),
+  get: loggedInProcedure
+    .input(getNewsletterItemInput)
+    .query(({ input, ctx }) => {
+      return ctx.dao.newsletterItem.get(input.newsletterItemId);
+    }),
+  create: loggedInProcedure
+    .input(postNewsletterItemInput)
+    .mutation(({ input, ctx }) => {
+      return ctx.dao.newsletterItem.post(ctx.user.userId, input);
+    }),
+  update: loggedInProcedure
+    .input(updateNewsletterItemInput)
+    .mutation(({ input, ctx }) => {
+      return '';
+    }),
+  delete: loggedInProcedure
+    .input(deleteNewsletterItemInput)
+    .mutation(({ input, ctx }) => {
+      return ctx.dao.newsletterItem.delete(input.newsletterItemId);
+    }),
 });
 export default router;
 

@@ -107,8 +107,9 @@ export interface NewsletterItemTable extends Meta {
   title: string;
   date: string | null;
   locationId: number | null;
-  newsletterItemDetailsId: ColumnType<number, number, never>;
-  detailsType: ColumnType<string, string, never>;
+  type: ColumnType<string, string, never>;
+  parentId: ColumnType<number | null, number | null, number | null>;
+  nextItemId: ColumnType<number | null, number | null, number | null>;
 }
 export type SelectNewsletterItem = Selectable<NewsletterItemTable>;
 export type InsertNewsletterItem = Insertable<NewsletterItemTable>;
@@ -182,4 +183,3 @@ export abstract class Table implements ITable {
     return;
   }
 }
-1;
