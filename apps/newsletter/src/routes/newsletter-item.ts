@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { loggedInProcedure, trpc } from '../trpc/trpc';
 import { z } from 'zod';
 
@@ -20,26 +21,48 @@ const postNewsletterItemInput = z.object({
   newsletterId: z.coerce.number(),
   title: z.string(),
   type: ItemTypeEnum,
-  parentId: z.coerce.number().optional(),
+  parentId: z.coerce.number().nullable(),
   nextItemId: z.coerce.number().optional(),
   date: z.string().optional(),
   location: locationInput,
 });
 
-const updateNewsletterItemInput = z.object({
-  newsletterItemId: z.coerce.number(),
-  title: z.string(),
-  date: z.string().optional().nullable(),
-  parentId: z.coerce.number().optional(),
-  nextItemId: z.coerce.number().optional(),
-  location: locationInput,
-});
+const postManyNewsletterItemsInput = z
+  .array(
+    z.object({
+      item: z.object({
+        newsletterId: z.coerce.number(),
+        title: z.string(),
+        type: ItemTypeEnum,
+        parentId: z.coerce.number().optional(),
+        nextItemId: z.coerce.number().optional(),
+        date: z.string().optional(),
+        location: locationInput,
+      }),
+      position: z.number(),
+    })
+  )
+  .transform((val) => val.sort((a, b) => b.position - a.position));
+
+const updateNewsletterItemInput = z
+  .object({
+    newsletterItemId: z.coerce.number(),
+    title: z.string().optional(),
+    date: z.string().optional().nullable(),
+    // parentId: z.coerce.number().optional(),
+    nextItemId: z.coerce.number().optional(),
+    location: locationInput,
+  })
+  .refine((obj) => obj.date || obj.nextItemId || obj.title || obj.location);
 
 const deleteNewsletterItemInput = z.object({
   newsletterItemId: z.coerce.number(),
 });
 export type LocationInput = z.infer<typeof locationInput>;
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
+export type CreateManyNewsletterItemsInput = z.infer<
+  typeof postManyNewsletterItemsInput
+>;
 export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
 export type UpdateNewsletterItemInput = z.infer<
   typeof updateNewsletterItemInput
@@ -50,6 +73,7 @@ export type DeleteNewsletterItemInput = z.infer<
 
 export type NewsletterItemInput =
   | CreateNewsletterItemInput
+  | CreateManyNewsletterItemsInput
   | ReadNewsletterItemInput
   | UpdateNewsletterItemInput
   | DeleteNewsletterItemInput;
@@ -63,12 +87,26 @@ const router = trpc.router({
   create: loggedInProcedure
     .input(postNewsletterItemInput)
     .mutation(({ input, ctx }) => {
-      return ctx.dao.newsletterItem.post(ctx.user.userId, input);
+      try {
+        return ctx.dao.newsletterItem.post(ctx.user.userId, input);
+      } catch (error) {
+        console.error(error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'An unexpected error occurred, please try again later.',
+          cause: error,
+        });
+      }
+    }),
+  createMany: loggedInProcedure
+    .input(postManyNewsletterItemsInput)
+    .mutation(({ input, ctx }) => {
+      return ctx.dao.newsletterItem.postMany(ctx.user.userId, input);
     }),
   update: loggedInProcedure
     .input(updateNewsletterItemInput)
     .mutation(({ input, ctx }) => {
-      return '';
+      return ctx.dao.newsletterItem.update(ctx.user.userId, input);
     }),
   delete: loggedInProcedure
     .input(deleteNewsletterItemInput)

@@ -19,7 +19,11 @@ import {
 import { LocationDAO } from './location';
 import fs from 'node:fs';
 import { location, photoItems, textItems, user, videoItems } from '../util/db';
-import { CreateNewsletterItemInput } from '../types/api';
+import {
+  CreateNewsletterItemInput,
+  UpdateNewsletterItemInput,
+} from '../types/api';
+import { CreateManyNewsletterItemsInput } from '../routes/newsletter-item';
 
 // TODO: fix this so its not using my local path
 const filePath = '/Users/isaacparsons/Documents/projects/athena/';
@@ -70,40 +74,34 @@ export class NewsletterItemDAO {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      const existingItem = await trx
-        .selectFrom('newsletterItem as ni')
-        .where(({ and, eb }) =>
+      await trx
+        .updateTable('newsletterItem')
+        .set({
+          nextItemId: createdNewsletterItem.id,
+        })
+        .where(({ eb, not, and }) =>
           and([
             eb(
-              'ni.nextItemId',
+              'nextItemId',
               input.nextItemId ? '=' : 'is',
               input.nextItemId ?? null
             ),
-            eb('ni.parentId', '=', createdNewsletterItem.parentId ?? null),
+            not(eb('id', '=', createdNewsletterItem.id)),
+            eb('parentId', input.parentId ? '=' : 'is', input.parentId),
           ])
         )
-        .select(['id', 'nextItemId'])
-        .executeTakeFirst();
-
-      if (existingItem) {
-        await trx
-          .updateTable('newsletterItem')
-          .set({
-            nextItemId: createdNewsletterItem.id,
-            modified: new Date().toISOString(),
-            modifierId: userId,
-          })
-          .where(({ eb, not, and }) =>
-            and([
-              eb('id', '=', existingItem.id),
-              not(eb('id', '=', createdNewsletterItem.id)),
-            ])
-          )
-          .executeTakeFirstOrThrow();
-      }
-
+        .executeTakeFirstOrThrow();
       return createdNewsletterItem.id;
     });
+  }
+
+  // if the last item has a nextItemId:
+  //  update the item with nextId = the last item nextId
+  //  to point to the first element in the input items.
+  //  the second last item should point to the newly created
+  //  last item.
+  async postMany(userId: number, input: CreateManyNewsletterItemsInput) {
+    return;
   }
 
   async get(id: number) {
@@ -120,6 +118,48 @@ export class NewsletterItemDAO {
       )
       .where('ni.id', '=', id)
       .executeTakeFirstOrThrow();
+  }
+
+  async update(userId: number, input: UpdateNewsletterItemInput) {
+    const newsletterItemUpdate = _.omit(input, [
+      'location',
+      'newsletterItemId',
+    ]);
+    return this.db.transaction().execute(async (trx: Transaction) => {
+      if (input.nextItemId) {
+        const nextItemId = input.nextItemId;
+        const existingItem = await trx
+          .selectFrom('newsletterItem as ni')
+          .selectAll()
+          .where('ni.id', '=', input.newsletterItemId)
+          .executeTakeFirstOrThrow();
+
+        await trx
+          .updateTable('newsletterItem as ni')
+          .set({
+            nextItemId: existingItem.nextItemId,
+          })
+          .where('ni.nextItemId', '=', existingItem.id)
+          .executeTakeFirst();
+
+        await trx
+          .updateTable('newsletterItem as ni')
+          .set({
+            nextItemId: existingItem.id,
+          })
+          .where('ni.nextItemId', '=', nextItemId)
+          .executeTakeFirst();
+      }
+      await trx
+        .updateTable('newsletterItem as ni')
+        .set({
+          ..._.omitBy(newsletterItemUpdate, _.isUndefined),
+          modified: new Date().toISOString(),
+          modifierId: userId,
+        })
+        .where('ni.id', '=', input.newsletterItemId)
+        .executeTakeFirstOrThrow();
+    });
   }
 
   // private async handleReadPhotoItems(newsletterId: number) {
