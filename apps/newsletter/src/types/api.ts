@@ -30,31 +30,55 @@ export interface Country {
 }
 
 export interface Location {
-  id: UniqueId;
-  country: Country;
-  name: string;
-  position: Position;
+  id: number;
+  country: string | null;
+  name: string | null;
+  position: Position | null;
 }
 
 export interface User {
   newsletters: [];
 }
 
-export type NewsletterItemType =
-  | 'photo'
-  | 'video'
-  | 'data-point'
-  | 'text'
-  | 'node';
+export type NewsletterItemType = 'media' | 'text';
+
 type NewsletterTemplate = {
   // examples: 'album', 'review', 'experience', 'celebration', 'notable-mention',
   name: string;
 };
 
-export interface NewsletterItem {
-  meta: Meta;
-  location: Location;
+type NewsletterItemDetailsBase = {
+  id: number;
+  name: string;
   type: NewsletterItemType;
+};
+
+export type NewsletterItemDetailsMedia = NewsletterItemDetailsBase & {
+  fileName: string;
+  caption: string | null;
+};
+
+export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
+  description: string | null;
+  link: string | null;
+};
+
+export type NewsletterItemDetails =
+  | NewsletterItemDetailsText
+  | NewsletterItemDetailsMedia;
+
+export interface NewsletterItemBase {
+  id: number;
+  meta: Meta;
+  location: Location | null;
+  date: string | null;
+  title: string;
+  nextItemId: number | null;
+  previousItemId: number | null;
+  details?: NewsletterItemDetails;
+}
+export interface NewsletterItem extends NewsletterItemBase {
+  children: NewsletterItemBase[];
 }
 
 interface NewsletterProperties {
@@ -70,17 +94,12 @@ export interface Newsletter {
   items: NewsletterItem[];
 }
 
-export {
-  CreateNewsletterInput,
-  ReadNewsletterInput,
-  UpdateNewsletterInput,
-  DeleteNewsletterInput,
-  CreateNewsletterItemInput,
-  ReadNewsletterItemInput,
-  UpdateNewsletterItemInput,
-  DeleteNewsletterItemInput,
-  LocationInput,
-} from '../routes/index';
+export interface UserSession {
+  email: string;
+  userId: number;
+  accessToken: string;
+  refreshToken: string;
+}
 
 // export type LocationInput = Omit<DB.SelectLocation, 'name' | 'id'> & {
 //   locationName: string | null;

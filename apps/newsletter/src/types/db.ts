@@ -69,37 +69,29 @@ export type SelectLocation = Selectable<LocationTable>;
 export type InsertLocation = Insertable<LocationTable>;
 export type UpdateLocation = Updateable<LocationTable>;
 
-export interface NewsletterItemPhotoTable {
+interface NewsletterItemDetailsBase {
   id: UniqueId;
+  type: ColumnType<string, string, never>;
+  newsletterItemId: number;
+}
+
+export interface NewsletterItemMediaTable extends NewsletterItemDetailsBase {
   name: string;
   caption: string | null;
-  format: string | null;
-  size: number | null;
+  fileName: string;
 }
-export type SelectNewsletterItemPhoto = Selectable<NewsletterItemPhotoTable>;
-export type InsertNewsletterItemPhoto = Insertable<NewsletterItemPhotoTable>;
-export type UpdateNewsletterItemPhoto = Updateable<NewsletterItemPhotoTable>;
+export type SelectNewsletterItemMedia = Selectable<NewsletterItemMediaTable>;
+export type InsertNewsletterItemMedia = Insertable<NewsletterItemMediaTable>;
+export type UpdateNewsletterItemMedia = Updateable<NewsletterItemMediaTable>;
 
-export interface NewsletterItemTextTable {
-  id: UniqueId;
-  link: string | null;
-  title: string;
+export interface NewsletterItemTextTable extends NewsletterItemDetailsBase {
+  name: string;
   description: string | null;
+  link: string | null;
 }
 export type SelectNewsletterItemText = Selectable<NewsletterItemTextTable>;
 export type InsertNewsletterItemText = Insertable<NewsletterItemTextTable>;
 export type UpdateNewsletterItemText = Updateable<NewsletterItemTextTable>;
-
-export interface NewsletterItemVideoTable {
-  id: UniqueId;
-  name: string;
-  caption: string | null;
-  format: string | null;
-  size: number | null;
-}
-export type SelectNewsletterItemVideo = Selectable<NewsletterItemVideoTable>;
-export type InsertNewsletterItemVideo = Insertable<NewsletterItemVideoTable>;
-export type UpdateNewsletterItemVideo = Updateable<NewsletterItemVideoTable>;
 
 export interface NewsletterItemTable extends Meta {
   id: UniqueId;
@@ -107,9 +99,9 @@ export interface NewsletterItemTable extends Meta {
   title: string;
   date: string | null;
   locationId: number | null;
-  type: ColumnType<string, string, never>;
   parentId: ColumnType<number | null, number | null, number | null>;
   nextItemId: ColumnType<number | null, number | null, number | null>;
+  previousItemId: ColumnType<number | null, number | null, number | null>;
 }
 export type SelectNewsletterItem = Selectable<NewsletterItemTable>;
 export type InsertNewsletterItem = Insertable<NewsletterItemTable>;
@@ -150,9 +142,8 @@ export interface Database {
   newsletter: NewsletterTable;
   userNewsletter: UserNewsletterTable;
   newsletterItem: NewsletterItemTable;
-  newsletterItemPhoto: NewsletterItemPhotoTable;
+  newsletterItemMedia: NewsletterItemMediaTable;
   newsletterItemText: NewsletterItemTextTable;
-  newsletterItemVideo: NewsletterItemVideoTable;
   country: CountryTable;
   federatedCredential: FederatedCredentialTable;
   location: LocationTable;

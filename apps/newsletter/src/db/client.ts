@@ -6,9 +6,8 @@ import {
   FederatedCredentialTable,
   LocationTable,
   NewsletterItemTable,
-  NewsletterItemPhotoTable,
+  NewsletterItemMediaTable,
   NewsletterItemTextTable,
-  NewsletterItemVideoTable,
 } from '../db/tables';
 import {
   ITable,
@@ -49,8 +48,7 @@ export class DBManagerClient {
       new NewsletterTable(dbClient, 'newsletter'),
       new UserNewsletterTable(dbClient, 'userNewsletter'),
       new NewsletterItemTable(dbClient, 'newsletterItem'),
-      new NewsletterItemPhotoTable(dbClient, 'newsletterItemPhoto'),
-      new NewsletterItemVideoTable(dbClient, 'newsletterItemVideo'),
+      new NewsletterItemMediaTable(dbClient, 'newsletterItemMedia'),
       new NewsletterItemTextTable(dbClient, 'newsletterItemText'),
     ];
   }

@@ -100,11 +100,13 @@ export class NewsletterItemTable extends Table implements ITable {
       )
       .addColumn('modified', 'timestamp')
       .addColumn('modifierId', 'integer', (cb) => cb.references('user.id'))
-      .addColumn('type', 'varchar')
       .addColumn('parentId', 'integer', (col) =>
         col.references('newsletterItem.id').onDelete('cascade')
       )
       .addColumn('nextItemId', 'integer', (col) =>
+        col.references('newsletterItem.id').onDelete('set null')
+      )
+      .addColumn('previousItemId', 'integer', (col) =>
         col.references('newsletterItem.id').onDelete('set null')
       )
       .execute();
@@ -116,7 +118,7 @@ export class NewsletterItemTable extends Table implements ITable {
 //   col.check(
 //     sql`(detailsType='text') OR (detailsType='video') OR (detailsType='photo')`
 //   )
-export class NewsletterItemPhotoTable extends Table implements ITable {
+export class NewsletterItemMediaTable extends Table implements ITable {
   constructor(db: Connection, name: string) {
     super(db, name);
   }
@@ -127,26 +129,11 @@ export class NewsletterItemPhotoTable extends Table implements ITable {
       .addColumn('id', 'serial', (cb) => cb.primaryKey())
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('caption', 'varchar')
-      .addColumn('format', 'varchar')
-      .addColumn('size', 'integer')
-      .execute();
-    return;
-  }
-}
-
-export class NewsletterItemVideoTable extends Table implements ITable {
-  constructor(db: Connection, name: string) {
-    super(db, name);
-  }
-  async createTable() {
-    await this.db.schema
-      .createTable(this.name)
-      .ifNotExists()
-      .addColumn('id', 'serial', (cb) => cb.primaryKey())
-      .addColumn('name', 'varchar', (col) => col.notNull())
-      .addColumn('caption', 'varchar')
-      .addColumn('format', 'varchar')
-      .addColumn('size', 'integer')
+      .addColumn('fileName', 'varchar', (col) => col.notNull())
+      .addColumn('type', 'varchar', (col) => col.notNull())
+      .addColumn('newsletterItemId', 'integer', (col) =>
+        col.references('newsletterItem.id').notNull().onDelete('cascade')
+      )
       .execute();
     return;
   }
@@ -161,9 +148,13 @@ export class NewsletterItemTextTable extends Table implements ITable {
       .createTable(this.name)
       .ifNotExists()
       .addColumn('id', 'serial', (cb) => cb.primaryKey())
-      .addColumn('title', 'varchar', (col) => col.notNull())
+      .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('link', 'varchar')
+      .addColumn('type', 'varchar', (col) => col.notNull())
       .addColumn('description', 'varchar')
+      .addColumn('newsletterItemId', 'integer', (col) =>
+        col.references('newsletterItem.id').notNull().onDelete('cascade')
+      )
       .execute();
     return;
   }

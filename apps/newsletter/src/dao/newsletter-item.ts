@@ -1,62 +1,62 @@
 import _ from 'lodash';
-import { GCSManager } from '../services/gcs';
 import {
   Connection as DBConnection,
-  jsonArrayFrom,
+  jsonObjectFrom,
   Transaction,
 } from '../types/db';
 
-import {
-  isPhotoItem,
-  isTextItem,
-  isVideoItem,
-  ItemDetailsInput,
-  PhotoDetailsInput,
-  TextDetailsInput,
-  VideoDetailsInput,
-} from '../types/server';
-
 import { LocationDAO } from './location';
-import fs from 'node:fs';
-import { location, photoItems, textItems, user, videoItems } from '../util/db';
 import {
   CreateNewsletterItemInput,
+  DeleteManyNewsletterItemsInput,
   UpdateNewsletterItemInput,
-} from '../types/api';
-import { CreateManyNewsletterItemsInput } from '../routes/newsletter-item';
-
-// TODO: fix this so its not using my local path
-const filePath = '/Users/isaacparsons/Documents/projects/athena/';
+} from '../routes/newsletter-item';
+import { NewsletterItemDetailsDAO } from './newsletter-item-details';
+import { mapItems } from './mapping/newsletter-item-mapper';
 
 export class NewsletterItemDAO {
   constructor(
     readonly db: DBConnection,
     readonly locationDAO: LocationDAO,
-    readonly storage: GCSManager
+    readonly newsletterItemDetailsDAO: NewsletterItemDetailsDAO
   ) {}
 
-  async delete(id: number) {
+  async deleteMany(input: DeleteManyNewsletterItemsInput) {
+    const { newsletterItemIds } = input;
     return this.db.transaction().execute(async (trx: Transaction) => {
-      const item = await trx
-        .selectFrom('newsletterItem')
-        .where('id', '=', id)
-        .select(['id', 'nextItemId'])
-        .executeTakeFirstOrThrow();
+      await newsletterItemIds.reduce(async (deletedItemId, id) => {
+        await deletedItemId;
 
-      console.log('existingItem', item);
+        const item = await trx
+          .selectFrom('newsletterItem')
+          .where('id', '=', id)
+          .select(['id', 'nextItemId', 'previousItemId'])
+          .executeTakeFirstOrThrow();
 
-      await trx
-        .updateTable('newsletterItem as prevItem')
-        .set({
-          nextItemId: item.nextItemId,
-        })
-        .where('prevItem.nextItemId', '=', id)
-        .execute();
+        // update item that has nextId = id to have nextId = item's nextId
+        await trx
+          .updateTable('newsletterItem')
+          .set({
+            nextItemId: item.nextItemId,
+          })
+          .where('nextItemId', '=', id)
+          .executeTakeFirstOrThrow();
 
-      return trx
-        .deleteFrom('newsletterItem')
-        .where('id', '=', id)
-        .executeTakeFirstOrThrow();
+        // update item that has previousId = id to have previousId = item's previousId
+        await trx
+          .updateTable('newsletterItem')
+          .set({
+            previousItemId: item.previousItemId,
+          })
+          .where('previousItemId', '=', id)
+          .executeTakeFirstOrThrow();
+
+        await trx
+          .deleteFrom('newsletterItem')
+          .where('id', '=', id)
+          .executeTakeFirstOrThrow();
+        return;
+      }, Promise.resolve());
     });
   }
 
@@ -75,19 +75,35 @@ export class NewsletterItemDAO {
         .executeTakeFirstOrThrow();
 
       await trx
-        .updateTable('newsletterItem')
+        .updateTable('newsletterItem as ni')
         .set({
           nextItemId: createdNewsletterItem.id,
         })
         .where(({ eb, not, and }) =>
           and([
             eb(
-              'nextItemId',
-              input.nextItemId ? '=' : 'is',
-              input.nextItemId ?? null
+              'ni.nextItemId',
+              createdNewsletterItem.nextItemId ? '=' : 'is',
+              createdNewsletterItem.nextItemId
             ),
-            not(eb('id', '=', createdNewsletterItem.id)),
-            eb('parentId', input.parentId ? '=' : 'is', input.parentId),
+            not(eb('ni.id', '=', createdNewsletterItem.id)),
+          ])
+        )
+        .executeTakeFirstOrThrow();
+
+      await trx
+        .updateTable('newsletterItem as ni')
+        .set({
+          previousItemId: createdNewsletterItem.id,
+        })
+        .where(({ eb, not, and }) =>
+          and([
+            eb(
+              'ni.previousItemId',
+              createdNewsletterItem.previousItemId ? '=' : 'is',
+              createdNewsletterItem.previousItemId
+            ),
+            not(eb('ni.id', '=', createdNewsletterItem.id)),
           ])
         )
         .executeTakeFirstOrThrow();
@@ -95,29 +111,58 @@ export class NewsletterItemDAO {
     });
   }
 
-  // if the last item has a nextItemId:
-  //  update the item with nextId = the last item nextId
-  //  to point to the first element in the input items.
-  //  the second last item should point to the newly created
-  //  last item.
-  async postMany(userId: number, input: CreateManyNewsletterItemsInput) {
-    return;
-  }
-
   async get(id: number) {
-    return this.db
+    const result = await this.db
       .selectFrom('newsletterItem as ni')
-      .selectAll()
-      .select((eb) =>
-        jsonArrayFrom(
+      .select((eb) => [
+        'id',
+        'newsletterId',
+        'title',
+        'date',
+        'parentId',
+        'nextItemId',
+        'previousItemId',
+        'created',
+        'modified',
+        jsonObjectFrom(
           eb
-            .selectFrom('newsletterItem as ni2')
-            .selectAll('ni2')
-            .whereRef('ni2.parentId', '=', 'ni.id')
-        ).as('children')
+            .selectFrom('newsletterItemMedia as media-details')
+            .selectAll('media-details')
+            .whereRef('media-details.newsletterItemId', '=', 'ni.id')
+        ).as('mediaDetails'),
+        jsonObjectFrom(
+          eb
+            .selectFrom('newsletterItemText as text-details')
+            .selectAll('text-details')
+            .whereRef('text-details.newsletterItemId', '=', 'ni.id')
+        ).as('textDetails'),
+        jsonObjectFrom(
+          eb
+            .selectFrom('location')
+            .selectAll('location')
+            .whereRef('location.id', '=', 'ni.locationId')
+        ).as('location'),
+        jsonObjectFrom(
+          eb
+            .selectFrom('user as creator')
+            .selectAll('creator')
+            .whereRef('creator.id', '=', 'ni.creatorId')
+        )
+          .$notNull()
+          .as('creator'),
+        jsonObjectFrom(
+          eb
+            .selectFrom('user as modifier')
+            .selectAll('modifier')
+            .whereRef('modifier.id', '=', 'ni.modifierId')
+        ).as('modifier'),
+      ])
+      .where(({ or, eb }) =>
+        or([eb('ni.id', '=', id), eb('ni.parentId', '=', id)])
       )
-      .where('ni.id', '=', id)
-      .executeTakeFirstOrThrow();
+      .execute();
+
+    return mapItems(id, result);
   }
 
   async update(userId: number, input: UpdateNewsletterItemInput) {
@@ -145,9 +190,9 @@ export class NewsletterItemDAO {
         await trx
           .updateTable('newsletterItem as ni')
           .set({
-            nextItemId: existingItem.id,
+            previousItemId: existingItem.previousItemId,
           })
-          .where('ni.nextItemId', '=', nextItemId)
+          .where('ni.previousItemId', '=', existingItem.id)
           .executeTakeFirst();
       }
       await trx
@@ -161,176 +206,4 @@ export class NewsletterItemDAO {
         .executeTakeFirstOrThrow();
     });
   }
-
-  // private async handleReadPhotoItems(newsletterId: number) {
-  //   const items = await this.db
-  //     .selectFrom('newsletterItem as ni')
-  //     .select(({ ref }) => [
-  //       'id',
-  //       'newsletterId',
-  //       'title',
-  //       'created',
-  //       'modified',
-  //       'creatorId',
-  //       'modifierId',
-  //       'date',
-  //       location(this.db, ref('ni.locationId')).as('location'),
-  //       photoItems(this.db, ref('ni.id')).as('details'),
-  //     ])
-  //     .where('ni.newsletterId', '=', newsletterId)
-  //     .execute();
-
-  //   const filtered = items.filter(
-  //     (
-  //       item
-  //     ): item is NewsletterItem & {
-  //       details: NewsletterItemPhoto;
-  //       location: Location;
-  //     } => item.details !== null && item.details !== undefined
-  //   );
-  //   return Promise.all(
-  //     filtered.map(async (item) => {
-  //       const url = await this.storage.getSignedUrl(item.id.toString());
-  //       return {
-  //         ...item,
-  //         details: {
-  //           ...item.details,
-  //           url,
-  //         },
-  //       };
-  //     })
-  //   );
-  // }
-
-  // private async handleReadVideoItems(newsletterId: number) {
-  //   const items = await this.db
-  //     .selectFrom('newsletterItem as ni')
-  //     .select(({ ref }) => [
-  //       'id',
-  //       'newsletterId',
-  //       'title',
-  //       'created',
-  //       'modified',
-  //       'creatorId',
-  //       'modifierId',
-  //       'date',
-  //       location(this.db, ref('ni.locationId')).as('location'),
-  //       videoItems(this.db, ref('ni.id')).as('details'),
-  //     ])
-  //     .where('ni.newsletterId', '=', newsletterId)
-  //     .execute();
-
-  //   const filtered = items.filter(
-  //     (
-  //       item
-  //     ): item is NewsletterItem & {
-  //       details: NewsletterItemVideo;
-  //       location: Location;
-  //     } => item.details !== null && item.details !== undefined
-  //   );
-  //   return Promise.all(
-  //     filtered.map(async (item) => {
-  //       const url = await this.storage.getSignedUrl(item.id.toString());
-  //       return {
-  //         ...item,
-  //         details: {
-  //           ...item.details,
-  //           url,
-  //         },
-  //       };
-  //     })
-  //   );
-  // }
-
-  // private async handleReadTextItems(newsletterId: number) {
-  //   const items = await this.db
-  //     .selectFrom('newsletterItem as ni')
-  //     .select(({ ref }) => [
-  //       'id',
-  //       'newsletterId',
-  //       'title',
-  //       'created',
-  //       'modified',
-  //       'creatorId',
-  //       'modifierId',
-  //       'date',
-  //       location(this.db, ref('ni.locationId')).as('location'),
-  //       textItems(this.db, ref('ni.id')).as('details'),
-  //     ])
-  //     .where('ni.newsletterId', '=', newsletterId)
-  //     .execute();
-
-  //   return items.filter(
-  //     (
-  //       item
-  //     ): item is NewsletterItem & {
-  //       details: NewsletterItemText;
-  //       location: Location;
-  //     } => item.details !== null && item.details !== undefined
-  //   );
-  // }
-
-  // private async handleCreateItemDetails(
-  //   db: DBConnection,
-  //   input: ItemDetailsInput
-  // ) {
-  //   if (isPhotoItem(input)) {
-  //     return this.handleCreatePhotoItem(db, input);
-  //   } else if (isVideoItem(input)) {
-  //     return this.handleCreateVideoItem(db, input);
-  //   } else if (isTextItem(input)) {
-  //     return this.handleCreateTextItem(db, input);
-  //   } else {
-  //     throw new Error('invalid');
-  //   }
-  // }
-
-  // private async handleCreatePhotoItem(
-  //   db: DBConnection,
-  //   input: PhotoDetailsInput
-  // ) {
-  //   const details = _.omit(input, ['file', 'detailsType']);
-  //   const item = await db
-  //     .insertInto('newsletterItemPhoto')
-  //     .values(details)
-  //     .returningAll()
-  //     .executeTakeFirstOrThrow();
-
-  //   this.storage.uploadPhoto(
-  //     filePath + input.file.path,
-  //     `${item.id}.${input.file.mimetype.split('/')[1]}`
-  //   );
-  //   await fs.promises.unlink(input.file.path);
-  //   return item;
-  // }
-
-  // private async handleCreateVideoItem(
-  //   db: DBConnection,
-  //   input: VideoDetailsInput
-  // ) {
-  //   const details = _.omit(input, ['file', 'detailsType']);
-  //   const item = await db
-  //     .insertInto('newsletterItemVideo')
-  //     .values(details)
-  //     .returningAll()
-  //     .executeTakeFirstOrThrow();
-  //   this.storage.uploadPhoto(
-  //     filePath + input.file.path,
-  //     `${item.id}.${input.file.mimetype.split('/')[1]}`
-  //   );
-  //   await fs.promises.unlink(input.file.path);
-  //   return item;
-  // }
-
-  // private async handleCreateTextItem(
-  //   db: DBConnection,
-  //   input: TextDetailsInput
-  // ) {
-  //   const details = _.omit(input, ['detailsType']);
-  //   return db
-  //     .insertInto('newsletterItemText')
-  //     .values(details)
-  //     .returningAll()
-  //     .executeTakeFirstOrThrow();
-  // }
 }

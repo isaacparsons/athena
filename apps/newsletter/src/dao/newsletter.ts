@@ -4,14 +4,15 @@ import {
   Connection as DBConnection,
   Transaction,
   jsonArrayFrom,
+  jsonObjectFrom,
 } from '../types/db';
-import {
-  CreateNewsletterInput,
-  Newsletter,
-  UpdateNewsletterInput,
-} from '../types/api';
+import { Newsletter } from '../types/api';
 import { parseDateRange } from '../util/helpers';
 import { creator, modifier, user } from '../util/db';
+import {
+  CreateNewsletterInput,
+  UpdateNewsletterInput,
+} from '../routes/newsletter';
 
 export class NewsletterDAO {
   constructor(

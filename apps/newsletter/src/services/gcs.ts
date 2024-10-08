@@ -13,30 +13,18 @@ export class GCSManager {
     this.bucket = storage.bucket(env.gcs.bucketName);
   }
 
-  async getSignedUrl(fileName: string) {
+  async getSignedUrl(
+    fileName: string,
+    action: 'read' | 'write' | 'delete' | 'resumable'
+  ) {
     const [url] = await storage
       .bucket(env.gcs.bucketName)
       .file(fileName)
       .getSignedUrl({
         version: 'v4',
-        action: 'read',
+        action: action,
         expires: Date.now() + 15 * 60 * 1000, // 15 minutes
       });
     return url;
-  }
-
-  async uploadPhoto(photoPath: string, name: string) {
-    return (
-      await this.bucket.upload(photoPath, {
-        destination: name,
-      })
-    )[0];
-  }
-  async uploadVideo(path: string, name: string) {
-    return (
-      await this.bucket.upload(path, {
-        destination: name,
-      })
-    )[0];
   }
 }

@@ -22,41 +22,63 @@ export const modifier = (db: DBConnection, id: Expression<number | null>) =>
 export const location = (db: DBConnection, id: Expression<number | null>) => {
   return jsonObjectFrom(
     db.selectFrom('location as l').selectAll().whereRef('l.id', '=', id)
-  );
+  ).as('location');
 };
 
-export const photoItems = (
+export const itemDetails = (
   db: DBConnection,
-  newsletterItemDetailsId: Expression<number>
+  id: Expression<number | null>
 ) => {
-  return jsonObjectFrom(
-    db
-      .selectFrom('newsletterItemPhoto as nip')
-      .selectAll()
-      .whereRef('nip.id', '=', newsletterItemDetailsId)
-  );
+  // jsonObjectFrom(
+  //   db
+  //     .selectFrom(['newsletterItemMedia', 'newsletterItemText'])
+  //     .select((eb) => [])
+  //     .whereRef()
+  //     .where(({ eb, or }) =>
+  //       or([
+  //         eb('newsletterItemMedia.newsletterItemId', '=', id),
+  //         eb('newsletterItemText.newsletterItemId', '=', id),
+  //       ])
+  //     )
+  // ).as('details');
+  // .select([
+  //   'new_person.id as person_id',
+  //   'new_pet.id as pet_id'
+  // ])
 };
 
-export const videoItems = (
-  db: DBConnection,
-  newsletterItemDetailsId: Expression<number>
-) => {
-  return jsonObjectFrom(
-    db
-      .selectFrom('newsletterItemVideo as niv')
-      .selectAll()
-      .whereRef('niv.id', '=', newsletterItemDetailsId)
-  );
-};
+// export const photoItems = (
+//   db: DBConnection,
+//   newsletterItemDetailsId: Expression<number>
+// ) => {
+//   return jsonObjectFrom(
+//     db
+//       .selectFrom('newsletterItemPhoto as nip')
+//       .selectAll()
+//       .whereRef('nip.id', '=', newsletterItemDetailsId)
+//   );
+// };
 
-export const textItems = (
-  db: DBConnection,
-  newsletterItemDetailsId: Expression<number>
-) => {
-  return jsonObjectFrom(
-    db
-      .selectFrom('newsletterItemText as nit')
-      .selectAll()
-      .whereRef('nit.id', '=', newsletterItemDetailsId)
-  );
-};
+// export const videoItems = (
+//   db: DBConnection,
+//   newsletterItemDetailsId: Expression<number>
+// ) => {
+//   return jsonObjectFrom(
+//     db
+//       .selectFrom('newsletterItemVideo as niv')
+//       .selectAll()
+//       .whereRef('niv.id', '=', newsletterItemDetailsId)
+//   );
+// };
+
+// export const textItems = (
+//   db: DBConnection,
+//   newsletterItemDetailsId: Expression<number>
+// ) => {
+//   return jsonObjectFrom(
+//     db
+//       .selectFrom('newsletterItemText as nit')
+//       .selectAll()
+//       .whereRef('nit.id', '=', newsletterItemDetailsId)
+//   );
+// };

@@ -87,6 +87,14 @@
           ]
         }
       }
+    },
+    "codegen": {
+      "executor": "nx:run-commands",
+      "configurations": {
+        "db": {
+          "commands": ["kysely-codegen --env-file apps/newsletter/.env.local"]
+        }
+      }
     }
   }
 }

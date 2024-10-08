@@ -1,5 +1,5 @@
 import { Connection } from '../types/db';
-import { LocationInput } from '../types/api';
+import { LocationInput } from '../routes/newsletter-item';
 
 export class LocationDAO {
   constructor(readonly db: Connection) {}

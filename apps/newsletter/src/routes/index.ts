@@ -11,20 +11,20 @@ export const appRouter = trpc.router({
 
 export type AppRouter = typeof appRouter;
 
-export {} from './user';
-export {
-  CreateNewsletterInput,
-  ReadNewsletterInput,
-  UpdateNewsletterInput,
-  DeleteNewsletterInput,
-  NewsletterInput,
-} from './newsletter';
+// export {} from './user';
+// export {
+//   CreateNewsletterInput,
+//   ReadNewsletterInput,
+//   UpdateNewsletterInput,
+//   DeleteNewsletterInput,
+//   NewsletterInput,
+// } from './newsletter';
 
-export {
-  CreateNewsletterItemInput,
-  ReadNewsletterItemInput,
-  UpdateNewsletterItemInput,
-  DeleteNewsletterItemInput,
-  NewsletterItemInput,
-  LocationInput,
-} from './newsletter-item';
+// export {
+//   CreateNewsletterItemInput,
+//   ReadNewsletterItemInput,
+//   UpdateNewsletterItemInput,
+//   DeleteNewsletterItemInput,
+//   NewsletterItemInput,
+//   LocationInput,
+// } from './newsletter-item';

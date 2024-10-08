@@ -1,8 +1,6 @@
-import { TRPCError } from '@trpc/server';
 import { loggedInProcedure, trpc } from '../trpc/trpc';
 import { z } from 'zod';
-
-const ItemTypeEnum = z.enum(['text', 'photo', 'video', 'data-point', 'node']);
+import { nanoid } from 'nanoid';
 
 const locationInput = z
   .object({
@@ -17,32 +15,34 @@ const getNewsletterItemInput = z.object({
   newsletterItemId: z.coerce.number(),
 });
 
-const postNewsletterItemInput = z.object({
-  newsletterId: z.coerce.number(),
-  title: z.string(),
-  type: ItemTypeEnum,
-  parentId: z.coerce.number().nullable(),
-  nextItemId: z.coerce.number().optional(),
-  date: z.string().optional(),
-  location: locationInput,
+const mediaItemDetails = z.object({
+  type: z.literal('media'),
+  name: z.string(),
+  fileName: z.string(),
+  caption: z.string().optional(),
 });
 
-const postManyNewsletterItemsInput = z
-  .array(
-    z.object({
-      item: z.object({
-        newsletterId: z.coerce.number(),
-        title: z.string(),
-        type: ItemTypeEnum,
-        parentId: z.coerce.number().optional(),
-        nextItemId: z.coerce.number().optional(),
-        date: z.string().optional(),
-        location: locationInput,
-      }),
-      position: z.number(),
-    })
-  )
-  .transform((val) => val.sort((a, b) => b.position - a.position));
+const textItemDetails = z.object({
+  type: z.literal('text'),
+  name: z.string(),
+  description: z.string().optional(),
+  link: z.string().optional(),
+});
+
+const newsletterItemDetails = z
+  .discriminatedUnion('type', [mediaItemDetails, textItemDetails])
+  .optional();
+
+const postNewsletterItemInput = z.object({
+  newsletterId: z.coerce.number(),
+  parentId: z.coerce.number().nullable(),
+  nextItemId: z.coerce.number().nullable(),
+  previousItemId: z.coerce.number().nullable(),
+  title: z.string(),
+  date: z.string().optional(),
+  location: locationInput,
+  details: newsletterItemDetails,
+});
 
 const updateNewsletterItemInput = z
   .object({
@@ -55,63 +55,70 @@ const updateNewsletterItemInput = z
   })
   .refine((obj) => obj.date || obj.nextItemId || obj.title || obj.location);
 
-const deleteNewsletterItemInput = z.object({
-  newsletterItemId: z.coerce.number(),
+const deleteManyNewsletterItemsInput = z.object({
+  newsletterItemIds: z.array(z.coerce.number()),
 });
+
+const getItemUploadLinksInput = z.object({
+  items: z.array(z.object({ id: z.string() })),
+});
+
 export type LocationInput = z.infer<typeof locationInput>;
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
-export type CreateManyNewsletterItemsInput = z.infer<
-  typeof postManyNewsletterItemsInput
->;
 export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
 export type UpdateNewsletterItemInput = z.infer<
   typeof updateNewsletterItemInput
 >;
-export type DeleteNewsletterItemInput = z.infer<
-  typeof deleteNewsletterItemInput
+export type DeleteManyNewsletterItemsInput = z.infer<
+  typeof deleteManyNewsletterItemsInput
+>;
+
+export type CreateNewsletterItemDetailsInput = z.infer<
+  typeof newsletterItemDetails
 >;
 
 export type NewsletterItemInput =
   | CreateNewsletterItemInput
-  | CreateManyNewsletterItemsInput
   | ReadNewsletterItemInput
   | UpdateNewsletterItemInput
-  | DeleteNewsletterItemInput;
+  | DeleteManyNewsletterItemsInput;
 
 const router = trpc.router({
   get: loggedInProcedure
     .input(getNewsletterItemInput)
     .query(({ input, ctx }) => {
+      //TODO: in media items, replace filename with a signed url.
       return ctx.dao.newsletterItem.get(input.newsletterItemId);
     }),
+  getItemUploadLinks: loggedInProcedure
+    .input(getItemUploadLinksInput)
+    .query(({ input, ctx }) => {
+      return Promise.all(
+        input.items.map(async (item) => {
+          const fileName = `${ctx.user.userId}-${nanoid()}`;
+          const url = await ctx.gcs.getSignedUrl(fileName, 'write');
+          return {
+            url,
+            id: item.id,
+          };
+        })
+      );
+    }),
+
   create: loggedInProcedure
     .input(postNewsletterItemInput)
     .mutation(({ input, ctx }) => {
-      try {
-        return ctx.dao.newsletterItem.post(ctx.user.userId, input);
-      } catch (error) {
-        console.error(error);
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'An unexpected error occurred, please try again later.',
-          cause: error,
-        });
-      }
-    }),
-  createMany: loggedInProcedure
-    .input(postManyNewsletterItemsInput)
-    .mutation(({ input, ctx }) => {
-      return ctx.dao.newsletterItem.postMany(ctx.user.userId, input);
+      return ctx.dao.newsletterItem.post(ctx.user.userId, input);
     }),
   update: loggedInProcedure
     .input(updateNewsletterItemInput)
     .mutation(({ input, ctx }) => {
       return ctx.dao.newsletterItem.update(ctx.user.userId, input);
     }),
-  delete: loggedInProcedure
-    .input(deleteNewsletterItemInput)
+  deleteMany: loggedInProcedure
+    .input(deleteManyNewsletterItemsInput)
     .mutation(({ input, ctx }) => {
-      return ctx.dao.newsletterItem.delete(input.newsletterItemId);
+      // return ctx.dao.newsletterItem.delete(input.newsletterItemId);
     }),
 });
 export default router;

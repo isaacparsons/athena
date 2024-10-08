@@ -43,7 +43,6 @@ export function isAuthenticated(
       const authReq = req as AuthenticatedRequest;
       return handler(authReq, res, next);
     }
-    console.log('Not authenticated!!!');
     res.clearCookie(env.app.sessionCookieName);
     res.send(formatResponseError(new Error('Not authenticated')));
   };
