@@ -42,6 +42,7 @@ export class NewsletterDAO {
       );
 
     return {
+      id: newsletter.id,
       meta: {
         created: newsletter.created,
         modified: newsletter.modified,

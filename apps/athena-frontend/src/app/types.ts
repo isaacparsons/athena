@@ -1,61 +1,36 @@
-import {
-  ReadUser,
-  ReadLocation,
-  ReadUserNewsletter,
-  ReadNewsletter,
-  ReadNewsletterItem,
-  Newsletter as INewsletter,
-  CreateNewsletterInput,
-  CreateNewsletterItemInput,
-  UpdateNewsletterInput,
-  UpdateUserInput,
-} from 'types/types';
+// export type UpdateEntityInput = UpdateUserInput | UpdateNewsletterInput;
 
-export * from 'types/types';
+// export type DeleteEntityInput = number;
 
-export type CreateEntityInput =
-  | CreateNewsletterInput
-  | CreateNewsletterItemInput;
+// //  ****************************************
+// //  State
+// //  ****************************************
 
-export type ReadEntity =
-  | ReadUser
-  | ReadUserNewsletter
-  | ReadNewsletter
-  | ReadNewsletterItem;
+// export type State = {
+//   newsletters: NewslettersState;
+//   newsletterItems: NewsletterItemsState;
+//   newsletterMembers: NewsletterMembersState;
+//   locations: LocationsState;
+// };
 
-export type UpdateEntityInput = UpdateUserInput | UpdateNewsletterInput;
+// export type StateEntityType = 'newsletters' | 'user-newsletters';
 
-export type DeleteEntityInput = number;
+// export type NewslettersState = Map<number, NewsletterState>;
+// export type NewsletterItemsState = Map<number, ReadNewsletterItem>;
+// export type NewsletterMembersState = Map<number, ReadUser>;
+// export type LocationsState = Map<number, ReadLocation>;
 
-//  ****************************************
-//  State
-//  ****************************************
+// export type NewsletterState = INewsletter & {
+//   itemIds: number[];
+//   memberIds: number[];
+// };
 
-export type State = {
-  newsletters: NewslettersState;
-  newsletterItems: NewsletterItemsState;
-  newsletterMembers: NewsletterMembersState;
-  locations: LocationsState;
-};
+// // export type FetchedEntityAction<T extends > = any
 
-export type StateEntityType = 'newsletters' | 'user-newsletters';
+// type ActionType = 'fetched';
 
-export type NewslettersState = Map<number, NewsletterState>;
-export type NewsletterItemsState = Map<number, ReadNewsletterItem>;
-export type NewsletterMembersState = Map<number, ReadUser>;
-export type LocationsState = Map<number, ReadLocation>;
-
-export type NewsletterState = INewsletter & {
-  itemIds: number[];
-  memberIds: number[];
-};
-
-// export type FetchedEntityAction<T extends > = any
-
-type ActionType = 'fetched';
-
-export type Action = {
-  type: ActionType;
-  entityType: StateEntityType;
-  payload: ReadEntity[];
-};
+// export type Action = {
+//   type: ActionType;
+//   entityType: StateEntityType;
+//   payload: ReadEntity[];
+// };

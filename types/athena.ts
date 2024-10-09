@@ -1,15 +1,33 @@
-import * as DB from './db';
+export { AppRouter } from '../apps/newsletter/src/routes/index';
+
 export interface AthenaResponse<T = undefined> {
   data: null | T;
   error: null | Error;
 }
 
-type UniqueId = DB.UniqueId;
 type NullableString = string | null;
 
+export interface UserSession {
+  email: string;
+  userId: number;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface UserBase {
+  id: number;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+export interface User extends UserBase {
+  newsletters: NewsletterBase[];
+}
+
 interface Meta {
-  creator: DB.SelectUser;
-  modifier: DB.SelectUser | null;
+  creator: UserBase;
+  modifier: UserBase | null;
   created: string;
   modified: string | null;
 }
@@ -34,21 +52,6 @@ export interface Location {
   country: string | null;
   name: string | null;
   position: Position | null;
-}
-
-export interface UserSession {
-  email: string;
-  userId: number;
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface User {
-  id: number;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  newsletters: NewsletterBase[];
 }
 
 export type NewsletterItemType = 'media' | 'text';
@@ -97,11 +100,11 @@ export interface NewsletterBase {
   id: number;
   meta: Meta;
   properties: NewsletterProperties;
-  owner: DB.SelectUser;
+  owner: UserBase;
 }
 
 export interface Newsletter extends NewsletterBase {
-  members: DB.SelectUser[];
+  members: UserBase[];
   items: NewsletterItem[];
 }
 

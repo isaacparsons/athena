@@ -1,13 +1,13 @@
-import axios from 'axios';
-import { useContext } from 'react';
-import { StateContext, StateDispatchContext } from './index';
+// import axios from 'axios';
+// import { useContext } from 'react';
+// import { StateContext, StateDispatchContext } from './index';
 
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
-export const useStateContext = () => {
-  return useContext(StateContext);
-};
+// export const useStateContext = () => {
+//   return useContext(StateContext);
+// };
 
-export const useStateDispatchContext = () => {
-  return useContext(StateDispatchContext);
-};
+// export const useStateDispatchContext = () => {
+//   return useContext(StateDispatchContext);
+// };

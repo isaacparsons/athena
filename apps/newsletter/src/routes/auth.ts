@@ -9,7 +9,7 @@ import {
 import { first } from 'remeda';
 import session from 'express-session';
 import { parseEnv } from '../util/parse-env';
-import { UserSession } from '../types/server';
+import { UserSession } from '../types/api';
 
 const env = parseEnv();
 

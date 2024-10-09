@@ -1,6 +1,7 @@
-import { loggedInProcedure, trpc } from '../trpc/trpc';
+import { trpc } from '../trpc/trpc';
 import { z } from 'zod';
-import { nanoid } from 'nanoid';
+import * as nanoid from 'nanoid';
+import { loggedInProcedure } from '../procedures/logged-in';
 
 const locationInput = z
   .object({
@@ -87,7 +88,7 @@ const router = trpc.router({
   get: loggedInProcedure
     .input(getNewsletterItemInput)
     .query(({ input, ctx }) => {
-      //TODO: in media items, replace filename with a signed url.
+      //TODO: in media items, replace filename with a signed url
       return ctx.dao.newsletterItem.get(input.newsletterItemId);
     }),
   getItemUploadLinks: loggedInProcedure
@@ -95,7 +96,7 @@ const router = trpc.router({
     .query(({ input, ctx }) => {
       return Promise.all(
         input.items.map(async (item) => {
-          const fileName = `${ctx.user.userId}-${nanoid()}`;
+          const fileName = `${ctx.user.userId}-${nanoid.nanoid()}`;
           const url = await ctx.gcs.getSignedUrl(fileName, 'write');
           return {
             url,

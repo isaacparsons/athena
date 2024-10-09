@@ -12,12 +12,3 @@ export const parseDateRange = (
       }
     : null;
 };
-
-export function removeUndefinedProperties(obj: object) {
-  return Object.entries(obj)
-    .filter(([key, value]) => value)
-    .reduce((obj, [key, value]) => {
-      obj[key] = value;
-      return obj;
-    }, {});
-}

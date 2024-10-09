@@ -16,8 +16,8 @@ declare global {
     }
     interface Request {
       db: Kysely<Database>;
-      user?: UserSession;
       dao: DAO;
+      user?: UserSession;
       isAuthenticated(): this is AuthenticatedRequest;
     }
   }

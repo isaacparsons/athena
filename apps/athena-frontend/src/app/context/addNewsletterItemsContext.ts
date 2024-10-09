@@ -1,13 +1,13 @@
-import { useContext } from 'react';
-import {
-  AddNewsletterItemsContext,
-  AddNewsletterItemsDispatchContext,
-} from './index';
+// import { useContext } from 'react';
+// import {
+//   AddNewsletterItemsContext,
+//   AddNewsletterItemsDispatchContext,
+// } from './index';
 
-export const useAddNewsletterItemsContext = () => {
-  return useContext(AddNewsletterItemsContext);
-};
+// export const useAddNewsletterItemsContext = () => {
+//   return useContext(AddNewsletterItemsContext);
+// };
 
-export const useAddNewsletterItemsDispatchContext = () => {
-  return useContext(AddNewsletterItemsDispatchContext);
-};
+// export const useAddNewsletterItemsDispatchContext = () => {
+//   return useContext(AddNewsletterItemsDispatchContext);
+// };

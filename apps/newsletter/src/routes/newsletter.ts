@@ -1,4 +1,5 @@
-import { loggedInProcedure, trpc } from '../trpc/trpc';
+import { loggedInProcedure } from '../procedures/logged-in';
+import { trpc } from '../trpc/trpc';
 import { z } from 'zod';
 
 const getNewsletterInput = z.object({

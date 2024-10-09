@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { useAddNewsletterItemsDispatchContext } from '../../context/index';
+// import { useAddNewsletterItemsDispatchContext } from '../../context/index';
 import { useEffect, useState } from 'react';
 
 interface NameInputProps {
@@ -11,7 +11,7 @@ export function NameInput(props: NameInputProps) {
   const { name: inputName, id } = props;
   const [name, setName] = useState('');
 
-  const dispatch = useAddNewsletterItemsDispatchContext();
+  // const dispatch = useAddNewsletterItemsDispatchContext();
 
   useEffect(() => {
     setName(inputName);
@@ -22,12 +22,12 @@ export function NameInput(props: NameInputProps) {
   };
 
   const updateName = () => {
-    dispatch({
-      entityType: 'newsletter-item',
-      action: 'name-updated',
-      id: id,
-      payload: name,
-    });
+    // dispatch({
+    //   entityType: 'newsletter-item',
+    //   action: 'name-updated',
+    //   id: id,
+    //   payload: name,
+    // });
   };
 
   return (
