@@ -7,7 +7,7 @@ import { LocationDAO } from '../dao/location';
 import { NewsletterItemDAO } from '../dao/newsletter-item';
 import { NewsletterItemDetailsDAO } from '../dao/newsletter-item-details';
 import { Request, Response } from 'express';
-import { UserSession } from '../types/api';
+import { UserSession } from '@athena/athena-common';
 
 const gcs = new GCSManager();
 

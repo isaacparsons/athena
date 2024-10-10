@@ -1,5 +1,5 @@
 import { Connection } from '../types/db';
-import { LocationInput } from '../routes/newsletter-item';
+import { LocationInput } from '@athena/athena-common';
 
 export class LocationDAO {
   constructor(readonly db: Connection) {}

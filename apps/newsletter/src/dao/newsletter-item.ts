@@ -10,7 +10,7 @@ import {
   CreateNewsletterItemInput,
   DeleteManyNewsletterItemsInput,
   UpdateNewsletterItemInput,
-} from '../routes/newsletter-item';
+} from '@athena/athena-common';
 import { NewsletterItemDetailsDAO } from './newsletter-item-details';
 import { mapItems } from './mapping/newsletter-item-mapper';
 

@@ -4,8 +4,7 @@ import {
   NewsletterItemDetailsText,
   NewsletterItemDetailsMedia,
   NewsletterItemType,
-} from '../../types/api';
-import * as DB from '../../types/db';
+} from '@athena/athena-common';
 
 function getDetails(item: MappedType) {
   if (item.mediaDetails) {

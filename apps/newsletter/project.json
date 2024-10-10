@@ -54,6 +54,16 @@
         }
       }
     },
+    "generate": {
+      "executor": "nx:run-commands",
+      "configurations": {
+        "api": {
+          "commands": [
+            "tsc -p apps/newsletter/tsconfig.app.json --declaration --outDir types/server"
+          ]
+        }
+      }
+    },
     "db": {
       "executor": "nx:run-commands",
       "configurations": {

@@ -1,5 +1,4 @@
 import { Router, Express, Request, Response } from 'express';
-
 import passport from 'passport';
 import {
   Profile,
@@ -9,7 +8,7 @@ import {
 import { first } from 'remeda';
 import session from 'express-session';
 import { parseEnv } from '../util/parse-env';
-import { UserSession } from '../types/api';
+import { UserSession } from '@athena/athena-common';
 
 const env = parseEnv();
 

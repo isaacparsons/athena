@@ -16,7 +16,9 @@
     "baseUrl": ".",
     "strictNullChecks": true,
     "paths": {
-      "@athena/api": ["types/athena.ts"]
+      "@athena/api": ["types/athena.ts"],
+      "@athena/backend": ["types/server/apps/newsletter/src/routes"],
+      "@athena/athena-common": ["libs/athena-common/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

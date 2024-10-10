@@ -1,36 +1,17 @@
 import { loggedInProcedure } from '../procedures/logged-in';
 import { trpc } from '../trpc/trpc';
-import { z } from 'zod';
+import {
+  getNewsletterInput,
+  postNewsletterInput,
+  updateNewsletterInput,
+  deleteNewsletterInput,
+} from '@athena/athena-common';
 
-const getNewsletterInput = z.object({
-  newsletterId: z.coerce.number(),
-});
-
-const postNewsletterInput = z.object({
-  name: z.string(),
-  startDate: z.string(),
-  endDate: z.string(),
-});
-
-const updateNewsletterInput = z.object({
-  id: z.coerce.number(),
-  name: z.string().optional(),
-  startDate: z.string().optional().nullable(),
-  endDate: z.string().optional().nullable(),
-});
-
-const deleteNewsletterInput = z.object({ id: z.coerce.number() });
-
-export type CreateNewsletterInput = z.infer<typeof postNewsletterInput>;
-export type ReadNewsletterInput = z.infer<typeof getNewsletterInput>;
-export type UpdateNewsletterInput = z.infer<typeof updateNewsletterInput>;
-export type DeleteNewsletterInput = z.infer<typeof deleteNewsletterInput>;
-
-export type NewsletterInput =
-  | CreateNewsletterInput
-  | ReadNewsletterInput
-  | UpdateNewsletterInput
-  | DeleteNewsletterInput;
+// export type NewsletterInput =
+//   | CreateNewsletterInput
+//   | ReadNewsletterInput
+//   | UpdateNewsletterInput
+//   | DeleteNewsletterInput;
 
 const router = trpc.router({
   get: loggedInProcedure.input(getNewsletterInput).query(({ input, ctx }) => {

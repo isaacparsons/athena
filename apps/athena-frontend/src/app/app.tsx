@@ -8,6 +8,7 @@ import { grey } from '@mui/material/colors';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { trpc } from '../trpc';
+import { NotFound } from './pages/NotFound';
 // import { APIProvider, StateProvider, AuthProvider } from './context/index';
 
 export function App() {
@@ -37,11 +38,12 @@ export function App() {
             <Box sx={{ flex: 1, minHeight: '100vh', bgcolor: grey[200] }}>
               <Routes>
                 <Route path="/" element={<Home />} />
-                {/* <Route path="/login" element={<Login />} />
-                  <Route
-                    path="newsletters/:newsletterId"
-                    element={<Newsletter />}
-                  /> */}
+                {/* <Route path="/login" element={<Login />} />*/}
+                <Route
+                  path="newsletters/:newsletterId"
+                  element={<Newsletter />}
+                />
+                <Route path="error" element={<NotFound />} />
               </Routes>
             </Box>
             {/* </AuthProvider>

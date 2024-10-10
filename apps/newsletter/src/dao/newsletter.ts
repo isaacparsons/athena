@@ -6,13 +6,13 @@ import {
   jsonArrayFrom,
   jsonObjectFrom,
 } from '../types/db';
-import { Newsletter } from '../types/api';
-import { parseDateRange } from '../util/helpers';
-import { creator, modifier, user } from '../util/db';
 import {
+  Newsletter,
   CreateNewsletterInput,
   UpdateNewsletterInput,
-} from '../routes/newsletter';
+} from '@athena/athena-common';
+import { parseDateRange } from '../util/helpers';
+import { creator, modifier, user } from '../util/db';
 
 export class NewsletterDAO {
   constructor(

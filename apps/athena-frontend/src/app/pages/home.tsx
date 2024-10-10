@@ -5,12 +5,12 @@ import { useEffect, useMemo, useState } from 'react';
 // import { useBearStore } from '../context/state';
 import { trpc } from '../../trpc';
 import { useStore } from '../store/store';
-// import {
-//   AddNewsletterDialog,
-//   CustomFab,
-//   Appbar,
-//   Newsletters,
-// } from '../components/index';
+import {
+  //   AddNewsletterDialog,
+  //   CustomFab,
+  Appbar,
+  UserNewsletters,
+} from '../components/index';
 // import {
 //   useStateContext,
 //   useStateDispatchContext,
@@ -19,7 +19,7 @@ import { useStore } from '../store/store';
 // } from '../context/index';
 
 export function Home() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   // const user = useAuthContext();
   // const api = useAPI();
   // const state = useStateContext();
@@ -58,24 +58,23 @@ export function Home() {
   // };
 
   // const increase = useBearStore((state) => state.increase);
-  const { fetchedUser } = useStore();
-  const userQuery = trpc.users.get.useQuery();
-
-  console.log(userQuery.data);
+  const { fetchedUser, fetchedNewsletter } = useStore();
+  const { data, isFetching, isFetched } = trpc.users.get.useQuery();
+  const newsletterQuery = trpc.newsletters.get.useQuery({ newsletterId: 1 });
 
   useEffect(() => {
-    if (userQuery.data) {
-      fetchedUser(userQuery.data);
-    }
-  }, [userQuery.data]);
+    if (data) fetchedUser(data);
+  }, [isFetched, data]);
+
+  const { user } = useStore();
 
   return (
     <Box sx={{ height: '100vh' }}>
-      {/* <Button onClick={() => increase(1)}>Click me</Button> */}
       {/* <AddNewsletterDialog
         open={addNewsletterDialogOpen}
         onClose={handleCloseAddNewsletterDialog}
       />
+      */}
       <Appbar
         title="Newsletter"
         right={
@@ -88,10 +87,11 @@ export function Home() {
           )
         }
       />
+
       <Container sx={{ flex: 1, minHeight: '100vh' }} maxWidth="md">
-        <Newsletters newsletters={newsletters} />
+        {user ? <UserNewsletters newsletters={user.newsletters} /> : null}
       </Container>
-      <CustomFab onClick={handleOpenAddNewsletterDialog} /> */}
+      {/* <CustomFab onClick={handleOpenAddNewsletterDialog} /> */}
     </Box>
   );
 }

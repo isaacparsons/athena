@@ -1,9 +1,13 @@
 import _ from 'lodash';
-import { create } from 'zustand';
+import { create, StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type {} from '@redux-devtools/extension'; // required for devtools typing
-import { Newsletter, NewsletterItem, User, NewsletterBase } from '@athena/api';
+import { Newsletter, NewsletterItem, User } from '@athena/athena-common';
+import {
+  createAddNewslettersItemsSlice,
+  NewsletterItemsSlice,
+} from './add-newsletter-items';
 
 type StoreNewsletter = Omit<Newsletter, 'items'> & {
   itemIds: number[];
@@ -13,7 +17,7 @@ type StoreNewsletterItem = Omit<NewsletterItem, 'children'> & {
   childrenIds: number[];
 };
 
-export interface Slice {
+export interface NewslettersSlice {
   user: User | null;
   newsletters: Record<number, StoreNewsletter>;
   newsletterItems: Record<number, StoreNewsletterItem>;
@@ -21,71 +25,43 @@ export interface Slice {
   fetchedNewsletter: (newsletter: Newsletter) => void;
 }
 
-export const useStore = create<Slice>()(
+export type Slices = NewslettersSlice & NewsletterItemsSlice;
+
+const createNewslettersSlice: StateCreator<
+  Slices,
+  [['zustand/devtools', never], ['zustand/immer', never]],
+  [],
+  NewslettersSlice
+> = (set, get) => ({
+  user: null,
+  newsletters: {},
+  newsletterItems: {},
+  fetchedUser: (user) =>
+    set((state) => {
+      state.user = user;
+    }),
+  fetchedNewsletter: (newsletter: Newsletter) =>
+    set((state) => {
+      const items = newsletter.items;
+      state.newsletters[newsletter.id] = {
+        ..._.omit(newsletter, ['items']),
+        itemIds: items.map((i) => i.id),
+      };
+      items.forEach((item) => {
+        const childrenIds = item.children.map((c) => c.id);
+        state.newsletterItems[item.id] = {
+          ..._.omit(item, ['children']),
+          childrenIds,
+        };
+      });
+    }),
+});
+
+export const useStore = create<Slices>()(
   devtools(
-    immer((set) => ({
-      user: null,
-      newsletters: {},
-      newsletterItems: {},
-      fetchedUser: (user) =>
-        set((state) => {
-          state.user = user;
-        }),
-      fetchedNewsletter: (newsletter: Newsletter) =>
-        set((state) => {
-          const items = newsletter.items;
-          state.newsletters[newsletter.id] = {
-            ..._.omit(newsletter, ['items']),
-            itemIds: items.map((i) => i.id),
-          };
-          items.forEach((item) => {
-            const childrenIds = item.children.map((c) => c.id);
-            state.newsletterItems[item.id] = {
-              ..._.omit(item, ['children']),
-              childrenIds,
-            };
-          });
-        }),
+    immer((...a) => ({
+      ...createNewslettersSlice(...a),
+      ...createAddNewslettersItemsSlice(...a),
     }))
   )
 );
-
-// {
-//     user,
-//     newsletters: {
-//         1: {
-//             meta: {
-//                 creator,
-//                 modifier,
-//                 created,
-//                 modified
-//             }
-//             properties: {
-//                 name,
-//                 dateRange: {
-//                     start,
-//                     end
-//                 }
-//             }
-//             owner: {}
-//             members:
-//             itemsIds: []
-//         },
-//         2: {
-
-//         }
-//     }
-//     newsletterItems: {
-//         id: number;
-//         meta: Meta;
-//         location: Location | null;
-//         date: string | null;
-//         title: string;
-//         nextItemId: number | null;
-//         previousItemId: number | null;
-//         details?: {
-
-//         }
-//     }
-
-// }

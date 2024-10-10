@@ -1,0 +1,87 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NewsletterDAO = void 0;
+const tslib_1 = require("tslib");
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
+const db_1 = require("../types/db");
+const helpers_1 = require("../util/helpers");
+const db_2 = require("../util/db");
+class NewsletterDAO {
+    constructor(db, newsletterItemDAO) {
+        this.db = db;
+        this.newsletterItemDAO = newsletterItemDAO;
+    }
+    get(id) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const newsletter = yield this.db
+                .selectFrom('newsletter as n')
+                .where('n.id', '=', id)
+                .selectAll()
+                .select(({ ref }) => (0, db_2.user)(this.db, ref('n.ownerId')).as('owner'))
+                .select(({ ref }) => (0, db_2.creator)(this.db, ref('n.creatorId')))
+                .select(({ ref }) => (0, db_2.modifier)(this.db, ref('n.modifierId')))
+                .select((eb) => (0, db_1.jsonArrayFrom)(eb
+                .selectFrom('userNewsletter as un')
+                .whereRef('un.newsletterId', '=', 'n.id')
+                .innerJoin('user', 'user.id', 'un.userId')
+                .selectAll('user')).as('members'))
+                .executeTakeFirstOrThrow(() => new Error(`newsletter with id: ${id} does not exist`));
+            return {
+                id: newsletter.id,
+                meta: {
+                    created: newsletter.created,
+                    modified: newsletter.modified,
+                    creator: newsletter.creator,
+                    modifier: newsletter.modifier,
+                },
+                properties: {
+                    name: newsletter.name,
+                    dateRange: (0, helpers_1.parseDateRange)(newsletter.startDate, newsletter.endDate),
+                },
+                owner: newsletter.owner,
+                members: newsletter.members,
+                items: [],
+            };
+        });
+    }
+    post(userId, input) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return this.db.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                const newsletter = yield trx
+                    .insertInto('newsletter')
+                    .values(Object.assign(Object.assign({}, input), { ownerId: userId, created: new Date().toISOString(), creatorId: userId }))
+                    .returningAll()
+                    .executeTakeFirstOrThrow();
+                yield trx
+                    .insertInto('userNewsletter')
+                    .values({
+                    userId: userId,
+                    newsletterId: newsletter.id,
+                })
+                    .executeTakeFirstOrThrow();
+                return newsletter;
+            }));
+        });
+    }
+    update(userId, input) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const inputWithoutId = lodash_1.default.omit(input, 'id');
+            return this.db
+                .updateTable('newsletter')
+                .set(Object.assign(Object.assign({}, inputWithoutId), { modifierId: userId, modified: new Date().toISOString() }))
+                .where('id', '=', input.id)
+                .executeTakeFirstOrThrow();
+        });
+    }
+    delete(userId, id) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return this.db
+                .deleteFrom('newsletter')
+                .where('id', '=', id)
+                .where('ownerId', '=', userId)
+                .execute();
+        });
+    }
+}
+exports.NewsletterDAO = NewsletterDAO;
+//# sourceMappingURL=newsletter.js.map

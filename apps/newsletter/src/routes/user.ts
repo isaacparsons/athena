@@ -1,5 +1,4 @@
 import { trpc } from '../trpc/trpc';
-import { z } from 'zod';
 import { loggedInProcedure } from '../procedures/logged-in';
 
 export const userRouter = trpc.router({

@@ -1,4 +1,4 @@
-import { User } from '../types/api';
+import { User } from '@athena/athena-common';
 import { Connection as DBConnection, jsonObjectFrom } from '../types/db';
 
 export class UserDAO {

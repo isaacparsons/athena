@@ -1,9 +1,9 @@
-import { CreateNewsletterItemDetailsInput } from '../routes/newsletter-item';
 import { Connection } from '../types/db';
 import {
   NewsletterItemDetailsMedia,
   NewsletterItemDetailsText,
-} from '../types/api';
+  CreateNewsletterItemDetailsInput,
+} from '@athena/athena-common';
 
 export class NewsletterItemDetailsDAO {
   constructor(readonly db: Connection) {}

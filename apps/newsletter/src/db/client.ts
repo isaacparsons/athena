@@ -9,16 +9,7 @@ import {
   NewsletterItemMediaTable,
   NewsletterItemTextTable,
 } from '../db/tables';
-import {
-  ITable,
-  Connection as DBConnection,
-  PostgresDialect,
-  Pool,
-  DB,
-  Database,
-} from '../types/db';
-import { NewsletterDAO } from '../dao/newsletter';
-import { parseEnv } from '../util/parse-env';
+import { ITable, PostgresDialect, Pool, DB, Database } from '../types/db';
 
 const env = process.env as any; //parseEnv();
 
