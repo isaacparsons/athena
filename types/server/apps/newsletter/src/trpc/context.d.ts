@@ -4,7 +4,7 @@ import { GCSManager } from '../services/gcs';
 import { LocationDAO } from '../dao/location';
 import { NewsletterItemDAO } from '../dao/newsletter-item';
 import { Request, Response } from 'express';
-import { UserSession } from '@athena/api';
+import { UserSession } from '@athena/athena-common';
 export declare function createContext({ req, res, }: {
     req: Request & {
         user?: UserSession;

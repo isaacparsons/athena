@@ -12,10 +12,15 @@ const context_1 = require("./trpc/context");
 const env = (0, parse_env_1.parseEnv)();
 exports.app = (0, express_1.default)();
 exports.app.use((0, cors_1.default)({
-    credentials: true,
-    origin: `http://${env.client.host}:${env.client.port}`,
+    // credentials: true,
+    credentials: false,
+    // origin: [
+    //   `http://${env.client.host}:${env.client.port}`,
+    //   'https://storage.googleapis.com/athena-newsletter',
+    // ],
+    origin: '*',
     AccessControlAllowOrigin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
 }));
 exports.app.use(express_1.default.json());
 exports.app.use(express_1.default.urlencoded({ extended: true }));

@@ -6,26 +6,12 @@ import theme from '../theme';
 import { Box } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink } from '@trpc/client';
-import { trpc } from '../trpc';
+import { trpc, trpcClient } from '../trpc';
 import { NotFound } from './pages/NotFound';
 // import { APIProvider, StateProvider, AuthProvider } from './context/index';
 
 export function App() {
   const queryClient = new QueryClient();
-  const trpcClient = trpc.createClient({
-    links: [
-      httpBatchLink({
-        url: 'http://localhost:3000/api/v1/trpc',
-
-        async headers() {
-          return {
-            'admin-secret': '123456',
-          };
-        },
-      }),
-    ],
-  });
 
   return (
     <ThemeProvider theme={theme}>

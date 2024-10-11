@@ -26,6 +26,7 @@ const router = trpc.router({
           return {
             url,
             id: item.id,
+            fileName,
           };
         })
       );

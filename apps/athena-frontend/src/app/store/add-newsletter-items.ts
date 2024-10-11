@@ -23,6 +23,7 @@ export type StoreAddNewsletterMediaItem = Pick<
 export interface NewsletterItemsSlice {
   mediaItems: Record<number, StoreAddNewsletterMediaItem>;
   addMediaItem: (mediaItem: StoreAddNewsletterMediaItem) => void;
+  removeMediaItem: (id: number) => void;
 }
 
 export const createAddNewslettersItemsSlice: StateCreator<
@@ -35,6 +36,11 @@ export const createAddNewslettersItemsSlice: StateCreator<
   addMediaItem: (mediaItem: StoreAddNewsletterMediaItem) => {
     set((state) => {
       state.mediaItems[mediaItem.tempId] = mediaItem;
+    });
+  },
+  removeMediaItem: (id: number) => {
+    set((state) => {
+      delete state.mediaItems[id];
     });
   },
 });

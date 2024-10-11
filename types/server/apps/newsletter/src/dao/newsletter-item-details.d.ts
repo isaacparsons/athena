@@ -1,5 +1,5 @@
 import { Connection } from '../types/db';
-import { NewsletterItemDetailsMedia, NewsletterItemDetailsText, CreateNewsletterItemDetailsInput } from '@athena/api';
+import { NewsletterItemDetailsMedia, NewsletterItemDetailsText, CreateNewsletterItemDetailsInput } from '@athena/athena-common';
 export declare class NewsletterItemDetailsDAO {
     readonly db: Connection;
     constructor(db: Connection);

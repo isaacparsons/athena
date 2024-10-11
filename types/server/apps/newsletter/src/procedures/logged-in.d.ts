@@ -2,7 +2,7 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
     _config: import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/api").UserSession;
+                user?: import("@athena/athena-common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -28,7 +28,7 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
             refreshToken: string;
         };
         req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/api").UserSession;
+            user?: import("@athena/athena-common").UserSession;
             isAuthenticated(): () => boolean;
         };
         res: import("express").Response<any, Record<string, any>>;

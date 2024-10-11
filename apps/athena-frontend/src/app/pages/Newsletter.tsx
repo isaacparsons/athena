@@ -1,4 +1,4 @@
-import { redirect, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, CircularProgress, Container, useTheme } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,19 +13,19 @@ import {
   ConfirmationDialog,
 } from '../components/index';
 import EditIcon from '@mui/icons-material/Edit';
-// import {
-//   useAPI,
-//   AddNewsletterItemsProvider,
-//   useStateContext,
-//   useStateDispatchContext,
-// } from '../context/index';
 import { successNotificationOptions } from '../../config';
 import { useStore } from '../store/store';
 import { trpc } from '../../trpc';
+import { useShallow } from 'zustand/react/shallow';
 
 export function Newsletter() {
   const { newsletterId } = useParams();
-  const { newsletters, fetchedNewsletter } = useStore();
+  const { newsletters, fetchedNewsletter } = useStore(
+    useShallow((state) => ({
+      newsletters: state.newsletters,
+      fetchedNewsletter: state.fetchedNewsletter,
+    }))
+  );
   const { data, isFetching, isFetched, error } = trpc.newsletters.get.useQuery({
     newsletterId: Number(newsletterId),
   });
@@ -38,10 +38,8 @@ export function Newsletter() {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // const state = useStateContext();
-  // const dispatch = useStateDispatchContext();
-
   // const newsletter = useMemo(() => {
+
   //   if (!newsletterId) return null;
   //   const id = parseInt(newsletterId);
   //   return state.newsletters.get(id);

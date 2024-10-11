@@ -11,6 +11,5 @@ export * from './CustomHorizontalBox';
 export * from './ConfirmationDialog';
 export * from './Carousel';
 export * from './AddMediaItemCard';
-
-// export * from './AddNewsletterDialog';
+export * from './AddNewsletterDialog';
 export * from './AddMediaItemsDialog';

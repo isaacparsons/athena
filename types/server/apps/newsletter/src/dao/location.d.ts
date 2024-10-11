@@ -1,5 +1,5 @@
 import { Connection } from '../types/db';
-import { LocationInput } from '@athena/api';
+import { LocationInput } from '@athena/athena-common';
 export declare class LocationDAO {
     readonly db: Connection;
     constructor(db: Connection);

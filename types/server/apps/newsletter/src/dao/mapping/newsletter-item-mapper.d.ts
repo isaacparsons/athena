@@ -1,4 +1,4 @@
-import { NewsletterItem } from '@athena/api';
+import { NewsletterItem } from '@athena/athena-common';
 type MappedType = {
     id: number;
     date: string | null;

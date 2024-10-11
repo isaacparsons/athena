@@ -4,21 +4,16 @@ const tslib_1 = require("tslib");
 const trpc_1 = require("../trpc/trpc");
 const nanoid = tslib_1.__importStar(require("nanoid"));
 const logged_in_1 = require("../procedures/logged-in");
-const api_1 = require("@athena/api");
-// export type NewsletterItemInput =
-//   | CreateNewsletterItemInput
-//   | ReadNewsletterItemInput
-//   | UpdateNewsletterItemInput
-//   | DeleteManyNewsletterItemsInput;
+const athena_common_1 = require("@athena/athena-common");
 const router = trpc_1.trpc.router({
     get: logged_in_1.loggedInProcedure
-        .input(api_1.getNewsletterItemInput)
+        .input(athena_common_1.getNewsletterItemInput)
         .query(({ input, ctx }) => {
         //TODO: in media items, replace filename with a signed url
         return ctx.dao.newsletterItem.get(input.newsletterItemId);
     }),
     getItemUploadLinks: logged_in_1.loggedInProcedure
-        .input(api_1.getItemUploadLinksInput)
+        .input(athena_common_1.getItemUploadLinksInput)
         .query(({ input, ctx }) => {
         return Promise.all(input.items.map((item) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
             const fileName = `${ctx.user.userId}-${nanoid.nanoid()}`;
@@ -26,21 +21,22 @@ const router = trpc_1.trpc.router({
             return {
                 url,
                 id: item.id,
+                fileName,
             };
         })));
     }),
     create: logged_in_1.loggedInProcedure
-        .input(api_1.postNewsletterItemInput)
+        .input(athena_common_1.postNewsletterItemInput)
         .mutation(({ input, ctx }) => {
         return ctx.dao.newsletterItem.post(ctx.user.userId, input);
     }),
     update: logged_in_1.loggedInProcedure
-        .input(api_1.updateNewsletterItemInput)
+        .input(athena_common_1.updateNewsletterItemInput)
         .mutation(({ input, ctx }) => {
         return ctx.dao.newsletterItem.update(ctx.user.userId, input);
     }),
     deleteMany: logged_in_1.loggedInProcedure
-        .input(api_1.deleteManyNewsletterItemsInput)
+        .input(athena_common_1.deleteManyNewsletterItemsInput)
         .mutation(({ input, ctx }) => {
         // return ctx.dao.newsletterItem.delete(input.newsletterItemId);
     }),

@@ -11,10 +11,15 @@ const env = parseEnv();
 export let app = express();
 app.use(
   cors({
-    credentials: true,
-    origin: `http://${env.client.host}:${env.client.port}`,
+    // credentials: true,
+    credentials: false,
+    // origin: [
+    //   `http://${env.client.host}:${env.client.port}`,
+    //   'https://storage.googleapis.com/athena-newsletter',
+    // ],
+    origin: '*',
     AccessControlAllowOrigin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   })
 );
 app.use(express.json());
@@ -30,6 +35,12 @@ app.use(
   createExpressMiddleware({
     router: appRouter,
     createContext: createContext,
+    onError(opts) {
+      const { error, type, path, input, ctx, req } = opts;
+      console.error('Error:', error);
+      // if (error.code === 'INTERNAL_SERVER_ERROR') {
+      // }
+    },
   })
 );
 

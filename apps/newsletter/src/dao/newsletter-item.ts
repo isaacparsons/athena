@@ -63,16 +63,25 @@ export class NewsletterItemDAO {
   async post(userId: number, input: CreateNewsletterItemInput) {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const location = await new LocationDAO(trx).post(input.location);
+      const details = input.details;
+
       const createdNewsletterItem = await trx
         .insertInto('newsletterItem')
         .values({
-          ..._.omit(input, ['location']),
+          ..._.omit(input, ['location', 'details']),
           locationId: location.id,
           created: new Date().toISOString(),
           creatorId: userId,
         })
         .returningAll()
         .executeTakeFirstOrThrow();
+
+      if (details) {
+        await new NewsletterItemDetailsDAO(trx).post(
+          createdNewsletterItem.id,
+          details
+        );
+      }
 
       await trx
         .updateTable('newsletterItem as ni')

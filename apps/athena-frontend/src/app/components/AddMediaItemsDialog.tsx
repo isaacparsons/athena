@@ -6,78 +6,33 @@ import {
   DialogContent,
   DialogTitle,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNotifications } from '@toolpad/core';
+import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '../store/store';
 
 import { Carousel } from '../components/index';
+import { asyncTrpcClient, trpc, trpcClient } from '../../trpc';
+import { getQueryKey } from '@trpc/react-query';
+import axios from 'axios';
+
 interface AddMediaItemsDialogProps {
   open: boolean;
   handleClose: () => void;
   newsletterId: number;
 }
-// const items: CreateNewsletterItemWithId[] = [
-//   {
-//     id: 1,
-//     file: new File([], 'test1'),
-//     newsletterId: 1,
-//     title: 'test item 1',
-//     details: {
-//       name: 'some name',
-//       location: {
-//         name: null,
-//         countryCode: null,
-//         longitude: null,
-//         lattitude: null,
-//       },
-//     },
-//   },
-//   {
-//     id: 2,
-//     file: new File([], 'test2'),
-//     newsletterId: 1,
-//     title: 'test item 2',
-//     details: {
-//       name: 'some name 2',
-//       location: {
-//         name: null,
-//         countryCode: null,
-//         longitude: null,
-//         lattitude: null,
-//       },
-//     },
-//   },
-//   {
-//     id: 3,
-//     file: new File([], 'test3'),
-//     newsletterId: 1,
-//     title: 'test item 3',
-//     details: {
-//       name: 'some name 3',
-//       location: {
-//         name: null,
-//         countryCode: null,
-//         longitude: null,
-//         lattitude: null,
-//       },
-//     },
-//   },
-// ];
 
 export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
   const { open, handleClose, newsletterId } = props;
-  const { mediaItems, addMediaItem } = useStore();
+  const createMediaItem = trpc.newsletterItems.create.useMutation();
+  const { mediaItems, addMediaItem } = useStore(
+    useShallow((state) => ({
+      mediaItems: state.mediaItems,
+      addMediaItem: state.addMediaItem,
+    }))
+  );
   const notifications = useNotifications();
-
   const [uploading, setUploading] = useState(false);
-
-  // useEffect(() => {
-  //   addNewsletterItemsDispatch({
-  //     entityType: 'newsletter-items',
-  //     action: 'added',
-  //     payload: items,
-  //   });
-  // }, []);
 
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -87,7 +42,7 @@ export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
       if (file) {
         const { lastModified, name } = file;
         addMediaItem({
-          tempId: Object.keys(mediaItems).length + 1,
+          tempId: Object.keys(mediaItems).length + i + 1,
           title: name,
           date: new Date(lastModified).toISOString(),
           location: undefined,
@@ -103,45 +58,57 @@ export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
   };
 
   const handleUploadFiles = async () => {
-    // setUploading(true);
-    // const data = Array.from(addNewsletterItemsContext).map(([key, item]) => {
-    //   const { file, details, title, date } = item;
-    //   const { caption, format, size, location, name } = details;
-    //   const {
-    //     countryCode,
-    //     lattitude,
-    //     longitude,
-    //     name: locationName,
-    //   } = location;
-    //   const formData = new FormData();
-    //   formData.append('photo', file);
-    //   formData.append('name', name);
-    //   formData.append('title', title);
-    //   if (date) formData.append('date', date);
-    //   if (caption) formData.append('caption', caption);
-    //   if (format) formData.append('format', format);
-    //   if (locationName) formData.append('locationName', locationName);
-    //   if (countryCode) formData.append('countryCode', countryCode);
-    //   if (lattitude) formData.append('lattitude', lattitude.toString());
-    //   if (longitude) formData.append('longitude', longitude.toString());
-    //   return formData;
-    // });
-    // for (let i = 0; i < data.length; i++) {
-    //   await api.upload(`/newsletters/${newsletterId}/items/photo`, data[i]);
-    //   notifications.show('Item(s) added successfully!', {
-    //     autoHideDuration: 3000,
-    //     severity: 'success',
-    //   });
-    //   handleClose();
-    // }
-    // setUploading(false);
+    setUploading(true);
+    // get signed upload urls
+    const items = Object.keys(mediaItems).map((i) => ({
+      id: mediaItems[Number(i)].tempId.toString(),
+    }));
+    const signedUrls =
+      await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
+        items,
+      });
+
+    // signedUrls.reduce(async (promiseChain, url) => {
+    //     const previousUploadededImg =
+    // }, Promise.resolve())
+
+    const item = mediaItems[Number(signedUrls[0].id)];
+    const signedUrl = signedUrls[0];
+    await axios.put(signedUrl.url, mediaItems[Number(signedUrl.id)].file);
+
+    const res = await createMediaItem.mutateAsync({
+      newsletterId: Number(newsletterId),
+      title: item.title,
+      parentId: null,
+      nextItemId: null,
+      previousItemId: null,
+      details: {
+        name: item.details.name,
+        type: 'media',
+        fileName: signedUrl.fileName,
+      },
+    });
+    console.log(res);
+
+    // sequentially upload each item, using the previous
+    // uploaded items id for the previous Id, and null as nextId
+
+    setUploading(false);
   };
+
+  const addItemsVisible = useMemo(() => {
+    return Object.keys(mediaItems).length === 0;
+  }, [mediaItems]);
+
+  const items = useMemo(() => {
+    return Object.keys(mediaItems).map((key) => mediaItems[Number(key)]);
+  }, [mediaItems]);
 
   return (
     <Dialog fullScreen open={open} onClose={handleClose}>
       <DialogTitle>Add Media</DialogTitle>
       <DialogContent>
-        {Object.keys(mediaItems).length === 0 ? (
+        {addItemsVisible ? (
           <input
             type="file"
             multiple
@@ -149,11 +116,7 @@ export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
             onChange={handleFileSelection}
           />
         ) : (
-          <Carousel
-            items={Object.keys(mediaItems).map(
-              (key) => mediaItems[Number(key)]
-            )}
-          />
+          <Carousel items={items} />
         )}
       </DialogContent>
       <DialogActions>
@@ -161,9 +124,7 @@ export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
         <Button
           type="submit"
           onClick={handleUploadFiles}
-          disabled={
-            Object.keys(mediaItems).length === 0 // || uploading
-          }
+          disabled={Object.keys(mediaItems).length === 0 || uploading}
         >
           {uploading ? <CircularProgress /> : 'Upload'}
         </Button>

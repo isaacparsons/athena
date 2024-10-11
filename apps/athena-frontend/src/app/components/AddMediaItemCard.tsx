@@ -2,16 +2,18 @@ import { Box, Card, CardContent, CardMedia, IconButton } from '@mui/material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useState } from 'react';
 import { EditItemLocation, DateInput, NameInput, LocationInput } from './index';
+import { StoreAddNewsletterMediaItem } from '../store/add-newsletter-items';
+import { useStore } from '../store/store';
 
 interface AddMediaItemCardProps {
-  // item: CreateNewsletterItemWithId;
+  item: StoreAddNewsletterMediaItem;
   isSnapPoint: boolean;
 }
 
 export function AddMediaItemCard(props: AddMediaItemCardProps) {
-  //   const { item, isSnapPoint } = props;
-  //   const addNewsletterItemsDispatchContext =
-  //     useAddNewsletterItemsDispatchContext();
+  const { item, isSnapPoint } = props;
+  const { removeMediaItem } = useStore();
+
   //   const [editLocationOpen, setEditLocationOpen] = useState(false);
   //   const handleCloseEditLocation = () => {
   //     setEditLocationOpen(false);
@@ -39,43 +41,46 @@ export function AddMediaItemCard(props: AddMediaItemCardProps) {
   //       <EditItemLocation open={true} handleClose={handleCloseEditLocation} />
   //     );
   //   } else {
-  //     return (
-  //       <Card
-  //         sx={{
-  //           display: 'flex',
-  //           flexDirection: 'column',
-  //           margin: 1,
-  //           minWidth: 400,
-  //           padding: 0,
-  //           ...(isSnapPoint ? { scrollSnapAlign: 'start' } : {}),
-  //         }}
-  //       >
-  //         <Box display="flex" flexDirection="row" justifyContent="flex-end">
-  //           <IconButton aria-label="delete" onClick={handleRemoveItem}>
-  //             <CancelIcon />
-  //           </IconButton>
-  //         </Box>
-  //         <CardMedia
-  //           sx={{ height: 400, width: 400 }}
-  //           image={URL.createObjectURL(item.file)} //`https://picsum.photos/500?idx=1`
-  //           title={item.details.name}
-  //         />
-  //         <CardContent>
-  //           <Box display="flex" flexDirection="column">
-  //             <NameInput id={item.id} name={item.details.name} />
-  //             <DateInput
-  //               id={item.id}
-  //               date={item.date}
-  //               onChange={handleDateChange}
-  //             />
-  //             <LocationInput
-  //               id={item.id}
-  //               location={item.details.location}
-  //               handleOpenLocationDialog={handleOpenEditLocation}
-  //             />
-  //           </Box>
-  //         </CardContent>
-  //       </Card>
-  //     );
+  return (
+    <Card
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        margin: 1,
+        minWidth: 400,
+        padding: 0,
+        ...(isSnapPoint ? { scrollSnapAlign: 'start' } : {}),
+      }}
+    >
+      <Box display="flex" flexDirection="row" justifyContent="flex-end">
+        <IconButton
+          aria-label="delete"
+          onClick={() => removeMediaItem(item.tempId)}
+        >
+          <CancelIcon />
+        </IconButton>
+      </Box>
+      <CardMedia
+        sx={{ height: 400, width: 400 }}
+        image={URL.createObjectURL(item.file)} //`https://picsum.photos/500?idx=1`
+        title={item.details.name}
+      />
+      <CardContent>
+        <Box display="flex" flexDirection="column">
+          <NameInput id={item.tempId} name={item.details.name} />
+          {/* <DateInput
+            id={item.id}
+            date={item.date}
+            onChange={handleDateChange}
+          />
+          <LocationInput
+            id={item.id}
+            location={item.details.location}
+            handleOpenLocationDialog={handleOpenEditLocation}
+          /> */}
+        </Box>
+      </CardContent>
+    </Card>
+  );
   //   }
 }

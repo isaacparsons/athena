@@ -1,6 +1,6 @@
 import { NewsletterItemDAO } from './newsletter-item';
 import { Connection as DBConnection } from '../types/db';
-import { Newsletter, CreateNewsletterInput, UpdateNewsletterInput } from '@athena/api';
+import { Newsletter, CreateNewsletterInput, UpdateNewsletterInput } from '@athena/athena-common';
 export declare class NewsletterDAO {
     readonly db: DBConnection;
     readonly newsletterItemDAO: NewsletterItemDAO;

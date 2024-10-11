@@ -9,26 +9,26 @@ interface NameInputProps {
 
 export function NameInput(props: NameInputProps) {
   const { name: inputName, id } = props;
-  const [name, setName] = useState('');
+  // const [name, setName] = useState('');
 
   // const dispatch = useAddNewsletterItemsDispatchContext();
 
-  useEffect(() => {
-    setName(inputName);
-  }, [inputName]);
+  // useEffect(() => {
+  //   setName(inputName);
+  // }, [inputName]);
 
-  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
+  // const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setName(event.target.value);
+  // };
 
-  const updateName = () => {
-    // dispatch({
-    //   entityType: 'newsletter-item',
-    //   action: 'name-updated',
-    //   id: id,
-    //   payload: name,
-    // });
-  };
+  // const updateName = () => {
+  // dispatch({
+  //   entityType: 'newsletter-item',
+  //   action: 'name-updated',
+  //   id: id,
+  //   payload: name,
+  // });
+  // };
 
   return (
     <TextField
@@ -40,10 +40,10 @@ export function NameInput(props: NameInputProps) {
       label="Name"
       type="text"
       fullWidth
-      onBlur={updateName}
+      // onBlur={updateName}
       variant="standard"
-      value={name}
-      onChange={handleNameChange}
+      value={'name'}
+      onChange={() => console.log('change')} //handleNameChange
     />
   );
 }

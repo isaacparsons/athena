@@ -1,7 +1,7 @@
 export declare const appRouter: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
     ctx: {
         req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/api").UserSession;
+            user?: import("@athena/athena-common").UserSession;
             isAuthenticated(): () => boolean;
         };
         res: import("express").Response<any, Record<string, any>>;
@@ -21,7 +21,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
     users: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/api").UserSession;
+                user?: import("@athena/athena-common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -42,7 +42,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -68,7 +68,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -85,12 +85,12 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _input_out: typeof import("@trpc/server").unsetMarker;
             _output_in: typeof import("@trpc/server").unsetMarker;
             _output_out: typeof import("@trpc/server").unsetMarker;
-        }, import("@athena/api").User>;
+        }, import("@athena/athena-common").User>;
         newsletters: import("@trpc/server").BuildProcedure<"query", {
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -116,7 +116,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -169,7 +169,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
     newsletters: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/api").UserSession;
+                user?: import("@athena/athena-common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -190,7 +190,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -216,7 +216,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -237,12 +237,12 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             };
             _output_in: typeof import("@trpc/server").unsetMarker;
             _output_out: typeof import("@trpc/server").unsetMarker;
-        }, import("@athena/api").Newsletter>;
+        }, import("@athena/athena-common").Newsletter>;
         post: import("@trpc/server").BuildProcedure<"mutation", {
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -268,7 +268,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -308,7 +308,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -334,7 +334,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -366,7 +366,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -392,7 +392,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -418,7 +418,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
     newsletterItems: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/api").UserSession;
+                user?: import("@athena/athena-common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -439,7 +439,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -465,7 +465,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -486,12 +486,12 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             };
             _output_in: typeof import("@trpc/server").unsetMarker;
             _output_out: typeof import("@trpc/server").unsetMarker;
-        }, import("@athena/api").NewsletterItem>;
+        }, import("@athena/athena-common").NewsletterItem>;
         getItemUploadLinks: import("@trpc/server").BuildProcedure<"query", {
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -517,7 +517,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -545,12 +545,13 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
         }, {
             url: string;
             id: string;
+            fileName: string;
         }[]>;
         create: import("@trpc/server").BuildProcedure<"mutation", {
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -576,7 +577,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -646,7 +647,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -672,7 +673,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -716,7 +717,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _config: import("@trpc/server").RootConfig<{
                 ctx: {
                     req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                        user?: import("@athena/api").UserSession;
+                        user?: import("@athena/athena-common").UserSession;
                         isAuthenticated(): () => boolean;
                     };
                     res: import("express").Response<any, Record<string, any>>;
@@ -742,7 +743,7 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     refreshToken: string;
                 };
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/api").UserSession;
+                    user?: import("@athena/athena-common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
