@@ -1,161 +1,133 @@
+import _ from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Box, CircularProgress, Container, useTheme } from '@mui/material';
+import { CircularProgress, Container, useTheme } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNotifications } from '@toolpad/core';
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   BackButton,
   CustomSpeedDial,
-  // NewsletterMembers,
-  // NewsletterItemsList,
   AddMediaItemsDialog,
   ConfirmationDialog,
+  NewsletterItemsList,
 } from '../components/index';
 import EditIcon from '@mui/icons-material/Edit';
 import { successNotificationOptions } from '../../config';
-import { useStore } from '../store/store';
-import { trpc } from '../../trpc';
+import { StoreNewsletter, StoreNewsletterItem, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
+import { NewsletterMembers } from '../components/NewsletterMembers';
+import { NewsletterProperties } from '../components/NewsletterProperties';
 
 export function Newsletter() {
-  const { newsletterId } = useParams();
-  const { newsletters, fetchedNewsletter } = useStore(
+  const params = useParams();
+  const newsletterId = useMemo(() => {
+    if (params.newsletterId && !_.isNaN(params.newsletterId)) {
+      return _.parseInt(params.newsletterId);
+    }
+    return null;
+  }, [params]);
+
+  const {
+    loading,
+    newsletters,
+    fetchNewsletter,
+    getNewsletterById,
+    newsletterItems,
+    deleteNewsletterItems,
+  } = useStore(
     useShallow((state) => ({
-      newsletters: state.newsletters,
-      fetchedNewsletter: state.fetchedNewsletter,
+      newsletters: state.newsletters.data,
+      loading: state.newsletters.loading,
+      getNewsletterById: state.newsletters.getNewsletterById,
+      fetchNewsletter: state.newsletters.fetch,
+      newsletterItems: state.newsletterItems.data,
+      getNewsletterItems: state.newsletterItems.getItems,
+      deleteNewsletterItems: state.newsletterItems.deleteItems,
     }))
   );
-  const { data, isFetching, isFetched, error } = trpc.newsletters.get.useQuery({
-    newsletterId: Number(newsletterId),
-  });
+
+  const newsletter = useMemo(
+    () => (newsletterId ? getNewsletterById(newsletterId) : null),
+    [newsletterId, getNewsletterById, newsletters]
+  );
+  const items = useMemo(
+    () => (newsletter ? newsletter.itemIds.map((i) => newsletterItems[i]) : []),
+    [newsletterItems, newsletter]
+  );
+
+  const members = useMemo(
+    () => (newsletter ? newsletter.members : []),
+    [newsletter]
+  );
 
   useEffect(() => {
-    if (data) fetchedNewsletter(data);
-  }, [isFetched, data]);
+    if (newsletterId) fetchNewsletter(newsletterId);
+  }, [newsletterId]);
 
   const notifications = useNotifications();
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // const newsletter = useMemo(() => {
+  const [selectable, setSelectable] = useState(false);
+  const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
+  const [deletingItems, setDeletingItems] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(
+    new Set()
+  );
+  const [addMediaItemsDialogOpen, setAddMediaItemsDialogOpen] = useState(false);
 
-  //   if (!newsletterId) return null;
-  //   const id = parseInt(newsletterId);
-  //   return state.newsletters.get(id);
-  // }, [state, newsletterId]);
-
-  // const members = useMemo(() => {
-  //   if (!newsletter) return [];
-  //   return newsletter.memberIds
-  //     .map((id) => state.newsletterMembers.get(id))
-  //     .filter((i) => i !== undefined);
-  // }, [newsletter, state.newsletterMembers]);
-
-  // const items = useMemo(() => {
-  //   if (!newsletter) return [];
-  //   return newsletter.itemIds
-  //     .map((id) => state.newsletterItems.get(id))
-  //     .filter((i) => i !== undefined);
-  // }, [newsletter, state.newsletterItems]);
-
-  // const [loading, setLoading] = useState(true);
-  // const [selectable, setSelectable] = useState(false);
-  // const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
-  // const [deletingItems, setDeletingItems] = useState(false);
-  // const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(
-  //   new Set()
-  // );
-  const [addMediaItemsDialogOpen, setAddMediaItemsDialogOpen] = useState(true);
-
-  const handleOpenMediaItemsDialog = () => {
-    setAddMediaItemsDialogOpen(true);
-  };
-
+  const handleOpenMediaItemsDialog = () => setAddMediaItemsDialogOpen(true);
   const handleCloseMediaItemsDialog = () => {
+    if (newsletter) fetchNewsletter(newsletter.id);
     setAddMediaItemsDialogOpen(false);
-    // if (newsletterId) {
-    //   getNewsletter(parseInt(newsletterId));
-    // }
+  };
+  const handleMakeSelectable = () => setSelectable(true);
+  const handleMakeUnSelectable = () => setSelectable(false);
+  const handleDeleteItemsClick = () => setConfirmDeleteDialogOpen(true);
+  const handleCloseConfirmDeleteDialog = () =>
+    setConfirmDeleteDialogOpen(false);
+
+  const handleToggleSelect = (id: number) => {
+    setSelectedItemIds((prev) => {
+      const newSelectedItemIds = new Set(prev);
+      if (newSelectedItemIds.has(id)) {
+        newSelectedItemIds.delete(id);
+      } else {
+        newSelectedItemIds.add(id);
+      }
+      return newSelectedItemIds;
+    });
   };
 
-  // const handleMakeSelectable = () => {
-  //   setSelectable(true);
-  // };
-  // const handleMakeUnSelectable = () => {
-  //   setSelectable(false);
-  // };
+  const handleToggleSelectAll = () => {
+    setSelectedItemIds((prev) => {
+      const newSelectedItemIds = new Set(prev);
+      if (newSelectedItemIds.size === items.length) {
+        newSelectedItemIds.clear();
+      } else {
+        items.forEach((item) => newSelectedItemIds.add(item.id));
+      }
+      return newSelectedItemIds;
+    });
+  };
 
-  // const handleToggleSelect = (id: number) => {
-  //   setSelectedItemIds((prev) => {
-  //     const newSelectedItemIds = new Set(prev);
-  //     if (newSelectedItemIds.has(id)) {
-  //       newSelectedItemIds.delete(id);
-  //     } else {
-  //       newSelectedItemIds.add(id);
-  //     }
-  //     return newSelectedItemIds;
-  //   });
-  // };
+  const handleItemsDeleted = async () => {
+    if (newsletter) {
+      setDeletingItems(true);
 
-  // const handleToggleSelectAll = () => {
-  //   setSelectedItemIds((prev) => {
-  //     const newSelectedItemIds = new Set(prev);
-  //     if (newSelectedItemIds.size === items.length) {
-  //       newSelectedItemIds.clear();
-  //     } else {
-  //       items.forEach((item) => newSelectedItemIds.add(item.id));
-  //     }
-  //     return newSelectedItemIds;
-  //   });
-  // };
+      await deleteNewsletterItems(Array.from(selectedItemIds));
+      fetchNewsletter(newsletter.id);
+      handleCloseConfirmDeleteDialog();
+      setDeletingItems(false);
+      handleMakeUnSelectable();
+    }
 
-  // const handleDeleteItemsClick = () => {
-  //   setConfirmDeleteDialogOpen(true);
-  // };
+    // notifications.show('Item(s) deleted!', successNotificationOptions);
+  };
 
-  // const handleItemsDeleted = async () => {
-  //   if (!newsletterId) return null;
-  //   const id = parseInt(newsletterId);
-
-  //   setDeletingItems(true);
-  //   const selectedItemsIdsArr = Array.from(selectedItemIds);
-  //   for (let i = 0; i < selectedItemsIdsArr.length; i++) {
-  //     await api.delete(`/newsletters/${id}/items/${selectedItemsIdsArr[i]}`);
-  //   }
-  //   await getNewsletter(id);
-  //   handleCloseConfirmDeleteDialog();
-  //   setDeletingItems(false);
-  //   handleMakeUnSelectable();
-
-  //   notifications.show('Item(s) deleted!', successNotificationOptions);
-  // };
-
-  // const handleCloseConfirmDeleteDialog = () => {
-  //   setConfirmDeleteDialogOpen(false);
-  // };
-
-  // const getNewsletter = useCallback(
-  //   async (id: number) => {
-  //     setLoading(true);
-  //     const response = await api.read<ReadNewsletter>(`/newsletters/${id}`);
-  //     if (response) {
-  //       dispatch({
-  //         entityType: 'newsletters',
-  //         type: 'fetched',
-  //         payload: [response],
-  //       });
-  //     }
-  //     setLoading(false);
-  //   },
-  //   [api, dispatch]
-  // );
-
-  // useEffect(() => {
-  //   if (newsletterId) {
-  //     getNewsletter(parseInt(newsletterId));
-  //   }
-  // }, [newsletterId, getNewsletter]);
+  if (loading) return <CircularProgress />;
+  if (!newsletter) return null;
 
   return (
     <Container
@@ -167,60 +139,47 @@ export function Newsletter() {
       maxWidth="md"
     >
       <BackButton onClick={() => navigate('/')} />
+      <NewsletterProperties properties={newsletter.properties} />
 
+      <ConfirmationDialog
+        open={confirmDeleteDialogOpen}
+        loading={deletingItems}
+        onCloseDialog={handleCloseConfirmDeleteDialog}
+        onConfirm={handleItemsDeleted}
+        title={'Delete items'}
+        content={'are you sure you want to delete the selected items?'}
+      />
       <AddMediaItemsDialog
-        newsletterId={Number(newsletterId)}
+        newsletterId={newsletter.id}
         open={addMediaItemsDialogOpen}
         handleClose={handleCloseMediaItemsDialog}
       />
-      {/* {isFetching ? (
-        <CircularProgress />
-      ) : (
-        <Box>
-          <ConfirmationDialog
-              open={confirmDeleteDialogOpen}
-              loading={deletingItems}
-              onCloseDialog={handleCloseConfirmDeleteDialog}
-              onConfirm={handleItemsDeleted}
-              title={'Delete items'}
-              content={'are you sure you want to delete the selected items?'}
-            />
-           
+      <NewsletterMembers members={members} />
+      <NewsletterItemsList
+        onDelete={handleDeleteItemsClick}
+        items={items}
+        selectable={selectable}
+        selectedItemIds={selectedItemIds}
+        onToggleSelectAll={handleToggleSelectAll}
+        onToggleSelect={handleToggleSelect}
+      />
 
-            <AddMediaItemsDialog
-              newsletterId={Number(newsletterId)}
-              open={addMediaItemsDialogOpen}
-              handleClose={handleCloseMediaItemsDialog}
-            />
-
-          
-            <NewsletterMembers members={members} />
-            <NewsletterItemsList
-              onDelete={handleDeleteItemsClick}
-              items={items}
-              selectable={selectable}
-              selectedItemIds={selectedItemIds}
-              onToggleSelectAll={handleToggleSelectAll}
-              onToggleSelect={handleToggleSelect}
-            />
-          <CustomSpeedDial
-            // overrideIcon={selectable ? <CloseIcon /> : null}
-            // onOverrideIconClick={handleMakeUnSelectable}
-            actions={[
-              {
-                icon: <FileUploadIcon />,
-                name: 'Media',
-                onClick: handleOpenMediaItemsDialog,
-              },
-              // {
-              //   icon: <EditIcon />,
-              //   name: 'Edit',
-              //   onClick: handleMakeSelectable,
-              // },
-            ]}
-          /> 
-        </Box>
-      )}*/}
+      <CustomSpeedDial
+        overrideIcon={selectable ? <CloseIcon /> : null}
+        onOverrideIconClick={handleMakeUnSelectable}
+        actions={[
+          {
+            icon: <FileUploadIcon />,
+            name: 'Media',
+            onClick: handleOpenMediaItemsDialog,
+          },
+          {
+            icon: <EditIcon />,
+            name: 'Edit',
+            onClick: handleMakeSelectable,
+          },
+        ]}
+      />
     </Container>
   );
 }

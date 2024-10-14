@@ -9,12 +9,15 @@ import {
 import { useMemo, useState } from 'react';
 import { useNotifications } from '@toolpad/core';
 import { useShallow } from 'zustand/react/shallow';
-import { useStore } from '../store/store';
-
 import { Carousel } from '../components/index';
-import { asyncTrpcClient, trpc, trpcClient } from '../../trpc';
-import { getQueryKey } from '@trpc/react-query';
+import { asyncTrpcClient } from '../../trpc';
 import axios from 'axios';
+import { ItemUploadLink } from '@athena/athena-common';
+import {
+  StoreAddNewsletterMediaItem,
+  StoreMediaItems,
+  useStore,
+} from '../store';
 
 interface AddMediaItemsDialogProps {
   open: boolean;
@@ -22,13 +25,56 @@ interface AddMediaItemsDialogProps {
   newsletterId: number;
 }
 
+type UploadItem = {
+  signedUrl: ItemUploadLink;
+  item: StoreAddNewsletterMediaItem;
+};
+
+const mapMediaItemsToArray = (
+  items: StoreMediaItems
+): StoreAddNewsletterMediaItem[] =>
+  Object.keys(items).map((i) => items[Number(i)]);
+
+function matchSignedUrlWithItem(
+  signedUrls: ItemUploadLink[],
+  items: StoreMediaItems
+) {
+  return signedUrls.map((su) => ({
+    signedUrl: su,
+    item: items[Number(su.id)],
+  }));
+}
+
+async function uploadMediaItem(
+  newsletterId: number,
+  previousItemId: number | null,
+  uploadItem: UploadItem
+) {
+  const signedUrl = uploadItem.signedUrl;
+  const item = uploadItem.item;
+  await axios.put(signedUrl.url, item.file);
+
+  return asyncTrpcClient.newsletterItems.create.mutate({
+    newsletterId: Number(newsletterId),
+    title: item.title,
+    parentId: null,
+    nextItemId: null,
+    previousItemId: previousItemId,
+    details: {
+      name: item.details.name,
+      type: 'media',
+      fileName: signedUrl.fileName,
+    },
+  });
+}
+
 export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
   const { open, handleClose, newsletterId } = props;
-  const createMediaItem = trpc.newsletterItems.create.useMutation();
-  const { mediaItems, addMediaItem } = useStore(
+  const { mediaItems, addMediaItem, fetchNewsletter } = useStore(
     useShallow((state) => ({
       mediaItems: state.mediaItems,
       addMediaItem: state.addMediaItem,
+      fetchNewsletter: state.newsletters.fetch,
     }))
   );
   const notifications = useNotifications();
@@ -59,41 +105,30 @@ export function AddMediaItemsDialog(props: AddMediaItemsDialogProps) {
 
   const handleUploadFiles = async () => {
     setUploading(true);
-    // get signed upload urls
-    const items = Object.keys(mediaItems).map((i) => ({
-      id: mediaItems[Number(i)].tempId.toString(),
-    }));
+    const itemsArr = mapMediaItemsToArray(mediaItems);
+    const itemIds = itemsArr.map((i) => ({ id: i.tempId.toString() }));
     const signedUrls =
       await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
-        items,
+        items: itemIds,
       });
 
-    // signedUrls.reduce(async (promiseChain, url) => {
-    //     const previousUploadededImg =
-    // }, Promise.resolve())
+    const uploadItems = matchSignedUrlWithItem(signedUrls, mediaItems);
 
-    const item = mediaItems[Number(signedUrls[0].id)];
-    const signedUrl = signedUrls[0];
-    await axios.put(signedUrl.url, mediaItems[Number(signedUrl.id)].file);
+    await uploadItems.reduce(
+      async (promiseChain: Promise<number | null>, uploadItem) => {
+        const previousUploadedItemId = await promiseChain;
 
-    const res = await createMediaItem.mutateAsync({
-      newsletterId: Number(newsletterId),
-      title: item.title,
-      parentId: null,
-      nextItemId: null,
-      previousItemId: null,
-      details: {
-        name: item.details.name,
-        type: 'media',
-        fileName: signedUrl.fileName,
+        return uploadMediaItem(
+          newsletterId,
+          previousUploadedItemId,
+          uploadItem
+        );
       },
-    });
-    console.log(res);
-
-    // sequentially upload each item, using the previous
-    // uploaded items id for the previous Id, and null as nextId
-
+      Promise.resolve(null)
+    );
+    await fetchNewsletter(Number(newsletterId));
     setUploading(false);
+    handleClose();
   };
 
   const addItemsVisible = useMemo(() => {

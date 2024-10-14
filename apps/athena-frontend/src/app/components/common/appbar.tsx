@@ -1,13 +1,23 @@
-import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useStore } from '../../store';
+import { useShallow } from 'zustand/react/shallow';
+import { useNavigate } from 'react-router-dom';
 
 interface AppbarProps {
-  right: JSX.Element;
   title: string;
 }
 
 export function Appbar(props: AppbarProps) {
-  const { right, title } = props;
+  const { title } = props;
+
+  const { user } = useStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+  const navigate = useNavigate();
   return (
     <AppBar position="static">
       <Toolbar>
@@ -23,7 +33,13 @@ export function Appbar(props: AppbarProps) {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           {title}
         </Typography>
-        {right}
+        {user ? (
+          <AccountCircleIcon />
+        ) : (
+          <Button color="inherit" onClick={() => navigate('/login')}>
+            Login
+          </Button>
+        )}
       </Toolbar>
     </AppBar>
   );

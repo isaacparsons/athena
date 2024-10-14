@@ -3,7 +3,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useState } from 'react';
 import { EditItemLocation, DateInput, NameInput, LocationInput } from './index';
 import { StoreAddNewsletterMediaItem } from '../store/add-newsletter-items';
-import { useStore } from '../store/store';
+import { useStore } from '../store';
 
 interface AddMediaItemCardProps {
   item: StoreAddNewsletterMediaItem;

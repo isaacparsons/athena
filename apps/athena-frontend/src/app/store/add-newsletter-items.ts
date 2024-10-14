@@ -6,7 +6,7 @@ import {
   NewsletterItemBase,
   NewsletterItemDetailsMedia,
 } from '@athena/athena-common';
-import { Slices } from './store';
+import { Slices } from '.';
 
 export type StoreAddNewsletterMediaItem = Pick<
   NewsletterItemBase,
@@ -20,17 +20,19 @@ export type StoreAddNewsletterMediaItem = Pick<
   tempId: number;
 };
 
-export interface NewsletterItemsSlice {
+export type StoreMediaItems = Record<number, StoreAddNewsletterMediaItem>;
+
+export interface CreateNewsletterItemsSlice {
   mediaItems: Record<number, StoreAddNewsletterMediaItem>;
   addMediaItem: (mediaItem: StoreAddNewsletterMediaItem) => void;
   removeMediaItem: (id: number) => void;
 }
 
-export const createAddNewslettersItemsSlice: StateCreator<
+export const createCreateNewslettersItemsSlice: StateCreator<
   Slices,
   [['zustand/devtools', never], ['zustand/immer', never]],
   [],
-  NewsletterItemsSlice
+  CreateNewsletterItemsSlice
 > = (set, get) => ({
   mediaItems: {},
   addMediaItem: (mediaItem: StoreAddNewsletterMediaItem) => {

@@ -347,12 +347,18 @@ export declare const getItemUploadLinksInput: z.ZodObject<{
         id: string;
     }[];
 }>;
+export type ItemUploadLink = {
+    id: string;
+    url: string;
+    fileName: string;
+};
+export type GetItemUploadLinksResponse = ItemUploadLink[];
 export type CreateNewsletterItemDetailsInput = z.infer<typeof newsletterItemDetails>;
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
 export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
 export type UpdateNewsletterItemInput = z.infer<typeof updateNewsletterItemInput>;
 export type DeleteManyNewsletterItemsInput = z.infer<typeof deleteManyNewsletterItemsInput>;
-interface NewsletterProperties {
+export interface NewsletterProperties {
     name: string;
     dateRange: DateRange | null;
 }
@@ -364,7 +370,7 @@ export interface NewsletterBase {
 }
 export interface Newsletter extends NewsletterBase {
     members: UserBase[];
-    items: NewsletterItem[];
+    items: NewsletterItemBase[];
 }
 export declare const getNewsletterInput: z.ZodObject<{
     newsletterId: z.ZodNumber;
@@ -376,15 +382,15 @@ export declare const getNewsletterInput: z.ZodObject<{
 export declare const postNewsletterInput: z.ZodObject<{
     name: z.ZodString;
     startDate: z.ZodString;
-    endDate: z.ZodString;
+    endDate: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     startDate: string;
-    endDate: string;
+    endDate?: string | undefined;
 }, {
     name: string;
     startDate: string;
-    endDate: string;
+    endDate?: string | undefined;
 }>;
 export declare const updateNewsletterInput: z.ZodObject<{
     id: z.ZodNumber;

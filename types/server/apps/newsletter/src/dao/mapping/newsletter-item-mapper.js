@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapItems = void 0;
+exports.mapItems = exports.mapItem = void 0;
 function getDetails(item) {
     if (item.mediaDetails) {
         return Object.assign(Object.assign({}, item.mediaDetails), { type: item.mediaDetails.type });
@@ -38,14 +38,15 @@ const mapItem = (item) => {
         details: getDetails(item),
     };
 };
+exports.mapItem = mapItem;
 const mapItems = (id, items) => {
     const _parentItem = items.find((item) => item.id === id);
     if (!_parentItem)
         throw new Error('invalid');
-    const parentItem = mapItem(_parentItem);
+    const parentItem = (0, exports.mapItem)(_parentItem);
     const childItems = items
         .filter((item) => item.id !== id)
-        .map((item) => mapItem(item));
+        .map((item) => (0, exports.mapItem)(item));
     return Object.assign(Object.assign({}, parentItem), { children: childItems });
 };
 exports.mapItems = mapItems;

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -8,15 +9,21 @@ import {
   TextField,
 } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import {
-  LocalizationProvider,
-  DateRangePicker,
-  DateRange,
-  PickerChangeHandlerContext,
-  DateRangeValidationError,
-} from '@mui/x-date-pickers-pro';
-import { ChangeEvent, useState } from 'react';
+import { MobileDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
+import { trpc } from '../../trpc';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  CreateNewsletterInput,
+  postNewsletterInput,
+} from '@athena/athena-common';
+import { useNotifications } from '@toolpad/core';
+import {
+  errorNotificationOptions,
+  successNotificationOptions,
+} from '../../config';
+import { useNavigate } from 'react-router-dom';
 
 interface AddNewsletterDialogProps {
   open: boolean;
@@ -24,62 +31,85 @@ interface AddNewsletterDialogProps {
 }
 
 export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
-  const { open, onClose } = props;
+  const { onClose, open } = props;
+  const notifications = useNotifications();
+  const navigate = useNavigate();
+  const createNewsletter = trpc.newsletters.post.useMutation();
 
-  const [name, setName] = useState('');
-  const [dateRange, setDateRange] = useState<
-    DateRange<dayjs.Dayjs> | undefined
-  >(undefined);
-  const [saving, setSaving] = useState(false);
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm<CreateNewsletterInput>({
+    resolver: zodResolver(postNewsletterInput),
+  });
 
-  const handleNameChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setName(event.target.value);
+  console.log(watch('name'));
+  console.log(watch('startDate'));
+  console.log(watch('endDate'));
+
+  const handleSave: SubmitHandler<CreateNewsletterInput> = async (data) => {
+    console.log(data);
+    try {
+      const newsletterId = await createNewsletter.mutateAsync(data);
+      navigate(`/newsletters/${newsletterId}`);
+      notifications.show('Newsletter created!', successNotificationOptions);
+      onClose();
+      reset();
+    } catch (error) {
+      console.error(error);
+      notifications.show(
+        'Unable to create newsletter :(',
+        errorNotificationOptions
+      );
+    }
   };
 
-  const handleDateRange = (
-    value: DateRange<dayjs.Dayjs>,
-    context: PickerChangeHandlerContext<DateRangeValidationError>
-  ) => {
-    setDateRange(value);
-  };
-  const handleSave = async () => {
-    setSaving(true);
-
-    setSaving(false);
-    onClose();
-  };
   return (
     <Dialog fullScreen open={open}>
       <DialogTitle>Add Newsletter</DialogTitle>
       <DialogContent>
         <TextField
-          // autoFocus
           required
           margin="dense"
-          id="name"
-          name="name"
           label="Name"
           type="text"
           fullWidth
-          //   onBlur={updateName}
           variant="standard"
-          value={name}
-          onChange={handleNameChange}
+          error={Boolean(errors.name)}
+          //   helperText=
+          {...register('name', { required: true })}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateRangePicker
-            calendars={1}
-            value={dateRange}
-            onChange={handleDateRange}
-          />
+          <Box display="flex" flexDirection="row">
+            <MobileDatePicker
+              {...register('startDate')}
+              onChange={(value) => {
+                if (value && value.isValid())
+                  setValue('startDate', value.toISOString());
+              }}
+            />
+            <MobileDatePicker
+              {...register('endDate')}
+              onChange={(value) => {
+                if (value && value.isValid())
+                  setValue('endDate', value.toISOString());
+              }}
+            />
+          </Box>
         </LocalizationProvider>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" onClick={handleSave} disabled={name.length === 0}>
-          {saving ? <CircularProgress /> : 'Save'}
+        <Button
+          type="submit"
+          onClick={handleSubmit(handleSave)}
+          disabled={!isValid}
+        >
+          {isSubmitting ? <CircularProgress /> : 'Save'}
         </Button>
       </DialogActions>
     </Dialog>

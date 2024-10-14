@@ -2,7 +2,7 @@ export * from './common/index';
 export * from './UserNewsletters';
 export * from './UserNewsletterCard';
 // export * from './NewsletterMembers';
-// export * from './NewsletterItemsList';
+export * from './NewsletterItemsList';
 
 export * from './LocationInput';
 export * from './EditItemLocation';

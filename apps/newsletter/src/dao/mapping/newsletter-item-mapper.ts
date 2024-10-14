@@ -67,7 +67,7 @@ type MappedType = {
   } | null;
 };
 
-const mapItem = (item: MappedType) => {
+export const mapItem = (item: MappedType) => {
   return {
     id: item.id,
     title: item.title,

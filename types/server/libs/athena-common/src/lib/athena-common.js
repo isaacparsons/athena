@@ -58,9 +58,9 @@ exports.getNewsletterInput = zod_1.z.object({
     newsletterId: zod_1.z.coerce.number(),
 });
 exports.postNewsletterInput = zod_1.z.object({
-    name: zod_1.z.string(),
-    startDate: zod_1.z.string(),
-    endDate: zod_1.z.string(),
+    name: zod_1.z.string().min(3).max(100),
+    startDate: zod_1.z.string().min(8),
+    endDate: zod_1.z.string().min(8).optional(),
 });
 exports.updateNewsletterInput = zod_1.z.object({
     id: zod_1.z.coerce.number(),

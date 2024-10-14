@@ -5,6 +5,7 @@ const tslib_1 = require("tslib");
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
 const db_1 = require("../types/db");
 const location_1 = require("./location");
+const newsletter_item_details_1 = require("./newsletter-item-details");
 const newsletter_item_mapper_1 = require("./mapping/newsletter-item-mapper");
 class NewsletterItemDAO {
     constructor(db, locationDAO, newsletterItemDetailsDAO) {
@@ -52,11 +53,15 @@ class NewsletterItemDAO {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return this.db.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 const location = yield new location_1.LocationDAO(trx).post(input.location);
+                const details = input.details;
                 const createdNewsletterItem = yield trx
                     .insertInto('newsletterItem')
-                    .values(Object.assign(Object.assign({}, lodash_1.default.omit(input, ['location'])), { locationId: location.id, created: new Date().toISOString(), creatorId: userId }))
+                    .values(Object.assign(Object.assign({}, lodash_1.default.omit(input, ['location', 'details'])), { locationId: location.id, created: new Date().toISOString(), creatorId: userId }))
                     .returningAll()
                     .executeTakeFirstOrThrow();
+                if (details) {
+                    yield new newsletter_item_details_1.NewsletterItemDetailsDAO(trx).post(createdNewsletterItem.id, details);
+                }
                 yield trx
                     .updateTable('newsletterItem as ni')
                     .set({

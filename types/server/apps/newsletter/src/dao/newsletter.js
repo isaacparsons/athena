@@ -6,6 +6,7 @@ const lodash_1 = tslib_1.__importDefault(require("lodash"));
 const db_1 = require("../types/db");
 const helpers_1 = require("../util/helpers");
 const db_2 = require("../util/db");
+const newsletter_item_mapper_1 = require("./mapping/newsletter-item-mapper");
 class NewsletterDAO {
     constructor(db, newsletterItemDAO) {
         this.db = db;
@@ -25,7 +26,45 @@ class NewsletterDAO {
                 .whereRef('un.newsletterId', '=', 'n.id')
                 .innerJoin('user', 'user.id', 'un.userId')
                 .selectAll('user')).as('members'))
+                .select((eb) => (0, db_1.jsonArrayFrom)(eb
+                .selectFrom('newsletterItem as ni')
+                .whereRef('ni.newsletterId', '=', 'n.id')
+                .select((eb) => [
+                'id',
+                'newsletterId',
+                'title',
+                'date',
+                'parentId',
+                'nextItemId',
+                'previousItemId',
+                'created',
+                'modified',
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('newsletterItemMedia as media-details')
+                    .selectAll('media-details')
+                    .whereRef('media-details.newsletterItemId', '=', 'ni.id')).as('mediaDetails'),
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('newsletterItemText as text-details')
+                    .selectAll('text-details')
+                    .whereRef('text-details.newsletterItemId', '=', 'ni.id')).as('textDetails'),
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('location')
+                    .selectAll('location')
+                    .whereRef('location.id', '=', 'ni.locationId')).as('location'),
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('user as creator')
+                    .selectAll('creator')
+                    .whereRef('creator.id', '=', 'ni.creatorId'))
+                    .$notNull()
+                    .as('creator'),
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('user as modifier')
+                    .selectAll('modifier')
+                    .whereRef('modifier.id', '=', 'ni.modifierId')).as('modifier'),
+            ])
+                .where('ni.parentId', 'is', null)).as('items'))
                 .executeTakeFirstOrThrow(() => new Error(`newsletter with id: ${id} does not exist`));
+            const mappedItems = newsletter.items.map((item) => (0, newsletter_item_mapper_1.mapItem)(item));
             return {
                 id: newsletter.id,
                 meta: {
@@ -40,7 +79,7 @@ class NewsletterDAO {
                 },
                 owner: newsletter.owner,
                 members: newsletter.members,
-                items: [],
+                items: mappedItems,
             };
         });
     }

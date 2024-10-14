@@ -284,12 +284,12 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _input_in: {
                 name: string;
                 startDate: string;
-                endDate: string;
+                endDate?: string | undefined;
             };
             _input_out: {
                 name: string;
                 startDate: string;
-                endDate: string;
+                endDate?: string | undefined;
             };
             _output_in: typeof import("@trpc/server").unsetMarker;
             _output_out: typeof import("@trpc/server").unsetMarker;

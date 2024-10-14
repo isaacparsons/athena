@@ -2,10 +2,10 @@ import { List } from '@mui/material';
 
 import { useNavigate } from 'react-router-dom';
 import { UserNewsletterCard } from './index';
-import { NewsletterBase } from '@athena/athena-common';
+import { StoreNewsletter } from '../store/newsletters';
 
 interface NewslettersProps {
-  newsletters: NewsletterBase[];
+  newsletters: StoreNewsletter[];
 }
 export function UserNewsletters(props: NewslettersProps) {
   const { newsletters } = props;

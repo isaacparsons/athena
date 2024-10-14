@@ -31,6 +31,12 @@ exports.app.get('/health', (req, res) => {
 exports.app.use('/api/v1/trpc', (0, express_2.createExpressMiddleware)({
     router: index_1.appRouter,
     createContext: context_1.createContext,
+    onError(opts) {
+        const { error, type, path, input, ctx, req } = opts;
+        console.error('Error:', error);
+        // if (error.code === 'INTERNAL_SERVER_ERROR') {
+        // }
+    },
 }));
 exports.app.listen(env.app.port, env.app.host, () => {
     console.log(`[ ready ] http://${env.app.host}:${env.app.port}`);

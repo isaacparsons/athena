@@ -10,13 +10,17 @@ import {
   Newsletter,
   CreateNewsletterInput,
   UpdateNewsletterInput,
+  NewsletterItemDetailsMedia,
 } from '@athena/athena-common';
 import { parseDateRange } from '../util/helpers';
 import { creator, modifier, user } from '../util/db';
+import { mapItem, mapItems } from './mapping/newsletter-item-mapper';
+import { GCSManager } from '../services/gcs';
 
 export class NewsletterDAO {
   constructor(
     readonly db: DBConnection,
+    readonly gcs: GCSManager,
     readonly newsletterItemDAO: NewsletterItemDAO
   ) {}
 
@@ -37,9 +41,79 @@ export class NewsletterDAO {
             .selectAll('user')
         ).as('members')
       )
+      .select((eb) =>
+        jsonArrayFrom(
+          eb
+            .selectFrom('newsletterItem as ni')
+            .whereRef('ni.newsletterId', '=', 'n.id')
+            .select((eb) => [
+              'id',
+              'newsletterId',
+              'title',
+              'date',
+              'parentId',
+              'nextItemId',
+              'previousItemId',
+              'created',
+              'modified',
+              jsonObjectFrom(
+                eb
+                  .selectFrom('newsletterItemMedia as media-details')
+                  .selectAll('media-details')
+                  .whereRef('media-details.newsletterItemId', '=', 'ni.id')
+              ).as('mediaDetails'),
+              jsonObjectFrom(
+                eb
+                  .selectFrom('newsletterItemText as text-details')
+                  .selectAll('text-details')
+                  .whereRef('text-details.newsletterItemId', '=', 'ni.id')
+              ).as('textDetails'),
+              jsonObjectFrom(
+                eb
+                  .selectFrom('location')
+                  .selectAll('location')
+                  .whereRef('location.id', '=', 'ni.locationId')
+              ).as('location'),
+              jsonObjectFrom(
+                eb
+                  .selectFrom('user as creator')
+                  .selectAll('creator')
+                  .whereRef('creator.id', '=', 'ni.creatorId')
+              )
+                .$notNull()
+                .as('creator'),
+              jsonObjectFrom(
+                eb
+                  .selectFrom('user as modifier')
+                  .selectAll('modifier')
+                  .whereRef('modifier.id', '=', 'ni.modifierId')
+              ).as('modifier'),
+            ])
+            .where('ni.parentId', 'is', null)
+        ).as('items')
+      )
       .executeTakeFirstOrThrow(
         () => new Error(`newsletter with id: ${id} does not exist`)
       );
+
+    const mappedItems = newsletter.items.map((item) => mapItem(item));
+    const itemsWithSignedUrl = await Promise.all(
+      mappedItems.map(async (item) => {
+        if (item.details?.type === 'media') {
+          const details = item.details as NewsletterItemDetailsMedia;
+          const signedUrl = await this.gcs.getSignedUrl(
+            details.fileName,
+            'read'
+          );
+          details.fileName = signedUrl;
+          return {
+            ...item,
+            details,
+          };
+        }
+        return item;
+      })
+    );
 
     return {
       id: newsletter.id,
@@ -55,7 +129,7 @@ export class NewsletterDAO {
       },
       owner: newsletter.owner,
       members: newsletter.members,
-      items: [],
+      items: itemsWithSignedUrl,
     };
   }
 
@@ -78,7 +152,7 @@ export class NewsletterDAO {
           newsletterId: newsletter.id,
         })
         .executeTakeFirstOrThrow();
-      return newsletter;
+      return newsletter.id;
     });
   }
 

@@ -13,7 +13,6 @@ const router = trpc.router({
   get: loggedInProcedure
     .input(getNewsletterItemInput)
     .query(({ input, ctx }) => {
-      //TODO: in media items, replace filename with a signed url
       return ctx.dao.newsletterItem.get(input.newsletterItemId);
     }),
   getItemUploadLinks: loggedInProcedure
@@ -45,7 +44,7 @@ const router = trpc.router({
   deleteMany: loggedInProcedure
     .input(deleteManyNewsletterItemsInput)
     .mutation(({ input, ctx }) => {
-      // return ctx.dao.newsletterItem.delete(input.newsletterItemId);
+      return ctx.dao.newsletterItem.deleteMany(input);
     }),
 });
 export default router;

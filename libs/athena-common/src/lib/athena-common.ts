@@ -149,6 +149,14 @@ export const getItemUploadLinksInput = z.object({
   items: z.array(z.object({ id: z.string() })),
 });
 
+export type ItemUploadLink = {
+  id: string;
+  url: string;
+  fileName: string;
+};
+
+export type GetItemUploadLinksResponse = ItemUploadLink[];
+
 export type CreateNewsletterItemDetailsInput = z.infer<
   typeof newsletterItemDetails
 >;
@@ -162,7 +170,7 @@ export type DeleteManyNewsletterItemsInput = z.infer<
   typeof deleteManyNewsletterItemsInput
 >;
 
-interface NewsletterProperties {
+export interface NewsletterProperties {
   name: string;
   dateRange: DateRange | null;
 }
@@ -176,16 +184,16 @@ export interface NewsletterBase {
 
 export interface Newsletter extends NewsletterBase {
   members: UserBase[];
-  items: NewsletterItem[];
+  items: NewsletterItemBase[];
 }
 export const getNewsletterInput = z.object({
   newsletterId: z.coerce.number(),
 });
 
 export const postNewsletterInput = z.object({
-  name: z.string(),
-  startDate: z.string(),
-  endDate: z.string(),
+  name: z.string().min(3).max(100),
+  startDate: z.string().min(8),
+  endDate: z.string().min(8).optional(),
 });
 
 export const updateNewsletterInput = z.object({

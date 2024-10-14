@@ -18,7 +18,7 @@ const newsletterItemDAO = new NewsletterItemDAO(
   locationDAO,
   newsletterItemDetailsDAO
 );
-const newsletterDAO = new NewsletterDAO(dbClient, newsletterItemDAO);
+const newsletterDAO = new NewsletterDAO(dbClient, gcs, newsletterItemDAO);
 const userDAO = new UserDAO(dbClient);
 
 export function createContext({
