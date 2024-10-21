@@ -8,6 +8,7 @@ import { NewsletterItemDAO } from '../dao/newsletter-item';
 import { NewsletterItemDetailsDAO } from '../dao/newsletter-item-details';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/athena-common';
+import { NewsletterItemTemplateDAO } from '../dao/newsletter-item-template';
 
 const gcs = new GCSManager();
 
@@ -21,16 +22,33 @@ const newsletterItemDAO = new NewsletterItemDAO(
 const newsletterDAO = new NewsletterDAO(dbClient, gcs, newsletterItemDAO);
 const userDAO = new UserDAO(dbClient);
 
-export function createContext({
-  req,
-  res,
-}: {
+const newsletterItemTemplateDAO = new NewsletterItemTemplateDAO(dbClient);
+
+type ContextInput = {
   req: Request & {
     user?: UserSession;
     isAuthenticated(): () => boolean;
   };
   res: Response;
-}) {
+};
+
+export type Context = {
+  req: Request & {
+    user?: UserSession;
+    isAuthenticated(): () => boolean;
+  };
+  res: Response;
+  gcs: GCSManager;
+  dao: {
+    user: UserDAO;
+    newsletter: NewsletterDAO;
+    location: LocationDAO;
+    newsletterItem: NewsletterItemDAO;
+    newsletterItemTemplate: NewsletterItemTemplateDAO;
+  };
+};
+
+export function createContext({ req, res }: ContextInput) {
   return {
     req,
     res,
@@ -41,6 +59,7 @@ export function createContext({
       newsletter: newsletterDAO,
       location: locationDAO,
       newsletterItem: newsletterItemDAO,
+      newsletterItemTemplate: newsletterItemTemplateDAO,
     },
   };
 }

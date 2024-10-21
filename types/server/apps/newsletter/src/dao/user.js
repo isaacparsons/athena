@@ -6,13 +6,12 @@ const db_1 = require("../types/db");
 class UserDAO {
     constructor(db) {
         this.db = db;
-        this.db.selectFrom('userNewsletter as un');
     }
     get(id) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const user = yield this.db
                 .selectFrom('user')
-                .where('user.id', '=', id)
+                .where(`user.id`, '=', id)
                 .selectAll()
                 .executeTakeFirstOrThrow();
             const newsletters = yield this.newsletters(user.id);
@@ -22,7 +21,7 @@ class UserDAO {
     newsletters(userId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const newsletters = yield this.db
-                .selectFrom('userNewsletter as un')
+                .selectFrom('user_newsletter as un')
                 .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
                 .where('un.userId', '=', userId)
                 .select((eb) => [

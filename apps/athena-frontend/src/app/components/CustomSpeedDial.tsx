@@ -1,6 +1,5 @@
 import { Box, SpeedDial, SpeedDialAction } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-
 import { ReactNode, useState } from 'react';
 
 interface Action {
@@ -13,10 +12,11 @@ interface CustomSpeedDialProps {
   actions: Action[];
   overrideIcon?: ReactNode;
   onOverrideIconClick?: () => void;
+  styles?: any;
 }
 
 export function CustomSpeedDial(props: CustomSpeedDialProps) {
-  const { actions, overrideIcon, onOverrideIconClick } = props;
+  const { actions, overrideIcon, onOverrideIconClick, styles } = props;
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     if (overrideIcon && onOverrideIconClick) {
@@ -33,34 +33,23 @@ export function CustomSpeedDial(props: CustomSpeedDialProps) {
   };
 
   return (
-    <Box
-      sx={{
-        height: 330,
-        transform: 'translateZ(0px)',
-        flexGrow: 1,
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-      }}
+    <SpeedDial
+      sx={{ position: 'absolute', bottom: 16, right: 16, ...styles }}
+      ariaLabel="SpeedDial tooltip example"
+      icon={overrideIcon ?? <MenuIcon />}
+      onClose={handleClose}
+      onOpen={handleOpen}
+      open={open}
     >
-      <SpeedDial
-        sx={{ position: 'absolute', bottom: 16, right: 16 }}
-        ariaLabel="SpeedDial tooltip example"
-        icon={overrideIcon ?? <MenuIcon />}
-        onClose={handleClose}
-        onOpen={handleOpen}
-        open={open}
-      >
-        {actions.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            tooltipTitle={action.name}
-            tooltipOpen
-            onClick={() => handleClick(action)}
-          />
-        ))}
-      </SpeedDial>
-    </Box>
+      {actions.map((action) => (
+        <SpeedDialAction
+          key={action.name}
+          icon={action.icon}
+          tooltipTitle={action.name}
+          tooltipOpen
+          onClick={() => handleClick(action)}
+        />
+      ))}
+    </SpeedDial>
   );
 }

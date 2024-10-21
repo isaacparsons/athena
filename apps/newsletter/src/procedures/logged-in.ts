@@ -6,6 +6,15 @@ const env = parseEnv();
 
 export const loggedInProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
+
+  // TODO:  fix all this
+  // if (!ctx.req.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+  // return opts.next({
+  //   ctx: {
+  //     user: ctx.req.user,
+  //   },
+  // });
+
   const adminSecret = ctx.req.headers['admin-secret'];
   if (adminSecret === env.app.adminSecret) {
     const admin = await ctx.db

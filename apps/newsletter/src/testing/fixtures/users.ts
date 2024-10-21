@@ -1,4 +1,4 @@
-import { dbClient } from '../../src/db/client';
+import { dbClient } from '../../db/client';
 
 export async function createUser() {
   const testUserEmail = 'test@test.com';

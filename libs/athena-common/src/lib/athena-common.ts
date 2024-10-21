@@ -60,37 +60,44 @@ export const locationInput = z
 
 export type LocationInput = z.infer<typeof locationInput>;
 
-export type NewsletterItemType = 'media' | 'text';
+export enum NewsletterItemType {
+  media = 'media',
+  text = 'text',
+}
 
 type NewsletterItemDetailsBase = {
   id: number;
   name: string;
-  type: NewsletterItemType;
 };
 
 export type NewsletterItemDetailsMedia = NewsletterItemDetailsBase & {
+  type: NewsletterItemType.media;
   fileName: string;
   caption: string | null;
 };
 
+export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
+  type: NewsletterItemType.text;
+  description: string | null;
+  link: string | null;
+};
+
 export const mediaItemDetails = z.object({
-  type: z.literal('media'),
+  type: z.literal(NewsletterItemType.media),
   name: z.string(),
   fileName: z.string(),
   caption: z.string().optional(),
 });
 
-export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
-  description: string | null;
-  link: string | null;
-};
-
 export const textItemDetails = z.object({
-  type: z.literal('text'),
+  type: z.literal(NewsletterItemType.text),
   name: z.string(),
   description: z.string().optional(),
   link: z.string().optional(),
 });
+
+export type CreateMediaItemDetailsInput = z.infer<typeof mediaItemDetails>;
+export type CreateTextItemDetailsInput = z.infer<typeof textItemDetails>;
 
 export type NewsletterItemDetails =
   | NewsletterItemDetailsText
@@ -119,7 +126,7 @@ export const getNewsletterItemInput = z.object({
   newsletterItemId: z.coerce.number(),
 });
 
-export const postNewsletterItemInput = z.object({
+export const postNewsletterItemInputBase = z.object({
   newsletterId: z.coerce.number(),
   parentId: z.coerce.number().nullable(),
   nextItemId: z.coerce.number().nullable(),
@@ -127,7 +134,33 @@ export const postNewsletterItemInput = z.object({
   title: z.string(),
   date: z.string().optional(),
   location: locationInput,
-  details: newsletterItemDetails,
+});
+
+export const postNewsletterItemInput = postNewsletterItemInputBase.merge(
+  z.object({
+    details: newsletterItemDetails,
+  })
+);
+
+export const postNewsletterItemBatchInput = z.object({
+  newsletterId: z.coerce.number(),
+  parentId: z.coerce.number().nullable(),
+  nextItemId: z.coerce.number().nullable(),
+  previousItemId: z.coerce.number().nullable(),
+  batch: z.array(
+    z.object({
+      title: z.string(),
+      date: z.string().optional(),
+      location: locationInput,
+      temp: z.object({
+        id: z.number(),
+        parentId: z.coerce.number().nullable(),
+        nextItemId: z.coerce.number().nullable(),
+        previousItemId: z.coerce.number().nullable(),
+      }),
+      details: newsletterItemDetails,
+    })
+  ),
 });
 
 export const updateNewsletterItemInput = z
@@ -162,6 +195,9 @@ export type CreateNewsletterItemDetailsInput = z.infer<
 >;
 
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
+export type CreateNewsletterItemBatchInput = z.infer<
+  typeof postNewsletterItemBatchInput
+>;
 export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
 export type UpdateNewsletterItemInput = z.infer<
   typeof updateNewsletterItemInput
@@ -210,7 +246,91 @@ export type ReadNewsletterInput = z.infer<typeof getNewsletterInput>;
 export type UpdateNewsletterInput = z.infer<typeof updateNewsletterInput>;
 export type DeleteNewsletterInput = z.infer<typeof deleteNewsletterInput>;
 
-type NewsletterTemplate = {
-  // examples: 'album', 'review', 'experience', 'celebration', 'notable-mention',
-  name: string;
-};
+/** Newsletter item templates
+ *
+ * examples: 'album', 'review', 'experience', 'celebration', 'notable-mention',
+ */
+
+const newsletterItemTemplateDataDetails = z
+  .discriminatedUnion('type', [
+    mediaItemDetails
+      .pick({ type: true })
+      .merge(mediaItemDetails.omit({ type: true }).partial()),
+    textItemDetails
+      .pick({ type: true })
+      .merge(textItemDetails.omit({ type: true }).partial()),
+  ])
+  .optional();
+
+const baseNewsletterItemTemplateData = z.object({
+  id: z.number(),
+  nextId: z.number().nullable(),
+  prevId: z.number().nullable(),
+  parentId: z.number().nullable(),
+  templateId: z.number().nullable(),
+  data: newsletterItemTemplateDataDetails,
+});
+
+// export type NewsletterItemTemplateData = z.infer<
+//   typeof baseNewsletterItemTemplateData
+// >
+// type CreateNewsletterItemTemplateData = z.infer<
+//   typeof baseNewsletterItemTemplateData
+// > & {
+//   children: CreateNewsletterItemTemplateData[];
+// };
+
+// const newsletterItemTemplateDataInput: z.ZodType<CreateNewsletterItemTemplateData> =
+//   baseNewsletterItemTemplateData.extend({
+//     children: z.lazy(() => newsletterItemTemplateDataInput.array()),
+//   });
+
+export const postNewsletterItemTemplateInput = z.object({
+  name: z.string(),
+  data: z.array(
+    z.object({
+      templateId: z.number().optional(),
+      temp: z.object({
+        id: z.number(),
+        parentId: z.number().nullable(),
+        nextId: z.number().nullable(),
+        prevId: z.number().nullable(),
+      }),
+      data: newsletterItemTemplateDataDetails,
+    })
+  ),
+});
+
+export const getNewsletterItemTemplateInput = z.object({
+  id: z.number(),
+});
+
+// export const updateNewsletterItemTemplateInput = z.object({
+//   id: z.number(),
+//   data: newsletterItemTemplateDataInput,
+// });
+
+export const deleteNewsletterItemTemplateInput = z.object({
+  id: z.number(),
+});
+
+// export type NewsletterItemTemplate = {
+//   id: number;
+//   name: string;
+//   items: ;
+//   templates:
+// };
+
+export type CreateNewsletterItemTemplateInput = z.infer<
+  typeof postNewsletterItemTemplateInput
+>;
+
+export type ReadNewsletterItemTemplateInput = z.infer<
+  typeof getNewsletterItemTemplateInput
+>;
+// export type UpdateNewsletterItemTemplateInput = z.infer<
+//   typeof updateNewsletterItemTemplateInput
+// >;
+export type DeleteNewsletterItemTemplateInput = z.infer<
+  typeof deleteNewsletterItemTemplateInput
+>;

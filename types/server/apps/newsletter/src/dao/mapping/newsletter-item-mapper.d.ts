@@ -1,4 +1,4 @@
-import { NewsletterItem, NewsletterItemType } from '@athena/athena-common';
+import { NewsletterItem, NewsletterItemDetailsMedia, NewsletterItemDetailsText } from '@athena/athena-common';
 type MappedType = {
     id: number;
     date: string | null;
@@ -76,21 +76,7 @@ export declare const mapItem: (item: MappedType) => {
             longitude: number;
         } | null;
     } | null;
-    details: {
-        type: NewsletterItemType;
-        name: string;
-        caption: string | null;
-        fileName: string;
-        id: number;
-        newsletterItemId: number;
-    } | {
-        type: NewsletterItemType;
-        link: string | null;
-        name: string;
-        id: number;
-        newsletterItemId: number;
-        description: string | null;
-    } | undefined;
+    details: NewsletterItemDetailsMedia | NewsletterItemDetailsText | undefined;
 };
 export declare const mapItems: (id: number, items: MappedType[]) => NewsletterItem;
 export {};

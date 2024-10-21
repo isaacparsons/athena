@@ -3,10 +3,10 @@ import {
   CardActionArea,
   CardContent,
   ListItem,
+  Stack,
   Typography,
 } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { CustomHorizontalBox } from './index';
 import { NewsletterBase, DateRange } from '@athena/athena-common';
 
 function formatDate(date: string) {
@@ -43,19 +43,19 @@ export function UserNewsletterCard(props: UserNewsletterCardProps) {
             <Typography gutterBottom variant="h4" component="div">
               {properties.name}
             </Typography>
-            <CustomHorizontalBox>
+            <Stack direction="row">
               {formattedDateRange && <CalendarMonthIcon />}
               <Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
                 {formattedDateRange}
               </Typography>
-            </CustomHorizontalBox>
+            </Stack>
             {formattedLastModifiedDate && (
-              <CustomHorizontalBox sx={{ justifyContent: 'space-between' }}>
+              <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
                 <Typography variant="subtitle2">{`last modified `}</Typography>
                 <Typography variant="subtitle2">
                   {formattedLastModifiedDate}
                 </Typography>
-              </CustomHorizontalBox>
+              </Stack>
             )}
           </CardContent>
         </CardActionArea>

@@ -1,8 +1,7 @@
 import {
   NewsletterItem,
-  NewsletterItemDetails,
-  NewsletterItemDetailsText,
   NewsletterItemDetailsMedia,
+  NewsletterItemDetailsText,
   NewsletterItemType,
 } from '@athena/athena-common';
 
@@ -10,13 +9,13 @@ function getDetails(item: MappedType) {
   if (item.mediaDetails) {
     return {
       ...item.mediaDetails,
-      type: item.mediaDetails.type as NewsletterItemType,
-    };
+      type: NewsletterItemType.media,
+    } as NewsletterItemDetailsMedia;
   } else if (item.textDetails) {
     return {
       ...item.textDetails,
-      type: item.textDetails.type as NewsletterItemType,
-    };
+      type: NewsletterItemType.text,
+    } as NewsletterItemDetailsText;
   }
 }
 

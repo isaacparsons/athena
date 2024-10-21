@@ -8,6 +8,13 @@ const trpc_1 = require("../trpc/trpc");
 const env = (0, parse_env_1.parseEnv)();
 exports.loggedInProcedure = trpc_1.publicProcedure.use((opts) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const { ctx } = opts;
+    // TODO:  fix all this
+    // if (!ctx.req.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+    // return opts.next({
+    //   ctx: {
+    //     user: ctx.req.user,
+    //   },
+    // });
     const adminSecret = ctx.req.headers['admin-secret'];
     if (adminSecret === env.app.adminSecret) {
         const admin = yield ctx.db

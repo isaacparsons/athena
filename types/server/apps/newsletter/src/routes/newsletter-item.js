@@ -9,7 +9,6 @@ const router = trpc_1.trpc.router({
     get: logged_in_1.loggedInProcedure
         .input(athena_common_1.getNewsletterItemInput)
         .query(({ input, ctx }) => {
-        //TODO: in media items, replace filename with a signed url
         return ctx.dao.newsletterItem.get(input.newsletterItemId);
     }),
     getItemUploadLinks: logged_in_1.loggedInProcedure
@@ -30,6 +29,11 @@ const router = trpc_1.trpc.router({
         .mutation(({ input, ctx }) => {
         return ctx.dao.newsletterItem.post(ctx.user.userId, input);
     }),
+    createBatch: logged_in_1.loggedInProcedure
+        .input(athena_common_1.postNewsletterItemBatchInput)
+        .mutation(({ input, ctx }) => {
+        return ctx.dao.newsletterItem.postBatch(ctx.user.userId, input);
+    }),
     update: logged_in_1.loggedInProcedure
         .input(athena_common_1.updateNewsletterItemInput)
         .mutation(({ input, ctx }) => {
@@ -38,71 +42,8 @@ const router = trpc_1.trpc.router({
     deleteMany: logged_in_1.loggedInProcedure
         .input(athena_common_1.deleteManyNewsletterItemsInput)
         .mutation(({ input, ctx }) => {
-        // return ctx.dao.newsletterItem.delete(input.newsletterItemId);
+        return ctx.dao.newsletterItem.deleteMany(input);
     }),
 });
 exports.default = router;
-// const upload = multer({ dest: 'media/' });
-// const uploadNewsletterItemMiddleware = (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const detailsType = validateItemDetailsType(req.params.detailsType);
-//     if (detailsType === 'text') {
-//       upload.none()(req, res, next);
-//     }
-//     if (detailsType === 'photo' || detailsType === 'video') {
-//       upload.single('file')(req, res, next);
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.send(
-//       new AthenaResponseBuilder()
-//         .setError(new Error('invalid item type'))
-//         .build()
-//     );
-//   }
-// };
-// router.post(
-//   '/',
-//   uploadNewsletterItemMiddleware,
-//   isAuthenticated(
-//     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-//       try {
-//         const userId = req.user.userId;
-//         const input = validateNewsletterItemCreateRequest(req);
-//         await new NewsletterItemDAO(req.db).post(
-//           userId,
-//           input.location,
-//           input.newsletterItem,
-//           input.details
-//         );
-//         res.send(new AthenaResponseBuilder().build());
-//       } catch (error) {
-//         console.error(error);
-//         res.send(new AthenaResponseBuilder().setError(error).build());
-//       }
-//     }
-//   )
-// );
-// router.delete(
-//   '/:newsletterItemId',
-//   isAuthenticated(
-//     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-//       const { newsletterId, newsletterItemId } = req.params;
-//       try {
-//         await new NewsletterItemDAO(req.db).delete(
-//           parseInt(newsletterId),
-//           parseInt(newsletterItemId)
-//         );
-//         res.send(new AthenaResponseBuilder().build());
-//       } catch (error) {
-//         console.error(error);
-//         res.send(new AthenaResponseBuilder().setError(error).build());
-//       }
-//     }
-//   )
-// );
 //# sourceMappingURL=newsletter-item.js.map

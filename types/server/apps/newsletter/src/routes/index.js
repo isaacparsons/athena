@@ -5,11 +5,13 @@ const tslib_1 = require("tslib");
 const user_1 = require("./user");
 const newsletter_1 = tslib_1.__importDefault(require("./newsletter"));
 const newsletter_item_1 = tslib_1.__importDefault(require("./newsletter-item"));
+const newsletter_item_template_1 = tslib_1.__importDefault(require("./newsletter-item-template"));
 const trpc_1 = require("../trpc/trpc");
 exports.appRouter = trpc_1.trpc.router({
     users: user_1.userRouter,
     newsletters: newsletter_1.default,
     newsletterItems: newsletter_item_1.default,
+    newsletterItemTemplates: newsletter_item_template_1.default,
 });
 // export {} from './user';
 // export {

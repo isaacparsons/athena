@@ -2,14 +2,12 @@ import { User } from '@athena/athena-common';
 import { Connection as DBConnection, jsonObjectFrom } from '../types/db';
 
 export class UserDAO {
-  constructor(readonly db: DBConnection) {
-    this.db.selectFrom('userNewsletter as un');
-  }
+  constructor(readonly db: DBConnection) {}
 
   async get(id: number): Promise<User> {
     const user = await this.db
       .selectFrom('user')
-      .where('user.id', '=', id)
+      .where(`user.id`, '=', id)
       .selectAll()
       .executeTakeFirstOrThrow();
 
@@ -21,7 +19,7 @@ export class UserDAO {
   }
   async newsletters(userId: number) {
     const newsletters = await this.db
-      .selectFrom('userNewsletter as un')
+      .selectFrom('user_newsletter as un')
       .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
       .where('un.userId', '=', userId)
       .select((eb) => [
@@ -74,14 +72,4 @@ export class UserDAO {
       owner: newsletter.owner,
     }));
   }
-
-  // async newsletter(id: number) {
-  //   return this.db
-  //     .selectFrom('userNewsletter as un')
-  //     .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
-  //     .where('un.userId', '=', this.userId)
-  //     .where('un.newsletterId', '=', id)
-  //     .selectAll('n')
-  //     .executeTakeFirstOrThrow();
-  // }
 }

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemDetailsDAO = void 0;
 const tslib_1 = require("tslib");
+const athena_common_1 = require("@athena/athena-common");
 class NewsletterItemDetailsDAO {
     constructor(db) {
         this.db = db;
@@ -9,7 +10,10 @@ class NewsletterItemDetailsDAO {
     get(newsletterItemId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const details = yield this.db
-                .selectFrom(['newsletterItemMedia as nim', 'newsletterItemText as nit'])
+                .selectFrom([
+                'newsletter_item_media as nim',
+                'newsletter_item_text as nit',
+            ])
                 .selectAll()
                 .where(({ or, eb }) => or([
                 eb('nim.newsletterItemId', '=', newsletterItemId),
@@ -47,15 +51,15 @@ class NewsletterItemDetailsDAO {
             if (!input) {
                 return;
             }
-            else if (input.type === 'text') {
+            else if (input.type === athena_common_1.NewsletterItemType.text) {
                 return this.db
-                    .insertInto('newsletterItemText')
+                    .insertInto('newsletter_item_text')
                     .values(Object.assign(Object.assign({}, input), { newsletterItemId }))
                     .executeTakeFirstOrThrow();
             }
             else if (input.type === 'media') {
                 return this.db
-                    .insertInto('newsletterItemMedia')
+                    .insertInto('newsletter_item_media')
                     .values(Object.assign(Object.assign({}, input), { newsletterItemId }))
                     .executeTakeFirstOrThrow();
             }

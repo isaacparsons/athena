@@ -3,6 +3,7 @@ import {
   NewsletterItemDetailsMedia,
   NewsletterItemDetailsText,
   CreateNewsletterItemDetailsInput,
+  NewsletterItemType,
 } from '@athena/athena-common';
 
 export class NewsletterItemDetailsDAO {
@@ -10,7 +11,10 @@ export class NewsletterItemDetailsDAO {
 
   async get(newsletterItemId: number) {
     const details = await this.db
-      .selectFrom(['newsletterItemMedia as nim', 'newsletterItemText as nit'])
+      .selectFrom([
+        'newsletter_item_media as nim',
+        'newsletter_item_text as nit',
+      ])
       .selectAll()
       .where(({ or, eb }) =>
         or([
@@ -47,14 +51,14 @@ export class NewsletterItemDetailsDAO {
   ) {
     if (!input) {
       return;
-    } else if (input.type === 'text') {
+    } else if (input.type === NewsletterItemType.text) {
       return this.db
-        .insertInto('newsletterItemText')
+        .insertInto('newsletter_item_text')
         .values({ ...input, newsletterItemId })
         .executeTakeFirstOrThrow();
     } else if (input.type === 'media') {
       return this.db
-        .insertInto('newsletterItemMedia')
+        .insertInto('newsletter_item_media')
         .values({ ...input, newsletterItemId })
         .executeTakeFirstOrThrow();
     } else {

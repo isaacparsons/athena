@@ -8,15 +8,8 @@ import { createUserSlice, UserSlice } from './user';
 import { createNewslettersSlice, NewslettersSlice } from './newsletters';
 import { NewsletterItemsSlice } from './newsletter-items';
 import { createNewsletterItemsSlice } from './newsletter-items';
-import {
-  createCreateNewslettersItemsSlice,
-  CreateNewsletterItemsSlice,
-} from './add-newsletter-items';
 
-export type Slices = UserSlice &
-  NewslettersSlice &
-  NewsletterItemsSlice &
-  CreateNewsletterItemsSlice;
+export type Slices = UserSlice & NewslettersSlice & NewsletterItemsSlice;
 
 export const useStore = create<Slices>()(
   devtools(
@@ -25,7 +18,6 @@ export const useStore = create<Slices>()(
         ...createUserSlice(...a),
         ...createNewslettersSlice(...a),
         ...createNewsletterItemsSlice(...a),
-        ...createCreateNewslettersItemsSlice(...a),
       }))
     )
   )

@@ -12,11 +12,15 @@ import {
   Checkbox,
   Paper,
   IconButton,
+  Stack,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { StoreNewsletterItem } from '../store';
-import { NewsletterItemDetailsMedia } from '@athena/athena-common';
+import {
+  NewsletterItemDetailsMedia,
+  NewsletterItemDetailsText,
+} from '@athena/athena-common';
 
 interface NewsletterItemsListProps {
   items: StoreNewsletterItem[];
@@ -95,7 +99,7 @@ interface NewsletterItemProps {
   handleSelectItemToggle: (id: number) => void;
 }
 
-function NewsletterItem(props: NewsletterItemProps) {
+export function NewsletterItem(props: NewsletterItemProps) {
   const theme = useTheme();
   const { selectable, isSelected, item, handleSelectItemToggle } = props;
   return (
@@ -127,7 +131,6 @@ function NewsletterItem(props: NewsletterItemProps) {
           />
         ) : null}
       </Card>
-      {/* <Box component="img" sx={{ height: 200 }} src={`${item.link}`} /> */}
     </ListItem>
   );
 }
@@ -139,13 +142,40 @@ interface MediaItemDetailsProps {
 export function MediaItemDetails(props: MediaItemDetailsProps) {
   const { details } = props;
   return (
-    <>
+    <Stack>
       <CardMedia component="img" image={`${details.fileName}`} />
       <CardContent>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {details.caption}
         </Typography>
       </CardContent>
-    </>
+    </Stack>
+  );
+}
+
+interface TextItemDetailsProps {
+  details: NewsletterItemDetailsText;
+}
+
+export function TextItemDetails(props: TextItemDetailsProps) {
+  const { details } = props;
+  return (
+    <Stack>
+      <CardContent>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {details.name}
+        </Typography>
+        {details.description && (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {details.description}
+          </Typography>
+        )}
+        {details.link && (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {details.link}
+          </Typography>
+        )}
+      </CardContent>
+    </Stack>
   );
 }

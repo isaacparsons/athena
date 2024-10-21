@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mapItems = exports.mapItem = void 0;
+const athena_common_1 = require("@athena/athena-common");
 function getDetails(item) {
     if (item.mediaDetails) {
-        return Object.assign(Object.assign({}, item.mediaDetails), { type: item.mediaDetails.type });
+        return Object.assign(Object.assign({}, item.mediaDetails), { type: athena_common_1.NewsletterItemType.media });
     }
     else if (item.textDetails) {
-        return Object.assign(Object.assign({}, item.textDetails), { type: item.textDetails.type });
+        return Object.assign(Object.assign({}, item.textDetails), { type: athena_common_1.NewsletterItemType.text });
     }
 }
 const mapItem = (item) => {

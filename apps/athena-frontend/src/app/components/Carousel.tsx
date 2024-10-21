@@ -1,7 +1,7 @@
 import { Box, MobileStepper } from '@mui/material';
 import { useEffect, useMemo } from 'react';
 import { useSnapCarousel } from 'react-snap-carousel';
-import { AddMediaItemCard } from './index';
+import { AddItemCard } from './index';
 import { mapToArray } from '../../util/helpers';
 import { StoreAddNewsletterMediaItem } from '../store/add-newsletter-items';
 
@@ -43,11 +43,7 @@ export function Carousel(props: CarouselProps) {
         }}
       >
         {items.map((item, i) => (
-          <AddMediaItemCard
-            key={item.tempId}
-            item={item}
-            isSnapPoint={snapPointIndexes.has(i)}
-          />
+          <AddItemCard key={item.tempId} item={item} />
         ))}
       </Box>
     </Box>

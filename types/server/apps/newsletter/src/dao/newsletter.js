@@ -8,8 +8,9 @@ const helpers_1 = require("../util/helpers");
 const db_2 = require("../util/db");
 const newsletter_item_mapper_1 = require("./mapping/newsletter-item-mapper");
 class NewsletterDAO {
-    constructor(db, newsletterItemDAO) {
+    constructor(db, gcs, newsletterItemDAO) {
         this.db = db;
+        this.gcs = gcs;
         this.newsletterItemDAO = newsletterItemDAO;
     }
     get(id) {
@@ -22,12 +23,12 @@ class NewsletterDAO {
                 .select(({ ref }) => (0, db_2.creator)(this.db, ref('n.creatorId')))
                 .select(({ ref }) => (0, db_2.modifier)(this.db, ref('n.modifierId')))
                 .select((eb) => (0, db_1.jsonArrayFrom)(eb
-                .selectFrom('userNewsletter as un')
+                .selectFrom('user_newsletter as un')
                 .whereRef('un.newsletterId', '=', 'n.id')
                 .innerJoin('user', 'user.id', 'un.userId')
                 .selectAll('user')).as('members'))
                 .select((eb) => (0, db_1.jsonArrayFrom)(eb
-                .selectFrom('newsletterItem as ni')
+                .selectFrom('newsletter_item as ni')
                 .whereRef('ni.newsletterId', '=', 'n.id')
                 .select((eb) => [
                 'id',
@@ -40,11 +41,11 @@ class NewsletterDAO {
                 'created',
                 'modified',
                 (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('newsletterItemMedia as media-details')
+                    .selectFrom('newsletter_item_media as media-details')
                     .selectAll('media-details')
                     .whereRef('media-details.newsletterItemId', '=', 'ni.id')).as('mediaDetails'),
                 (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('newsletterItemText as text-details')
+                    .selectFrom('newsletter_item_text as text-details')
                     .selectAll('text-details')
                     .whereRef('text-details.newsletterItemId', '=', 'ni.id')).as('textDetails'),
                 (0, db_1.jsonObjectFrom)(eb
@@ -65,6 +66,16 @@ class NewsletterDAO {
                 .where('ni.parentId', 'is', null)).as('items'))
                 .executeTakeFirstOrThrow(() => new Error(`newsletter with id: ${id} does not exist`));
             const mappedItems = newsletter.items.map((item) => (0, newsletter_item_mapper_1.mapItem)(item));
+            const itemsWithSignedUrl = yield Promise.all(mappedItems.map((item) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                var _a;
+                if (((_a = item.details) === null || _a === void 0 ? void 0 : _a.type) === 'media') {
+                    const details = item.details;
+                    const signedUrl = yield this.gcs.getSignedUrl(details.fileName, 'read');
+                    details.fileName = signedUrl;
+                    return Object.assign(Object.assign({}, item), { details });
+                }
+                return item;
+            })));
             return {
                 id: newsletter.id,
                 meta: {
@@ -79,7 +90,7 @@ class NewsletterDAO {
                 },
                 owner: newsletter.owner,
                 members: newsletter.members,
-                items: mappedItems,
+                items: itemsWithSignedUrl,
             };
         });
     }
@@ -92,13 +103,13 @@ class NewsletterDAO {
                     .returningAll()
                     .executeTakeFirstOrThrow();
                 yield trx
-                    .insertInto('userNewsletter')
+                    .insertInto('user_newsletter')
                     .values({
                     userId: userId,
                     newsletterId: newsletter.id,
                 })
                     .executeTakeFirstOrThrow();
-                return newsletter;
+                return newsletter.id;
             }));
         });
     }

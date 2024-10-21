@@ -5,13 +5,30 @@ import { LocationDAO } from '../dao/location';
 import { NewsletterItemDAO } from '../dao/newsletter-item';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/athena-common';
-export declare function createContext({ req, res, }: {
+import { NewsletterItemTemplateDAO } from '../dao/newsletter-item-template';
+type ContextInput = {
     req: Request & {
         user?: UserSession;
         isAuthenticated(): () => boolean;
     };
     res: Response;
-}): {
+};
+export type Context = {
+    req: Request & {
+        user?: UserSession;
+        isAuthenticated(): () => boolean;
+    };
+    res: Response;
+    gcs: GCSManager;
+    dao: {
+        user: UserDAO;
+        newsletter: NewsletterDAO;
+        location: LocationDAO;
+        newsletterItem: NewsletterItemDAO;
+        newsletterItemTemplate: NewsletterItemTemplateDAO;
+    };
+};
+export declare function createContext({ req, res }: ContextInput): {
     req: Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
         user?: UserSession;
         isAuthenticated(): () => boolean;
@@ -24,5 +41,7 @@ export declare function createContext({ req, res, }: {
         newsletter: NewsletterDAO;
         location: LocationDAO;
         newsletterItem: NewsletterItemDAO;
+        newsletterItemTemplate: NewsletterItemTemplateDAO;
     };
 };
+export {};

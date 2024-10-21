@@ -35,7 +35,7 @@ export class NewsletterDAO {
       .select((eb) =>
         jsonArrayFrom(
           eb
-            .selectFrom('userNewsletter as un')
+            .selectFrom('user_newsletter as un')
             .whereRef('un.newsletterId', '=', 'n.id')
             .innerJoin('user', 'user.id', 'un.userId')
             .selectAll('user')
@@ -44,7 +44,7 @@ export class NewsletterDAO {
       .select((eb) =>
         jsonArrayFrom(
           eb
-            .selectFrom('newsletterItem as ni')
+            .selectFrom('newsletter_item as ni')
             .whereRef('ni.newsletterId', '=', 'n.id')
             .select((eb) => [
               'id',
@@ -58,13 +58,13 @@ export class NewsletterDAO {
               'modified',
               jsonObjectFrom(
                 eb
-                  .selectFrom('newsletterItemMedia as media-details')
+                  .selectFrom('newsletter_item_media as media-details')
                   .selectAll('media-details')
                   .whereRef('media-details.newsletterItemId', '=', 'ni.id')
               ).as('mediaDetails'),
               jsonObjectFrom(
                 eb
-                  .selectFrom('newsletterItemText as text-details')
+                  .selectFrom('newsletter_item_text as text-details')
                   .selectAll('text-details')
                   .whereRef('text-details.newsletterItemId', '=', 'ni.id')
               ).as('textDetails'),
@@ -146,7 +146,7 @@ export class NewsletterDAO {
         .returningAll()
         .executeTakeFirstOrThrow();
       await trx
-        .insertInto('userNewsletter')
+        .insertInto('user_newsletter')
         .values({
           userId: userId,
           newsletterId: newsletter.id,

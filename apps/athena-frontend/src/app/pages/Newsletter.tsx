@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CircularProgress, Container, useTheme } from '@mui/material';
+import { CircularProgress, Container, useTheme, Button } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNotifications } from '@toolpad/core';
@@ -8,9 +8,10 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   BackButton,
   CustomSpeedDial,
-  AddMediaItemsDialog,
+  AddItemsDialog,
   ConfirmationDialog,
-  NewsletterItemsList,
+  MediaItemDetails,
+  TextItemDetails,
 } from '../components/index';
 import EditIcon from '@mui/icons-material/Edit';
 import { successNotificationOptions } from '../../config';
@@ -18,6 +19,13 @@ import { StoreNewsletter, StoreNewsletterItem, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { NewsletterMembers } from '../components/NewsletterMembers';
 import { NewsletterProperties } from '../components/NewsletterProperties';
+import {
+  NewsletterItemDetailsMedia,
+  NewsletterItemDetailsText,
+} from '@athena/athena-common';
+import { ToggleList } from '../components/ToggleList';
+import { asyncTrpcClient } from '../../trpc';
+import { AddItemTemplateDialog } from '../components/AddItemTemplateDialog';
 
 export function Newsletter() {
   const params = useParams();
@@ -76,11 +84,16 @@ export function Newsletter() {
     new Set()
   );
   const [addMediaItemsDialogOpen, setAddMediaItemsDialogOpen] = useState(false);
+  const [addTemplateDialogOpen, setAddTemplateDialogOpen] = useState(false);
 
   const handleOpenMediaItemsDialog = () => setAddMediaItemsDialogOpen(true);
   const handleCloseMediaItemsDialog = () => {
     if (newsletter) fetchNewsletter(newsletter.id);
     setAddMediaItemsDialogOpen(false);
+  };
+  const handleOpenAddTemplateDialog = () => setAddTemplateDialogOpen(true);
+  const handleCloseAddTemplateDialog = () => {
+    setAddTemplateDialogOpen(false);
   };
   const handleMakeSelectable = () => setSelectable(true);
   const handleMakeUnSelectable = () => setSelectable(false);
@@ -88,35 +101,11 @@ export function Newsletter() {
   const handleCloseConfirmDeleteDialog = () =>
     setConfirmDeleteDialogOpen(false);
 
-  const handleToggleSelect = (id: number) => {
-    setSelectedItemIds((prev) => {
-      const newSelectedItemIds = new Set(prev);
-      if (newSelectedItemIds.has(id)) {
-        newSelectedItemIds.delete(id);
-      } else {
-        newSelectedItemIds.add(id);
-      }
-      return newSelectedItemIds;
-    });
-  };
-
-  const handleToggleSelectAll = () => {
-    setSelectedItemIds((prev) => {
-      const newSelectedItemIds = new Set(prev);
-      if (newSelectedItemIds.size === items.length) {
-        newSelectedItemIds.clear();
-      } else {
-        items.forEach((item) => newSelectedItemIds.add(item.id));
-      }
-      return newSelectedItemIds;
-    });
-  };
-
-  const handleItemsDeleted = async () => {
+  const handleDeleteItems = async (ids: number[]) => {
     if (newsletter) {
       setDeletingItems(true);
 
-      await deleteNewsletterItems(Array.from(selectedItemIds));
+      await deleteNewsletterItems(ids);
       fetchNewsletter(newsletter.id);
       handleCloseConfirmDeleteDialog();
       setDeletingItems(false);
@@ -126,13 +115,19 @@ export function Newsletter() {
     // notifications.show('Item(s) deleted!', successNotificationOptions);
   };
 
+  const handleSaveTemplate = async () => {
+    await asyncTrpcClient.newsletterItemTemplates.create.mutate({
+      name: '',
+      data: [],
+    });
+  };
+
   if (loading) return <CircularProgress />;
   if (!newsletter) return null;
 
   return (
     <Container
       sx={{
-        flex: 1,
         minHeight: '100vh',
         padding: theme.spacing(2),
       }}
@@ -141,28 +136,48 @@ export function Newsletter() {
       <BackButton onClick={() => navigate('/')} />
       <NewsletterProperties properties={newsletter.properties} />
 
-      <ConfirmationDialog
+      {/* <ConfirmationDialog
         open={confirmDeleteDialogOpen}
         loading={deletingItems}
         onCloseDialog={handleCloseConfirmDeleteDialog}
-        onConfirm={handleItemsDeleted}
+        onConfirm={handleDeleteItems}
         title={'Delete items'}
         content={'are you sure you want to delete the selected items?'}
+      /> */}
+      <AddItemTemplateDialog
+        open={addTemplateDialogOpen}
+        handleClose={handleCloseAddTemplateDialog}
       />
-      <AddMediaItemsDialog
+      <AddItemsDialog
         newsletterId={newsletter.id}
         open={addMediaItemsDialogOpen}
         handleClose={handleCloseMediaItemsDialog}
       />
       <NewsletterMembers members={members} />
-      <NewsletterItemsList
-        onDelete={handleDeleteItemsClick}
+
+      <ToggleList
         items={items}
-        selectable={selectable}
         selectedItemIds={selectedItemIds}
-        onToggleSelectAll={handleToggleSelectAll}
-        onToggleSelect={handleToggleSelect}
+        setSelectedItemIds={setSelectedItemIds}
+        selectable={selectable}
+        onDelete={handleDeleteItems}
+        renderItem={(item: StoreNewsletterItem) => {
+          if (item.details?.type === 'media') {
+            return (
+              <MediaItemDetails
+                details={item.details as NewsletterItemDetailsMedia}
+              />
+            );
+          } else if (item.details?.type === 'text') {
+            return (
+              <TextItemDetails
+                details={item.details as NewsletterItemDetailsText}
+              />
+            );
+          }
+        }}
       />
+      <Button>Press me</Button>
 
       <CustomSpeedDial
         overrideIcon={selectable ? <CloseIcon /> : null}

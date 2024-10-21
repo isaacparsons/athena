@@ -1,15 +1,25 @@
 import {
-  CountryTable,
-  UserNewsletterTable,
-  NewsletterTable,
-  UserTable,
-  FederatedCredentialTable,
-  LocationTable,
-  NewsletterItemTable,
-  NewsletterItemMediaTable,
-  NewsletterItemTextTable,
-} from '../db/tables';
-import { ITable, PostgresDialect, Pool, DB, Database } from '../types/db';
+  CountryTableClient,
+  UserNewsletterTableClient,
+  NewsletterTableClient,
+  UserTableClient,
+  FederatedCredentialTableClient,
+  LocationTableClient,
+  NewsletterItemTableClient,
+  NewsletterItemMediaTableClient,
+  NewsletterItemTextTableClient,
+  NewsletterItemTemplateTableClient,
+  NewsletterItemTemplateDataTableClient,
+  UserTemplateTableClient,
+} from '../db';
+import {
+  ITable,
+  PostgresDialect,
+  Pool,
+  DB,
+  Database,
+  TABLE_NAMES,
+} from '../types/db';
 
 const env = process.env as any; //parseEnv();
 
@@ -32,15 +42,33 @@ export class DBManagerClient {
   tables: ITable[];
   constructor() {
     this.tables = [
-      new LocationTable(dbClient, 'location'),
-      new CountryTable(dbClient, 'country'),
-      new UserTable(dbClient, 'user'),
-      new FederatedCredentialTable(dbClient, 'federatedCredential'),
-      new NewsletterTable(dbClient, 'newsletter'),
-      new UserNewsletterTable(dbClient, 'userNewsletter'),
-      new NewsletterItemTable(dbClient, 'newsletterItem'),
-      new NewsletterItemMediaTable(dbClient, 'newsletterItemMedia'),
-      new NewsletterItemTextTable(dbClient, 'newsletterItemText'),
+      new LocationTableClient(dbClient, TABLE_NAMES.LOCATION),
+      new CountryTableClient(dbClient, TABLE_NAMES.COUNTRY),
+      new UserTableClient(dbClient, TABLE_NAMES.USER),
+      new FederatedCredentialTableClient(
+        dbClient,
+        TABLE_NAMES.FEDEREATED_CREDENTIAL
+      ),
+      new NewsletterTableClient(dbClient, TABLE_NAMES.NEWSLETTER),
+      new UserNewsletterTableClient(dbClient, TABLE_NAMES.USER_NEWSLETTER),
+      new NewsletterItemTableClient(dbClient, TABLE_NAMES.NEWSLETTER_ITEM),
+      new NewsletterItemMediaTableClient(
+        dbClient,
+        TABLE_NAMES.NEWSLETTER_ITEM_MEDIA
+      ),
+      new NewsletterItemTextTableClient(
+        dbClient,
+        TABLE_NAMES.NEWSLETTER_ITEM_TEXT
+      ),
+      new NewsletterItemTemplateTableClient(
+        dbClient,
+        TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE
+      ),
+      new NewsletterItemTemplateDataTableClient(
+        dbClient,
+        TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE_DATA
+      ),
+      new UserTemplateTableClient(dbClient, TABLE_NAMES.USER_TEMPLATE),
     ];
   }
   async createTables() {

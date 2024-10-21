@@ -7,6 +7,7 @@ import {
 
 import { LocationDAO } from './location';
 import {
+  CreateNewsletterItemBatchInput,
   CreateNewsletterItemInput,
   DeleteManyNewsletterItemsInput,
   UpdateNewsletterItemInput,
@@ -28,14 +29,14 @@ export class NewsletterItemDAO {
         await deletedItemId;
 
         const item = await trx
-          .selectFrom('newsletterItem')
+          .selectFrom('newsletter_item')
           .where('id', '=', id)
           .select(['id', 'nextItemId', 'previousItemId'])
           .executeTakeFirstOrThrow();
 
         // update item that has nextId = id to have nextId = item's nextId
         await trx
-          .updateTable('newsletterItem')
+          .updateTable('newsletter_item')
           .set({
             nextItemId: item.nextItemId,
           })
@@ -44,7 +45,7 @@ export class NewsletterItemDAO {
 
         // update item that has previousId = id to have previousId = item's previousId
         await trx
-          .updateTable('newsletterItem')
+          .updateTable('newsletter_item')
           .set({
             previousItemId: item.previousItemId,
           })
@@ -52,7 +53,7 @@ export class NewsletterItemDAO {
           .executeTakeFirstOrThrow();
 
         await trx
-          .deleteFrom('newsletterItem')
+          .deleteFrom('newsletter_item')
           .where('id', '=', id)
           .executeTakeFirstOrThrow();
         return;
@@ -66,7 +67,7 @@ export class NewsletterItemDAO {
       const details = input.details;
 
       const createdNewsletterItem = await trx
-        .insertInto('newsletterItem')
+        .insertInto('newsletter_item')
         .values({
           ..._.omit(input, ['location', 'details']),
           locationId: location.id,
@@ -84,7 +85,7 @@ export class NewsletterItemDAO {
       }
 
       await trx
-        .updateTable('newsletterItem as ni')
+        .updateTable('newsletter_item as ni')
         .set({
           nextItemId: createdNewsletterItem.id,
         })
@@ -101,7 +102,7 @@ export class NewsletterItemDAO {
         .executeTakeFirstOrThrow();
 
       await trx
-        .updateTable('newsletterItem as ni')
+        .updateTable('newsletter_item as ni')
         .set({
           previousItemId: createdNewsletterItem.id,
         })
@@ -119,10 +120,75 @@ export class NewsletterItemDAO {
       return createdNewsletterItem.id;
     });
   }
+  async postBatch(userId: number, input: CreateNewsletterItemBatchInput) {
+    return this.db.transaction().execute(async (trx: Transaction) => {
+      const tuples = await Promise.all(
+        input.batch.map(async (item) => {
+          const res = await this.db
+            .insertInto('newsletter_item')
+            .values({
+              ..._.omit(item, ['temp', 'location', 'details']),
+              parentId: null,
+              nextItemId: null,
+              previousItemId: null,
+              created: new Date().toISOString(),
+              creatorId: userId,
+              newsletterId: input.newsletterId,
+            })
+            .returning('id')
+            .executeTakeFirstOrThrow();
+
+          if (item.details) {
+            await new NewsletterItemDetailsDAO(trx).post(res.id, item.details);
+          }
+          return [item.temp.id, res.id] as [number, number];
+        })
+      );
+
+      const parentBatchItems = Array.from(
+        input.batch
+          .filter((i) => i.temp.parentId === null)
+          .map((i) => i.temp.id)
+      );
+
+      const tempIdRealIdMap = new Map<number, number>(tuples);
+      const firstItemTempId = Math.min(...parentBatchItems);
+      const lastItemTempId = Math.min(...parentBatchItems);
+
+      const getRealId = (id: number | null) => {
+        if (!id) return null;
+        return tempIdRealIdMap.get(id) ?? null;
+      };
+
+      return Promise.all(
+        input.batch.map(async (item) =>
+          this.db
+            .updateTable('newsletter_item')
+            .set({
+              parentId:
+                item.temp.parentId == null
+                  ? input.parentId
+                  : getRealId(item.temp.parentId),
+              nextItemId:
+                item.temp.nextItemId == lastItemTempId
+                  ? input.nextItemId
+                  : getRealId(item.temp.nextItemId),
+              previousItemId:
+                item.temp.previousItemId == firstItemTempId
+                  ? input.previousItemId
+                  : getRealId(item.temp.previousItemId),
+            })
+            .returning('id')
+            .where('newsletter_item.id', '=', getRealId(item.temp.id))
+            .executeTakeFirstOrThrow()
+        )
+      );
+    });
+  }
 
   async get(id: number) {
     const result = await this.db
-      .selectFrom('newsletterItem as ni')
+      .selectFrom('newsletter_item as ni')
       .select((eb) => [
         'id',
         'newsletterId',
@@ -135,13 +201,13 @@ export class NewsletterItemDAO {
         'modified',
         jsonObjectFrom(
           eb
-            .selectFrom('newsletterItemMedia as media-details')
+            .selectFrom('newsletter_item_media as media-details')
             .selectAll('media-details')
             .whereRef('media-details.newsletterItemId', '=', 'ni.id')
         ).as('mediaDetails'),
         jsonObjectFrom(
           eb
-            .selectFrom('newsletterItemText as text-details')
+            .selectFrom('newsletter_item_text as text-details')
             .selectAll('text-details')
             .whereRef('text-details.newsletterItemId', '=', 'ni.id')
         ).as('textDetails'),
@@ -183,13 +249,13 @@ export class NewsletterItemDAO {
       if (input.nextItemId) {
         const nextItemId = input.nextItemId;
         const existingItem = await trx
-          .selectFrom('newsletterItem as ni')
+          .selectFrom('newsletter_item as ni')
           .selectAll()
           .where('ni.id', '=', input.newsletterItemId)
           .executeTakeFirstOrThrow();
 
         await trx
-          .updateTable('newsletterItem as ni')
+          .updateTable('newsletter_item as ni')
           .set({
             nextItemId: existingItem.nextItemId,
           })
@@ -197,7 +263,7 @@ export class NewsletterItemDAO {
           .executeTakeFirst();
 
         await trx
-          .updateTable('newsletterItem as ni')
+          .updateTable('newsletter_item as ni')
           .set({
             previousItemId: existingItem.previousItemId,
           })
@@ -205,7 +271,7 @@ export class NewsletterItemDAO {
           .executeTakeFirst();
       }
       await trx
-        .updateTable('newsletterItem as ni')
+        .updateTable('newsletter_item as ni')
         .set({
           ..._.omitBy(newsletterItemUpdate, _.isUndefined),
           modified: new Date().toISOString(),
