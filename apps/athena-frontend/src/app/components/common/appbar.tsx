@@ -1,9 +1,28 @@
-import { AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Button,
+  Drawer,
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+} from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
-import { useNavigate } from 'react-router-dom';
+import { matchPath, useLocation, useNavigate } from 'react-router-dom';
+import SettingsIcon from '@mui/icons-material/Settings';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import HomeIcon from '@mui/icons-material/Home';
+import { useMemo, useState } from 'react';
+import { appBarVisiblePaths } from '../../AppRoutes';
 
 interface AppbarProps {
   title: string;
@@ -18,8 +37,46 @@ export function Appbar(props: AppbarProps) {
     }))
   );
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleCloseDrawer = () => setDrawerOpen(false);
+  const handleOpenDrawer = () => setDrawerOpen(true);
+
+  const visible = useMemo(() => {
+    return Boolean(
+      appBarVisiblePaths.find((p) => matchPath(p, location.pathname))
+    );
+  }, [location.pathname]);
+
+  if (!visible) return null;
   return (
     <AppBar position="static">
+      <Drawer open={drawerOpen} onClose={handleCloseDrawer}>
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={handleCloseDrawer}
+        >
+          <List>
+            <DrawerListItem
+              text={'Home'}
+              icon={<HomeIcon />}
+              onClick={() => navigate('/')}
+            />
+            <DrawerListItem
+              text={'Templates'}
+              icon={<FileCopyIcon />}
+              onClick={() => navigate('/templates')}
+            />
+          </List>
+          <Divider />
+          <List>
+            <DrawerListItem text={'Settings'} icon={<SettingsIcon />} />
+          </List>
+        </Box>
+      </Drawer>
       <Toolbar>
         <IconButton
           size="large"
@@ -27,6 +84,7 @@ export function Appbar(props: AppbarProps) {
           color="inherit"
           aria-label="menu"
           sx={{ mr: 2 }}
+          onClick={handleOpenDrawer}
         >
           <MenuIcon />
         </IconButton>
@@ -42,5 +100,23 @@ export function Appbar(props: AppbarProps) {
         )}
       </Toolbar>
     </AppBar>
+  );
+}
+
+interface DrawerListItemProps {
+  text: string;
+  icon: React.ReactNode;
+  onClick?: () => void;
+}
+
+function DrawerListItem(props: DrawerListItemProps) {
+  const { text, icon, onClick } = props;
+  return (
+    <ListItem key={text} disablePadding>
+      <ListItemButton onClick={onClick}>
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText primary={text} />
+      </ListItemButton>
+    </ListItem>
   );
 }

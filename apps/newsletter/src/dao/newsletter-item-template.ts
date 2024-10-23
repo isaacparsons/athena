@@ -1,20 +1,16 @@
 import _ from 'lodash';
 import {
   Connection as DBConnection,
-  jsonArrayFrom,
-  jsonObjectFrom,
   TABLE_NAMES,
   Transaction,
 } from '../types/db';
 
-import { LocationDAO } from './location';
 import {
-  CreateNewsletterItemInput,
   CreateNewsletterItemTemplateInput,
-  UpdateNewsletterItemInput,
+  NewsletterItemTemplate,
+  NewsletterItemTemplateBase,
+  NewsletterItemTemplateDataDetails,
 } from '@athena/athena-common';
-import { NewsletterItemDetailsDAO } from './newsletter-item-details';
-import { mapItems } from './mapping/newsletter-item-mapper';
 
 export class NewsletterItemTemplateDAO {
   constructor(readonly db: DBConnection) {}
@@ -89,7 +85,7 @@ export class NewsletterItemTemplateDAO {
       return template.id;
     });
   }
-  async get(id: number) {
+  async get(id: number): Promise<NewsletterItemTemplate> {
     const template = await this.getTemplate(id);
     const templates = await Promise.all(
       template.items
@@ -103,7 +99,7 @@ export class NewsletterItemTemplateDAO {
     };
   }
 
-  private async getTemplate(id: number) {
+  private async getTemplate(id: number): Promise<NewsletterItemTemplateBase> {
     const template = await this.db
       .selectFrom('newsletter_item_template as nit')
       .where('nit.id', '=', id)
@@ -133,10 +129,12 @@ export class NewsletterItemTemplateDAO {
       .selectFrom('template_tree')
       .selectAll()
       .execute();
-
     return {
       ...template,
-      items,
+      items: items.map((i) => ({
+        ...i,
+        data: _.get(i, ['data']) as NewsletterItemTemplateDataDetails,
+      })),
     };
   }
   // async update(userId: number, input: UpdateNewsletterItemInput) {}

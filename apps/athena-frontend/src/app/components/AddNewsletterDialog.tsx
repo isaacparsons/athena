@@ -41,15 +41,10 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
     setValue,
     handleSubmit,
     reset,
-    watch,
     formState: { errors, isValid, isSubmitting },
   } = useForm<CreateNewsletterInput>({
     resolver: zodResolver(postNewsletterInput),
   });
-
-  console.log(watch('name'));
-  console.log(watch('startDate'));
-  console.log(watch('endDate'));
 
   const handleSave: SubmitHandler<CreateNewsletterInput> = async (data) => {
     console.log(data);

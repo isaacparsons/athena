@@ -72,30 +72,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, {
-        templates: {
-            items: {
-                id: number;
-                parentId: number | null;
-                nextId: number | null;
-                prevId: number | null;
-                templateId: number | null;
-                data: object | null;
-            }[];
-            id: number;
-            name: string;
-        }[];
-        items: {
-            id: number;
-            parentId: number | null;
-            nextId: number | null;
-            prevId: number | null;
-            templateId: number | null;
-            data: object | null;
-        }[];
-        id: number;
-        name: string;
-    }>;
+    }, import("@athena/athena-common").NewsletterItemTemplate>;
     create: import("@trpc/server").BuildProcedure<"mutation", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {

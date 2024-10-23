@@ -71,6 +71,7 @@ export const mapItem = (item: MappedType) => {
     id: item.id,
     title: item.title,
     date: item.date,
+    parentId: item.parentId,
     nextItemId: item.nextItemId,
     previousItemId: item.previousItemId,
     meta: {

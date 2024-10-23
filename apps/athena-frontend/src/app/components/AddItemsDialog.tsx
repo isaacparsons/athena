@@ -30,10 +30,11 @@ import {
   useAddItemsStore,
 } from '../store';
 
-interface AddMediaItemsDialogProps {
+interface AddItemsDialogProps {
   open: boolean;
   handleClose: () => void;
   newsletterId: number;
+  parentId: number | null;
 }
 
 type UploadItem = {
@@ -47,6 +48,7 @@ const mapItemsToArray = (items: StoreItems): StoreItem[] =>
 async function uploadMediaItem(
   newsletterId: number,
   previousItemId: number | null,
+  parentId: number | null,
   uploadItem: UploadItem
 ) {
   const signedUrl = uploadItem.signedUrl;
@@ -56,7 +58,7 @@ async function uploadMediaItem(
   return asyncTrpcClient.newsletterItems.create.mutate({
     newsletterId: Number(newsletterId),
     title: item.title,
-    parentId: null,
+    parentId: parentId,
     nextItemId: null,
     previousItemId: previousItemId,
     details: {
@@ -70,12 +72,13 @@ async function uploadMediaItem(
 async function uploadTextItem(
   newsletterId: number,
   previousItemId: number | null,
+  parentId: number | null,
   item: StoreAddNewsletterTextItem
 ) {
   return asyncTrpcClient.newsletterItems.create.mutate({
     newsletterId: Number(newsletterId),
     title: item.title,
-    parentId: null,
+    parentId: parentId,
     nextItemId: null,
     previousItemId: previousItemId,
     details: {
@@ -87,11 +90,12 @@ async function uploadTextItem(
   });
 }
 
-export function AddItemsDialog(props: AddMediaItemsDialogProps) {
-  const { open, handleClose, newsletterId } = props;
-  const { fetchNewsletter } = useStore(
+export function AddItemsDialog(props: AddItemsDialogProps) {
+  const { open, handleClose, newsletterId, parentId } = props;
+  const { fetchNewsletter, fetchNewsletterItems } = useStore(
     useShallow((state) => ({
       fetchNewsletter: state.newsletters.fetch,
+      fetchNewsletterItems: state.newsletterItems.fetch,
     }))
   );
   const { items, addItem } = useAddItemsStore(
@@ -143,22 +147,32 @@ export function AddItemsDialog(props: AddMediaItemsDialogProps) {
         if (item.details.type === 'media') {
           const url = signedUrls.find((i) => Number(i.id) === item.tempId);
           if (url) {
-            return uploadMediaItem(newsletterId, previousUploadedItemId, {
-              item: item as StoreAddNewsletterMediaItem,
-              signedUrl: url,
-            });
+            return uploadMediaItem(
+              newsletterId,
+              previousUploadedItemId,
+              parentId,
+              {
+                item: item as StoreAddNewsletterMediaItem,
+                signedUrl: url,
+              }
+            );
           } else return promiseChain;
         } else if (item.details.type === 'text') {
           return uploadTextItem(
             newsletterId,
             previousUploadedItemId,
+            parentId,
             item as StoreAddNewsletterTextItem
           );
         } else return promiseChain;
       },
       Promise.resolve(null)
     );
-    await fetchNewsletter(Number(newsletterId));
+    if (parentId === null) {
+      await fetchNewsletter(Number(newsletterId));
+    } else {
+      await fetchNewsletterItems(parentId);
+    }
     setUploading(false);
     handleClose();
   };

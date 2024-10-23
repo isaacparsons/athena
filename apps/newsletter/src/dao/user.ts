@@ -12,9 +12,11 @@ export class UserDAO {
       .executeTakeFirstOrThrow();
 
     const newsletters = await this.newsletters(user.id);
+    const newsletterItemTemplates = await this.newsletterItemTemplates(user.id);
     return {
       ...user,
       newsletters,
+      newsletterItemTemplates,
     };
   }
   async newsletters(userId: number) {
@@ -70,6 +72,24 @@ export class UserDAO {
         },
       },
       owner: newsletter.owner,
+    }));
+  }
+
+  async newsletterItemTemplates(userId: number) {
+    const templates = await this.db
+      .selectFrom('user_template as ut')
+      .innerJoin(
+        'newsletter_item_template as nit',
+        'nit.id',
+        'ut.newsletterItemTemplateId'
+      )
+      .selectAll('nit')
+      .where('ut.userId', '=', userId)
+      .execute();
+
+    return templates.map((t) => ({
+      id: t.id,
+      name: t.name,
     }));
   }
 }

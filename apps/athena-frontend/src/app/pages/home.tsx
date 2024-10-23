@@ -31,7 +31,7 @@ export function Home() {
         onClose={handleCloseAddNewsletterDialog}
       />
 
-      <Appbar title="Newsletter" />
+      {/* <Appbar title="Newsletter" /> */}
       <Container sx={{ flex: 1, minHeight: '100vh' }} maxWidth="md">
         <UserNewsletters newsletters={newslettersArr} />
       </Container>

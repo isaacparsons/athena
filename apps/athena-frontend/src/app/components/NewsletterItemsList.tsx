@@ -1,181 +1,130 @@
-import {
-  List,
-  ListItem,
-  Card,
-  CardHeader,
-  CardMedia,
-  CardContent,
-  Typography,
-  Avatar,
-  useTheme,
-  Box,
-  Checkbox,
-  Paper,
-  IconButton,
-  Stack,
-} from '@mui/material';
-import { red } from '@mui/material/colors';
+import { useTheme, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { StoreNewsletterItem } from '../store';
-import {
-  NewsletterItemDetailsMedia,
-  NewsletterItemDetailsText,
-} from '@athena/athena-common';
+import EditIcon from '@mui/icons-material/Edit';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import CloseIcon from '@mui/icons-material/Close';
+import { StoreNewsletterItem, useStore } from '../store';
+
+import { ToggleList } from './ToggleList';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AddItemTemplateDialog } from './AddItemTemplateDialog';
+import { AddItemsDialog } from './AddItemsDialog';
+import { CustomSpeedDial } from './CustomSpeedDial';
+import { asyncTrpcClient } from '../../trpc';
+import { useShallow } from 'zustand/react/shallow';
+import { NewsletterItemCard } from './common/NewsletterItemCard';
 
 interface NewsletterItemsListProps {
+  parentId: number | null;
   items: StoreNewsletterItem[];
-  selectable: boolean;
-  selectedItemIds: Set<number>;
-  onToggleSelect: (id: number) => void;
-  onToggleSelectAll: () => void;
-  onDelete: () => void;
+  newsletterId: number;
 }
 
 export function NewsletterItemsList(props: NewsletterItemsListProps) {
-  const {
-    items,
-    selectable,
-    onToggleSelect,
-    onToggleSelectAll,
-    selectedItemIds,
-    onDelete,
-  } = props;
+  const { items, newsletterId, parentId } = props;
+
+  const { fetchNewsletter, deleteNewsletterItems } = useStore(
+    useShallow((state) => ({
+      fetchNewsletter: state.newsletters.fetch,
+      deleteNewsletterItems: state.newsletterItems.deleteItems,
+    }))
+  );
 
   const theme = useTheme();
+  const navigate = useNavigate();
 
-  const handleSelectItemToggle = (id: number) => {
-    onToggleSelect(id);
+  const [selectable, setSelectable] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(
+    new Set()
+  );
+
+  const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
+  const [deletingItems, setDeletingItems] = useState(false);
+  const [addMediaItemsDialogOpen, setAddMediaItemsDialogOpen] = useState(false);
+  const [addTemplateDialogOpen, setAddTemplateDialogOpen] = useState(false);
+
+  const handleOpenMediaItemsDialog = () => setAddMediaItemsDialogOpen(true);
+  const handleCloseMediaItemsDialog = () => {
+    fetchNewsletter(newsletterId);
+    setAddMediaItemsDialogOpen(false);
+  };
+  const handleOpenAddTemplateDialog = () => setAddTemplateDialogOpen(true);
+  const handleCloseAddTemplateDialog = () => {
+    setAddTemplateDialogOpen(false);
+  };
+  const handleMakeSelectable = () => setSelectable(true);
+  const handleMakeUnSelectable = () => setSelectable(false);
+  const handleDeleteItemsClick = () => setConfirmDeleteDialogOpen(true);
+  const handleCloseConfirmDeleteDialog = () =>
+    setConfirmDeleteDialogOpen(false);
+
+  const handleDeleteItems = async (ids: number[]) => {
+    setDeletingItems(true);
+
+    await deleteNewsletterItems(ids);
+    fetchNewsletter(newsletterId);
+    handleCloseConfirmDeleteDialog();
+    setDeletingItems(false);
+    handleMakeUnSelectable();
+    // notifications.show('Item(s) deleted!', successNotificationOptions);
   };
 
-  return (
-    <Box>
-      {selectable && (
-        <Paper elevation={2}>
-          <Box
-            display="flex"
-            flexDirection="row"
-            alignItems="center"
-            justifyContent="space-between"
-            padding={theme.spacing(1)}
-          >
-            <Box display="flex" flexDirection="row" alignItems="center">
-              <Checkbox
-                value={items.length === selectedItemIds.size}
-                onClick={onToggleSelectAll}
-              />
-              <Typography>Select all</Typography>
-            </Box>
-            <IconButton
-              onClick={onDelete}
-              disabled={selectedItemIds.size === 0}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Box>
-        </Paper>
-      )}
-
-      <List sx={{ display: 'flex', flexDirection: 'column' }}>
-        {items.map((item) => {
-          const isSelected = selectedItemIds.has(item.id);
-          return (
-            <NewsletterItem
-              item={item}
-              selectable={selectable}
-              isSelected={isSelected}
-              handleSelectItemToggle={handleSelectItemToggle}
-            />
-          );
-        })}
-      </List>
-    </Box>
+  const selectedItems = useMemo(
+    () => Array.from(selectedItemIds).map((i) => items[i]),
+    [items, selectedItemIds]
   );
-}
 
-interface NewsletterItemProps {
-  item: StoreNewsletterItem;
-  selectable: boolean;
-  isSelected: boolean;
-  handleSelectItemToggle: (id: number) => void;
-}
-
-export function NewsletterItem(props: NewsletterItemProps) {
-  const theme = useTheme();
-  const { selectable, isSelected, item, handleSelectItemToggle } = props;
   return (
-    <ListItem sx={{ padding: 0 }} key={item.id}>
-      <Card sx={{ marginBottom: theme.spacing(2) }}>
-        <Box display="flex">
-          {selectable && (
-            <Checkbox
-              key={item.id}
-              checked={isSelected}
-              onClick={() => handleSelectItemToggle(item.id)}
-            />
-          )}
-
-          <CardHeader
-            avatar={
-              <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                ?
-              </Avatar>
-            }
-            title={item.title}
-            subheader={item.meta.created.toString()}
-          />
-        </Box>
-
-        {item.details?.type === 'media' ? (
-          <MediaItemDetails
-            details={item.details as NewsletterItemDetailsMedia}
-          />
-        ) : null}
-      </Card>
-    </ListItem>
-  );
-}
-
-interface MediaItemDetailsProps {
-  details: NewsletterItemDetailsMedia;
-}
-
-export function MediaItemDetails(props: MediaItemDetailsProps) {
-  const { details } = props;
-  return (
-    <Stack>
-      <CardMedia component="img" image={`${details.fileName}`} />
-      <CardContent>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {details.caption}
-        </Typography>
-      </CardContent>
-    </Stack>
-  );
-}
-
-interface TextItemDetailsProps {
-  details: NewsletterItemDetailsText;
-}
-
-export function TextItemDetails(props: TextItemDetailsProps) {
-  const { details } = props;
-  return (
-    <Stack>
-      <CardContent>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {details.name}
-        </Typography>
-        {details.description && (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {details.description}
-          </Typography>
+    <>
+      {/* <ConfirmationDialog
+        open={confirmDeleteDialogOpen}
+        loading={deletingItems}
+        onCloseDialog={handleCloseConfirmDeleteDialog}
+        onConfirm={handleDeleteItems}
+        title={'Delete items'}
+        content={'are you sure you want to delete the selected items?'}
+      /> */}
+      <AddItemTemplateDialog
+        open={addTemplateDialogOpen}
+        handleClose={handleCloseAddTemplateDialog}
+        items={selectedItems}
+      />
+      <AddItemsDialog
+        parentId={parentId}
+        newsletterId={newsletterId}
+        open={addMediaItemsDialogOpen}
+        handleClose={handleCloseMediaItemsDialog}
+      />
+      <ToggleList
+        items={items}
+        selectedItemIds={selectedItemIds}
+        setSelectedItemIds={setSelectedItemIds}
+        selectable={selectable}
+        onDelete={handleDeleteItems}
+        renderItem={(item: StoreNewsletterItem) => (
+          <NewsletterItemCard item={item} />
         )}
-        {details.link && (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {details.link}
-          </Typography>
-        )}
-      </CardContent>
-    </Stack>
+      />
+
+      <Button onClick={handleOpenAddTemplateDialog}>Press me</Button>
+
+      <CustomSpeedDial
+        overrideIcon={selectable ? <CloseIcon /> : null}
+        onOverrideIconClick={handleMakeUnSelectable}
+        actions={[
+          {
+            icon: <FileUploadIcon />,
+            name: 'Media',
+            onClick: handleOpenMediaItemsDialog,
+          },
+          {
+            icon: <EditIcon />,
+            name: 'Edit',
+            onClick: handleMakeSelectable,
+          },
+        ]}
+      />
+    </>
   );
 }

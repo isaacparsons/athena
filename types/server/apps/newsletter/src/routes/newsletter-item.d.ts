@@ -405,6 +405,17 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             date?: string | null | undefined;
             nextItemId?: number | undefined;
             title?: string | undefined;
+            details?: {
+                name: string;
+                type: import("@athena/athena-common").NewsletterItemType.media;
+                fileName: string;
+                caption?: string | undefined;
+            } | {
+                name: string;
+                type: import("@athena/athena-common").NewsletterItemType.text;
+                description?: string | undefined;
+                link?: string | undefined;
+            } | undefined;
         };
         _input_out: {
             newsletterItemId: number;
@@ -417,6 +428,17 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             date?: string | null | undefined;
             nextItemId?: number | undefined;
             title?: string | undefined;
+            details?: {
+                name: string;
+                type: import("@athena/athena-common").NewsletterItemType.media;
+                fileName: string;
+                caption?: string | undefined;
+            } | {
+                name: string;
+                type: import("@athena/athena-common").NewsletterItemType.text;
+                description?: string | undefined;
+                link?: string | undefined;
+            } | undefined;
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;

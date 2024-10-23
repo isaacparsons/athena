@@ -49,6 +49,7 @@ export declare const mapItem: (item: MappedType) => {
     id: number;
     title: string;
     date: string | null;
+    parentId: number | null;
     nextItemId: number | null;
     previousItemId: number | null;
     meta: {

@@ -73,7 +73,7 @@ interface MediaItemCardProps {
   item: StoreAddNewsletterMediaItem;
 }
 
-function MediaCardItem(props: MediaItemCardProps) {
+export function MediaCardItem(props: MediaItemCardProps) {
   const { item } = props;
   return (
     <>
@@ -104,7 +104,7 @@ interface TextItemCardProps {
   item: StoreAddNewsletterTextItem;
 }
 
-function TextCardItem(props: TextItemCardProps) {
+export function TextCardItem(props: TextItemCardProps) {
   const { item } = props;
   const { updateItemDetails } = useAddItemsStore();
   return (

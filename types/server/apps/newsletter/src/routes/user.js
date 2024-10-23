@@ -10,5 +10,8 @@ exports.userRouter = trpc_1.trpc.router({
     newsletters: logged_in_1.loggedInProcedure.query(({ ctx }) => {
         return ctx.dao.user.newsletters(ctx.user.userId);
     }),
+    newsletterItemTemplates: logged_in_1.loggedInProcedure.query(({ ctx }) => {
+        return ctx.dao.user.newsletterItemTemplates(ctx.user.userId);
+    }),
 });
 //# sourceMappingURL=user.js.map

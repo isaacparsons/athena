@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemTemplateDAO = void 0;
 const tslib_1 = require("tslib");
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
 const db_1 = require("../types/db");
 class NewsletterItemTemplateDAO {
     constructor(db) {
@@ -104,7 +105,7 @@ class NewsletterItemTemplateDAO {
                 .selectFrom('template_tree')
                 .selectAll()
                 .execute();
-            return Object.assign(Object.assign({}, template), { items });
+            return Object.assign(Object.assign({}, template), { items: items.map((i) => (Object.assign(Object.assign({}, i), { data: lodash_1.default.get(i, ['data']) }))) });
         });
     }
 }

@@ -15,7 +15,9 @@ class UserDAO {
                 .selectAll()
                 .executeTakeFirstOrThrow();
             const newsletters = yield this.newsletters(user.id);
-            return Object.assign(Object.assign({}, user), { newsletters });
+            const newsletterItemTemplates = yield this.newsletterItemTemplates(user.id);
+            return Object.assign(Object.assign({}, user), { newsletters,
+                newsletterItemTemplates });
         });
     }
     newsletters(userId) {
@@ -65,6 +67,20 @@ class UserDAO {
                     },
                 },
                 owner: newsletter.owner,
+            }));
+        });
+    }
+    newsletterItemTemplates(userId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const templates = yield this.db
+                .selectFrom('user_template as ut')
+                .innerJoin('newsletter_item_template as nit', 'nit.id', 'ut.newsletterItemTemplateId')
+                .selectAll('nit')
+                .where('ut.userId', '=', userId)
+                .execute();
+            return templates.map((t) => ({
+                id: t.id,
+                name: t.name,
             }));
         });
     }

@@ -36,4 +36,8 @@ export declare class UserDAO {
             email: string;
         };
     }[]>;
+    newsletterItemTemplates(userId: number): Promise<{
+        id: number;
+        name: string;
+    }[]>;
 }

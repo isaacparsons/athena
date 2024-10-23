@@ -18,6 +18,7 @@ export interface UserBase {
 
 export interface User extends UserBase {
   newsletters: NewsletterBase[];
+  newsletterItemTemplates: Omit<NewsletterItemTemplateBase, 'items'>[];
 }
 
 interface Meta {
@@ -113,6 +114,7 @@ export interface NewsletterItemBase {
   location: Location | null;
   date: string | null;
   title: string;
+  parentId: number | null;
   nextItemId: number | null;
   previousItemId: number | null;
   details?: NewsletterItemDetails;
@@ -171,6 +173,7 @@ export const updateNewsletterItemInput = z
     // parentId: z.coerce.number().optional(),
     nextItemId: z.coerce.number().optional(),
     location: locationInput,
+    details: newsletterItemDetails,
   })
   .refine((obj) => obj.date || obj.nextItemId || obj.title || obj.location);
 
@@ -262,6 +265,10 @@ const newsletterItemTemplateDataDetails = z
   ])
   .optional();
 
+export type NewsletterItemTemplateDataDetails = z.infer<
+  typeof newsletterItemTemplateDataDetails
+>;
+
 const baseNewsletterItemTemplateData = z.object({
   id: z.number(),
   nextId: z.number().nullable(),
@@ -271,9 +278,9 @@ const baseNewsletterItemTemplateData = z.object({
   data: newsletterItemTemplateDataDetails,
 });
 
-// export type NewsletterItemTemplateData = z.infer<
-//   typeof baseNewsletterItemTemplateData
-// >
+export type NewsletterItemTemplateData = z.infer<
+  typeof baseNewsletterItemTemplateData
+>;
 // type CreateNewsletterItemTemplateData = z.infer<
 //   typeof baseNewsletterItemTemplateData
 // > & {
@@ -314,12 +321,15 @@ export const deleteNewsletterItemTemplateInput = z.object({
   id: z.number(),
 });
 
-// export type NewsletterItemTemplate = {
-//   id: number;
-//   name: string;
-//   items: ;
-//   templates:
-// };
+export type NewsletterItemTemplateBase = {
+  id: number;
+  name: string;
+  items: NewsletterItemTemplateData[];
+};
+
+export type NewsletterItemTemplate = NewsletterItemTemplateBase & {
+  templates: NewsletterItemTemplateBase[];
+};
 
 export type CreateNewsletterItemTemplateInput = z.infer<
   typeof postNewsletterItemTemplateInput

@@ -71,6 +71,7 @@ exports.updateNewsletterItemInput = zod_1.z
     // parentId: z.coerce.number().optional(),
     nextItemId: zod_1.z.coerce.number().optional(),
     location: exports.locationInput,
+    details: exports.newsletterItemDetails,
 })
     .refine((obj) => obj.date || obj.nextItemId || obj.title || obj.location);
 exports.deleteManyNewsletterItemsInput = zod_1.z.object({
@@ -116,9 +117,6 @@ const baseNewsletterItemTemplateData = zod_1.z.object({
     templateId: zod_1.z.number().nullable(),
     data: newsletterItemTemplateDataDetails,
 });
-// export type NewsletterItemTemplateData = z.infer<
-//   typeof baseNewsletterItemTemplateData
-// >
 // type CreateNewsletterItemTemplateData = z.infer<
 //   typeof baseNewsletterItemTemplateData
 // > & {

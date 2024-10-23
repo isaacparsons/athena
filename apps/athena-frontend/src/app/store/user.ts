@@ -32,8 +32,10 @@ export const createUserSlice: StateCreator<
       set((state) => {
         state.user.data = _.omit(user, ['newsletters']);
         state.user.loading = false;
+        state.user.error = null;
       });
       get().newsletters.addNewsletters(user.newsletters);
+      get().newsletterItemTemplates.addTemplates(user.newsletterItemTemplates);
     },
   },
 });

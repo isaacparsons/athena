@@ -33,10 +33,16 @@ export const createNewslettersSlice: StateCreator<
     getNewsletters: () => Object.values(get().newsletters.data),
     getNewsletterById: (id: number) => get().newsletters.data[id] ?? null,
     fetch: async (id: number) => {
+      set((state) => {
+        state.newsletters.loading = true;
+        state.newsletters.error = null;
+      });
       const newsletter = await asyncTrpcClient.newsletters.get.query({
         newsletterId: id,
       });
       set((state) => {
+        state.newsletters.loading = false;
+        state.newsletters.error = null;
         state.newsletters.data[newsletter.id] = {
           ..._.omit(newsletter, ['items']),
           itemIds: newsletter.items.map((i) => i.id),
@@ -57,18 +63,3 @@ export const createNewslettersSlice: StateCreator<
     },
   },
 });
-
-// fetchedNewsletter: (newsletter: Newsletter) =>
-//   set((state) => {
-//     const items = newsletter.items;
-//     state.newsletters[newsletter.id] = {
-//       ..._.omit(newsletter, ['items']),
-//       itemIds: items.map((i) => i.id),
-//     };
-//     items.forEach((item) => {
-//       state.newsletterItems[item.id] = {
-//         ...item,
-//         childrenIds: [],
-//       };
-//     });
-//   }),
