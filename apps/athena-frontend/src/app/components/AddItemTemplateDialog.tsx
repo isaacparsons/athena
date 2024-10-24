@@ -10,7 +10,6 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import { useNotifications } from '@toolpad/core';
 import { StoreNewsletterItem, useStore } from '../store';
 import { useEffect } from 'react';
 import {
@@ -21,6 +20,7 @@ import {
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useShallow } from 'zustand/react/shallow';
+import { usePromiseWithNotification } from '../hooks/usePromiseWithNotification';
 
 interface AddItemTemplateDialog {
   open: boolean;
@@ -45,7 +45,7 @@ const convertToTemplateItems = (items: StoreNewsletterItem[]) => {
 
 export function AddItemTemplateDialog(props: AddItemTemplateDialog) {
   const { open, handleClose, items } = props;
-  const notifications = useNotifications();
+  const promiseWithNotifications = usePromiseWithNotification();
   const { saveTemplate } = useStore(
     useShallow((state) => ({
       saveTemplate: state.newsletterItemTemplates.save,
@@ -84,7 +84,15 @@ export function AddItemTemplateDialog(props: AddItemTemplateDialog) {
   const handleSaveTemplate: SubmitHandler<
     CreateNewsletterItemTemplateInput
   > = async (data) => {
-    await saveTemplate(data);
+    promiseWithNotifications.execute(saveTemplate(data), {
+      successMsg: 'Templated created!',
+      errorMsg: 'Unable to create Template :(',
+      onSuccess: (templateId) => {
+        reset({ name: '', data: [] });
+        handleClose();
+        // TODO: should this navigate to newly created template?
+      },
+    });
   };
 
   return (

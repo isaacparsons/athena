@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {
   Connection as DBConnection,
+  jsonObjectFrom,
   TABLE_NAMES,
   Transaction,
 } from '../types/db';
@@ -19,7 +20,11 @@ export class NewsletterItemTemplateDAO {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const template = await trx
         .insertInto('newsletter_item_template')
-        .values({ name: input.name })
+        .values({
+          name: input.name,
+          created: new Date().toISOString(),
+          creatorId: userId,
+        })
         .returning('id')
         .executeTakeFirstOrThrow();
 
@@ -103,7 +108,26 @@ export class NewsletterItemTemplateDAO {
     const template = await this.db
       .selectFrom('newsletter_item_template as nit')
       .where('nit.id', '=', id)
-      .selectAll()
+      .select((eb) => [
+        'nit.id',
+        'nit.name',
+        'nit.created',
+        'nit.modified',
+        jsonObjectFrom(
+          eb
+            .selectFrom('user as creator')
+            .selectAll('creator')
+            .whereRef('creator.id', '=', 'nit.creatorId')
+        )
+          .$notNull()
+          .as('creator'),
+        jsonObjectFrom(
+          eb
+            .selectFrom('user as modifier')
+            .selectAll('modifier')
+            .whereRef('modifier.id', '=', 'nit.modifierId')
+        ).as('modifier'),
+      ])
       .executeTakeFirstOrThrow();
 
     const items = await this.db
@@ -130,7 +154,14 @@ export class NewsletterItemTemplateDAO {
       .selectAll()
       .execute();
     return {
-      ...template,
+      id: template.id,
+      name: template.name,
+      meta: {
+        created: template.created,
+        modified: template.modified,
+        creator: template.creator,
+        modifier: template.modifier,
+      },
       items: items.map((i) => ({
         ...i,
         data: _.get(i, ['data']) as NewsletterItemTemplateDataDetails,

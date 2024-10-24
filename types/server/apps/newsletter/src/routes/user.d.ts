@@ -202,6 +202,22 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
     }, {
         id: number;
         name: string;
+        meta: {
+            created: string;
+            modified: string | null;
+            creator: {
+                id: number;
+                firstName: string | null;
+                lastName: string | null;
+                email: string;
+            };
+            modifier: {
+                id: number;
+                firstName: string | null;
+                lastName: string | null;
+                email: string;
+            } | null;
+        };
     }[]>;
 }>;
 export type UserRouter = typeof userRouter;

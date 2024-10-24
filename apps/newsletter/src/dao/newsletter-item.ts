@@ -120,6 +120,7 @@ export class NewsletterItemDAO {
       return createdNewsletterItem.id;
     });
   }
+
   async postBatch(userId: number, input: CreateNewsletterItemBatchInput) {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const tuples = await Promise.all(

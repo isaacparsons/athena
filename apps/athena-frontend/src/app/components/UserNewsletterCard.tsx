@@ -7,18 +7,8 @@ import {
   Typography,
 } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { NewsletterBase, DateRange } from '@athena/athena-common';
-
-function formatDate(date: string) {
-  return new Date(date).toDateString();
-}
-
-function formatDateRange(dateRange: DateRange) {
-  if (!dateRange.start) return null;
-  const start = formatDate(dateRange.start);
-  const end = dateRange.end ? formatDate(dateRange.end) : null;
-  return `${start} - ${end}`;
-}
+import { NewsletterBase } from '@athena/athena-common';
+import { formatDate, formatDateRange } from '../../util/helpers';
 
 interface UserNewsletterCardProps {
   newsletter: NewsletterBase;

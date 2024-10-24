@@ -1,7 +1,14 @@
 import { Insertable, Selectable, Updateable, sql } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../types/db';
+import {
+  Connection,
+  Table,
+  ITable,
+  UniqueId,
+  TABLE_NAMES,
+  Meta,
+} from '../types/db';
 
-export interface NewsletterItemTemplateTableColumns {
+export interface NewsletterItemTemplateTableColumns extends Meta {
   id: UniqueId;
   name: string;
 }
@@ -29,6 +36,16 @@ export class NewsletterItemTemplateTableClient extends Table implements ITable {
       .ifNotExists()
       .addColumn('id', 'serial', (cb) => cb.primaryKey())
       .addColumn('name', 'varchar', (cb) => cb.notNull())
+      .addColumn('created', 'timestamp', (cb) =>
+        cb.notNull().defaultTo(sql`now()`)
+      )
+      .addColumn('creatorId', 'integer', (col) =>
+        col.references(`${TABLE_NAMES.USER}.id`).onDelete('cascade')
+      )
+      .addColumn('modified', 'timestamp')
+      .addColumn('modifierId', 'integer', (col) =>
+        col.references(`${TABLE_NAMES.USER}.id`).onDelete('cascade')
+      )
       .execute();
     return;
   }

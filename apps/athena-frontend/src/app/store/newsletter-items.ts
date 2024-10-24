@@ -36,9 +36,7 @@ type NewsletterItemsData = Record<number, StoreNewsletterItem>;
 export interface NewsletterItemsSlice {
   newsletterItems: {
     loading: boolean;
-    error: string | null;
     data: Record<number, StoreNewsletterItem>;
-    getItems: () => StoreNewsletterItem[];
     fetch: (id: number) => Promise<void>;
     deleteItems: (ids: number[]) => Promise<void>;
     addItems: (items: NewsletterItemBase[]) => void;
@@ -53,20 +51,16 @@ export const createNewsletterItemsSlice: StateCreator<
 > = (set, get) => ({
   newsletterItems: {
     loading: false,
-    error: null,
     data: {},
-    getItems: () => Object.values(get().newsletterItems.data),
     fetch: async (id: number) => {
       set((state) => {
         state.newsletterItems.loading = true;
-        state.newsletterItems.error = null;
       });
       const item = await asyncTrpcClient.newsletterItems.get.query({
         newsletterItemId: id,
       });
       set((state) => {
         state.newsletterItems.loading = false;
-        state.newsletterItems.error = null;
         state.newsletterItems.data[item.id] = mapToStoreItem(item);
         item.children.forEach((i) => {
           state.newsletterItems.data[i.id] = {
@@ -80,14 +74,12 @@ export const createNewsletterItemsSlice: StateCreator<
     deleteItems: async (ids: number[]) => {
       set((state) => {
         state.newsletterItems.loading = true;
-        state.newsletterItems.error = null;
       });
       await asyncTrpcClient.newsletterItems.deleteMany.mutate({
         newsletterItemIds: ids,
       });
       set((state) => {
         state.newsletterItems.loading = false;
-        state.newsletterItems.error = null;
         Object.values(state.newsletters.data).forEach((newsletter) => {
           newsletter.itemIds = _.difference(newsletter.itemIds, ids);
         });

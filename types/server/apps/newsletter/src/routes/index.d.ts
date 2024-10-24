@@ -223,6 +223,22 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
         }, {
             id: number;
             name: string;
+            meta: {
+                created: string;
+                modified: string | null;
+                creator: {
+                    id: number;
+                    firstName: string | null;
+                    lastName: string | null;
+                    email: string;
+                };
+                modifier: {
+                    id: number;
+                    firstName: string | null;
+                    lastName: string | null;
+                    email: string;
+                } | null;
+            };
         }[]>;
     }>;
     newsletters: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
@@ -656,8 +672,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 };
             };
             _input_in: {
-                newsletterId: number;
                 parentId: number | null;
+                newsletterId: number;
                 nextItemId: number | null;
                 previousItemId: number | null;
                 title: string;
@@ -676,13 +692,13 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 } | {
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.text;
-                    description?: string | undefined;
                     link?: string | undefined;
+                    description?: string | undefined;
                 } | undefined;
             };
             _input_out: {
-                newsletterId: number;
                 parentId: number | null;
+                newsletterId: number;
                 nextItemId: number | null;
                 previousItemId: number | null;
                 title: string;
@@ -701,8 +717,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 } | {
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.text;
-                    description?: string | undefined;
                     link?: string | undefined;
+                    description?: string | undefined;
                 } | undefined;
             };
             _output_in: typeof import("@trpc/server").unsetMarker;
@@ -754,8 +770,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 };
             };
             _input_in: {
-                newsletterId: number;
                 parentId: number | null;
+                newsletterId: number;
                 nextItemId: number | null;
                 previousItemId: number | null;
                 batch: {
@@ -781,14 +797,14 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     } | {
                         name: string;
                         type: import("@athena/athena-common").NewsletterItemType.text;
-                        description?: string | undefined;
                         link?: string | undefined;
+                        description?: string | undefined;
                     } | undefined;
                 }[];
             };
             _input_out: {
-                newsletterId: number;
                 parentId: number | null;
+                newsletterId: number;
                 nextItemId: number | null;
                 previousItemId: number | null;
                 batch: {
@@ -814,8 +830,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     } | {
                         name: string;
                         type: import("@athena/athena-common").NewsletterItemType.text;
-                        description?: string | undefined;
                         link?: string | undefined;
+                        description?: string | undefined;
                     } | undefined;
                 }[];
             };
@@ -888,8 +904,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 } | {
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.text;
-                    description?: string | undefined;
                     link?: string | undefined;
+                    description?: string | undefined;
                 } | undefined;
             };
             _input_out: {
@@ -911,8 +927,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 } | {
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.text;
-                    description?: string | undefined;
                     link?: string | undefined;
+                    description?: string | undefined;
                 } | undefined;
             };
             _output_in: typeof import("@trpc/server").unsetMarker;
@@ -1098,9 +1114,9 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 data: {
                     temp: {
                         id: number;
-                        parentId: number | null;
                         nextId: number | null;
                         prevId: number | null;
+                        parentId: number | null;
                     };
                     templateId?: number | undefined;
                     data?: {
@@ -1111,8 +1127,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     } | {
                         type: import("@athena/athena-common").NewsletterItemType.text;
                         name?: string | undefined;
-                        description?: string | undefined;
                         link?: string | undefined;
+                        description?: string | undefined;
                     } | undefined;
                 }[];
             };
@@ -1121,9 +1137,9 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                 data: {
                     temp: {
                         id: number;
-                        parentId: number | null;
                         nextId: number | null;
                         prevId: number | null;
+                        parentId: number | null;
                     };
                     templateId?: number | undefined;
                     data?: {
@@ -1134,8 +1150,8 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
                     } | {
                         type: import("@athena/athena-common").NewsletterItemType.text;
                         name?: string | undefined;
-                        description?: string | undefined;
                         link?: string | undefined;
+                        description?: string | undefined;
                     } | undefined;
                 }[];
             };

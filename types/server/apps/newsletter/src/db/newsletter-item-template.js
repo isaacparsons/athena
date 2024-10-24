@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemTemplateDataTableClient = exports.NewsletterItemTemplateTableClient = void 0;
 const tslib_1 = require("tslib");
+const kysely_1 = require("kysely");
 const db_1 = require("../types/db");
 class NewsletterItemTemplateTableClient extends db_1.Table {
     constructor(db, name) {
@@ -14,6 +15,10 @@ class NewsletterItemTemplateTableClient extends db_1.Table {
                 .ifNotExists()
                 .addColumn('id', 'serial', (cb) => cb.primaryKey())
                 .addColumn('name', 'varchar', (cb) => cb.notNull())
+                .addColumn('created', 'timestamp', (cb) => cb.notNull().defaultTo((0, kysely_1.sql) `now()`))
+                .addColumn('creatorId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.USER}.id`).onDelete('cascade'))
+                .addColumn('modified', 'timestamp')
+                .addColumn('modifierId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.USER}.id`).onDelete('cascade'))
                 .execute();
             return;
         });

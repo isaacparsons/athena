@@ -1,14 +1,16 @@
-export function mapToArray<T = any>(map: Map<any, T>) {
-  return Array.from(map, ([name, value]) => value);
+import { DateRange } from '@athena/athena-common';
+
+export function mapToArray<T = object>(obj: Record<string, T>): T[] {
+  return Object.keys(obj).map((key) => obj[Number(key)]);
 }
 
-export function addArrayItemsToMap<T extends { id: number }>(
-  items: T[],
-  map: Map<any, any>
-) {
-  const newMap = new Map(map);
-  items.forEach((item) => {
-    newMap.set(item.id, item);
-  });
-  return newMap;
+export function formatDate(date: string) {
+  return new Date(date).toDateString();
+}
+
+export function formatDateRange(dateRange: DateRange) {
+  if (!dateRange.start) return null;
+  const start = formatDate(dateRange.start);
+  const end = dateRange.end ? formatDate(dateRange.end) : null;
+  return `${start} - ${end}`;
 }

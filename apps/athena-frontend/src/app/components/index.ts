@@ -8,7 +8,7 @@ export * from './LocationInput';
 export * from './EditItemLocation';
 export * from './CustomSpeedDial';
 export * from './ConfirmationDialog';
-export * from './Carousel';
+// export * from './Carousel';
 export * from './AddItemCard';
 export * from './AddNewsletterDialog';
 export * from './AddItemsDialog';

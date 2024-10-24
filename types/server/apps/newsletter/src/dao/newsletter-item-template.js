@@ -13,7 +13,11 @@ class NewsletterItemTemplateDAO {
             return this.db.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 const template = yield trx
                     .insertInto('newsletter_item_template')
-                    .values({ name: input.name })
+                    .values({
+                    name: input.name,
+                    created: new Date().toISOString(),
+                    creatorId: userId,
+                })
                     .returning('id')
                     .executeTakeFirstOrThrow();
                 yield trx
@@ -84,7 +88,22 @@ class NewsletterItemTemplateDAO {
             const template = yield this.db
                 .selectFrom('newsletter_item_template as nit')
                 .where('nit.id', '=', id)
-                .selectAll()
+                .select((eb) => [
+                'nit.id',
+                'nit.name',
+                'nit.created',
+                'nit.modified',
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('user as creator')
+                    .selectAll('creator')
+                    .whereRef('creator.id', '=', 'nit.creatorId'))
+                    .$notNull()
+                    .as('creator'),
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('user as modifier')
+                    .selectAll('modifier')
+                    .whereRef('modifier.id', '=', 'nit.modifierId')).as('modifier'),
+            ])
                 .executeTakeFirstOrThrow();
             const items = yield this.db
                 .withRecursive('template_tree', (db) => db
@@ -105,7 +124,17 @@ class NewsletterItemTemplateDAO {
                 .selectFrom('template_tree')
                 .selectAll()
                 .execute();
-            return Object.assign(Object.assign({}, template), { items: items.map((i) => (Object.assign(Object.assign({}, i), { data: lodash_1.default.get(i, ['data']) }))) });
+            return {
+                id: template.id,
+                name: template.name,
+                meta: {
+                    created: template.created,
+                    modified: template.modified,
+                    creator: template.creator,
+                    modifier: template.modifier,
+                },
+                items: items.map((i) => (Object.assign(Object.assign({}, i), { data: lodash_1.default.get(i, ['data']) }))),
+            };
         });
     }
 }

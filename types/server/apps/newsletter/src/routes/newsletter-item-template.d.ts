@@ -123,9 +123,9 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             data: {
                 temp: {
                     id: number;
-                    parentId: number | null;
                     nextId: number | null;
                     prevId: number | null;
+                    parentId: number | null;
                 };
                 templateId?: number | undefined;
                 data?: {
@@ -136,8 +136,8 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 } | {
                     type: import("@athena/athena-common").NewsletterItemType.text;
                     name?: string | undefined;
-                    description?: string | undefined;
                     link?: string | undefined;
+                    description?: string | undefined;
                 } | undefined;
             }[];
         };
@@ -146,9 +146,9 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             data: {
                 temp: {
                     id: number;
-                    parentId: number | null;
                     nextId: number | null;
                     prevId: number | null;
+                    parentId: number | null;
                 };
                 templateId?: number | undefined;
                 data?: {
@@ -159,8 +159,8 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 } | {
                     type: import("@athena/athena-common").NewsletterItemType.text;
                     name?: string | undefined;
-                    description?: string | undefined;
                     link?: string | undefined;
+                    description?: string | undefined;
                 } | undefined;
             }[];
         };

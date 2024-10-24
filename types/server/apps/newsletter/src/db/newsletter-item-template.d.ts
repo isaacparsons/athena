@@ -1,6 +1,6 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../types/db';
-export interface NewsletterItemTemplateTableColumns {
+import { Connection, Table, ITable, UniqueId, TABLE_NAMES, Meta } from '../types/db';
+export interface NewsletterItemTemplateTableColumns extends Meta {
     id: UniqueId;
     name: string;
 }

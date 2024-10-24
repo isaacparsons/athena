@@ -1,7 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteNewsletterItemTemplateInput = exports.getNewsletterItemTemplateInput = exports.postNewsletterItemTemplateInput = exports.deleteNewsletterInput = exports.updateNewsletterInput = exports.postNewsletterInput = exports.getNewsletterInput = exports.getItemUploadLinksInput = exports.deleteManyNewsletterItemsInput = exports.updateNewsletterItemInput = exports.postNewsletterItemBatchInput = exports.postNewsletterItemInput = exports.postNewsletterItemInputBase = exports.getNewsletterItemInput = exports.newsletterItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.NewsletterItemType = exports.locationInput = void 0;
+exports.deleteNewsletterItemTemplateInput = exports.getNewsletterItemTemplateInput = exports.postNewsletterItemTemplateInput = exports.deleteNewsletterInput = exports.updateNewsletterInput = exports.postNewsletterInput = exports.getNewsletterInput = exports.getItemUploadLinksInput = exports.deleteManyNewsletterItemsInput = exports.updateNewsletterItemInput = exports.postNewsletterItemBatchInput = exports.postNewsletterItemInput = exports.postNewsletterItemInputBase = exports.getNewsletterItemInput = exports.newsletterItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.locationInput = exports.NewsletterItemType = void 0;
 const zod_1 = require("zod");
+var NewsletterItemType;
+(function (NewsletterItemType) {
+    NewsletterItemType["media"] = "media";
+    NewsletterItemType["text"] = "text";
+})(NewsletterItemType || (exports.NewsletterItemType = NewsletterItemType = {}));
 exports.locationInput = zod_1.z
     .object({
     name: zod_1.z.string().optional(),
@@ -10,11 +15,6 @@ exports.locationInput = zod_1.z
     longitude: zod_1.z.coerce.number().optional(),
 })
     .optional();
-var NewsletterItemType;
-(function (NewsletterItemType) {
-    NewsletterItemType["media"] = "media";
-    NewsletterItemType["text"] = "text";
-})(NewsletterItemType || (exports.NewsletterItemType = NewsletterItemType = {}));
 exports.mediaItemDetails = zod_1.z.object({
     type: zod_1.z.literal(NewsletterItemType.media),
     name: zod_1.z.string(),

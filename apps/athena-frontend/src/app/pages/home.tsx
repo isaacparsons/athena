@@ -1,41 +1,25 @@
-import { Box, Container } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { CircularProgress } from '@mui/material';
+import { useEffect } from 'react';
 import { useStore } from '../store';
-import {
-  Appbar,
-  CustomFab,
-  AddNewsletterDialog,
-  UserNewsletters,
-} from '../components/index';
 import { useShallow } from 'zustand/react/shallow';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+
+const SESSION_COOKIE_NAME = 'newsletter_session';
 
 export function Home() {
-  const { newsletters, getNewsletters } = useStore(
+  const { user, loading } = useStore(
     useShallow((state) => ({
-      newsletters: state.newsletters.data,
-      getNewsletters: state.newsletters.getNewsletters,
+      user: state.user.data,
+      loading: state.user.loading,
     }))
   );
-  const [addNewsletterDialogOpen, setAddNewsletterDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const newslettersArr = useMemo(() => getNewsletters(), [newsletters]);
+  useEffect(() => {
+    if (user !== null) navigate('/newsletters');
+  }, [user, navigate]);
 
-  const handleOpenAddNewsletterDialog = () => setAddNewsletterDialogOpen(true);
-  const handleCloseAddNewsletterDialog = () =>
-    setAddNewsletterDialogOpen(false);
-
-  return (
-    <Box sx={{ height: '100vh' }}>
-      <AddNewsletterDialog
-        open={addNewsletterDialogOpen}
-        onClose={handleCloseAddNewsletterDialog}
-      />
-
-      {/* <Appbar title="Newsletter" /> */}
-      <Container sx={{ flex: 1, minHeight: '100vh' }} maxWidth="md">
-        <UserNewsletters newsletters={newslettersArr} />
-      </Container>
-      <CustomFab onClick={handleOpenAddNewsletterDialog} />
-    </Box>
-  );
+  if (loading) return <CircularProgress />;
+  return null;
 }

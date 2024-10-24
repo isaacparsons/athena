@@ -16,11 +16,14 @@ export interface User extends UserBase {
     newsletters: NewsletterBase[];
     newsletterItemTemplates: Omit<NewsletterItemTemplateBase, 'items'>[];
 }
-interface Meta {
+interface MetaBase {
     creator: UserBase;
     modifier: UserBase | null;
     created: string;
     modified: string | null;
+}
+interface Meta {
+    meta: MetaBase;
 }
 export type Position = {
     lattitude: number;
@@ -40,6 +43,64 @@ export interface Location {
     name: string | null;
     position: Position | null;
 }
+export declare enum NewsletterItemType {
+    media = "media",
+    text = "text"
+}
+export type ItemUploadLink = {
+    id: string;
+    url: string;
+    fileName: string;
+};
+type NewsletterItemDetailsBase = {
+    id: number;
+    name: string;
+};
+export type NewsletterItemDetailsMedia = NewsletterItemDetailsBase & {
+    type: NewsletterItemType.media;
+    fileName: string;
+    caption: string | null;
+};
+export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
+    type: NewsletterItemType.text;
+    description: string | null;
+    link: string | null;
+};
+export type NewsletterItemDetails = NewsletterItemDetailsText | NewsletterItemDetailsMedia;
+export interface NewsletterItemBase extends Meta {
+    id: number;
+    location: Location | null;
+    date: string | null;
+    title: string;
+    parentId: number | null;
+    nextItemId: number | null;
+    previousItemId: number | null;
+    details?: NewsletterItemDetails;
+}
+export interface NewsletterItem extends NewsletterItemBase {
+    children: NewsletterItemBase[];
+}
+export interface NewsletterProperties {
+    name: string;
+    dateRange: DateRange | null;
+}
+export interface NewsletterBase extends Meta {
+    id: number;
+    properties: NewsletterProperties;
+    owner: UserBase;
+}
+export interface Newsletter extends NewsletterBase {
+    members: UserBase[];
+    items: NewsletterItemBase[];
+}
+export interface NewsletterItemTemplateBase extends Meta {
+    id: number;
+    name: string;
+    items: NewsletterItemTemplateData[];
+}
+export type NewsletterItemTemplate = NewsletterItemTemplateBase & {
+    templates: NewsletterItemTemplateBase[];
+};
 export declare const locationInput: z.ZodOptional<z.ZodObject<{
     name: z.ZodOptional<z.ZodString>;
     countryCode: z.ZodOptional<z.ZodString>;
@@ -57,24 +118,6 @@ export declare const locationInput: z.ZodOptional<z.ZodObject<{
     countryCode?: string | undefined;
 }>>;
 export type LocationInput = z.infer<typeof locationInput>;
-export declare enum NewsletterItemType {
-    media = "media",
-    text = "text"
-}
-type NewsletterItemDetailsBase = {
-    id: number;
-    name: string;
-};
-export type NewsletterItemDetailsMedia = NewsletterItemDetailsBase & {
-    type: NewsletterItemType.media;
-    fileName: string;
-    caption: string | null;
-};
-export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
-    type: NewsletterItemType.text;
-    description: string | null;
-    link: string | null;
-};
 export declare const mediaItemDetails: z.ZodObject<{
     type: z.ZodLiteral<NewsletterItemType.media>;
     name: z.ZodString;
@@ -99,17 +142,16 @@ export declare const textItemDetails: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     name: string;
     type: NewsletterItemType.text;
-    description?: string | undefined;
     link?: string | undefined;
+    description?: string | undefined;
 }, {
     name: string;
     type: NewsletterItemType.text;
-    description?: string | undefined;
     link?: string | undefined;
+    description?: string | undefined;
 }>;
 export type CreateMediaItemDetailsInput = z.infer<typeof mediaItemDetails>;
 export type CreateTextItemDetailsInput = z.infer<typeof textItemDetails>;
-export type NewsletterItemDetails = NewsletterItemDetailsText | NewsletterItemDetailsMedia;
 export declare const newsletterItemDetails: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
     type: z.ZodLiteral<NewsletterItemType.media>;
     name: z.ZodString;
@@ -133,28 +175,14 @@ export declare const newsletterItemDetails: z.ZodOptional<z.ZodDiscriminatedUnio
 }, "strip", z.ZodTypeAny, {
     name: string;
     type: NewsletterItemType.text;
-    description?: string | undefined;
     link?: string | undefined;
+    description?: string | undefined;
 }, {
     name: string;
     type: NewsletterItemType.text;
-    description?: string | undefined;
     link?: string | undefined;
+    description?: string | undefined;
 }>]>>;
-export interface NewsletterItemBase {
-    id: number;
-    meta: Meta;
-    location: Location | null;
-    date: string | null;
-    title: string;
-    parentId: number | null;
-    nextItemId: number | null;
-    previousItemId: number | null;
-    details?: NewsletterItemDetails;
-}
-export interface NewsletterItem extends NewsletterItemBase {
-    children: NewsletterItemBase[];
-}
 export declare const getNewsletterItemInput: z.ZodObject<{
     newsletterItemId: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
@@ -186,8 +214,8 @@ export declare const postNewsletterItemInputBase: z.ZodObject<{
         countryCode?: string | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    newsletterId: number;
     parentId: number | null;
+    newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     title: string;
@@ -199,8 +227,8 @@ export declare const postNewsletterItemInputBase: z.ZodObject<{
     } | undefined;
     date?: string | undefined;
 }, {
-    newsletterId: number;
     parentId: number | null;
+    newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     title: string;
@@ -259,17 +287,17 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     }, {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     }>]>>;
 }>, "strip", z.ZodTypeAny, {
-    newsletterId: number;
     parentId: number | null;
+    newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     title: string;
@@ -288,12 +316,12 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
     } | {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }, {
-    newsletterId: number;
     parentId: number | null;
+    newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     title: string;
@@ -312,8 +340,8 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
     } | {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }>;
 export declare const postNewsletterItemBatchInput: z.ZodObject<{
@@ -379,13 +407,13 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
         }, "strip", z.ZodTypeAny, {
             name: string;
             type: NewsletterItemType.text;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         }, {
             name: string;
             type: NewsletterItemType.text;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         }>]>>;
     }, "strip", z.ZodTypeAny, {
         title: string;
@@ -410,8 +438,8 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
         } | {
             name: string;
             type: NewsletterItemType.text;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }, {
         title: string;
@@ -436,13 +464,13 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
         } | {
             name: string;
             type: NewsletterItemType.text;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
-    newsletterId: number;
     parentId: number | null;
+    newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     batch: {
@@ -468,13 +496,13 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
         } | {
             name: string;
             type: NewsletterItemType.text;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }[];
 }, {
-    newsletterId: number;
     parentId: number | null;
+    newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     batch: {
@@ -500,8 +528,8 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
         } | {
             name: string;
             type: NewsletterItemType.text;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }[];
 }>;
@@ -549,13 +577,13 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     }, {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     }>]>>;
 }, "strip", z.ZodTypeAny, {
     newsletterItemId: number;
@@ -576,8 +604,8 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
     } | {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }, {
     newsletterItemId: number;
@@ -598,8 +626,8 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
     } | {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }>, {
     newsletterItemId: number;
@@ -620,8 +648,8 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
     } | {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }, {
     newsletterItemId: number;
@@ -642,8 +670,8 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
     } | {
         name: string;
         type: NewsletterItemType.text;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }>;
 export declare const deleteManyNewsletterItemsInput: z.ZodObject<{
@@ -670,11 +698,6 @@ export declare const getItemUploadLinksInput: z.ZodObject<{
         id: string;
     }[];
 }>;
-export type ItemUploadLink = {
-    id: string;
-    url: string;
-    fileName: string;
-};
 export type GetItemUploadLinksResponse = ItemUploadLink[];
 export type CreateNewsletterItemDetailsInput = z.infer<typeof newsletterItemDetails>;
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
@@ -682,20 +705,6 @@ export type CreateNewsletterItemBatchInput = z.infer<typeof postNewsletterItemBa
 export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
 export type UpdateNewsletterItemInput = z.infer<typeof updateNewsletterItemInput>;
 export type DeleteManyNewsletterItemsInput = z.infer<typeof deleteManyNewsletterItemsInput>;
-export interface NewsletterProperties {
-    name: string;
-    dateRange: DateRange | null;
-}
-export interface NewsletterBase {
-    id: number;
-    meta: Meta;
-    properties: NewsletterProperties;
-    owner: UserBase;
-}
-export interface Newsletter extends NewsletterBase {
-    members: UserBase[];
-    items: NewsletterItemBase[];
-}
 export declare const getNewsletterInput: z.ZodObject<{
     newsletterId: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
@@ -773,18 +782,18 @@ declare const newsletterItemTemplateDataDetails: z.ZodOptional<z.ZodDiscriminate
     link: z.ZodOptional<z.ZodString>;
 }, "type">, {
     name: z.ZodOptional<z.ZodString>;
-    description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     link: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }>, "strip", z.ZodTypeAny, {
     type: NewsletterItemType.text;
     name?: string | undefined;
-    description?: string | undefined;
     link?: string | undefined;
+    description?: string | undefined;
 }, {
     type: NewsletterItemType.text;
     name?: string | undefined;
-    description?: string | undefined;
     link?: string | undefined;
+    description?: string | undefined;
 }>]>>;
 export type NewsletterItemTemplateDataDetails = z.infer<typeof newsletterItemTemplateDataDetails>;
 declare const baseNewsletterItemTemplateData: z.ZodObject<{
@@ -819,24 +828,24 @@ declare const baseNewsletterItemTemplateData: z.ZodObject<{
         link: z.ZodOptional<z.ZodString>;
     }, "type">, {
         name: z.ZodOptional<z.ZodString>;
-        description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
         link: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     }>, "strip", z.ZodTypeAny, {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     }, {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     }>]>>;
 }, "strip", z.ZodTypeAny, {
     id: number;
-    parentId: number | null;
     nextId: number | null;
     prevId: number | null;
+    parentId: number | null;
     templateId: number | null;
     data?: {
         type: NewsletterItemType.media;
@@ -846,14 +855,14 @@ declare const baseNewsletterItemTemplateData: z.ZodObject<{
     } | {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }, {
     id: number;
-    parentId: number | null;
     nextId: number | null;
     prevId: number | null;
+    parentId: number | null;
     templateId: number | null;
     data?: {
         type: NewsletterItemType.media;
@@ -863,8 +872,8 @@ declare const baseNewsletterItemTemplateData: z.ZodObject<{
     } | {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        description?: string | undefined;
         link?: string | undefined;
+        description?: string | undefined;
     } | undefined;
 }>;
 export type NewsletterItemTemplateData = z.infer<typeof baseNewsletterItemTemplateData>;
@@ -879,14 +888,14 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             prevId: z.ZodNullable<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
             id: number;
-            parentId: number | null;
             nextId: number | null;
             prevId: number | null;
+            parentId: number | null;
         }, {
             id: number;
-            parentId: number | null;
             nextId: number | null;
             prevId: number | null;
+            parentId: number | null;
         }>;
         data: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<z.objectUtil.extendShape<Pick<{
             type: z.ZodLiteral<NewsletterItemType.media>;
@@ -914,25 +923,25 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             link: z.ZodOptional<z.ZodString>;
         }, "type">, {
             name: z.ZodOptional<z.ZodString>;
-            description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
             link: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+            description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
         }>, "strip", z.ZodTypeAny, {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         }, {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         }>]>>;
     }, "strip", z.ZodTypeAny, {
         temp: {
             id: number;
-            parentId: number | null;
             nextId: number | null;
             prevId: number | null;
+            parentId: number | null;
         };
         templateId?: number | undefined;
         data?: {
@@ -943,15 +952,15 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }, {
         temp: {
             id: number;
-            parentId: number | null;
             nextId: number | null;
             prevId: number | null;
+            parentId: number | null;
         };
         templateId?: number | undefined;
         data?: {
@@ -962,8 +971,8 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
@@ -971,9 +980,9 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
     data: {
         temp: {
             id: number;
-            parentId: number | null;
             nextId: number | null;
             prevId: number | null;
+            parentId: number | null;
         };
         templateId?: number | undefined;
         data?: {
@@ -984,8 +993,8 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }[];
 }, {
@@ -993,9 +1002,9 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
     data: {
         temp: {
             id: number;
-            parentId: number | null;
             nextId: number | null;
             prevId: number | null;
+            parentId: number | null;
         };
         templateId?: number | undefined;
         data?: {
@@ -1006,8 +1015,8 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            description?: string | undefined;
             link?: string | undefined;
+            description?: string | undefined;
         } | undefined;
     }[];
 }>;
@@ -1025,14 +1034,6 @@ export declare const deleteNewsletterItemTemplateInput: z.ZodObject<{
 }, {
     id: number;
 }>;
-export type NewsletterItemTemplateBase = {
-    id: number;
-    name: string;
-    items: NewsletterItemTemplateData[];
-};
-export type NewsletterItemTemplate = NewsletterItemTemplateBase & {
-    templates: NewsletterItemTemplateBase[];
-};
 export type CreateNewsletterItemTemplateInput = z.infer<typeof postNewsletterItemTemplateInput>;
 export type ReadNewsletterItemTemplateInput = z.infer<typeof getNewsletterItemTemplateInput>;
 export type DeleteNewsletterItemTemplateInput = z.infer<typeof deleteNewsletterItemTemplateInput>;

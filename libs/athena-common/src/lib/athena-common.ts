@@ -21,11 +21,15 @@ export interface User extends UserBase {
   newsletterItemTemplates: Omit<NewsletterItemTemplateBase, 'items'>[];
 }
 
-interface Meta {
+interface MetaBase {
   creator: UserBase;
   modifier: UserBase | null;
   created: string;
   modified: string | null;
+}
+
+interface Meta {
+  meta: MetaBase;
 }
 
 export type Position = {
@@ -50,21 +54,16 @@ export interface Location {
   position: Position | null;
 }
 
-export const locationInput = z
-  .object({
-    name: z.string().optional(),
-    countryCode: z.string().optional(),
-    lattitude: z.coerce.number().optional(),
-    longitude: z.coerce.number().optional(),
-  })
-  .optional();
-
-export type LocationInput = z.infer<typeof locationInput>;
-
 export enum NewsletterItemType {
   media = 'media',
   text = 'text',
 }
+
+export type ItemUploadLink = {
+  id: string;
+  url: string;
+  fileName: string;
+};
 
 type NewsletterItemDetailsBase = {
   id: number;
@@ -83,6 +82,62 @@ export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
   link: string | null;
 };
 
+export type NewsletterItemDetails =
+  | NewsletterItemDetailsText
+  | NewsletterItemDetailsMedia;
+
+export interface NewsletterItemBase extends Meta {
+  id: number;
+  location: Location | null;
+  date: string | null;
+  title: string;
+  parentId: number | null;
+  nextItemId: number | null;
+  previousItemId: number | null;
+  details?: NewsletterItemDetails;
+}
+
+export interface NewsletterItem extends NewsletterItemBase {
+  children: NewsletterItemBase[];
+}
+
+export interface NewsletterProperties {
+  name: string;
+  dateRange: DateRange | null;
+}
+
+export interface NewsletterBase extends Meta {
+  id: number;
+  properties: NewsletterProperties;
+  owner: UserBase;
+}
+
+export interface Newsletter extends NewsletterBase {
+  members: UserBase[];
+  items: NewsletterItemBase[];
+}
+
+export interface NewsletterItemTemplateBase extends Meta {
+  id: number;
+  name: string;
+  items: NewsletterItemTemplateData[];
+}
+
+export type NewsletterItemTemplate = NewsletterItemTemplateBase & {
+  templates: NewsletterItemTemplateBase[];
+};
+
+export const locationInput = z
+  .object({
+    name: z.string().optional(),
+    countryCode: z.string().optional(),
+    lattitude: z.coerce.number().optional(),
+    longitude: z.coerce.number().optional(),
+  })
+  .optional();
+
+export type LocationInput = z.infer<typeof locationInput>;
+
 export const mediaItemDetails = z.object({
   type: z.literal(NewsletterItemType.media),
   name: z.string(),
@@ -100,29 +155,9 @@ export const textItemDetails = z.object({
 export type CreateMediaItemDetailsInput = z.infer<typeof mediaItemDetails>;
 export type CreateTextItemDetailsInput = z.infer<typeof textItemDetails>;
 
-export type NewsletterItemDetails =
-  | NewsletterItemDetailsText
-  | NewsletterItemDetailsMedia;
-
 export const newsletterItemDetails = z
   .discriminatedUnion('type', [mediaItemDetails, textItemDetails])
   .optional();
-
-export interface NewsletterItemBase {
-  id: number;
-  meta: Meta;
-  location: Location | null;
-  date: string | null;
-  title: string;
-  parentId: number | null;
-  nextItemId: number | null;
-  previousItemId: number | null;
-  details?: NewsletterItemDetails;
-}
-
-export interface NewsletterItem extends NewsletterItemBase {
-  children: NewsletterItemBase[];
-}
 
 export const getNewsletterItemInput = z.object({
   newsletterItemId: z.coerce.number(),
@@ -185,12 +220,6 @@ export const getItemUploadLinksInput = z.object({
   items: z.array(z.object({ id: z.string() })),
 });
 
-export type ItemUploadLink = {
-  id: string;
-  url: string;
-  fileName: string;
-};
-
 export type GetItemUploadLinksResponse = ItemUploadLink[];
 
 export type CreateNewsletterItemDetailsInput = z.infer<
@@ -209,22 +238,6 @@ export type DeleteManyNewsletterItemsInput = z.infer<
   typeof deleteManyNewsletterItemsInput
 >;
 
-export interface NewsletterProperties {
-  name: string;
-  dateRange: DateRange | null;
-}
-
-export interface NewsletterBase {
-  id: number;
-  meta: Meta;
-  properties: NewsletterProperties;
-  owner: UserBase;
-}
-
-export interface Newsletter extends NewsletterBase {
-  members: UserBase[];
-  items: NewsletterItemBase[];
-}
 export const getNewsletterInput = z.object({
   newsletterId: z.coerce.number(),
 });
@@ -320,16 +333,6 @@ export const getNewsletterItemTemplateInput = z.object({
 export const deleteNewsletterItemTemplateInput = z.object({
   id: z.number(),
 });
-
-export type NewsletterItemTemplateBase = {
-  id: number;
-  name: string;
-  items: NewsletterItemTemplateData[];
-};
-
-export type NewsletterItemTemplate = NewsletterItemTemplateBase & {
-  templates: NewsletterItemTemplateBase[];
-};
 
 export type CreateNewsletterItemTemplateInput = z.infer<
   typeof postNewsletterItemTemplateInput

@@ -83,13 +83,38 @@ export class UserDAO {
         'nit.id',
         'ut.newsletterItemTemplateId'
       )
-      .selectAll('nit')
+      .select((eb) => [
+        'nit.id',
+        'nit.name',
+        'nit.created',
+        'nit.modified',
+        jsonObjectFrom(
+          eb
+            .selectFrom('user as creator')
+            .selectAll('creator')
+            .whereRef('creator.id', '=', 'nit.creatorId')
+        )
+          .$notNull()
+          .as('creator'),
+        jsonObjectFrom(
+          eb
+            .selectFrom('user as modifier')
+            .selectAll('modifier')
+            .whereRef('modifier.id', '=', 'nit.modifierId')
+        ).as('modifier'),
+      ])
       .where('ut.userId', '=', userId)
       .execute();
 
     return templates.map((t) => ({
       id: t.id,
       name: t.name,
+      meta: {
+        created: t.created,
+        modified: t.modified,
+        creator: t.creator,
+        modifier: t.modifier,
+      },
     }));
   }
 }

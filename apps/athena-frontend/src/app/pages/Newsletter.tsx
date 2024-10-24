@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CircularProgress, Container, useTheme } from '@mui/material';
+import { CircularProgress, Skeleton, useTheme } from '@mui/material';
 import { useNotifications } from '@toolpad/core';
 import { useEffect, useMemo } from 'react';
 import { BackButton, NewsletterItemsList } from '../components/index';
@@ -12,6 +12,10 @@ import { CustomContainer } from '../components/common/CustomContainer';
 
 export function Newsletter() {
   const params = useParams();
+  const notifications = useNotifications();
+  const navigate = useNavigate();
+  const theme = useTheme();
+
   const newsletterId = useMemo(() => {
     if (params.newsletterId && !_.isNaN(params.newsletterId)) {
       return _.parseInt(params.newsletterId);
@@ -19,58 +23,52 @@ export function Newsletter() {
     return null;
   }, [params]);
 
-  const {
-    loading,
-    newsletters,
-    fetchNewsletter,
-    getNewsletterById,
-    newsletterItems,
-  } = useStore(
+  const { loading, newsletters, fetchNewsletter, newsletterItems } = useStore(
     useShallow((state) => ({
       newsletters: state.newsletters.data,
       loading: state.newsletters.loading,
-      getNewsletterById: state.newsletters.getNewsletterById,
       fetchNewsletter: state.newsletters.fetch,
       newsletterItems: state.newsletterItems.data,
-      getNewsletterItems: state.newsletterItems.getItems,
     }))
   );
 
-  const notifications = useNotifications();
-  const navigate = useNavigate();
-  const theme = useTheme();
-
-  const newsletter = useMemo(
-    () => (newsletterId ? getNewsletterById(newsletterId) : null),
-    [newsletterId, getNewsletterById, newsletters]
-  );
-  const items = useMemo(
-    () => (newsletter ? newsletter.itemIds.map((i) => newsletterItems[i]) : []),
-    [newsletterItems, newsletter]
-  );
-
-  const members = useMemo(
-    () => (newsletter ? newsletter.members : []),
-    [newsletter]
-  );
+  const info = useMemo(() => {
+    if (newsletterId && newsletters[newsletterId]) {
+      const newsletter = newsletters[newsletterId];
+      return {
+        newsletter: newsletter,
+        items: newsletter?.itemIds.map((i) => newsletterItems[i]) ?? [],
+        members: newsletter?.members ?? [],
+      };
+    }
+  }, [newsletterId, newsletters, newsletterItems]);
 
   useEffect(() => {
     if (newsletterId) fetchNewsletter(newsletterId);
-  }, [newsletterId]);
+  }, [newsletterId, fetchNewsletter]);
 
   if (loading) return <CircularProgress />;
-  if (!newsletter) return null;
+  if (!info) return null;
 
   return (
     <CustomContainer>
       <BackButton />
-      <NewsletterProperties properties={newsletter.properties} />
-      <NewsletterMembers members={members} />
+      <NewsletterProperties properties={info.newsletter.properties} />
+      <NewsletterMembers members={info.members} />
       <NewsletterItemsList
         parentId={null}
-        newsletterId={newsletter.id}
-        items={items}
+        newsletterId={info.newsletter.id}
+        items={info.items}
       />
     </CustomContainer>
   );
+}
+{
+  /* <Skeleton variant="circular" width={40} height={40} />
+<Skeleton variant="rectangular" width={210} height={60} /> 
+<Skeleton variant="rounded" width={210} height={60} />*/
+}
+
+function NewsletterSkeleton() {
+  return <Skeleton variant="rectangular" width={210} height={60} />;
 }

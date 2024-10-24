@@ -17,12 +17,11 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
-import { matchPath, useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SettingsIcon from '@mui/icons-material/Settings';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import HomeIcon from '@mui/icons-material/Home';
-import { useMemo, useState } from 'react';
-import { appBarVisiblePaths } from '../../AppRoutes';
+import { useState } from 'react';
 
 interface AppbarProps {
   title: string;
@@ -37,20 +36,12 @@ export function Appbar(props: AppbarProps) {
     }))
   );
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleCloseDrawer = () => setDrawerOpen(false);
   const handleOpenDrawer = () => setDrawerOpen(true);
 
-  const visible = useMemo(() => {
-    return Boolean(
-      appBarVisiblePaths.find((p) => matchPath(p, location.pathname))
-    );
-  }, [location.pathname]);
-
-  if (!visible) return null;
   return (
     <AppBar position="static">
       <Drawer open={drawerOpen} onClose={handleCloseDrawer}>

@@ -75,12 +75,33 @@ class UserDAO {
             const templates = yield this.db
                 .selectFrom('user_template as ut')
                 .innerJoin('newsletter_item_template as nit', 'nit.id', 'ut.newsletterItemTemplateId')
-                .selectAll('nit')
+                .select((eb) => [
+                'nit.id',
+                'nit.name',
+                'nit.created',
+                'nit.modified',
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('user as creator')
+                    .selectAll('creator')
+                    .whereRef('creator.id', '=', 'nit.creatorId'))
+                    .$notNull()
+                    .as('creator'),
+                (0, db_1.jsonObjectFrom)(eb
+                    .selectFrom('user as modifier')
+                    .selectAll('modifier')
+                    .whereRef('modifier.id', '=', 'nit.modifierId')).as('modifier'),
+            ])
                 .where('ut.userId', '=', userId)
                 .execute();
             return templates.map((t) => ({
                 id: t.id,
                 name: t.name,
+                meta: {
+                    created: t.created,
+                    modified: t.modified,
+                    creator: t.creator,
+                    modifier: t.modifier,
+                },
             }));
         });
     }

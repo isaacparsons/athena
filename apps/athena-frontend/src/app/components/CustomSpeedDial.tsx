@@ -34,7 +34,13 @@ export function CustomSpeedDial(props: CustomSpeedDialProps) {
 
   return (
     <SpeedDial
-      sx={{ position: 'absolute', bottom: 16, right: 16, ...styles }}
+      sx={{
+        zIndex: 1060,
+        position: 'absolute',
+        bottom: 16,
+        right: 16,
+        ...styles,
+      }}
       ariaLabel="SpeedDial tooltip example"
       icon={overrideIcon ?? <MenuIcon />}
       onClose={handleClose}

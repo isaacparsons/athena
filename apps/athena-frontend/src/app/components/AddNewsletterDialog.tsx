@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { MobileDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import dayjs from 'dayjs';
 import { trpc } from '../../trpc';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,12 +17,8 @@ import {
   CreateNewsletterInput,
   postNewsletterInput,
 } from '@athena/athena-common';
-import { useNotifications } from '@toolpad/core';
-import {
-  errorNotificationOptions,
-  successNotificationOptions,
-} from '../../config';
 import { useNavigate } from 'react-router-dom';
+import { usePromiseWithNotification } from '../hooks/usePromiseWithNotification';
 
 interface AddNewsletterDialogProps {
   open: boolean;
@@ -32,7 +27,7 @@ interface AddNewsletterDialogProps {
 
 export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
   const { onClose, open } = props;
-  const notifications = useNotifications();
+  const promiseWithNotifications = usePromiseWithNotification();
   const navigate = useNavigate();
   const createNewsletter = trpc.newsletters.post.useMutation();
 
@@ -47,20 +42,15 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
   });
 
   const handleSave: SubmitHandler<CreateNewsletterInput> = async (data) => {
-    console.log(data);
-    try {
-      const newsletterId = await createNewsletter.mutateAsync(data);
-      navigate(`/newsletters/${newsletterId}`);
-      notifications.show('Newsletter created!', successNotificationOptions);
-      onClose();
-      reset();
-    } catch (error) {
-      console.error(error);
-      notifications.show(
-        'Unable to create newsletter :(',
-        errorNotificationOptions
-      );
-    }
+    promiseWithNotifications.execute(createNewsletter.mutateAsync(data), {
+      successMsg: 'Newsletter created!',
+      errorMsg: 'Unable to create newsletter :(',
+      onSuccess: (newsletterId) => {
+        navigate(`/newsletters/${newsletterId}`);
+        onClose();
+        reset();
+      },
+    });
   };
 
   return (

@@ -27,10 +27,9 @@ type StoreNewsletterItemTemplatesData = Record<
 export interface NewsletterItemTemplatesSlice {
   newsletterItemTemplates: {
     loading: boolean;
-    error: string | null;
     data: StoreNewsletterItemTemplatesData;
     fetch: (id: number) => Promise<void>;
-    save: (input: CreateNewsletterItemTemplateInput) => Promise<void>;
+    save: (input: CreateNewsletterItemTemplateInput) => Promise<number>;
     addTemplates: (
       templates: Omit<NewsletterItemTemplateBase, 'items'>[]
     ) => void;
@@ -50,14 +49,12 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
     fetch: async (id: number) => {
       set((state) => {
         state.newsletterItemTemplates.loading = true;
-        state.newsletterItemTemplates.error = null;
       });
       const template = await asyncTrpcClient.newsletterItemTemplates.get.query({
         id,
       });
       set((state) => {
         state.newsletterItemTemplates.loading = false;
-        state.newsletterItemTemplates.error = null;
         const { templates, ...rest } = template;
         state.newsletterItemTemplates.data[template.id] = rest;
         templates.forEach((t) => {
@@ -68,16 +65,15 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
     save: async (input: CreateNewsletterItemTemplateInput) => {
       set((state) => {
         state.newsletterItemTemplates.loading = true;
-        state.newsletterItemTemplates.error = null;
       });
       const id = await asyncTrpcClient.newsletterItemTemplates.create.mutate(
         input
       );
       set((state) => {
         state.newsletterItemTemplates.loading = true;
-        state.newsletterItemTemplates.error = null;
       });
       get().newsletterItemTemplates.fetch(id);
+      return id;
     },
     addTemplates: (templates: Omit<NewsletterItemTemplateBase, 'items'>[]) => {
       set((state) => {

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Button } from '@mui/material';
+import { Fab } from '@mui/material';
 import ArrowbackBtn from '@mui/icons-material/ArrowBack';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
@@ -16,16 +16,15 @@ export function BackButton() {
   }, [location.pathname]);
 
   return (
-    <Button
+    <Fab
+      sx={{ position: 'fixed', top: 16, left: 16 }}
       onClick={() =>
         navigate(backPath, {
           replace: true,
         })
       }
-      variant="contained"
-      startIcon={<ArrowbackBtn />}
     >
-      Back
-    </Button>
+      <ArrowbackBtn />
+    </Fab>
   );
 }

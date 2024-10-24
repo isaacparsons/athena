@@ -7,7 +7,6 @@ import { asyncTrpcClient } from '../../trpc';
 export interface UserSlice {
   user: {
     loading: boolean;
-    error: null | string;
     data: Omit<User, 'newsletters'> | null;
     fetch: () => Promise<void>;
   };
@@ -21,18 +20,15 @@ export const createUserSlice: StateCreator<
 > = (set, get) => ({
   user: {
     loading: false,
-    error: null,
     data: null,
     fetch: async () => {
       set((state) => {
         state.user.loading = true;
-        state.user.error = null;
       });
       const user = await asyncTrpcClient.users.get.query();
       set((state) => {
         state.user.data = _.omit(user, ['newsletters']);
         state.user.loading = false;
-        state.user.error = null;
       });
       get().newsletters.addNewsletters(user.newsletters);
       get().newsletterItemTemplates.addTemplates(user.newsletterItemTemplates);

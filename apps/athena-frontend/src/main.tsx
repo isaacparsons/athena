@@ -1,6 +1,5 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { HashRouter } from 'react-router-dom';
 
 import App from './app/App';
 import { CssBaseline } from '@mui/material';
@@ -12,9 +11,7 @@ root.render(
   <>
     <CssBaseline />
     <StrictMode>
-      <HashRouter>
-        <App />
-      </HashRouter>
+      <App />
     </StrictMode>
   </>
 );

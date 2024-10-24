@@ -1,5 +1,4 @@
 import { useTheme, Button } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,9 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import { AddItemTemplateDialog } from './AddItemTemplateDialog';
 import { AddItemsDialog } from './AddItemsDialog';
 import { CustomSpeedDial } from './CustomSpeedDial';
-import { asyncTrpcClient } from '../../trpc';
 import { useShallow } from 'zustand/react/shallow';
 import { NewsletterItemCard } from './common/NewsletterItemCard';
+import { usePromiseWithNotification } from '../hooks/usePromiseWithNotification';
 
 interface NewsletterItemsListProps {
   parentId: number | null;
@@ -23,7 +22,7 @@ interface NewsletterItemsListProps {
 
 export function NewsletterItemsList(props: NewsletterItemsListProps) {
   const { items, newsletterId, parentId } = props;
-
+  const promiseWithNotifications = usePromiseWithNotification();
   const { fetchNewsletter, deleteNewsletterItems } = useStore(
     useShallow((state) => ({
       fetchNewsletter: state.newsletters.fetch,
@@ -52,6 +51,7 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
   const handleOpenAddTemplateDialog = () => setAddTemplateDialogOpen(true);
   const handleCloseAddTemplateDialog = () => {
     setAddTemplateDialogOpen(false);
+    handleMakeUnSelectable();
   };
   const handleMakeSelectable = () => setSelectable(true);
   const handleMakeUnSelectable = () => setSelectable(false);
@@ -61,19 +61,24 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
 
   const handleDeleteItems = async (ids: number[]) => {
     setDeletingItems(true);
+    promiseWithNotifications.execute(deleteNewsletterItems(ids), {
+      successMsg: 'Items deleted!',
+      errorMsg: 'Unable to delete items :(',
+      onSuccess: () => {
+        fetchNewsletter(newsletterId);
+        handleCloseConfirmDeleteDialog();
+        setDeletingItems(false);
+        handleMakeUnSelectable();
+      },
+    });
 
     await deleteNewsletterItems(ids);
-    fetchNewsletter(newsletterId);
-    handleCloseConfirmDeleteDialog();
-    setDeletingItems(false);
-    handleMakeUnSelectable();
-    // notifications.show('Item(s) deleted!', successNotificationOptions);
   };
 
-  const selectedItems = useMemo(
-    () => Array.from(selectedItemIds).map((i) => items[i]),
-    [items, selectedItemIds]
-  );
+  const selectedItems = useMemo(() => {
+    const ids = Array.from(selectedItemIds);
+    return items.filter((i) => ids.includes(i.id));
+  }, [items, selectedItemIds]);
 
   return (
     <>
@@ -108,14 +113,13 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
       />
 
       <Button onClick={handleOpenAddTemplateDialog}>Press me</Button>
-
       <CustomSpeedDial
         overrideIcon={selectable ? <CloseIcon /> : null}
         onOverrideIconClick={handleMakeUnSelectable}
         actions={[
           {
             icon: <FileUploadIcon />,
-            name: 'Media',
+            name: 'Add',
             onClick: handleOpenMediaItemsDialog,
           },
           {
