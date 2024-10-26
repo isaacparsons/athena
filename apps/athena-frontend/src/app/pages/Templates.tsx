@@ -3,6 +3,8 @@ import { CustomContainer } from '../components/common/CustomContainer';
 import { useStore } from '../store';
 import { Card, CardContent, List, ListItem, Typography } from '@mui/material';
 import { useMemo } from 'react';
+import { StoreNewsletterItemTemplate } from '../store/newsletter-item-templates';
+import { mapToArray } from '../../util/helpers';
 
 export function Templates() {
   const { loading, newsletterItemTemplates } = useStore(
@@ -12,25 +14,48 @@ export function Templates() {
     }))
   );
 
-  const templates = useMemo(() => {
-    return Object.keys(newsletterItemTemplates).map(
-      (key) => newsletterItemTemplates[Number(key)]
-    );
-  }, [newsletterItemTemplates]);
+  const templates = useMemo(
+    () => mapToArray(newsletterItemTemplates),
+    [newsletterItemTemplates]
+  );
 
   return (
     <CustomContainer>
-      <List>
-        {templates.map((template) => (
-          <ListItem>
-            <Card sx={{ width: '100%' }}>
-              <CardContent>
-                <Typography>{template.name}</Typography>
-              </CardContent>
-            </Card>
-          </ListItem>
-        ))}
-      </List>
+      <UserTemplatesList templates={templates} />
     </CustomContainer>
+  );
+}
+
+interface UserTemplatesListProps {
+  templates: StoreNewsletterItemTemplate[];
+}
+
+export function UserTemplatesList(props: UserTemplatesListProps) {
+  const { templates } = props;
+
+  return (
+    <List>
+      {templates.map((template) => (
+        <ListItem key={template.id}>
+          <UserTemplateCard template={template} />
+        </ListItem>
+      ))}
+    </List>
+  );
+}
+
+interface UserTemplatesCardProps {
+  template: StoreNewsletterItemTemplate;
+}
+
+export function UserTemplateCard(props: UserTemplatesCardProps) {
+  const { template } = props;
+
+  return (
+    <Card sx={{ width: '100%' }}>
+      <CardContent>
+        <Typography>{template.name}</Typography>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,5 +1,7 @@
 import { createTheme } from '@mui/material';
 
+export const APPBAR_HEIGHT = 70;
+
 export default createTheme({
   palette: {
     primary: {

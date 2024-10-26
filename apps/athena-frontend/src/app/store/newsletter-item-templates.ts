@@ -4,6 +4,7 @@ import {
   NewsletterItemDetails,
   NewsletterItemTemplateBase,
   CreateNewsletterItemTemplateInput,
+  NewsletterItemTemplate,
 } from '@athena/athena-common';
 import { Slices } from '.';
 import { asyncTrpcClient } from '../../trpc';
@@ -28,7 +29,7 @@ export interface NewsletterItemTemplatesSlice {
   newsletterItemTemplates: {
     loading: boolean;
     data: StoreNewsletterItemTemplatesData;
-    fetch: (id: number) => Promise<void>;
+    fetch: (id: number) => Promise<NewsletterItemTemplate>;
     save: (input: CreateNewsletterItemTemplateInput) => Promise<number>;
     addTemplates: (
       templates: Omit<NewsletterItemTemplateBase, 'items'>[]
@@ -61,6 +62,7 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
           state.newsletterItemTemplates.data[t.id] = t;
         });
       });
+      return template;
     },
     save: async (input: CreateNewsletterItemTemplateInput) => {
       set((state) => {

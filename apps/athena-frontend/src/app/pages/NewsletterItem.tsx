@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { BackButton, NewsletterItemsList } from '../components';
+import { NewsletterItemsList } from '../components';
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { CustomContainer } from '../components/common/CustomContainer';
@@ -39,8 +39,9 @@ export function NewsletterItem() {
   if (!newsletterId || !newsletterItemId) return null;
   return (
     <CustomContainer>
-      <BackButton />
+      {/* <BackButton /> */}
       <NewsletterItemsList
+        editing={false}
         parentId={newsletterItemId}
         newsletterId={newsletterId}
         items={items}

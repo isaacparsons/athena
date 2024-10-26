@@ -142,14 +142,14 @@ export const mediaItemDetails = z.object({
   type: z.literal(NewsletterItemType.media),
   name: z.string(),
   fileName: z.string(),
-  caption: z.string().optional(),
+  caption: z.string().optional().nullable(),
 });
 
 export const textItemDetails = z.object({
   type: z.literal(NewsletterItemType.text),
   name: z.string(),
-  description: z.string().optional(),
-  link: z.string().optional(),
+  description: z.string().optional().nullable(),
+  link: z.string().optional().nullable(),
 });
 
 export type CreateMediaItemDetailsInput = z.infer<typeof mediaItemDetails>;
@@ -179,25 +179,25 @@ export const postNewsletterItemInput = postNewsletterItemInputBase.merge(
   })
 );
 
+export const postNewsletterItemBatchInputItem = z.object({
+  title: z.string(),
+  date: z.string().optional(),
+  location: locationInput,
+  temp: z.object({
+    id: z.number(),
+    parentId: z.coerce.number().nullable(),
+    nextItemId: z.coerce.number().nullable(),
+    previousItemId: z.coerce.number().nullable(),
+  }),
+  details: newsletterItemDetails,
+});
+
 export const postNewsletterItemBatchInput = z.object({
   newsletterId: z.coerce.number(),
   parentId: z.coerce.number().nullable(),
   nextItemId: z.coerce.number().nullable(),
   previousItemId: z.coerce.number().nullable(),
-  batch: z.array(
-    z.object({
-      title: z.string(),
-      date: z.string().optional(),
-      location: locationInput,
-      temp: z.object({
-        id: z.number(),
-        parentId: z.coerce.number().nullable(),
-        nextItemId: z.coerce.number().nullable(),
-        previousItemId: z.coerce.number().nullable(),
-      }),
-      details: newsletterItemDetails,
-    })
-  ),
+  batch: z.array(postNewsletterItemBatchInputItem),
 });
 
 export const updateNewsletterItemInput = z
@@ -227,6 +227,11 @@ export type CreateNewsletterItemDetailsInput = z.infer<
 >;
 
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
+
+export type CreateNewsletterItemBatchInputItem = z.infer<
+  typeof postNewsletterItemBatchInputItem
+>;
+
 export type CreateNewsletterItemBatchInput = z.infer<
   typeof postNewsletterItemBatchInput
 >;

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Fab } from '@mui/material';
+import { Fab, IconButton } from '@mui/material';
 import ArrowbackBtn from '@mui/icons-material/ArrowBack';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
@@ -16,15 +16,24 @@ export function BackButton() {
   }, [location.pathname]);
 
   return (
-    <Fab
-      sx={{ position: 'fixed', top: 16, left: 16 }}
+    <BackButtonIcon
       onClick={() =>
         navigate(backPath, {
           replace: true,
         })
       }
-    >
-      <ArrowbackBtn />
-    </Fab>
+    />
+  );
+}
+interface BackButtonIconProps {
+  onClick: () => void;
+}
+
+export function BackButtonIcon(props: BackButtonIconProps) {
+  const { onClick } = props;
+  return (
+    <IconButton onClick={onClick}>
+      <ArrowbackBtn htmlColor={'#fff'} />
+    </IconButton>
   );
 }

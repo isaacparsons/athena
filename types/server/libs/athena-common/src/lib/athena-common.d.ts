@@ -122,33 +122,33 @@ export declare const mediaItemDetails: z.ZodObject<{
     type: z.ZodLiteral<NewsletterItemType.media>;
     name: z.ZodString;
     fileName: z.ZodString;
-    caption: z.ZodOptional<z.ZodString>;
+    caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     type: NewsletterItemType.media;
     fileName: string;
-    caption?: string | undefined;
+    caption?: string | null | undefined;
 }, {
     name: string;
     type: NewsletterItemType.media;
     fileName: string;
-    caption?: string | undefined;
+    caption?: string | null | undefined;
 }>;
 export declare const textItemDetails: z.ZodObject<{
     type: z.ZodLiteral<NewsletterItemType.text>;
     name: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
-    link: z.ZodOptional<z.ZodString>;
+    description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+    link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     type: NewsletterItemType.text;
-    link?: string | undefined;
-    description?: string | undefined;
+    link?: string | null | undefined;
+    description?: string | null | undefined;
 }, {
     name: string;
     type: NewsletterItemType.text;
-    link?: string | undefined;
-    description?: string | undefined;
+    link?: string | null | undefined;
+    description?: string | null | undefined;
 }>;
 export type CreateMediaItemDetailsInput = z.infer<typeof mediaItemDetails>;
 export type CreateTextItemDetailsInput = z.infer<typeof textItemDetails>;
@@ -156,32 +156,32 @@ export declare const newsletterItemDetails: z.ZodOptional<z.ZodDiscriminatedUnio
     type: z.ZodLiteral<NewsletterItemType.media>;
     name: z.ZodString;
     fileName: z.ZodString;
-    caption: z.ZodOptional<z.ZodString>;
+    caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     type: NewsletterItemType.media;
     fileName: string;
-    caption?: string | undefined;
+    caption?: string | null | undefined;
 }, {
     name: string;
     type: NewsletterItemType.media;
     fileName: string;
-    caption?: string | undefined;
+    caption?: string | null | undefined;
 }>, z.ZodObject<{
     type: z.ZodLiteral<NewsletterItemType.text>;
     name: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
-    link: z.ZodOptional<z.ZodString>;
+    description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+    link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     type: NewsletterItemType.text;
-    link?: string | undefined;
-    description?: string | undefined;
+    link?: string | null | undefined;
+    description?: string | null | undefined;
 }, {
     name: string;
     type: NewsletterItemType.text;
-    link?: string | undefined;
-    description?: string | undefined;
+    link?: string | null | undefined;
+    description?: string | null | undefined;
 }>]>>;
 export declare const getNewsletterItemInput: z.ZodObject<{
     newsletterItemId: z.ZodNumber;
@@ -268,32 +268,32 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
         type: z.ZodLiteral<NewsletterItemType.media>;
         name: z.ZodString;
         fileName: z.ZodString;
-        caption: z.ZodOptional<z.ZodString>;
+        caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     }, {
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     }>, z.ZodObject<{
         type: z.ZodLiteral<NewsletterItemType.text>;
         name: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
-        link: z.ZodOptional<z.ZodString>;
+        description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+        link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     }, {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     }>]>>;
 }>, "strip", z.ZodTypeAny, {
     parentId: number | null;
@@ -312,12 +312,12 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }, {
     parentId: number | null;
@@ -336,12 +336,12 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }>;
 export declare const postNewsletterItemBatchInput: z.ZodObject<{
@@ -388,32 +388,32 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             type: z.ZodLiteral<NewsletterItemType.media>;
             name: z.ZodString;
             fileName: z.ZodString;
-            caption: z.ZodOptional<z.ZodString>;
+            caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             type: NewsletterItemType.media;
             fileName: string;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         }, {
             name: string;
             type: NewsletterItemType.media;
             fileName: string;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         }>, z.ZodObject<{
             type: z.ZodLiteral<NewsletterItemType.text>;
             name: z.ZodString;
-            description: z.ZodOptional<z.ZodString>;
-            link: z.ZodOptional<z.ZodString>;
+            description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+            link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             type: NewsletterItemType.text;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         }, {
             name: string;
             type: NewsletterItemType.text;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         }>]>>;
     }, "strip", z.ZodTypeAny, {
         title: string;
@@ -434,12 +434,12 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             name: string;
             type: NewsletterItemType.media;
             fileName: string;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             name: string;
             type: NewsletterItemType.text;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }, {
         title: string;
@@ -460,12 +460,12 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             name: string;
             type: NewsletterItemType.media;
             fileName: string;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             name: string;
             type: NewsletterItemType.text;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
@@ -492,12 +492,12 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             name: string;
             type: NewsletterItemType.media;
             fileName: string;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             name: string;
             type: NewsletterItemType.text;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }[];
 }, {
@@ -524,12 +524,12 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             name: string;
             type: NewsletterItemType.media;
             fileName: string;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             name: string;
             type: NewsletterItemType.text;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }[];
 }>;
@@ -558,32 +558,32 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         type: z.ZodLiteral<NewsletterItemType.media>;
         name: z.ZodString;
         fileName: z.ZodString;
-        caption: z.ZodOptional<z.ZodString>;
+        caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     }, {
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     }>, z.ZodObject<{
         type: z.ZodLiteral<NewsletterItemType.text>;
         name: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
-        link: z.ZodOptional<z.ZodString>;
+        description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+        link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     }, {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     }>]>>;
 }, "strip", z.ZodTypeAny, {
     newsletterItemId: number;
@@ -600,12 +600,12 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }, {
     newsletterItemId: number;
@@ -622,12 +622,12 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }>, {
     newsletterItemId: number;
@@ -644,12 +644,12 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }, {
     newsletterItemId: number;
@@ -666,12 +666,12 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         name: string;
         type: NewsletterItemType.media;
         fileName: string;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         name: string;
         type: NewsletterItemType.text;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }>;
 export declare const deleteManyNewsletterItemsInput: z.ZodObject<{
@@ -760,40 +760,40 @@ declare const newsletterItemTemplateDataDetails: z.ZodOptional<z.ZodDiscriminate
     type: z.ZodLiteral<NewsletterItemType.media>;
     name: z.ZodString;
     fileName: z.ZodString;
-    caption: z.ZodOptional<z.ZodString>;
+    caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
 }, "type">, {
     name: z.ZodOptional<z.ZodString>;
     fileName: z.ZodOptional<z.ZodString>;
-    caption: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    caption: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
 }>, "strip", z.ZodTypeAny, {
     type: NewsletterItemType.media;
     name?: string | undefined;
     fileName?: string | undefined;
-    caption?: string | undefined;
+    caption?: string | null | undefined;
 }, {
     type: NewsletterItemType.media;
     name?: string | undefined;
     fileName?: string | undefined;
-    caption?: string | undefined;
+    caption?: string | null | undefined;
 }>, z.ZodObject<z.objectUtil.extendShape<Pick<{
     type: z.ZodLiteral<NewsletterItemType.text>;
     name: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
-    link: z.ZodOptional<z.ZodString>;
+    description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+    link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
 }, "type">, {
     name: z.ZodOptional<z.ZodString>;
-    link: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    link: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
+    description: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
 }>, "strip", z.ZodTypeAny, {
     type: NewsletterItemType.text;
     name?: string | undefined;
-    link?: string | undefined;
-    description?: string | undefined;
+    link?: string | null | undefined;
+    description?: string | null | undefined;
 }, {
     type: NewsletterItemType.text;
     name?: string | undefined;
-    link?: string | undefined;
-    description?: string | undefined;
+    link?: string | null | undefined;
+    description?: string | null | undefined;
 }>]>>;
 export type NewsletterItemTemplateDataDetails = z.infer<typeof newsletterItemTemplateDataDetails>;
 declare const baseNewsletterItemTemplateData: z.ZodObject<{
@@ -806,40 +806,40 @@ declare const baseNewsletterItemTemplateData: z.ZodObject<{
         type: z.ZodLiteral<NewsletterItemType.media>;
         name: z.ZodString;
         fileName: z.ZodString;
-        caption: z.ZodOptional<z.ZodString>;
+        caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     }, "type">, {
         name: z.ZodOptional<z.ZodString>;
         fileName: z.ZodOptional<z.ZodString>;
-        caption: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        caption: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
     }>, "strip", z.ZodTypeAny, {
         type: NewsletterItemType.media;
         name?: string | undefined;
         fileName?: string | undefined;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     }, {
         type: NewsletterItemType.media;
         name?: string | undefined;
         fileName?: string | undefined;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     }>, z.ZodObject<z.objectUtil.extendShape<Pick<{
         type: z.ZodLiteral<NewsletterItemType.text>;
         name: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
-        link: z.ZodOptional<z.ZodString>;
+        description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+        link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
     }, "type">, {
         name: z.ZodOptional<z.ZodString>;
-        link: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-        description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+        link: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
+        description: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
     }>, "strip", z.ZodTypeAny, {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     }, {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     }>]>>;
 }, "strip", z.ZodTypeAny, {
     id: number;
@@ -851,12 +851,12 @@ declare const baseNewsletterItemTemplateData: z.ZodObject<{
         type: NewsletterItemType.media;
         name?: string | undefined;
         fileName?: string | undefined;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }, {
     id: number;
@@ -868,12 +868,12 @@ declare const baseNewsletterItemTemplateData: z.ZodObject<{
         type: NewsletterItemType.media;
         name?: string | undefined;
         fileName?: string | undefined;
-        caption?: string | undefined;
+        caption?: string | null | undefined;
     } | {
         type: NewsletterItemType.text;
         name?: string | undefined;
-        link?: string | undefined;
-        description?: string | undefined;
+        link?: string | null | undefined;
+        description?: string | null | undefined;
     } | undefined;
 }>;
 export type NewsletterItemTemplateData = z.infer<typeof baseNewsletterItemTemplateData>;
@@ -901,40 +901,40 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             type: z.ZodLiteral<NewsletterItemType.media>;
             name: z.ZodString;
             fileName: z.ZodString;
-            caption: z.ZodOptional<z.ZodString>;
+            caption: z.ZodNullable<z.ZodOptional<z.ZodString>>;
         }, "type">, {
             name: z.ZodOptional<z.ZodString>;
             fileName: z.ZodOptional<z.ZodString>;
-            caption: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+            caption: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
         }>, "strip", z.ZodTypeAny, {
             type: NewsletterItemType.media;
             name?: string | undefined;
             fileName?: string | undefined;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         }, {
             type: NewsletterItemType.media;
             name?: string | undefined;
             fileName?: string | undefined;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         }>, z.ZodObject<z.objectUtil.extendShape<Pick<{
             type: z.ZodLiteral<NewsletterItemType.text>;
             name: z.ZodString;
-            description: z.ZodOptional<z.ZodString>;
-            link: z.ZodOptional<z.ZodString>;
+            description: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+            link: z.ZodNullable<z.ZodOptional<z.ZodString>>;
         }, "type">, {
             name: z.ZodOptional<z.ZodString>;
-            link: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-            description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+            link: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
+            description: z.ZodOptional<z.ZodNullable<z.ZodOptional<z.ZodString>>>;
         }>, "strip", z.ZodTypeAny, {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         }, {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         }>]>>;
     }, "strip", z.ZodTypeAny, {
         temp: {
@@ -948,12 +948,12 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             type: NewsletterItemType.media;
             name?: string | undefined;
             fileName?: string | undefined;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }, {
         temp: {
@@ -967,12 +967,12 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             type: NewsletterItemType.media;
             name?: string | undefined;
             fileName?: string | undefined;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
@@ -989,12 +989,12 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             type: NewsletterItemType.media;
             name?: string | undefined;
             fileName?: string | undefined;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }[];
 }, {
@@ -1011,12 +1011,12 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             type: NewsletterItemType.media;
             name?: string | undefined;
             fileName?: string | undefined;
-            caption?: string | undefined;
+            caption?: string | null | undefined;
         } | {
             type: NewsletterItemType.text;
             name?: string | undefined;
-            link?: string | undefined;
-            description?: string | undefined;
+            link?: string | null | undefined;
+            description?: string | null | undefined;
         } | undefined;
     }[];
 }>;

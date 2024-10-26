@@ -4,6 +4,7 @@ import {
   NewsletterItem,
   NewsletterItemBase,
   NewsletterItemDetails,
+  logObject,
 } from '@athena/athena-common';
 import { Slices } from '.';
 import { asyncTrpcClient } from '../../trpc';

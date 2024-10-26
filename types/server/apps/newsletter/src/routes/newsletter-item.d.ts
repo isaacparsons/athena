@@ -197,12 +197,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.media;
                 fileName: string;
-                caption?: string | undefined;
+                caption?: string | null | undefined;
             } | {
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.text;
-                link?: string | undefined;
-                description?: string | undefined;
+                link?: string | null | undefined;
+                description?: string | null | undefined;
             } | undefined;
         };
         _input_out: {
@@ -222,12 +222,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.media;
                 fileName: string;
-                caption?: string | undefined;
+                caption?: string | null | undefined;
             } | {
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.text;
-                link?: string | undefined;
-                description?: string | undefined;
+                link?: string | null | undefined;
+                description?: string | null | undefined;
             } | undefined;
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
@@ -302,12 +302,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.media;
                     fileName: string;
-                    caption?: string | undefined;
+                    caption?: string | null | undefined;
                 } | {
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.text;
-                    link?: string | undefined;
-                    description?: string | undefined;
+                    link?: string | null | undefined;
+                    description?: string | null | undefined;
                 } | undefined;
             }[];
         };
@@ -335,12 +335,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.media;
                     fileName: string;
-                    caption?: string | undefined;
+                    caption?: string | null | undefined;
                 } | {
                     name: string;
                     type: import("@athena/athena-common").NewsletterItemType.text;
-                    link?: string | undefined;
-                    description?: string | undefined;
+                    link?: string | null | undefined;
+                    description?: string | null | undefined;
                 } | undefined;
             }[];
         };
@@ -409,12 +409,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.media;
                 fileName: string;
-                caption?: string | undefined;
+                caption?: string | null | undefined;
             } | {
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.text;
-                link?: string | undefined;
-                description?: string | undefined;
+                link?: string | null | undefined;
+                description?: string | null | undefined;
             } | undefined;
         };
         _input_out: {
@@ -432,12 +432,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.media;
                 fileName: string;
-                caption?: string | undefined;
+                caption?: string | null | undefined;
             } | {
                 name: string;
                 type: import("@athena/athena-common").NewsletterItemType.text;
-                link?: string | undefined;
-                description?: string | undefined;
+                link?: string | null | undefined;
+                description?: string | null | undefined;
             } | undefined;
         };
         _output_in: typeof import("@trpc/server").unsetMarker;

@@ -9,8 +9,8 @@ interface NewsletterPropertiesProps {
 export function NewsletterProperties(props: NewsletterPropertiesProps) {
   const { properties } = props;
   return (
-    <Stack>
-      <Typography>{properties.name}</Typography>
+    <Stack spacing={1}>
+      <Typography variant="h4">{properties.name}</Typography>
       <DateRange value={properties.dateRange} />
     </Stack>
   );

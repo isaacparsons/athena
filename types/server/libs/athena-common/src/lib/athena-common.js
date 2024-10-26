@@ -19,13 +19,13 @@ exports.mediaItemDetails = zod_1.z.object({
     type: zod_1.z.literal(NewsletterItemType.media),
     name: zod_1.z.string(),
     fileName: zod_1.z.string(),
-    caption: zod_1.z.string().optional(),
+    caption: zod_1.z.string().optional().nullable(),
 });
 exports.textItemDetails = zod_1.z.object({
     type: zod_1.z.literal(NewsletterItemType.text),
     name: zod_1.z.string(),
-    description: zod_1.z.string().optional(),
-    link: zod_1.z.string().optional(),
+    description: zod_1.z.string().optional().nullable(),
+    link: zod_1.z.string().optional().nullable(),
 });
 exports.newsletterItemDetails = zod_1.z
     .discriminatedUnion('type', [exports.mediaItemDetails, exports.textItemDetails])

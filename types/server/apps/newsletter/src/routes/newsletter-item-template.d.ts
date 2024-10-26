@@ -132,12 +132,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     type: import("@athena/athena-common").NewsletterItemType.media;
                     name?: string | undefined;
                     fileName?: string | undefined;
-                    caption?: string | undefined;
+                    caption?: string | null | undefined;
                 } | {
                     type: import("@athena/athena-common").NewsletterItemType.text;
                     name?: string | undefined;
-                    link?: string | undefined;
-                    description?: string | undefined;
+                    link?: string | null | undefined;
+                    description?: string | null | undefined;
                 } | undefined;
             }[];
         };
@@ -155,12 +155,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     type: import("@athena/athena-common").NewsletterItemType.media;
                     name?: string | undefined;
                     fileName?: string | undefined;
-                    caption?: string | undefined;
+                    caption?: string | null | undefined;
                 } | {
                     type: import("@athena/athena-common").NewsletterItemType.text;
                     name?: string | undefined;
-                    link?: string | undefined;
-                    description?: string | undefined;
+                    link?: string | null | undefined;
+                    description?: string | null | undefined;
                 } | undefined;
             }[];
         };

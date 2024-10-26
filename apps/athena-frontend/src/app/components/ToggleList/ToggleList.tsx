@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { List, Stack } from '@mui/material';
 import { ToggleListHeader } from './ToggleListHeader';
 import { ToggleListItem } from './ToggleListItem';
@@ -57,6 +56,7 @@ export function ToggleList<T extends { id: number }>(
           const isSelected = selectedItemIds.has(item.id);
           return (
             <ToggleListItem
+              key={item.id.toString()}
               id={item.id}
               selectable={selectable}
               selected={isSelected}

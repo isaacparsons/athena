@@ -12,7 +12,7 @@ export function NewsletterMembers(props: NewsletterMembersProps) {
   return (
     <Stack>
       {members.map((member) => (
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} key={member.id.toString()}>
           <Chip
             avatar={
               <Avatar>

@@ -1,5 +1,7 @@
+import _ from 'lodash';
 import {
   Button,
+  ButtonGroup,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -7,252 +9,179 @@ import {
   DialogTitle,
   List,
   ListItem,
-  SpeedDial,
-  SpeedDialAction,
 } from '@mui/material';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import FormatSizeIcon from '@mui/icons-material/FormatSize';
-import PermMediaIcon from '@mui/icons-material/PermMedia';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import {
+  FormatSize as FormatSizeIcon,
+  PermMedia as PermMediaIcon,
+  Assignment as AssignmentIcon,
+} from '@mui/icons-material';
+
 import { useMemo, useRef, useState } from 'react';
 import { useNotifications } from '@toolpad/core';
 import { useShallow } from 'zustand/react/shallow';
-import { AddItemCard, CustomSpeedDial } from './index';
-import { asyncTrpcClient } from '../../trpc';
-import axios from 'axios';
-import { ItemUploadLink, NewsletterItemType } from '@athena/athena-common';
-import {
-  StoreAddNewsletterMediaItem,
-  StoreItems,
-  useStore,
-  StoreItem,
-  StoreAddNewsletterTextItem,
-  useAddItemsStore,
-} from '../store';
+import { AddItemCard, BackButtonIcon } from './index';
+import { NewsletterItemType, range } from '@athena/athena-common';
+import { useStore, useAddItemsStore } from '../store';
+import { mapToArray } from '../../util/helpers';
+import { CreateItemFromTemplateDialog } from './CreateItemFromTemplateDialog';
+import { ActionBar } from './common/ActionBar';
 
-interface AddItemsDialogProps {
-  open: boolean;
-  handleClose: () => void;
-  newsletterId: number;
-  parentId: number | null;
-}
-
-type UploadItem = {
-  signedUrl: ItemUploadLink;
-  item: StoreAddNewsletterMediaItem;
-};
-
-const mapItemsToArray = (items: StoreItems): StoreItem[] =>
-  Object.keys(items).map((i) => items[Number(i)]);
-
-async function uploadMediaItem(
-  newsletterId: number,
-  previousItemId: number | null,
-  parentId: number | null,
-  uploadItem: UploadItem
-) {
-  const signedUrl = uploadItem.signedUrl;
-  const item = uploadItem.item;
-  await axios.put(signedUrl.url, item.file);
-
-  return asyncTrpcClient.newsletterItems.create.mutate({
-    newsletterId: Number(newsletterId),
-    title: item.title,
-    parentId: parentId,
-    nextItemId: null,
-    previousItemId: previousItemId,
-    details: {
-      name: item.details.name,
-      type: NewsletterItemType.media,
-      fileName: signedUrl.fileName,
-    },
-  });
-}
-
-async function uploadTextItem(
-  newsletterId: number,
-  previousItemId: number | null,
-  parentId: number | null,
-  item: StoreAddNewsletterTextItem
-) {
-  return asyncTrpcClient.newsletterItems.create.mutate({
-    newsletterId: Number(newsletterId),
-    title: item.title,
-    parentId: parentId,
-    nextItemId: null,
-    previousItemId: previousItemId,
-    details: {
-      name: item.details.name,
-      description: item.details.description ?? undefined,
-      link: item.details.link ?? undefined,
-      type: NewsletterItemType.text,
-    },
-  });
-}
-
-export function AddItemsDialog(props: AddItemsDialogProps) {
-  const { open, handleClose, newsletterId, parentId } = props;
+export function AddItemsDialog() {
   const { fetchNewsletter, fetchNewsletterItems } = useStore(
     useShallow((state) => ({
       fetchNewsletter: state.newsletters.fetch,
       fetchNewsletterItems: state.newsletterItems.fetch,
     }))
   );
-  const { items, addItem } = useAddItemsStore(
-    useShallow((state) => ({
-      items: state.items,
-      addItem: state.addItem,
-    }))
-  );
+  const { items, existingItem, addItems, reset, uploading, upload } =
+    useAddItemsStore(
+      useShallow((state) => ({
+        existingItem: state.existingItem,
+        items: state.data,
+        addItems: state.addItems,
+        reset: state.reset,
+        uploading: state.uploading,
+        upload: state.upload,
+      }))
+    );
+
   const notifications = useNotifications();
-  const [uploading, setUploading] = useState(false);
+  const [tempParentId, setTempParentId] = useState<null | number>(null);
+  const [
+    createItemFromTemplateDialogOpen,
+    setCreateItemFromTemplateDialogOpen,
+  ] = useState(false);
+
+  const handleOpenCreateItemFromTemplateDialog = () =>
+    setCreateItemFromTemplateDialogOpen(false);
+  const handleCloseCreateItemFromTemplateDialog = () =>
+    setCreateItemFromTemplateDialogOpen(false);
+
+  const handleItemClick = (id: number) => setTempParentId(id);
+
+  const inputFile = useRef<HTMLInputElement | null>(null);
+
+  const itemsArr = useMemo(
+    () => mapToArray(items).filter((i) => i.temp.parentId === tempParentId),
+    [items, tempParentId]
+  );
 
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-    for (let i = 0; i < files.length; i++) {
-      const file = files.item(i);
-      if (file) {
-        const { lastModified, name } = file;
-        addItem({
-          tempId: Object.keys(items).length + i + 1,
-          title: name,
-          date: new Date(lastModified).toISOString(),
-          location: undefined,
-          details: {
-            name: name,
-            caption: '',
-            type: 'media',
-          },
-          file: file,
-        });
-      }
-    }
+    const _files = event.target.files;
+    if (!_files) return;
+    const files = range(_files.length)
+      .map((idx) => _files.item(idx))
+      .filter((f) => !_.isNil(f))
+      .map((f) => ({
+        title: '',
+        date: new Date(f.lastModified).toISOString(),
+        location: undefined,
+        details: {
+          name: f.name,
+          caption: '',
+          type: NewsletterItemType.media,
+          fileName: '',
+          file: f,
+        },
+      }));
+
+    addItems(tempParentId, files);
   };
 
-  const handleUploadFiles = async () => {
-    setUploading(true);
-    const itemsArr = mapItemsToArray(items);
-    const mediaItems = itemsArr.filter((i) => i.details.type === 'media');
-    const mediaItemIds = mediaItems.map((i) => ({ id: i.tempId.toString() }));
-    const signedUrls =
-      await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
-        items: mediaItemIds,
-      });
-
-    await itemsArr.reduce(
-      async (promiseChain: Promise<number | null>, item) => {
-        const previousUploadedItemId = await promiseChain;
-
-        if (item.details.type === 'media') {
-          const url = signedUrls.find((i) => Number(i.id) === item.tempId);
-          if (url) {
-            return uploadMediaItem(
-              newsletterId,
-              previousUploadedItemId,
-              parentId,
-              {
-                item: item as StoreAddNewsletterMediaItem,
-                signedUrl: url,
-              }
-            );
-          } else return promiseChain;
-        } else if (item.details.type === 'text') {
-          return uploadTextItem(
-            newsletterId,
-            previousUploadedItemId,
-            parentId,
-            item as StoreAddNewsletterTextItem
-          );
-        } else return promiseChain;
+  const handleAddTextItem = () =>
+    addItems(tempParentId, [
+      {
+        title: '',
+        date: new Date().toISOString(),
+        location: undefined,
+        details: {
+          name: '',
+          type: NewsletterItemType.text,
+        },
       },
-      Promise.resolve(null)
-    );
-    if (parentId === null) {
-      await fetchNewsletter(Number(newsletterId));
-    } else {
-      await fetchNewsletterItems(parentId);
-    }
-    setUploading(false);
-    handleClose();
-  };
+    ]);
 
-  const itemsArr = useMemo(() => {
-    return Object.keys(items).map((key) => items[Number(key)]);
-  }, [items]);
-
-  const handleAddTextItem = () => {
-    addItem({
-      tempId: Object.keys(items).length + 1,
-      title: '',
-      date: new Date().toISOString(),
-      location: undefined,
-      details: {
-        name: '',
-        description: null,
-        link: null,
-        type: 'text',
-      },
-    });
-  };
-  const inputFile = useRef<HTMLInputElement | null>(null);
   const handleAddMediaItem = () => {
     if (inputFile.current) inputFile.current.click();
   };
 
+  const handleUploadFiles = async () => {
+    await upload();
+    if (existingItem) {
+      if (existingItem.parentId === null) {
+        await fetchNewsletter(Number(existingItem.newsletterId));
+      } else {
+        await fetchNewsletterItems(existingItem.parentId);
+      }
+    }
+    reset();
+  };
+
+  const handleBackBtnClick = () => {
+    setTempParentId((prev) => (prev ? items[prev].temp.parentId : prev));
+  };
+
   return (
-    <Dialog fullScreen open={open} onClose={handleClose}>
-      <CustomSpeedDial
-        styles={{ bottom: 64 }}
-        overrideIcon={<SpeedDialIcon />}
-        actions={[
-          {
-            icon: <AssignmentIcon />,
-            name: 'From Template',
-            onClick: () => console.log('template'),
-          },
-          {
-            icon: <FormatSizeIcon />,
-            name: 'Text',
-            onClick: handleAddTextItem,
-          },
-          {
-            icon: <PermMediaIcon />,
-            name: 'Media',
-            onClick: handleAddMediaItem,
-          },
-        ]}
-      />
-      <DialogTitle>Add Items</DialogTitle>
-      <DialogContent>
-        <input
-          type="file"
-          multiple
-          ref={inputFile}
-          style={{ display: 'none' }}
-          name="media"
-          onChange={handleFileSelection}
+    <>
+      <Dialog fullScreen open={true}>
+        <ActionBar
+          backBtn={
+            tempParentId !== null ? (
+              <BackButtonIcon onClick={handleBackBtnClick} />
+            ) : null
+          }
         />
-        <List>
-          {itemsArr.map((item) => {
-            return (
-              <ListItem sx={{ padding: 0 }} key={item.tempId}>
-                <AddItemCard item={item} />
+        <DialogTitle>Add Items</DialogTitle>
+        <DialogContent>
+          <input
+            type="file"
+            multiple
+            ref={inputFile}
+            style={{ display: 'none' }}
+            name="media"
+            onChange={handleFileSelection}
+          />
+          <List>
+            {itemsArr.map((item) => (
+              <ListItem key={item.temp.id}>
+                <AddItemCard
+                  item={item}
+                  onClick={() => handleItemClick(item.temp.id)}
+                />
               </ListItem>
-            );
-          })}
-        </List>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          type="submit"
-          onClick={handleUploadFiles}
-          disabled={Object.keys(items).length === 0 || uploading}
-        >
-          {uploading ? <CircularProgress /> : 'Upload'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+            ))}
+          </List>
+          <ButtonGroup>
+            <Button
+              startIcon={<AssignmentIcon />}
+              onClick={handleOpenCreateItemFromTemplateDialog}
+            >
+              {'From Template'}
+            </Button>
+            <Button startIcon={<FormatSizeIcon />} onClick={handleAddTextItem}>
+              {'Text'}
+            </Button>
+            <Button startIcon={<PermMediaIcon />} onClick={handleAddMediaItem}>
+              {'Media'}
+            </Button>
+          </ButtonGroup>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={reset}>Cancel</Button>
+          <Button
+            type="submit"
+            onClick={handleUploadFiles}
+            disabled={Object.keys(items).length === 0 || uploading}
+          >
+            {uploading ? <CircularProgress /> : 'Upload'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <CreateItemFromTemplateDialog
+        open={createItemFromTemplateDialogOpen}
+        onClose={handleCloseCreateItemFromTemplateDialog}
+        onSubmit={() => console.log('on submit')}
+      />
+    </>
   );
 }

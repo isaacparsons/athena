@@ -1,14 +1,23 @@
 import _ from 'lodash';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CircularProgress, Skeleton, useTheme } from '@mui/material';
+import {
+  CircularProgress,
+  IconButton,
+  Skeleton,
+  useTheme,
+} from '@mui/material';
 import { useNotifications } from '@toolpad/core';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BackButton, NewsletterItemsList } from '../components/index';
-import { useStore } from '../store';
+import { useAddItemsStore, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { NewsletterMembers } from '../components/NewsletterMembers';
 import { NewsletterProperties } from '../components/NewsletterProperties';
 import { CustomContainer } from '../components/common/CustomContainer';
+import { ActionBar } from '../components/common/ActionBar';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import { mapToArray } from '../../util/helpers';
 
 export function Newsletter() {
   const params = useParams();
@@ -32,6 +41,14 @@ export function Newsletter() {
     }))
   );
 
+  const { openDialog } = useAddItemsStore(
+    useShallow((state) => ({
+      openDialog: state.openDialog,
+    }))
+  );
+
+  const [editing, setEditing] = useState(false);
+
   const info = useMemo(() => {
     if (newsletterId && newsletters[newsletterId]) {
       const newsletter = newsletters[newsletterId];
@@ -47,20 +64,47 @@ export function Newsletter() {
     if (newsletterId) fetchNewsletter(newsletterId);
   }, [newsletterId, fetchNewsletter]);
 
+  const lastItemId = useMemo(() => {
+    const lastItem = mapToArray(newsletterItems).find(
+      (i) => i.nextItemId === null
+    );
+    return lastItem?.id ?? null;
+  }, [newsletterItems]);
+
+  const handleOpenMediaItemsDialog = () => {
+    if (newsletterId)
+      openDialog({
+        newsletterId: newsletterId,
+        parentId: null,
+        previousItemId: lastItemId,
+        nextItemId: null,
+      });
+  };
+
   if (loading) return <CircularProgress />;
   if (!info) return null;
 
   return (
-    <CustomContainer>
-      <BackButton />
-      <NewsletterProperties properties={info.newsletter.properties} />
-      <NewsletterMembers members={info.members} />
-      <NewsletterItemsList
-        parentId={null}
-        newsletterId={info.newsletter.id}
-        items={info.items}
-      />
-    </CustomContainer>
+    <>
+      <ActionBar backBtn={<BackButton />}>
+        <IconButton size="large" onClick={handleOpenMediaItemsDialog}>
+          <AddIcon htmlColor="#fff" fontSize="inherit" />
+        </IconButton>
+        <IconButton size="large" onClick={() => setEditing(true)}>
+          <EditIcon htmlColor="#fff" fontSize="inherit" />
+        </IconButton>
+      </ActionBar>
+      <CustomContainer>
+        <NewsletterProperties properties={info.newsletter.properties} />
+        <NewsletterMembers members={info.members} />
+        <NewsletterItemsList
+          editing={editing}
+          parentId={null}
+          newsletterId={info.newsletter.id}
+          items={info.items}
+        />
+      </CustomContainer>
+    </>
   );
 }
 {

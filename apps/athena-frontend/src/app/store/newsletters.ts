@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
-import { Newsletter, NewsletterBase } from '@athena/athena-common';
+import { logObject, Newsletter, NewsletterBase } from '@athena/athena-common';
 import { asyncTrpcClient } from '../../trpc';
 import { Slices } from '.';
 
