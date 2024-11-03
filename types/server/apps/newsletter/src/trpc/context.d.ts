@@ -1,11 +1,7 @@
-import { UserDAO } from '../dao/user';
-import { NewsletterDAO } from '../dao/newsletter';
-import { GCSManager } from '../services/gcs';
-import { LocationDAO } from '../dao/location';
-import { NewsletterItemDAO } from '../dao/newsletter-item';
+import { UserDAO, NewsletterDAO, LocationDAO, NewsletterItemDAO, NewsletterItemTemplateDAO } from '../dao';
+import { GCSManager } from '../services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/athena-common';
-import { NewsletterItemTemplateDAO } from '../dao/newsletter-item-template';
 type ContextInput = {
     req: Request & {
         user?: UserSession;
@@ -35,7 +31,7 @@ export declare function createContext({ req, res }: ContextInput): {
     };
     res: Response<any, Record<string, any>>;
     gcs: GCSManager;
-    db: import("kysely").Kysely<import("../types/db").Database>;
+    db: import("kysely/dist/cjs/kysely").Kysely<import("../db").Database>;
     dao: {
         user: UserDAO;
         newsletter: NewsletterDAO;

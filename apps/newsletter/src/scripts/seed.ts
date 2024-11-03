@@ -1,3 +1,3 @@
-import { DBManagerClient } from '../db/client';
+import { DBManagerClient } from '../db';
 
 new DBManagerClient().seed();

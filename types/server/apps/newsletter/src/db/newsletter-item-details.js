@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemTextTableClient = exports.NewsletterItemMediaTableClient = void 0;
 const tslib_1 = require("tslib");
-const db_1 = require("../types/db");
+const db_1 = require("../db");
 class NewsletterItemMediaTableClient extends db_1.Table {
     constructor(db, name) {
         super(db, name);
@@ -17,10 +17,7 @@ class NewsletterItemMediaTableClient extends db_1.Table {
                 .addColumn('caption', 'varchar')
                 .addColumn('fileName', 'varchar', (col) => col.notNull())
                 .addColumn('type', 'varchar', (col) => col.notNull())
-                .addColumn('newsletterItemId', 'integer', (col) => col
-                .references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`)
-                .notNull()
-                .onDelete('cascade'))
+                .addColumn('newsletterItemId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`).notNull().onDelete('cascade'))
                 .execute();
             return;
         });
@@ -41,10 +38,7 @@ class NewsletterItemTextTableClient extends db_1.Table {
                 .addColumn('link', 'varchar')
                 .addColumn('type', 'varchar', (col) => col.notNull())
                 .addColumn('description', 'varchar')
-                .addColumn('newsletterItemId', 'integer', (col) => col
-                .references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`)
-                .notNull()
-                .onDelete('cascade'))
+                .addColumn('newsletterItemId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`).notNull().onDelete('cascade'))
                 .execute();
             return;
         });

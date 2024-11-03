@@ -1,5 +1,5 @@
 import { Insertable, Selectable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '../types/db';
+import { Connection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '../db';
 export interface CountryTableColumns {
     id: UniqueId;
     code: ImmutableString;

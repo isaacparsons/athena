@@ -1,9 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewsletterItemTableClient = void 0;
+exports.NewsletterItemTableClient = exports.NewsletterItemTableInfo = void 0;
 const tslib_1 = require("tslib");
 const kysely_1 = require("kysely");
-const db_1 = require("../types/db");
+const db_1 = require("../db");
+exports.NewsletterItemTableInfo = {
+    name: db_1.TABLE_NAMES.NEWSLETTER_ITEM,
+    columns: [
+        ...db_1.MetaColumns,
+        'id',
+        'newsletterId',
+        'title',
+        'date',
+        'locationId',
+        'parentId',
+        'nextItemId',
+        'previousItemId',
+    ],
+};
 class NewsletterItemTableClient extends db_1.Table {
     constructor(db, name) {
         super(db, name);

@@ -1,24 +1,21 @@
-import { useTheme, Button } from '@mui/material';
-import { StoreNewsletterItem, useAddItemsStore, useStore } from '../store';
-
-import { ToggleList } from './ToggleList';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AddItemTemplateDialog } from './AddItemTemplateDialog';
-import { AddItemsDialog } from './AddItemsDialog';
+import { Fab } from '@mui/material';
+import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '../components';
+import { CloseIcon, TemplateIcon } from '../icons';
+import { StoreNewsletterItem, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { NewsletterItemCard } from './common/NewsletterItemCard';
-import { usePromiseWithNotification } from '../hooks/usePromiseWithNotification';
+import { usePromiseWithNotification } from '../hooks';
+
 
 interface NewsletterItemsListProps {
   editing: boolean;
-  parentId: number | null;
+  stopEditing?: () => void;
   items: StoreNewsletterItem[];
   newsletterId: number;
 }
 
 export function NewsletterItemsList(props: NewsletterItemsListProps) {
-  const { items, newsletterId, parentId, editing } = props;
+  const { items, newsletterId, editing, stopEditing } = props;
   const promiseWithNotifications = usePromiseWithNotification();
   const { fetchNewsletter, deleteNewsletterItems } = useStore(
     useShallow((state) => ({
@@ -26,9 +23,6 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
       deleteNewsletterItems: state.newsletterItems.deleteItems,
     }))
   );
-
-  const theme = useTheme();
-  const navigate = useNavigate();
 
   const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(
     new Set()
@@ -78,6 +72,18 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
         title={'Delete items'}
         content={'are you sure you want to delete the selected items?'}
       /> */}
+      {editing &&
+        <>
+          <Fab onClick={stopEditing} sx={{ position: 'fixed', bottom: 32, right: 32, bgcolor: 'red', color: 'white' }}>
+            <CloseIcon />
+          </Fab>
+          {selectedItems.length > 0 && <Fab variant="extended" onClick={handleOpenAddTemplateDialog} sx={{ position: 'fixed', bottom: 32 }}>
+            <TemplateIcon sx={{ mr: 1 }} />
+            Create Template
+          </Fab>}
+        </>
+      }
+
       <AddItemTemplateDialog
         open={addTemplateDialogOpen}
         handleClose={handleCloseAddTemplateDialog}
@@ -94,7 +100,6 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
           <NewsletterItemCard item={item} />
         )}
       />
-      <Button onClick={handleOpenAddTemplateDialog}>Press me</Button>
     </>
   );
 }

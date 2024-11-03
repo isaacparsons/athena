@@ -4,12 +4,11 @@ exports.createNewsletter = createNewsletter;
 exports.createNewsletterItemText = createNewsletterItemText;
 exports.createNewsletterItemNode = createNewsletterItemNode;
 const tslib_1 = require("tslib");
-const client_1 = require("../../db/client");
-const db_1 = require("../../types/db");
+const db_1 = require("../../db");
 function createNewsletter(userId, name) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         try {
-            return client_1.dbClient.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return db_1.dbClient.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 const newsletter = yield trx
                     .insertInto(db_1.TABLE_NAMES.NEWSLETTER)
                     .values({
@@ -42,7 +41,7 @@ function createNewsletter(userId, name) {
 function createNewsletterItemText(itemInput, detailsInput) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         try {
-            return client_1.dbClient.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return db_1.dbClient.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 const item = yield trx
                     .insertInto(db_1.TABLE_NAMES.NEWSLETTER_ITEM)
                     .values(Object.assign({}, itemInput))
@@ -65,7 +64,7 @@ function createNewsletterItemText(itemInput, detailsInput) {
 function createNewsletterItemNode(itemInput) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         try {
-            return client_1.dbClient.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return db_1.dbClient.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 const item = yield trx
                     .insertInto(db_1.TABLE_NAMES.NEWSLETTER_ITEM)
                     .values(itemInput)

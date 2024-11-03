@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemDetailsDAO = void 0;
 const tslib_1 = require("tslib");
-const athena_common_1 = require("@athena/athena-common");
 class NewsletterItemDetailsDAO {
     constructor(db) {
         this.db = db;
@@ -10,20 +9,16 @@ class NewsletterItemDetailsDAO {
     get(newsletterItemId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const details = yield this.db
-                .selectFrom([
-                'newsletter_item_media as nim',
-                'newsletter_item_text as nit',
-            ])
+                .selectFrom(['newsletter_item_media as nim', 'newsletter_item_text as nit'])
                 .selectAll()
                 .where(({ or, eb }) => or([
                 eb('nim.newsletterItemId', '=', newsletterItemId),
                 eb('nit.newsletterItemId', '=', newsletterItemId),
             ]))
                 .executeTakeFirst();
-            if (!details) {
+            if (!details)
                 return;
-            }
-            else if (details.type === 'text') {
+            if (details.type === 'text') {
                 return {
                     id: details.id,
                     type: 'text',
@@ -32,7 +27,7 @@ class NewsletterItemDetailsDAO {
                     link: details.link,
                 };
             }
-            else if (details.type === 'media') {
+            if (details.type === 'media') {
                 return {
                     id: details.id,
                     type: 'media',
@@ -41,9 +36,7 @@ class NewsletterItemDetailsDAO {
                     caption: details.caption,
                 };
             }
-            else {
-                throw new Error('unrecognized type');
-            }
+            throw new Error('unrecognized type');
         });
     }
     post(newsletterItemId, input) {
@@ -51,7 +44,7 @@ class NewsletterItemDetailsDAO {
             if (!input) {
                 return;
             }
-            else if (input.type === athena_common_1.NewsletterItemType.text) {
+            else if (input.type === 'text') {
                 return this.db
                     .insertInto('newsletter_item_text')
                     .values(Object.assign(Object.assign({}, input), { newsletterItemId }))

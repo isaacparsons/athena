@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react';
+
 import {
   Button,
   ButtonBase,
@@ -9,23 +11,21 @@ import {
   List,
   ListItem,
 } from '@mui/material';
-import { UserTemplateCard, UserTemplatesList } from '../pages/Templates';
-import { mapToArray } from '../../util/helpers';
-import { useMemo, useState } from 'react';
+import { UserTemplateCard } from '../pages';
+import { mapToArray } from '../../util';
 import { useAddItemsStore, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { grey } from '@mui/material/colors';
 
 interface CreateItemFromTemplateDialogProps {
+  parentId: string | null;
   open: boolean;
   onClose: () => void;
-  onSubmit: () => void;
 }
 
 export function CreateItemFromTemplateDialog(
   props: CreateItemFromTemplateDialogProps
 ) {
-  const { open, onSubmit, onClose } = props;
+  const { parentId, open, onClose } = props;
 
   const { loading, newsletterItemTemplates, fetchTemplate } = useStore(
     useShallow((state) => ({
@@ -55,21 +55,22 @@ export function CreateItemFromTemplateDialog(
     setSelectedTemplateId((prev) => (prev === id ? null : id));
   };
 
+
+
   const handleAddTemplate = async () => {
     if (selectedTemplateId !== null) {
       const template = await fetchTemplate(selectedTemplateId);
-      console.log(template);
-      //   addItem({
-      //     tempId: Object.keys(items).length + 1,
-      //     date: new Date().toISOString(),
-      //     location: undefined,
-      //     title: name,
-      //     details: {
-      //       name: name,
-      //       caption: '',
-      //       type: 'media',
-      //     },
-      //   });
+
+      console.log(template)
+
+      addItems(parentId, template.items.filter((i) => i.data).map((i) => ({
+        location: undefined,
+        date: new Date().toISOString(),
+        title: '',
+        details: i.data.type === 'media' ? { ...i.data, file: null } : i.data
+      })))
+
+      onClose()
     }
   };
 
@@ -91,14 +92,14 @@ export function CreateItemFromTemplateDialog(
                 sx={
                   selectedTemplateId === template.id
                     ? {
-                        borderWidth: 5,
-                        borderColor: 'black',
-                        borderStyle: 'solid',
-                        opacity: 1,
-                      }
+                      borderWidth: 5,
+                      borderColor: 'black',
+                      borderStyle: 'solid',
+                      opacity: 1,
+                    }
                     : {
-                        opacity: 0.5,
-                      }
+                      opacity: 0.5,
+                    }
                 }
                 onClick={() => handleTemplateSelected(template.id)}
               >

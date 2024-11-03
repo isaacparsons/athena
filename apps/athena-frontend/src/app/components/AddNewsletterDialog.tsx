@@ -1,29 +1,32 @@
 import {
-  Box,
   Button,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  Stack,
   TextField,
 } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { MobileDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DesktopDatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import dayjs from 'dayjs';
 import { trpc } from '../../trpc';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   CreateNewsletterInput,
   postNewsletterInput,
 } from '@athena/athena-common';
+import { SubmitHandler, useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { usePromiseWithNotification } from '../hooks/usePromiseWithNotification';
+import { usePromiseWithNotification } from '../hooks';
 
 interface AddNewsletterDialogProps {
   open: boolean;
   onClose: () => void;
 }
+
 
 export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
   const { onClose, open } = props;
@@ -32,13 +35,19 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
   const createNewsletter = trpc.newsletters.post.useMutation();
 
   const {
+    control,
     register,
-    setValue,
     handleSubmit,
     reset,
     formState: { errors, isValid, isSubmitting },
   } = useForm<CreateNewsletterInput>({
     resolver: zodResolver(postNewsletterInput),
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      startDate: new Date().toISOString(),
+      endDate: undefined
+    },
   });
 
   const handleSave: SubmitHandler<CreateNewsletterInput> = async (data) => {
@@ -58,33 +67,44 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
       <DialogTitle>Add Newsletter</DialogTitle>
       <DialogContent>
         <TextField
-          required
+          {...register('name')}
           margin="dense"
           label="Name"
           type="text"
           fullWidth
-          variant="standard"
+          variant="outlined"
+          helperText={errors.name?.message}
           error={Boolean(errors.name)}
-          //   helperText=
-          {...register('name', { required: true })}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box display="flex" flexDirection="row">
-            <MobileDatePicker
-              {...register('startDate')}
-              onChange={(value) => {
-                if (value && value.isValid())
-                  setValue('startDate', value.toISOString());
-              }}
+          <Stack direction="row" display="flex" justifyContent="space-between">
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field: { onChange, value } }) => (
+                <DesktopDatePicker
+                  value={dayjs(value)}
+                  onChange={(value) => { onChange(value?.toISOString()) }}
+                  slotProps={{
+                    field: { clearable: true, onClear: () => onChange(undefined) },
+                  }}
+                />
+              )}
             />
-            <MobileDatePicker
-              {...register('endDate')}
-              onChange={(value) => {
-                if (value && value.isValid())
-                  setValue('endDate', value.toISOString());
-              }}
+            <Controller
+              control={control}
+              name="endDate"
+              render={({ field: { onChange, value } }) => (
+                <DesktopDatePicker
+                  value={value ? dayjs(value) : undefined}
+                  onChange={(value) => { onChange(value?.toISOString()) }}
+                  slotProps={{
+                    field: { clearable: true, onClear: () => onChange(undefined) },
+                  }}
+                />
+              )}
             />
-          </Box>
+          </Stack>
         </LocalizationProvider>
       </DialogContent>
       <DialogActions>
@@ -92,7 +112,7 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
         <Button
           type="submit"
           onClick={handleSubmit(handleSave)}
-          disabled={!isValid}
+          disabled={Boolean(!isValid)}
         >
           {isSubmitting ? <CircularProgress /> : 'Save'}
         </Button>

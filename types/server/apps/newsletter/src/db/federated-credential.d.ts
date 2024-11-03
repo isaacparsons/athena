@@ -1,5 +1,5 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '../types/db';
+import { Connection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '../db';
 export interface FederatedCredentialTableColumns {
     id: UniqueId;
     provider: ImmutableString;

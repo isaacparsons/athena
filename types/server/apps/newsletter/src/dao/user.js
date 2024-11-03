@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserDAO = void 0;
 const tslib_1 = require("tslib");
-const db_1 = require("../types/db");
+const db_1 = require("../db");
 class UserDAO {
     constructor(db) {
         this.db = db;

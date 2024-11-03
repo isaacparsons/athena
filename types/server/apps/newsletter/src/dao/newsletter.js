@@ -3,10 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterDAO = void 0;
 const tslib_1 = require("tslib");
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
-const db_1 = require("../types/db");
-const helpers_1 = require("../util/helpers");
-const db_2 = require("../util/db");
-const newsletter_item_mapper_1 = require("./mapping/newsletter-item-mapper");
+const _1 = require(".");
+const db_1 = require("../db");
+const util_1 = require("../util");
 class NewsletterDAO {
     constructor(db, gcs, newsletterItemDAO) {
         this.db = db;
@@ -19,9 +18,9 @@ class NewsletterDAO {
                 .selectFrom('newsletter as n')
                 .where('n.id', '=', id)
                 .selectAll()
-                .select(({ ref }) => (0, db_2.user)(this.db, ref('n.ownerId')).as('owner'))
-                .select(({ ref }) => (0, db_2.creator)(this.db, ref('n.creatorId')))
-                .select(({ ref }) => (0, db_2.modifier)(this.db, ref('n.modifierId')))
+                .select(({ ref }) => (0, util_1.user)(this.db, ref('n.ownerId'), 'owner'))
+                .select(({ ref }) => (0, util_1.creator)(this.db, ref('n.creatorId')))
+                .select(({ ref }) => (0, util_1.modifier)(this.db, ref('n.modifierId')))
                 .select((eb) => (0, db_1.jsonArrayFrom)(eb
                 .selectFrom('user_newsletter as un')
                 .whereRef('un.newsletterId', '=', 'n.id')
@@ -65,7 +64,7 @@ class NewsletterDAO {
             ])
                 .where('ni.parentId', 'is', null)).as('items'))
                 .executeTakeFirstOrThrow(() => new Error(`newsletter with id: ${id} does not exist`));
-            const mappedItems = newsletter.items.map((item) => (0, newsletter_item_mapper_1.mapItem)(item));
+            const mappedItems = newsletter.items.map((item) => (0, _1.mapNewsletterItem)(item));
             const itemsWithSignedUrl = yield Promise.all(mappedItems.map((item) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                 var _a;
                 if (((_a = item.details) === null || _a === void 0 ? void 0 : _a.type) === 'media') {
@@ -86,7 +85,7 @@ class NewsletterDAO {
                 },
                 properties: {
                     name: newsletter.name,
-                    dateRange: (0, helpers_1.parseDateRange)(newsletter.startDate, newsletter.endDate),
+                    dateRange: (0, util_1.parseDateRange)(newsletter.startDate, newsletter.endDate),
                 },
                 owner: newsletter.owner,
                 members: newsletter.members,

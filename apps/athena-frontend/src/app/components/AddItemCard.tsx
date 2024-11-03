@@ -1,5 +1,6 @@
 import {
   Box,
+  Stack,
   ButtonBase,
   Card,
   CardContent,
@@ -7,20 +8,18 @@ import {
   IconButton,
   TextField,
 } from '@mui/material';
-import CancelIcon from '@mui/icons-material/Cancel';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { CancelIcon, ArrowForwardIcon } from '../icons';
+import { grey } from '@mui/material/colors';
 import {
   StoreAddNewsletterItem,
-  StoreAddNewsletterItemDetailsMedia,
-  StoreAddNewsletterItemDetailsText,
   useAddItemsStore,
-} from '../store/add-newsletter-items';
-import { grey } from '@mui/material/colors';
-import { NewsletterItemType } from '@athena/athena-common';
+} from '../store';
+import { isMediaDetailsInput, isTextDetailsInput } from '@athena/athena-common';
+
 
 interface AddItemCardProps {
   item: StoreAddNewsletterItem;
-  onClick: (id: number) => void;
+  onClick: (id: string) => void;
 }
 
 export function AddItemCard(props: AddItemCardProps) {
@@ -41,27 +40,19 @@ export function AddItemCard(props: AddItemCardProps) {
   //   } else {
   return (
     <Card>
-      <Box display="flex" flexDirection="row" justifyContent="flex-end">
+      <Stack direction="row" justifyContent="flex-end">
         <IconButton
           aria-label="delete"
           onClick={() => removeItem(item.temp.id)}
         >
           <CancelIcon />
         </IconButton>
-      </Box>
-      {item.details.type === 'media' && (
-        <MediaCardItem
-          item={
-            item as StoreAddNewsletterItem<StoreAddNewsletterItemDetailsMedia>
-          }
-        />
+      </Stack>
+      {isMediaDetailsInput(item.details) && (
+        <MediaCardItem item={{ ...item, details: item.details }} />
       )}
-      {item.details.type === 'text' && (
-        <TextCardItem
-          item={
-            item as StoreAddNewsletterItem<StoreAddNewsletterItemDetailsText>
-          }
-        />
+      {isTextDetailsInput(item.details) && (
+        <TextCardItem item={{ ...item, details: item.details }} />
       )}
       <ButtonBase
         sx={{
@@ -81,17 +72,18 @@ export function AddItemCard(props: AddItemCardProps) {
 }
 
 interface MediaItemCardProps {
-  item: StoreAddNewsletterItem<StoreAddNewsletterItemDetailsMedia>;
+  item: StoreAddNewsletterItem<'media'>;
 }
 
 export function MediaCardItem(props: MediaItemCardProps) {
   const { item } = props;
+  const { details } = item
   return (
     <>
       <CardMedia
-        sx={{ height: 400, width: 400 }}
-        image={URL.createObjectURL(item.details.file)}
-        title={item.details.name}
+        sx={{ height: 400, width: '100vw' }}
+        image={details.file ? URL.createObjectURL(details.file) : ''}
+        title={details.name}
       />
       <CardContent>
         <Box display="flex" flexDirection="column">
@@ -112,7 +104,7 @@ export function MediaCardItem(props: MediaItemCardProps) {
 }
 
 interface TextItemCardProps {
-  item: StoreAddNewsletterItem<StoreAddNewsletterItemDetailsText>;
+  item: StoreAddNewsletterItem<'text'>;
 }
 
 export function TextCardItem(props: TextItemCardProps) {
@@ -120,7 +112,7 @@ export function TextCardItem(props: TextItemCardProps) {
   const { updateItemDetails } = useAddItemsStore();
   const itemId = item.temp.id;
   return (
-    <CardContent>
+    <CardContent >
       <TextField
         required
         margin="dense"
@@ -131,14 +123,7 @@ export function TextCardItem(props: TextItemCardProps) {
         variant="standard"
         defaultValue={item.details.name}
         name={item.details.name}
-        onChange={(e) =>
-          updateItemDetails(itemId, {
-            details: {
-              type: NewsletterItemType.text,
-              name: e.target.value,
-            },
-          })
-        }
+        onChange={(e) => updateItemDetails(itemId, { details: { type: 'text', name: e.target.value } })}
       />
       <TextField
         required
@@ -150,14 +135,7 @@ export function TextCardItem(props: TextItemCardProps) {
         variant="standard"
         name={item.details.description ?? ''}
         defaultValue={item.details.description ?? ''}
-        onChange={(e) =>
-          updateItemDetails<StoreAddNewsletterItemDetailsText>(itemId, {
-            details: {
-              type: NewsletterItemType.text,
-              description: e.target.value,
-            },
-          })
-        }
+        onChange={(e) => updateItemDetails<'text'>(itemId, { details: { type: 'text', description: e.target.value } })}
       />
       <TextField
         required
@@ -169,14 +147,7 @@ export function TextCardItem(props: TextItemCardProps) {
         variant="standard"
         name={item.details.link ?? ''}
         defaultValue={item.details.link ?? ''}
-        onChange={(e) =>
-          updateItemDetails<StoreAddNewsletterItemDetailsText>(itemId, {
-            details: {
-              type: NewsletterItemType.text,
-              link: e.target.value,
-            },
-          })
-        }
+        onChange={(e) => updateItemDetails<'text'>(itemId, { details: { type: 'text', link: e.target.value } })}
       />
     </CardContent>
   );

@@ -1,23 +1,30 @@
 import { createTheme } from '@mui/material';
+import { grey, purple } from '@mui/material/colors';
 
 export const APPBAR_HEIGHT = 70;
 
-export default createTheme({
+declare module '@mui/material/styles' {
+  interface Palette {
+    white: Palette['primary'];
+  }
+
+  interface PaletteOptions {
+    white?: PaletteOptions['primary'];
+  }
+}
+
+export const theme = createTheme({
+  spacing: 8,
   palette: {
     primary: {
-      main: '#673ab7',
-      light: '#8561c5',
-      dark: '#482880',
-      contrastText: '#fff',
+      main: '#7e57c2',
+      light: '#9575cd',
+      dark: '#673ab7',
     },
     secondary: {
-      main: '#1de9b6',
-      light: '#4aedc4',
+      main: grey[400],
+      light: grey[50],
       dark: '#14a37f',
-      contrastText: '#fff',
     },
-    // success: {
-
-    // }
   },
 });

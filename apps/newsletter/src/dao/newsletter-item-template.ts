@@ -4,7 +4,7 @@ import {
   jsonObjectFrom,
   TABLE_NAMES,
   Transaction,
-} from '../types/db';
+} from '../db';
 
 import {
   CreateNewsletterItemTemplateInput,
@@ -59,12 +59,12 @@ export class NewsletterItemTemplateDAO {
             .returning('id')
             .executeTakeFirstOrThrow();
 
-          return [item.temp.id, res.id] as [number, number];
+          return [item.temp.id, res.id] as [string, number];
         })
       );
 
-      const tempIdRealIdMap = new Map<number, number>(tuples);
-      const getRealId = (id: number | null) => {
+      const tempIdRealIdMap = new Map<string, number>(tuples);
+      const getRealId = (id: string | null) => {
         if (!id) return null;
         return tempIdRealIdMap.get(id) ?? null;
       };
@@ -79,11 +79,7 @@ export class NewsletterItemTemplateDAO {
               prevId: getRealId(item.temp.prevId),
             })
             .returning('id')
-            .where(
-              'newsletter_item_template_data.id',
-              '=',
-              getRealId(item.temp.id)
-            )
+            .where('newsletter_item_template_data.id', '=', getRealId(item.temp.id))
             .executeTakeFirstOrThrow()
         )
       );
@@ -153,6 +149,7 @@ export class NewsletterItemTemplateDAO {
       .selectFrom('template_tree')
       .selectAll()
       .execute();
+
     return {
       id: template.id,
       name: template.name,

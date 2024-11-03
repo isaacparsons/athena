@@ -1,10 +1,8 @@
 import express from 'express';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import cors from 'cors';
-import { appRouter } from './routes/index';
-import { initPassport } from './routes/auth';
-import { parseEnv } from './util/parse-env';
-import { createContext } from './trpc/context';
+import { parseEnv } from './util';
+import { createContext, appRouter, initPassport } from './trpc';
 
 const env = parseEnv();
 

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { useEffect } from 'react';
 import {
   Button,
   Card,
@@ -11,37 +11,21 @@ import {
   TextField,
 } from '@mui/material';
 import { StoreNewsletterItem, useStore } from '../store';
-import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import {
   CreateNewsletterItemTemplateInput,
-  NewsletterItemType,
   postNewsletterItemTemplateInput,
 } from '@athena/athena-common';
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useShallow } from 'zustand/react/shallow';
-import { usePromiseWithNotification } from '../hooks/usePromiseWithNotification';
+import { usePromiseWithNotification } from '../hooks';
+import { convertToTemplateItems } from '../../util';
 
 interface AddItemTemplateDialog {
   open: boolean;
   handleClose: () => void;
   items: StoreNewsletterItem[];
 }
-
-const convertToTemplateItems = (items: StoreNewsletterItem[]) => {
-  return items.map((i) => {
-    const parent = items.find((item) => item.childrenIds.includes(i.id));
-    return {
-      temp: {
-        id: i.id,
-        parentId: parent ? parent.id : null,
-        nextId: i.nextItemId,
-        prevId: i.previousItemId,
-      },
-      data: _.omit(i.details, ['id']),
-    };
-  });
-};
 
 export function AddItemTemplateDialog(props: AddItemTemplateDialog) {
   const { open, handleClose, items } = props;
@@ -84,6 +68,7 @@ export function AddItemTemplateDialog(props: AddItemTemplateDialog) {
   const handleSaveTemplate: SubmitHandler<
     CreateNewsletterItemTemplateInput
   > = async (data) => {
+    console.log(data)
     promiseWithNotifications.execute(saveTemplate(data), {
       successMsg: 'Templated created!',
       errorMsg: 'Unable to create Template :(',
@@ -110,7 +95,7 @@ export function AddItemTemplateDialog(props: AddItemTemplateDialog) {
       <DialogContent>
         <Card>
           {fields.map((field, index) => {
-            if (field.data?.type === NewsletterItemType.media) {
+            if (field.data?.type === 'media') {
               return (
                 <Stack key={field.id}>
                   <TextField
@@ -132,7 +117,7 @@ export function AddItemTemplateDialog(props: AddItemTemplateDialog) {
                   />
                 </Stack>
               );
-            } else if (field.data?.type === NewsletterItemType.text) {
+            } else if (field.data?.type === 'text') {
               return (
                 <Stack key={field.id}>
                   <TextField

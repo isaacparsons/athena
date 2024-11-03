@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../store';
+import { useShallow } from 'zustand/react/shallow';
 import {
   CustomFab,
   AddNewsletterDialog,
   UserNewsletters,
-} from '../components/index';
-import { useShallow } from 'zustand/react/shallow';
-import { mapToArray } from '../../util/helpers';
-import { CustomContainer } from '../components/common/CustomContainer';
+  CustomContainer,
+} from '../components';
 import { CircularProgress } from '@mui/material';
+import { mapToArray } from '../../util';
 
 export function Newsletters() {
   const { newsletters, loading } = useStore(

@@ -1,6 +1,10 @@
-import { dbClient } from '../../db/client';
-import { TABLE_NAMES, Transaction } from '../../types/db';
-import { InsertNewsletterItem, InsertNewsletterItemText } from '../../db';
+import {
+  TABLE_NAMES,
+  Transaction,
+  dbClient,
+  InsertNewsletterItem,
+  InsertNewsletterItemText,
+} from '../../db';
 
 export async function createNewsletter(userId: number, name: string) {
   try {
@@ -61,9 +65,7 @@ export async function createNewsletterItemText(
   }
 }
 
-export async function createNewsletterItemNode(
-  itemInput: InsertNewsletterItem
-) {
+export async function createNewsletterItemNode(itemInput: InsertNewsletterItem) {
   try {
     return dbClient.transaction().execute(async (trx: Transaction) => {
       const item = await trx

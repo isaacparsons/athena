@@ -1,36 +1,28 @@
 import _ from 'lodash';
-import { StateCreator } from 'zustand';
 import {
   NewsletterItem,
   NewsletterItemBase,
-  NewsletterItemDetails,
-  logObject,
+  NewsletterItemTypeName,
 } from '@athena/athena-common';
-import { Slices } from '.';
+import { Slices } from '../store';
+import { StateCreator } from 'zustand';
+import type {} from '@redux-devtools/extension';
 import { asyncTrpcClient } from '../../trpc';
+import { mapToArray } from '../../util';
 
-const mapToStoreItem = (item: NewsletterItem): StoreNewsletterItem => {
+const mapToStoreItem = <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+  item: NewsletterItem<T>
+): StoreNewsletterItem<T> => {
   return {
     ..._.omit(item, ['children']),
     childrenIds: item.children.map((c) => c.id),
   };
 };
-
-export type ItemDetailsType<T = void> = T extends void
-  ? // | (NewsletterItemDetailsText | NewsletterItemDetailsMedia)
-    {
-      details?: NewsletterItemDetails | undefined;
-    }
-  : {
-      details: T;
-    };
-
-export type StoreNewsletterItem<T = void> = Omit<
-  NewsletterItem,
-  'children' | 'details'
-> & {
+export type StoreNewsletterItem<
+  T extends NewsletterItemTypeName = NewsletterItemTypeName
+> = NewsletterItemBase<T> & {
   childrenIds: number[];
-} & ItemDetailsType<T>;
+};
 
 type NewsletterItemsData = Record<number, StoreNewsletterItem>;
 
@@ -40,7 +32,10 @@ export interface NewsletterItemsSlice {
     data: Record<number, StoreNewsletterItem>;
     fetch: (id: number) => Promise<void>;
     deleteItems: (ids: number[]) => Promise<void>;
-    addItems: (items: NewsletterItemBase[]) => void;
+    addItems: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+      newsletterId: number,
+      items: NewsletterItemBase<T>[]
+    ) => void;
   };
 }
 
@@ -98,13 +93,25 @@ export const createNewsletterItemsSlice: StateCreator<
         state.newsletterItems.data = newItems;
       });
     },
-    addItems: (items: NewsletterItemBase[]) => {
+    addItems: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+      newsletterId: number,
+      items: NewsletterItemBase<T>[]
+    ) => {
       set((state) => {
         items.forEach((item) => {
           state.newsletterItems.data[item.id] = {
             ...item,
             childrenIds: [],
           };
+        });
+        const newsletterItems = mapToArray(state.newsletterItems.data).filter(
+          (i) => i.newsletterId === newsletterId
+        );
+
+        newsletterItems.forEach((item) => {
+          state.newsletterItems.data[item.id].childrenIds = newsletterItems
+            .filter((i) => i.parentId === item.id)
+            .map((i) => i.id);
         });
       });
     },

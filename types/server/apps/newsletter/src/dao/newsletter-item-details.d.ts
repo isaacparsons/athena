@@ -1,4 +1,4 @@
-import { Connection } from '../types/db';
+import { Connection } from '../db';
 import { NewsletterItemDetailsMedia, NewsletterItemDetailsText, CreateNewsletterItemDetailsInput } from '@athena/athena-common';
 export declare class NewsletterItemDetailsDAO {
     readonly db: Connection;

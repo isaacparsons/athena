@@ -6,9 +6,9 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { NewsletterBase } from '@athena/athena-common';
-import { formatDate, formatDateRange } from '../../util/helpers';
+import { formatDate, formatDateRange } from '../../util';
+import { CalendarMonthIcon } from '../icons';
 
 interface UserNewsletterCardProps {
   newsletter: NewsletterBase;

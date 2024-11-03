@@ -1,21 +1,19 @@
 import _ from 'lodash';
-import { NewsletterItemDAO } from './newsletter-item';
+import { mapNewsletterItem, NewsletterItemDAO } from '.';
 import {
   Connection as DBConnection,
   Transaction,
   jsonArrayFrom,
   jsonObjectFrom,
-} from '../types/db';
+} from '../db';
 import {
   Newsletter,
   CreateNewsletterInput,
   UpdateNewsletterInput,
   NewsletterItemDetailsMedia,
 } from '@athena/athena-common';
-import { parseDateRange } from '../util/helpers';
-import { creator, modifier, user } from '../util/db';
-import { mapItem, mapItems } from './mapping/newsletter-item-mapper';
-import { GCSManager } from '../services/gcs';
+import { creator, modifier, user, parseDateRange } from '../util';
+import { GCSManager } from '../services';
 
 export class NewsletterDAO {
   constructor(
@@ -29,7 +27,7 @@ export class NewsletterDAO {
       .selectFrom('newsletter as n')
       .where('n.id', '=', id)
       .selectAll()
-      .select(({ ref }) => user(this.db, ref('n.ownerId')).as('owner'))
+      .select(({ ref }) => user(this.db, ref('n.ownerId'), 'owner'))
       .select(({ ref }) => creator(this.db, ref('n.creatorId')))
       .select(({ ref }) => modifier(this.db, ref('n.modifierId')))
       .select((eb) =>
@@ -89,22 +87,18 @@ export class NewsletterDAO {
                   .whereRef('modifier.id', '=', 'ni.modifierId')
               ).as('modifier'),
             ])
-            .where('ni.parentId', 'is', null)
         ).as('items')
       )
       .executeTakeFirstOrThrow(
         () => new Error(`newsletter with id: ${id} does not exist`)
       );
 
-    const mappedItems = newsletter.items.map((item) => mapItem(item));
+    const mappedItems = newsletter.items.map((item) => mapNewsletterItem(item));
     const itemsWithSignedUrl = await Promise.all(
       mappedItems.map(async (item) => {
         if (item.details?.type === 'media') {
           const details = item.details as NewsletterItemDetailsMedia;
-          const signedUrl = await this.gcs.getSignedUrl(
-            details.fileName,
-            'read'
-          );
+          const signedUrl = await this.gcs.getSignedUrl(details.fileName, 'read');
           details.fileName = signedUrl;
           return {
             ...item,

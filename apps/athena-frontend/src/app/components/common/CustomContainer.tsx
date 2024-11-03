@@ -1,6 +1,6 @@
-import { Container, useTheme } from '@mui/material';
-import { grey } from '@mui/material/colors';
 import React from 'react';
+
+import { Container, useTheme } from '@mui/material';
 
 interface CustomContainerProps {
   children: React.ReactNode;

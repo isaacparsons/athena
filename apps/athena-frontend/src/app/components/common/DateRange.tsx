@@ -1,7 +1,7 @@
 import { DateRange as IDateRange } from '@athena/athena-common';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { CalendarTodayIcon } from '../../icons';
 import { Stack } from '@mui/material';
-import { formatDate } from '../../../util/helpers';
+import { formatDate } from '../../../util';
 
 interface DateRangeProps {
   value: IDateRange | null;

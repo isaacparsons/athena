@@ -1,14 +1,15 @@
-import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
-import { dbClient } from '../db/client';
-import { UserDAO } from '../dao/user';
-import { NewsletterDAO } from '../dao/newsletter';
-import { GCSManager } from '../services/gcs';
-import { LocationDAO } from '../dao/location';
-import { NewsletterItemDAO } from '../dao/newsletter-item';
-import { NewsletterItemDetailsDAO } from '../dao/newsletter-item-details';
+import { dbClient } from '../db';
+import {
+  UserDAO,
+  NewsletterDAO,
+  LocationDAO,
+  NewsletterItemDAO,
+  NewsletterItemDetailsDAO,
+  NewsletterItemTemplateDAO,
+} from '../dao';
+import { GCSManager } from '../services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/athena-common';
-import { NewsletterItemTemplateDAO } from '../dao/newsletter-item-template';
 
 const gcs = new GCSManager();
 

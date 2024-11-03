@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemTemplateDAO = void 0;
 const tslib_1 = require("tslib");
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
-const db_1 = require("../types/db");
+const db_1 = require("../db");
 class NewsletterItemTemplateDAO {
     constructor(db) {
         this.db = db;

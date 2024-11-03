@@ -35,3 +35,4 @@ export * from './user';
 export * from './newsletters';
 export * from './newsletter-items';
 export * from './add-newsletter-items';
+export * from './newsletter-item-templates';

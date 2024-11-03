@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   AppBar,
   Toolbar,
@@ -13,15 +15,12 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import MenuIcon from '@mui/icons-material/Menu';
+import { AccountCircleIcon, MenuIcon, TemplateIcon, SettingsIcon, HomeIcon } from '../../icons'
 import { useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
-import SettingsIcon from '@mui/icons-material/Settings';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import HomeIcon from '@mui/icons-material/Home';
-import { useState } from 'react';
+
+
 
 interface AppbarProps {
   title: string;
@@ -58,7 +57,7 @@ export function Appbar(props: AppbarProps) {
             />
             <DrawerListItem
               text={'Templates'}
-              icon={<FileCopyIcon />}
+              icon={<TemplateIcon />}
               onClick={() => navigate('/templates')}
             />
           </List>

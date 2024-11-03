@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LocationTableClient = void 0;
 const tslib_1 = require("tslib");
-const db_1 = require("../types/db");
+const db_1 = require("../db");
 class LocationTableClient extends db_1.Table {
     constructor(db, name) {
         super(db, name);

@@ -1,9 +1,8 @@
-import { Connection } from '../types/db';
+import { Connection } from '../db';
 import {
   NewsletterItemDetailsMedia,
   NewsletterItemDetailsText,
   CreateNewsletterItemDetailsInput,
-  NewsletterItemType,
 } from '@athena/athena-common';
 
 export class NewsletterItemDetailsDAO {
@@ -11,10 +10,7 @@ export class NewsletterItemDetailsDAO {
 
   async get(newsletterItemId: number) {
     const details = await this.db
-      .selectFrom([
-        'newsletter_item_media as nim',
-        'newsletter_item_text as nit',
-      ])
+      .selectFrom(['newsletter_item_media as nim', 'newsletter_item_text as nit'])
       .selectAll()
       .where(({ or, eb }) =>
         or([
@@ -23,9 +19,8 @@ export class NewsletterItemDetailsDAO {
         ])
       )
       .executeTakeFirst();
-    if (!details) {
-      return;
-    } else if (details.type === 'text') {
+    if (!details) return;
+    if (details.type === 'text') {
       return {
         id: details.id,
         type: 'text',
@@ -33,7 +28,8 @@ export class NewsletterItemDetailsDAO {
         description: details.description,
         link: details.link,
       } as NewsletterItemDetailsText;
-    } else if (details.type === 'media') {
+    }
+    if (details.type === 'media') {
       return {
         id: details.id,
         type: 'media',
@@ -41,17 +37,13 @@ export class NewsletterItemDetailsDAO {
         name: details.name,
         caption: details.caption,
       } as NewsletterItemDetailsMedia;
-    } else {
-      throw new Error('unrecognized type');
     }
+    throw new Error('unrecognized type');
   }
-  async post(
-    newsletterItemId: number,
-    input: CreateNewsletterItemDetailsInput
-  ) {
+  async post(newsletterItemId: number, input: CreateNewsletterItemDetailsInput) {
     if (!input) {
       return;
-    } else if (input.type === NewsletterItemType.text) {
+    } else if (input.type === 'text') {
       return this.db
         .insertInto('newsletter_item_text')
         .values({ ...input, newsletterItemId })

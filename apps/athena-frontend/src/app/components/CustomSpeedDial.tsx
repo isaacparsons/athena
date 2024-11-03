@@ -1,6 +1,7 @@
-import { Box, SpeedDial, SpeedDialAction } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import { ReactNode, useState } from 'react';
+
+import { SpeedDial, SpeedDialAction } from '@mui/material';
+import { MenuIcon } from '../icons';
 
 interface Action {
   icon: ReactNode;

@@ -7,7 +7,7 @@ import {
   ImmutableString,
   ImmutableNumber,
   TABLE_NAMES,
-} from '../types/db';
+} from '../db';
 
 export interface FederatedCredentialTableColumns {
   id: UniqueId;

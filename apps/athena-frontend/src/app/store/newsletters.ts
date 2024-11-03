@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
-import { logObject, Newsletter, NewsletterBase } from '@athena/athena-common';
+import type {} from '@redux-devtools/extension';
+import { Slices } from '../store';
+import { Newsletter, NewsletterBase } from '@athena/athena-common';
 import { asyncTrpcClient } from '../../trpc';
-import { Slices } from '.';
 
 export type StoreNewsletter = Omit<Newsletter, 'items'> & {
   itemIds: number[];
@@ -40,7 +41,7 @@ export const createNewslettersSlice: StateCreator<
           itemIds: newsletter.items.map((i) => i.id),
         };
       });
-      get().newsletterItems.addItems(newsletter.items);
+      get().newsletterItems.addItems(newsletter.id, newsletter.items);
     },
     addNewsletters: (newsletters: NewsletterBase[]) => {
       set((state) => {

@@ -2,14 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CountryTableClient = exports.CountryTable = void 0;
 const tslib_1 = require("tslib");
-const db_1 = require("../types/db");
-// class TableInfo {
-//     constructor(readonly name: string, readonly columns: string[]){}
-//     selectCol: (colName: string) => {
-//         const isColName = this.columns.find((c) => c === colName)
-//         if ()
-//     }
-// }
+const db_1 = require("../db");
 exports.CountryTable = {
     tableName: db_1.TABLE_NAMES.COUNTRY,
     columns: ['id', 'code', 'name', 'longitude', 'lattitude'],

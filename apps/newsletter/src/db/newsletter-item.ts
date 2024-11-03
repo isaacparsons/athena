@@ -6,7 +6,8 @@ import {
   UniqueId,
   TABLE_NAMES,
   Meta,
-} from '../types/db';
+  MetaColumns,
+} from '../db';
 
 export interface NewsletterItemTableColumns extends Meta {
   id: UniqueId;
@@ -19,10 +20,25 @@ export interface NewsletterItemTableColumns extends Meta {
   previousItemId: ColumnType<number | null, number | null, number | null>;
 }
 
-export interface NewsletterItemTable {
-  name: TABLE_NAMES.NEWSLETTER_ITEM;
-  columns: NewsletterItemTableColumns;
-}
+type TableInfo<T> = {
+  name: TABLE_NAMES;
+  columns: (keyof T)[];
+};
+
+export const NewsletterItemTableInfo: TableInfo<NewsletterItemTableColumns> = {
+  name: TABLE_NAMES.NEWSLETTER_ITEM,
+  columns: [
+    ...MetaColumns,
+    'id',
+    'newsletterId',
+    'title',
+    'date',
+    'locationId',
+    'parentId',
+    'nextItemId',
+    'previousItemId',
+  ],
+};
 
 export type SelectNewsletterItem = Selectable<NewsletterItemTableColumns>;
 export type InsertNewsletterItem = Insertable<NewsletterItemTableColumns>;

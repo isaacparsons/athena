@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { useMemo, useRef, useState } from 'react';
 import {
   Button,
   ButtonGroup,
@@ -9,22 +10,25 @@ import {
   DialogTitle,
   List,
   ListItem,
-} from '@mui/material';
-import {
-  FormatSize as FormatSizeIcon,
-  PermMedia as PermMediaIcon,
-  Assignment as AssignmentIcon,
-} from '@mui/icons-material';
 
-import { useMemo, useRef, useState } from 'react';
-import { useNotifications } from '@toolpad/core';
-import { useShallow } from 'zustand/react/shallow';
-import { AddItemCard, BackButtonIcon } from './index';
-import { NewsletterItemType, range } from '@athena/athena-common';
+} from '@mui/material';
+
+import {
+  CreateItemFromTemplateDialog,
+  ActionBar,
+  AddItemCard,
+  BackButtonIcon,
+} from '../components'
+
+import {
+  TextIcon,
+  MediaIcon,
+  TemplateIcon
+} from '../icons'
+import { range, NewsletterItemTypeName } from '@athena/athena-common';
 import { useStore, useAddItemsStore } from '../store';
-import { mapToArray } from '../../util/helpers';
-import { CreateItemFromTemplateDialog } from './CreateItemFromTemplateDialog';
-import { ActionBar } from './common/ActionBar';
+import { useShallow } from 'zustand/react/shallow';
+import { mapToArray } from '../../util';
 
 export function AddItemsDialog() {
   const { fetchNewsletter, fetchNewsletterItems } = useStore(
@@ -45,19 +49,19 @@ export function AddItemsDialog() {
       }))
     );
 
-  const notifications = useNotifications();
-  const [tempParentId, setTempParentId] = useState<null | number>(null);
+
+  const [tempParentId, setTempParentId] = useState<null | string>(null);
   const [
     createItemFromTemplateDialogOpen,
     setCreateItemFromTemplateDialogOpen,
   ] = useState(false);
 
   const handleOpenCreateItemFromTemplateDialog = () =>
-    setCreateItemFromTemplateDialogOpen(false);
+    setCreateItemFromTemplateDialogOpen(true);
   const handleCloseCreateItemFromTemplateDialog = () =>
     setCreateItemFromTemplateDialogOpen(false);
 
-  const handleItemClick = (id: number) => setTempParentId(id);
+  const handleItemClick = (id: string) => setTempParentId(id);
 
   const inputFile = useRef<HTMLInputElement | null>(null);
 
@@ -79,7 +83,7 @@ export function AddItemsDialog() {
         details: {
           name: f.name,
           caption: '',
-          type: NewsletterItemType.media,
+          type: 'media' as NewsletterItemTypeName,
           fileName: '',
           file: f,
         },
@@ -96,7 +100,7 @@ export function AddItemsDialog() {
         location: undefined,
         details: {
           name: '',
-          type: NewsletterItemType.text,
+          type: 'text',
         },
       },
     ]);
@@ -123,7 +127,7 @@ export function AddItemsDialog() {
 
   return (
     <>
-      <Dialog fullScreen open={true}>
+      <Dialog fullScreen open={Boolean(existingItem)}>
         <ActionBar
           backBtn={
             tempParentId !== null ? (
@@ -153,15 +157,15 @@ export function AddItemsDialog() {
           </List>
           <ButtonGroup>
             <Button
-              startIcon={<AssignmentIcon />}
+              startIcon={<TemplateIcon />}
               onClick={handleOpenCreateItemFromTemplateDialog}
             >
               {'From Template'}
             </Button>
-            <Button startIcon={<FormatSizeIcon />} onClick={handleAddTextItem}>
+            <Button startIcon={<TextIcon />} onClick={handleAddTextItem}>
               {'Text'}
             </Button>
-            <Button startIcon={<PermMediaIcon />} onClick={handleAddMediaItem}>
+            <Button startIcon={<MediaIcon />} onClick={handleAddMediaItem}>
               {'Media'}
             </Button>
           </ButtonGroup>
@@ -178,9 +182,9 @@ export function AddItemsDialog() {
         </DialogActions>
       </Dialog>
       <CreateItemFromTemplateDialog
+        parentId={tempParentId}
         open={createItemFromTemplateDialogOpen}
         onClose={handleCloseCreateItemFromTemplateDialog}
-        onSubmit={() => console.log('on submit')}
       />
     </>
   );

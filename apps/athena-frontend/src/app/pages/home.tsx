@@ -1,5 +1,6 @@
-import { CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
+
+import { CircularProgress } from '@mui/material';
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';

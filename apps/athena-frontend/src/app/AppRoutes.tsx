@@ -1,20 +1,12 @@
-import _ from 'lodash';
+import { ReactNode } from 'react';
 import {
   createHashRouter,
   Navigate,
   Outlet,
   RouteObject,
 } from 'react-router-dom';
-// import Login from './pages/Login';
-import { Home } from './pages/Home';
-import { Login, Newsletter } from './pages';
-import { NotFound } from './pages/NotFound';
-import { ReactNode } from 'react';
+import { Login, Newsletter, Home, NotFound, NewsletterItem, Templates, NewsletterItemTemplate, Newsletters } from './pages';
 import { UserBase } from '@athena/athena-common';
-import { NewsletterItem } from './pages/NewsletterItem';
-import { Templates } from './pages/Templates';
-import { NewsletterItemTemplate } from './pages/NewsletterItemTemplate';
-import { Newsletters } from './pages/Newsletters';
 import { Appbar } from './components';
 
 export enum RoutePaths {

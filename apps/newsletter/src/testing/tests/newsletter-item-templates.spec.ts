@@ -1,13 +1,7 @@
-import { appRouter as router } from '../../routes/index';
-import { createContext } from '../../trpc/context';
 import { createNewsletter } from '../fixtures/newsletters';
-import { trpc } from '../../trpc/trpc';
+import { trpc, createContext, appRouter as router } from '../../trpc';
 
-import {
-  CreateNewsletterItemTemplateInput,
-  CreateTextItemDetailsInput,
-  NewsletterItemType,
-} from '@athena/athena-common';
+import { CreateNewsletterItemTemplateInput } from '@athena/athena-common';
 
 const testCaller = trpc.createCallerFactory(router)(
   createContext({
@@ -45,7 +39,7 @@ describe('newsletter item template routes', () => {
           prevId: null,
         },
         data: {
-          type: NewsletterItemType.text,
+          type: 'text',
           name: 'thoughts',
           description: 'it was good',
         },
@@ -58,7 +52,7 @@ describe('newsletter item template routes', () => {
           prevId: 1,
         },
         data: {
-          type: NewsletterItemType.text,
+          type: 'text',
           name: 'rating',
           description: '8/10',
         },
@@ -101,7 +95,7 @@ describe('newsletter item template routes', () => {
               prevId: null,
             },
             data: {
-              type: NewsletterItemType.text,
+              type: 'text',
               name: 'distance',
               description: 'it was close',
             },
@@ -114,7 +108,7 @@ describe('newsletter item template routes', () => {
               prevId: 2,
             },
             data: {
-              type: NewsletterItemType.text,
+              type: 'text',
               name: 'snacks',
               description: 'large selection',
             },
@@ -136,7 +130,7 @@ describe('newsletter item template routes', () => {
               prevId: 4,
             },
             data: {
-              type: NewsletterItemType.text,
+              type: 'text',
               name: 'Conclusion',
               description: '',
             },
@@ -144,10 +138,9 @@ describe('newsletter item template routes', () => {
         ],
       };
 
-      const movieTheatreTemplateId =
-        await testCaller.newsletterItemTemplates.create(
-          movieTheatreReviewInput
-        );
+      const movieTheatreTemplateId = await testCaller.newsletterItemTemplates.create(
+        movieTheatreReviewInput
+      );
 
       const result = await testCaller.newsletterItemTemplates.get({
         id: movieTheatreTemplateId,

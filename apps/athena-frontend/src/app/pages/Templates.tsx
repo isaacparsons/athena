@@ -1,10 +1,10 @@
-import { useShallow } from 'zustand/react/shallow';
-import { CustomContainer } from '../components/common/CustomContainer';
-import { useStore } from '../store';
-import { Card, CardContent, List, ListItem, Typography } from '@mui/material';
 import { useMemo } from 'react';
-import { StoreNewsletterItemTemplate } from '../store/newsletter-item-templates';
-import { mapToArray } from '../../util/helpers';
+import { Card, CardContent, List, ListItem, Typography } from '@mui/material'
+import { CustomContainer } from '../components';
+import { useStore } from '../store';
+import { useShallow } from 'zustand/react/shallow';
+import { mapToArray } from '../../util';
+import { NewsletterItemTemplateBase } from '@athena/athena-common';
 
 export function Templates() {
   const { loading, newsletterItemTemplates } = useStore(
@@ -27,7 +27,7 @@ export function Templates() {
 }
 
 interface UserTemplatesListProps {
-  templates: StoreNewsletterItemTemplate[];
+  templates: NewsletterItemTemplateBase[];
 }
 
 export function UserTemplatesList(props: UserTemplatesListProps) {
@@ -45,7 +45,7 @@ export function UserTemplatesList(props: UserTemplatesListProps) {
 }
 
 interface UserTemplatesCardProps {
-  template: StoreNewsletterItemTemplate;
+  template: NewsletterItemTemplateBase;
 }
 
 export function UserTemplateCard(props: UserTemplatesCardProps) {

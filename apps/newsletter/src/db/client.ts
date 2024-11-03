@@ -11,15 +11,13 @@ import {
   NewsletterItemTemplateTableClient,
   NewsletterItemTemplateDataTableClient,
   UserTemplateTableClient,
-} from '../db';
-import {
   ITable,
   PostgresDialect,
   Pool,
   DB,
   Database,
   TABLE_NAMES,
-} from '../types/db';
+} from '../db';
 
 const env = process.env as any; //parseEnv();
 

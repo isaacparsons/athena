@@ -1,4 +1,4 @@
-import { ITable, DB, Database } from '../types/db';
+import { ITable, DB, Database } from '../db';
 export declare const dbClient: DB<Database>;
 export declare class DBManagerClient {
     tables: ITable[];

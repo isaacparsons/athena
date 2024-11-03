@@ -7,7 +7,7 @@ import {
   ImmutableString,
   ImmutableNumber,
   TABLE_NAMES,
-} from '../types/db';
+} from '../db';
 
 export interface CountryTableColumns {
   id: UniqueId;
@@ -16,13 +16,7 @@ export interface CountryTableColumns {
   longitude: ImmutableNumber;
   lattitude: ImmutableNumber;
 }
-// class TableInfo {
-//     constructor(readonly name: string, readonly columns: string[]){}
-//     selectCol: (colName: string) => {
-//         const isColName = this.columns.find((c) => c === colName)
-//         if ()
-//     }
-// }
+
 export const CountryTable = {
   tableName: TABLE_NAMES.COUNTRY,
   columns: ['id', 'code', 'name', 'longitude', 'lattitude'],

@@ -3,10 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DBManagerClient = exports.dbClient = void 0;
 const tslib_1 = require("tslib");
 const db_1 = require("../db");
-const db_2 = require("../types/db");
 const env = process.env; //parseEnv();
-const dialect = new db_2.PostgresDialect({
-    pool: new db_2.Pool({
+const dialect = new db_1.PostgresDialect({
+    pool: new db_1.Pool({
         database: env['DB_NAME'],
         host: env['DB_HOST'],
         user: env['DB_USERNAME'],
@@ -15,24 +14,24 @@ const dialect = new db_2.PostgresDialect({
         max: 10,
     }),
 });
-exports.dbClient = new db_2.DB({
+exports.dbClient = new db_1.DB({
     dialect,
 });
 class DBManagerClient {
     constructor() {
         this.tables = [
-            new db_1.LocationTableClient(exports.dbClient, db_2.TABLE_NAMES.LOCATION),
-            new db_1.CountryTableClient(exports.dbClient, db_2.TABLE_NAMES.COUNTRY),
-            new db_1.UserTableClient(exports.dbClient, db_2.TABLE_NAMES.USER),
-            new db_1.FederatedCredentialTableClient(exports.dbClient, db_2.TABLE_NAMES.FEDEREATED_CREDENTIAL),
-            new db_1.NewsletterTableClient(exports.dbClient, db_2.TABLE_NAMES.NEWSLETTER),
-            new db_1.UserNewsletterTableClient(exports.dbClient, db_2.TABLE_NAMES.USER_NEWSLETTER),
-            new db_1.NewsletterItemTableClient(exports.dbClient, db_2.TABLE_NAMES.NEWSLETTER_ITEM),
-            new db_1.NewsletterItemMediaTableClient(exports.dbClient, db_2.TABLE_NAMES.NEWSLETTER_ITEM_MEDIA),
-            new db_1.NewsletterItemTextTableClient(exports.dbClient, db_2.TABLE_NAMES.NEWSLETTER_ITEM_TEXT),
-            new db_1.NewsletterItemTemplateTableClient(exports.dbClient, db_2.TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE),
-            new db_1.NewsletterItemTemplateDataTableClient(exports.dbClient, db_2.TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE_DATA),
-            new db_1.UserTemplateTableClient(exports.dbClient, db_2.TABLE_NAMES.USER_TEMPLATE),
+            new db_1.LocationTableClient(exports.dbClient, db_1.TABLE_NAMES.LOCATION),
+            new db_1.CountryTableClient(exports.dbClient, db_1.TABLE_NAMES.COUNTRY),
+            new db_1.UserTableClient(exports.dbClient, db_1.TABLE_NAMES.USER),
+            new db_1.FederatedCredentialTableClient(exports.dbClient, db_1.TABLE_NAMES.FEDEREATED_CREDENTIAL),
+            new db_1.NewsletterTableClient(exports.dbClient, db_1.TABLE_NAMES.NEWSLETTER),
+            new db_1.UserNewsletterTableClient(exports.dbClient, db_1.TABLE_NAMES.USER_NEWSLETTER),
+            new db_1.NewsletterItemTableClient(exports.dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM),
+            new db_1.NewsletterItemMediaTableClient(exports.dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_MEDIA),
+            new db_1.NewsletterItemTextTableClient(exports.dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_TEXT),
+            new db_1.NewsletterItemTemplateTableClient(exports.dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE),
+            new db_1.NewsletterItemTemplateDataTableClient(exports.dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE_DATA),
+            new db_1.UserTemplateTableClient(exports.dbClient, db_1.TABLE_NAMES.USER_TEMPLATE),
         ];
     }
     createTables() {

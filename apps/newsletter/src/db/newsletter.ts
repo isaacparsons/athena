@@ -8,7 +8,7 @@ import {
   MutableForeignKey,
   MutableNullableDate,
   Meta,
-} from '../types/db';
+} from '../db';
 
 export interface NewsletterTableColumns extends Meta {
   id: UniqueId;

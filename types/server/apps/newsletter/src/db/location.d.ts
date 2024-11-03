@@ -1,5 +1,5 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../types/db';
+import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
 export interface LocationTableColumns {
     id: UniqueId;
     countryCode: string | null;

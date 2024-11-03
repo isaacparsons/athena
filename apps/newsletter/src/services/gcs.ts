@@ -1,10 +1,10 @@
 import { Bucket, Storage } from '@google-cloud/storage';
-import { parseEnv } from '../util/parse-env';
+import { parseEnv } from '../util';
 
 const env = parseEnv();
 const storage = new Storage({
   keyFilename:
-    '/Users/isaacparsons/Documents/projects/athena/apps/newsletter/athena-435518-246fc2bb15a8.json',
+    '/Users/isaacparsons/Documents/Projects/athena/apps/newsletter/athena-435518-246fc2bb15a8.json',
 });
 
 export class GCSManager {

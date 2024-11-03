@@ -1,5 +1,5 @@
 import { User } from '@athena/athena-common';
-import { Connection as DBConnection, jsonObjectFrom } from '../types/db';
+import { Connection as DBConnection, jsonObjectFrom } from '../db';
 
 export class UserDAO {
   constructor(readonly db: DBConnection) {}

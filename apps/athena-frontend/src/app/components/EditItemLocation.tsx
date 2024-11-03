@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import GoogleMap from 'google-map-react';
 import {
   Button,
@@ -8,8 +10,6 @@ import {
   Box,
   CircularProgress,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
-import RoomIcon from '@mui/icons-material/Room';
 
 const GOOGLE_API_KEY = 'AIzaSyCQJxFCjWTq0wD0rZgKNWva92xJ2oDiuCU';
 
@@ -62,7 +62,7 @@ export function EditItemLocation(props: EditItemLocationProps) {
                   lng: currentLocation.longitude,
                 }}
                 zoom={12}
-                //options={createMapOptions}
+              //options={createMapOptions}
               >
                 {/* <div
                   lat={currentLocation.latitude}

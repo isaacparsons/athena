@@ -1,19 +1,100 @@
 import _ from 'lodash';
 import {
   Connection as DBConnection,
-  jsonObjectFrom,
   Transaction,
-} from '../types/db';
+  SelectLocation,
+  SelectNewsletterItem,
+  SelectNewsletterItemMedia,
+  SelectNewsletterItemText,
+  SelectUser,
+} from '../db';
 
-import { LocationDAO } from './location';
+import { LocationDAO, NewsletterItemDetailsDAO } from '.';
 import {
   CreateNewsletterItemBatchInput,
   CreateNewsletterItemInput,
   DeleteManyNewsletterItemsInput,
   UpdateNewsletterItemInput,
+  ReadNewsletterItemTreeInput,
+  NewsletterItemBase,
+  NewsletterItemDetailsMedia,
+  NewsletterItemDetailsText,
+  NewsletterItem,
 } from '@athena/athena-common';
-import { NewsletterItemDetailsDAO } from './newsletter-item-details';
-import { mapItems } from './mapping/newsletter-item-mapper';
+import {
+  location,
+  newsletterItemDetailsMedia,
+  newsletterItemDetailsText,
+  creator,
+  modifier,
+} from '../util';
+
+type MappedItem = Omit<
+  SelectNewsletterItem,
+  'locationId' | 'creatorId' | 'modifierId'
+> & {
+  location: SelectLocation | null;
+  mediaDetails: SelectNewsletterItemMedia | null;
+  textDetails: SelectNewsletterItemText | null;
+  creator: SelectUser;
+  modifier: SelectUser | null;
+};
+
+export const mapNewsletterItem = (item: MappedItem) => ({
+  id: item.id,
+  newsletterId: item.newsletterId,
+  meta: {
+    created: item.created,
+    modified: item.modified,
+    creator: item.creator,
+    modifier: item.modifier,
+  },
+  location: mapLocation(item.location),
+  date: item.date,
+  title: item.title,
+  parentId: item.parentId,
+  nextItemId: item.nextItemId,
+  previousItemId: item.previousItemId,
+  details: mapNewsletterItemDetails(item.mediaDetails, item.textDetails),
+});
+
+const mapLocation = (location: SelectLocation | null) =>
+  location
+    ? {
+        id: location.id,
+        name: location.name,
+        country: location.countryCode,
+        position:
+          location.lattitude && location.longitude
+            ? {
+                lattitude: location.lattitude,
+                longitude: location.longitude,
+              }
+            : null,
+      }
+    : null;
+
+const mapNewsletterItemDetails = (
+  media: NewsletterItemDetailsMedia | null,
+  text: NewsletterItemDetailsText | null
+) => {
+  if (media)
+    return {
+      id: media.id,
+      name: media.name,
+      type: media.type,
+      fileName: media.fileName,
+      caption: media.caption,
+    };
+  if (text)
+    return {
+      id: text.id,
+      name: text.name,
+      type: text.type,
+      description: text.description,
+      link: text.link,
+    };
+};
 
 export class NewsletterItemDAO {
   constructor(
@@ -78,10 +159,7 @@ export class NewsletterItemDAO {
         .executeTakeFirstOrThrow();
 
       if (details) {
-        await new NewsletterItemDetailsDAO(trx).post(
-          createdNewsletterItem.id,
-          details
-        );
+        await new NewsletterItemDetailsDAO(trx).post(createdNewsletterItem.id, details);
       }
 
       await trx
@@ -142,21 +220,22 @@ export class NewsletterItemDAO {
           if (item.details) {
             await new NewsletterItemDetailsDAO(trx).post(res.id, item.details);
           }
-          return [item.temp.id, res.id] as [number, number];
+          return [item.temp.id, res.id] as [string, number];
         })
       );
 
       const parentBatchItems = Array.from(
-        input.batch
-          .filter((i) => i.temp.parentId === null)
-          .map((i) => i.temp.id)
+        input.batch.filter((i) => i.temp.parentId === null)
       );
 
-      const tempIdRealIdMap = new Map<number, number>(tuples);
-      const firstItemTempId = Math.min(...parentBatchItems);
-      const lastItemTempId = Math.min(...parentBatchItems);
+      const tempIdRealIdMap = new Map<string, number>(tuples);
+      const firstItemTemp = parentBatchItems.find((i) => i.temp.prevId === null);
+      const lastItemTemp = parentBatchItems.find((i) => i.temp.nextId === null);
 
-      const getRealId = (id: number | null) => {
+      if (!firstItemTemp || !lastItemTemp)
+        throw new Error('there must be a first item and a last item');
+
+      const getRealId = (id: string | null) => {
         if (!id) return null;
         return tempIdRealIdMap.get(id) ?? null;
       };
@@ -171,13 +250,13 @@ export class NewsletterItemDAO {
                   ? input.parentId
                   : getRealId(item.temp.parentId),
               nextItemId:
-                item.temp.nextItemId == lastItemTempId
+                item.temp.nextId == lastItemTemp.temp.id
                   ? input.nextItemId
-                  : getRealId(item.temp.nextItemId),
+                  : getRealId(item.temp.nextId),
               previousItemId:
-                item.temp.previousItemId == firstItemTempId
+                item.temp.prevId == firstItemTemp.temp.id
                   ? input.previousItemId
-                  : getRealId(item.temp.previousItemId),
+                  : getRealId(item.temp.prevId),
             })
             .returning('id')
             .where('newsletter_item.id', '=', getRealId(item.temp.id))
@@ -187,65 +266,116 @@ export class NewsletterItemDAO {
     });
   }
 
-  async get(id: number) {
-    const result = await this.db
-      .selectFrom('newsletter_item as ni')
-      .select((eb) => [
-        'id',
-        'newsletterId',
-        'title',
-        'date',
-        'parentId',
-        'nextItemId',
-        'previousItemId',
-        'created',
-        'modified',
-        jsonObjectFrom(
-          eb
-            .selectFrom('newsletter_item_media as media-details')
-            .selectAll('media-details')
-            .whereRef('media-details.newsletterItemId', '=', 'ni.id')
-        ).as('mediaDetails'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('newsletter_item_text as text-details')
-            .selectAll('text-details')
-            .whereRef('text-details.newsletterItemId', '=', 'ni.id')
-        ).as('textDetails'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('location')
-            .selectAll('location')
-            .whereRef('location.id', '=', 'ni.locationId')
-        ).as('location'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as creator')
-            .selectAll('creator')
-            .whereRef('creator.id', '=', 'ni.creatorId')
+  async get(id: number): Promise<NewsletterItem> {
+    return this.db.transaction().execute(async (trx: Transaction) => {
+      const parentItem = await trx
+        .selectFrom('newsletter_item')
+        .select((eb) => [
+          'id',
+          'newsletterId',
+          'title',
+          'date',
+          'parentId',
+          'nextItemId',
+          'previousItemId',
+          'created',
+          'modified',
+          newsletterItemDetailsMedia(this.db, eb.ref('newsletter_item.id')),
+          newsletterItemDetailsText(this.db, eb.ref('newsletter_item.id')),
+          location(this.db, eb.ref('newsletter_item.locationId')),
+          creator(this.db, eb.ref('newsletter_item.creatorId')),
+          modifier(this.db, eb.ref('newsletter_item.modifierId')),
+        ])
+        .where(({ or, eb }) =>
+          or([eb('newsletter_item.id', '=', id), eb('newsletter_item.parentId', '=', id)])
         )
-          .$notNull()
-          .as('creator'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as modifier')
-            .selectAll('modifier')
-            .whereRef('modifier.id', '=', 'ni.modifierId')
-        ).as('modifier'),
-      ])
-      .where(({ or, eb }) =>
-        or([eb('ni.id', '=', id), eb('ni.parentId', '=', id)])
-      )
-      .execute();
+        .executeTakeFirstOrThrow();
 
-    return mapItems(id, result);
+      const children = await trx
+        .selectFrom('newsletter_item')
+        .select((eb) => [
+          'id',
+          'newsletterId',
+          'title',
+          'date',
+          'parentId',
+          'nextItemId',
+          'previousItemId',
+          'created',
+          'modified',
+          newsletterItemDetailsMedia(this.db, eb.ref('newsletter_item.id')),
+          newsletterItemDetailsText(this.db, eb.ref('newsletter_item.id')),
+          location(this.db, eb.ref('newsletter_item.locationId')),
+          creator(this.db, eb.ref('newsletter_item.creatorId')),
+          modifier(this.db, eb.ref('newsletter_item.modifierId')),
+        ])
+        .where('newsletter_item.parentId', '=', parentItem.id)
+        .execute();
+
+      return {
+        ...mapNewsletterItem(parentItem),
+        children: children.map(mapNewsletterItem),
+      };
+    });
   }
 
+  // async getTree(input: ReadNewsletterItemTreeInput): Promise<NewsletterItemBase[]> {
+  //   const result: MappedItem[] = await this.db
+  //     .withRecursive('newsletter_items_tree', (db) =>
+  //       db
+  //         .selectFrom('newsletter_item as ni1')
+  //         .select((eb) => [
+  //           'id',
+  //           'newsletterId',
+  //           'title',
+  //           'date',
+  //           'parentId',
+  //           'nextItemId',
+  //           'previousItemId',
+  //           'created',
+  //           'modified',
+  //           newsletterItemDetailsMedia(this.db, eb.ref('ni1.id')),
+  //           newsletterItemDetailsText(this.db, eb.ref('ni1.id')),
+  //           location(this.db, eb.ref('ni1.locationId')),
+  //           creator(this.db, eb.ref('ni1.creatorId')),
+  //           modifier(this.db, eb.ref('ni1.modifierId')),
+  //         ])
+  //         .where('ni1.parentId', input.parentId ? '=' : 'is', input.parentId)
+  //         .unionAll(
+  //           db
+  //             .selectFrom('newsletter_item as ni2')
+  //             .select((eb) => [
+  //               'id',
+  //               'newsletterId',
+  //               'title',
+  //               'date',
+  //               'parentId',
+  //               'nextItemId',
+  //               'previousItemId',
+  //               'created',
+  //               'modified',
+  //               newsletterItemDetailsMedia(this.db, eb.ref('ni2.id')),
+  //               newsletterItemDetailsText(this.db, eb.ref('ni2.id')),
+  //               location(this.db, eb.ref('ni2.locationId')),
+  //               creator(this.db, eb.ref('ni2.creatorId')),
+  //               modifier(this.db, eb.ref('ni2.modifierId')),
+  //             ])
+  //             .innerJoin(
+  //               'newsletter_items_tree',
+  //               'ni2.id',
+  //               'newsletter_items_tree.parentId'
+  //             )
+  //         )
+  //     )
+  //     .selectFrom('newsletter_items_tree')
+  //     .selectAll()
+  //     .execute();
+
+  //   return result.map(mapNewsletterItem);
+  // }
+
   async update(userId: number, input: UpdateNewsletterItemInput) {
-    const newsletterItemUpdate = _.omit(input, [
-      'location',
-      'newsletterItemId',
-    ]);
+    const newsletterItemUpdate = _.omit(input, ['location', 'newsletterItemId']);
     return this.db.transaction().execute(async (trx: Transaction) => {
       if (input.nextItemId) {
         const nextItemId = input.nextItemId;

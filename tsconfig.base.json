@@ -17,7 +17,7 @@
     "strictNullChecks": true,
     "paths": {
       "@athena/api": ["types/athena.ts"],
-      "@athena/backend": ["types/server/apps/newsletter/src/routes"],
+      "@athena/backend": ["types/server/apps/newsletter/src/trpc/routes"],
       "@athena/athena-common": ["libs/athena-common/src/index.ts"]
     }
   },

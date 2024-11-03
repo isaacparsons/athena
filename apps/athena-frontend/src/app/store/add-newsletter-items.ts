@@ -1,105 +1,65 @@
 import _ from 'lodash';
+import axios from 'axios';
+import { nanoid } from 'nanoid';
+
 import {
-  CreateNewsletterItemDetailsInput,
-  LocationInput,
-  logObject,
-  NewsletterItemType,
+  NewsletterItemTypeName,
+  CreateNewsletterItemInput,
+  TempNewsletterItemIds,
+  CreateItemDetailsInput,
+  NewsletterItem,
+  isMediaDetailsInput,
+  DeepPartial,
 } from '@athena/athena-common';
 import { create, StateCreator } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { subscribeWithSelector } from 'zustand/middleware';
-import type {} from '@redux-devtools/extension'; // required for devtools typing
-import { mapToArray } from '../../util/helpers';
+import type {} from '@redux-devtools/extension';
+import { mapToArray } from '../../util';
 import { asyncTrpcClient } from '../../trpc';
-import axios from 'axios';
 
-type NullableId = number | null;
+type ParentId = string | null;
 
-export interface StoreAddNewsletterItemDetailsBase<T = NewsletterItemType> {
-  type: T;
-  name: string;
-}
+export type StoreItemDetailsMedia = CreateItemDetailsInput<'media'> & { file: File };
 
-export interface StoreAddNewsletterItemDetailsText
-  extends StoreAddNewsletterItemDetailsBase<NewsletterItemType.text> {
-  description?: string;
-  link?: string;
-}
+export type StoreAddNewsletterItemInput<
+  T extends NewsletterItemTypeName = NewsletterItemTypeName
+> = Omit<
+  CreateNewsletterItemInput,
+  'newsletterId' | 'nextItemId' | 'previousItemId' | 'parentId' | 'details'
+> & {
+  details: T extends 'media'
+    ? CreateItemDetailsInput<'media'> & { file: File | null }
+    : CreateItemDetailsInput<T>;
+} & { temp?: TempNewsletterItemIds };
 
-export interface StoreAddNewsletterItemDetailsMedia
-  extends StoreAddNewsletterItemDetailsBase<NewsletterItemType.media> {
-  fileName: string;
-  caption?: string;
-  file: File;
-}
+export type StoreAddNewsletterItem<
+  T extends NewsletterItemTypeName = NewsletterItemTypeName
+> = StoreAddNewsletterItemInput<T> & { temp: TempNewsletterItemIds };
 
-export type StoreAddNewsletterItemDetails =
-  | StoreAddNewsletterItemDetailsText
-  | StoreAddNewsletterItemDetailsMedia;
+export type StoreAddNewsletterItemsData = Record<string, StoreAddNewsletterItem>;
 
-export interface StoreAddNewsletterItemInput<
-  T = StoreAddNewsletterItemDetails
-> {
-  title: string;
-  date?: string;
-  location: LocationInput;
-  details: T;
-}
-
-export interface StoreAddNewsletterItem<T = StoreAddNewsletterItemDetails>
-  extends StoreAddNewsletterItemInput<T> {
-  temp: {
-    id: number;
-    nextItemId: NullableId;
-    previousItemId: NullableId;
-    parentId: NullableId;
-  };
-}
-
-export type StoreAddNewsletterItemsData = Record<
-  number,
-  StoreAddNewsletterItem
+export type StoreAddNewsletterItemsExistingItem = Pick<
+  NewsletterItem,
+  'newsletterId' | 'parentId' | 'nextItemId' | 'previousItemId'
 >;
 
-export type StoreAddNewsletterItemsExistingItem = {
-  newsletterId: number;
-  parentId: NullableId;
-  nextItemId: NullableId;
-  previousItemId: NullableId;
-};
-
-export type StoreUpdateNewsletterItemDetails<
-  T = StoreAddNewsletterItemDetails
-> = Omit<Partial<T>, 'type'> & Pick<StoreAddNewsletterItemDetails, 'type'>;
-
-export type StoreUpdateNewsletterItem<T extends StoreAddNewsletterItemDetails> =
-  {
-    details?: StoreUpdateNewsletterItemDetails<T>;
-    item?: Partial<StoreAddNewsletterItemInput>;
-  };
-
 export interface CreateNewsletterItemsSlice {
-  nextAvailableId: number;
   uploading: boolean;
   existingItem: StoreAddNewsletterItemsExistingItem | null;
   data: StoreAddNewsletterItemsData;
   openDialog: (existingItem: StoreAddNewsletterItemsExistingItem) => void;
-  addItems: (
-    parentId: NullableId,
-    items: StoreAddNewsletterItemInput[]
-  ) => void;
-  removeItem: (id: number) => void;
-  updateItemDetails: <T extends StoreAddNewsletterItemDetails>(
-    id: number,
-    item: StoreUpdateNewsletterItem<T>
+  addItems: (parentId: ParentId, items: StoreAddNewsletterItemInput[]) => void;
+  removeItem: (id: string) => void;
+  updateItemDetails: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+    id: string,
+    item: DeepPartial<StoreAddNewsletterItemInput<T>>
   ) => void;
   upload: () => Promise<void>;
   reset: () => void;
 }
 
 const DEFAULT_DATA = {
-  nextAvailableId: 1,
   uploading: false,
   existingItem: null,
   data: {},
@@ -116,44 +76,57 @@ export const createCreateNewslettersItemsSlice: StateCreator<
     set((state) => {
       state.existingItem = existingItem;
     }),
-  addItems: (parentId: NullableId, items: StoreAddNewsletterItemInput[]) =>
+  addItems: (parentId: ParentId, items: StoreAddNewsletterItemInput[]) =>
     set((state) => {
-      items.forEach((i) => {
+      // items with temp specified:
+      // items where parentId is null, should have a parentId = parentId
+      // all other items should be added without setting temp
+      const itemsWithTemp = items.filter((i) => i.temp !== undefined);
+
+      itemsWithTemp
+        .filter((i) => i.temp?.parentId === null)
+        .forEach((i) => {
+          if (i.temp === undefined) return;
+          state.data[i.temp.id] = { ...i, temp: { ...i.temp, parentId: parentId } };
+        });
+
+      itemsWithTemp
+        .filter((i) => i.temp?.parentId !== null && i.temp !== undefined)
+        .forEach((i) => {
+          if (i.temp) {
+            state.data[i.temp.id] = { ...i, temp: i.temp };
+          }
+        });
+
+      // items without temp specified:
+      const itemsWithoutTemp = items.filter((i) => i.temp === undefined);
+      itemsWithoutTemp.forEach((i) => {
+        const id = nanoid();
         const previousItem = mapToArray(state.data).find(
-          (i) => i.temp.parentId === parentId && i.temp.nextItemId === null
+          (i) => i.temp.parentId === parentId && i.temp.nextId === null
         );
-        const id = state.nextAvailableId;
         state.data[id] = {
           temp: {
             id,
-            nextItemId: null,
-            previousItemId: previousItem?.temp.id ?? null,
+            nextId: null,
+            prevId: previousItem?.temp.id ?? null,
             parentId: parentId,
           },
           ...i,
         };
-        if (previousItem) state.data[previousItem.temp.id].temp.nextItemId = id;
-        state.nextAvailableId = id + 1;
+        if (previousItem) state.data[previousItem.temp.id].temp.nextId = id;
       });
     }),
-  removeItem: (id: number) =>
+  removeItem: (id: string) =>
     set((state) => {
       delete state.data[id];
     }),
-  updateItemDetails: <T extends StoreAddNewsletterItemDetails>(
-    id: number,
-    item: StoreUpdateNewsletterItem<T>
+  updateItemDetails: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+    id: string,
+    item: DeepPartial<StoreAddNewsletterItemInput<T>>
   ) =>
     set((state) => {
-      const existing = state.data[id];
-      state.data[id] = {
-        ...existing,
-        ...(item.item ?? {}),
-        details: {
-          ...existing.details,
-          ...(item.details ?? {}),
-        } as T,
-      };
+      state.data[id] = _.merge(state.data[id], item);
     }),
   upload: async () => {
     set((state) => {
@@ -163,35 +136,33 @@ export const createCreateNewslettersItemsSlice: StateCreator<
     const existingItem = get().existingItem;
     const items = mapToArray(data);
     const mediaItemIds = items
-      .filter((i) => i.details.type === NewsletterItemType.media)
+      .filter((i) => i.details?.type === 'media')
       .map((i) => ({ id: i.temp.id.toString() }));
-    const signedUrls =
-      await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
-        items: mediaItemIds,
-      });
-    const signedUrlsMap = new Map(
-      signedUrls.map((su) => [_.parseInt(su.id), su])
-    );
+    const signedUrls = await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
+      items: mediaItemIds,
+    });
+    const signedUrlsMap = new Map(signedUrls.map((su) => [su.id, su]));
 
     if (existingItem === null) return;
 
     const batch = await Promise.all(
       items.map(async (item) => {
-        let itemDetails = item.details as CreateNewsletterItemDetailsInput;
-        if (item.details.type === NewsletterItemType.media) {
-          const d = item.details as StoreAddNewsletterItemDetailsMedia;
-          const itemUploadInfo = signedUrlsMap.get(item.temp.id);
+        let resolvedItem = item;
+        const itemUploadInfo = signedUrlsMap.get(item.temp.id);
+        if (isMediaDetailsInput(item.details)) {
+          const { details } = item;
           if (!itemUploadInfo) throw new Error('no signed url to upload photo');
-          await axios.put(itemUploadInfo.url, d.file);
-          itemDetails = {
-            ...d,
-            fileName: itemUploadInfo.fileName,
+          await axios.put(itemUploadInfo.url, details.file);
+          const fileName = itemUploadInfo.fileName as string;
+          resolvedItem = {
+            ...item,
+            details: {
+              ...details,
+              fileName,
+            },
           };
         }
-        return {
-          ...item,
-          details: itemDetails,
-        };
+        return { newsletterId: existingItem.newsletterId, ...resolvedItem };
       })
     );
 

@@ -1,7 +1,7 @@
 import { DateRange } from '@athena/athena-common';
 
 export function mapToArray<T = object>(obj: Record<string, T>): T[] {
-  return Object.keys(obj).map((key) => obj[Number(key)]);
+  return Object.keys(obj).map((key) => obj[key]);
 }
 
 export function formatDate(date: string) {

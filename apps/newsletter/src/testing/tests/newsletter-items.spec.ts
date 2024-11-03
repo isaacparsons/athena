@@ -1,14 +1,5 @@
-import { appRouter as router } from '../../routes/index';
-import { createContext } from '../../trpc/context';
 import { createNewsletter } from '../fixtures/newsletters';
-import { createUser } from '../fixtures/users';
-import { trpc } from '../../trpc/trpc';
-import {
-  CreateMediaItemDetailsInput,
-  CreateTextItemDetailsInput,
-  NewsletterItemDetailsText,
-  NewsletterItemType,
-} from '@athena/athena-common';
+import { trpc, appRouter as router, createContext } from '../../trpc';
 
 const testCaller = trpc.createCallerFactory(router)(
   createContext({
@@ -54,7 +45,7 @@ describe('newsletter item routes', () => {
           previousItemId: null,
         },
         details: {
-          type: NewsletterItemType.text,
+          type: 'text',
           name: 'text item 1',
         } as CreateTextItemDetailsInput,
       };
@@ -67,7 +58,7 @@ describe('newsletter item routes', () => {
           previousItemId: 2,
         },
         details: {
-          type: NewsletterItemType.text,
+          type: 'text',
           name: 'text item 2',
         } as CreateTextItemDetailsInput,
       };

@@ -1,13 +1,13 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../types/db';
-import { NewsletterItemType } from '@athena/athena-common';
+import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
+import { NewsletterItemTypeName } from '@athena/athena-common';
 interface NewsletterItemDetailsBase {
     id: UniqueId;
-    type: NewsletterItemType;
+    type: NewsletterItemTypeName;
     newsletterItemId: number;
 }
 export interface NewsletterItemMediaTableColumns extends NewsletterItemDetailsBase {
-    type: NewsletterItemType.media;
+    type: 'media';
     name: string;
     caption: string | null;
     fileName: string;
@@ -20,7 +20,7 @@ export type SelectNewsletterItemMedia = Selectable<NewsletterItemMediaTableColum
 export type InsertNewsletterItemMedia = Insertable<NewsletterItemMediaTableColumns>;
 export type UpdateNewsletterItemMedia = Updateable<NewsletterItemMediaTableColumns>;
 export interface NewsletterItemTextTableColumns extends NewsletterItemDetailsBase {
-    type: NewsletterItemType.text;
+    type: 'text';
     name: string;
     description: string | null;
     link: string | null;

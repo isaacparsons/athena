@@ -1,29 +1,27 @@
+import { useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import {
+
+  ActionBar,
+  CustomContainer,
+  NewsletterProperties,
+  NewsletterMembers,
+  BackButton,
+  NewsletterItemsList
+} from '../components';
 import {
   CircularProgress,
   IconButton,
   Skeleton,
-  useTheme,
-} from '@mui/material';
-import { useNotifications } from '@toolpad/core';
-import { useEffect, useMemo, useState } from 'react';
-import { BackButton, NewsletterItemsList } from '../components/index';
+} from '@mui/material'
 import { useAddItemsStore, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { NewsletterMembers } from '../components/NewsletterMembers';
-import { NewsletterProperties } from '../components/NewsletterProperties';
-import { CustomContainer } from '../components/common/CustomContainer';
-import { ActionBar } from '../components/common/ActionBar';
-import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
-import { mapToArray } from '../../util/helpers';
+import { EditIcon, AddIcon } from '../icons';
+import { mapToArray } from '../../util';
 
 export function Newsletter() {
   const params = useParams();
-  const notifications = useNotifications();
-  const navigate = useNavigate();
-  const theme = useTheme();
 
   const newsletterId = useMemo(() => {
     if (params.newsletterId && !_.isNaN(params.newsletterId)) {
@@ -42,9 +40,7 @@ export function Newsletter() {
   );
 
   const { openDialog } = useAddItemsStore(
-    useShallow((state) => ({
-      openDialog: state.openDialog,
-    }))
+    useShallow((state) => ({ openDialog: state.openDialog }))
   );
 
   const [editing, setEditing] = useState(false);
@@ -54,7 +50,7 @@ export function Newsletter() {
       const newsletter = newsletters[newsletterId];
       return {
         newsletter: newsletter,
-        items: newsletter?.itemIds.map((i) => newsletterItems[i]) ?? [],
+        items: newsletter?.itemIds.map((i) => newsletterItems[i]).filter((i) => i.parentId === null) ?? [],
         members: newsletter?.members ?? [],
       };
     }
@@ -99,7 +95,7 @@ export function Newsletter() {
         <NewsletterMembers members={info.members} />
         <NewsletterItemsList
           editing={editing}
-          parentId={null}
+          stopEditing={() => setEditing(false)}
           newsletterId={info.newsletter.id}
           items={info.items}
         />

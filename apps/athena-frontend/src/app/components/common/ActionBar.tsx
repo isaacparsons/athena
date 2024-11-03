@@ -1,5 +1,6 @@
-import { AppBar, Stack } from '@mui/material';
 import React from 'react';
+
+import { AppBar, Stack } from '@mui/material';
 import { APPBAR_HEIGHT } from '../../../theme';
 
 interface ActionBarProps {

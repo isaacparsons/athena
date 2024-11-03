@@ -1,13 +1,14 @@
 import _ from 'lodash';
 import { useEffect, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import { NewsletterItemsList } from '../components';
+import { useNavigate, useParams } from 'react-router-dom';
+import { NewsletterItemsList, CustomContainer, ActionBar, BackButtonIcon } from '../components';
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { CustomContainer } from '../components/common/CustomContainer';
+
 
 export function NewsletterItem() {
   const params = useParams();
+  const navigate = useNavigate();
 
   const newsletterId =
     params.newsletterId && !_.isNaN(params.newsletterId)
@@ -26,26 +27,34 @@ export function NewsletterItem() {
     }))
   );
 
-  useEffect(() => {
-    if (newsletterItemId !== null) fetch(newsletterItemId);
-  }, [newsletterItemId, fetch]);
-
-  const items = useMemo(() => {
-    if (newsletterItemId === null) return [];
-    const item = newsletterItems[newsletterItemId];
-    return item ? item.childrenIds.map((cId) => newsletterItems[cId]) : [];
+  const item = useMemo(() => {
+    if (newsletterItemId === null) return null;
+    return newsletterItems[newsletterItemId];
   }, [newsletterItemId, newsletterItems]);
 
+
+  const items = useMemo(() => {
+    if (item === null) return [];
+    return item ? item.childrenIds.map((cId) => newsletterItems[cId]) : [];
+  }, [newsletterItems, item]);
+
   if (!newsletterId || !newsletterItemId) return null;
+
+
+  const handleBackBtnClick = () => {
+    if (item) navigate(item.parentId === null ? `/newsletters/${newsletterId}` : `/newsletters/${newsletterId}/items/${item.parentId}`)
+  }
   return (
-    <CustomContainer>
-      {/* <BackButton /> */}
-      <NewsletterItemsList
-        editing={false}
-        parentId={newsletterItemId}
-        newsletterId={newsletterId}
-        items={items}
-      />
-    </CustomContainer>
+    <>
+      <ActionBar backBtn={item !== null ? (<BackButtonIcon onClick={handleBackBtnClick} />) : null} />
+      <CustomContainer>
+        <NewsletterItemsList
+          editing={false}
+          newsletterId={newsletterId}
+          items={items}
+        />
+      </CustomContainer>
+    </>
+
   );
 }

@@ -1,29 +1,13 @@
-import _ from 'lodash';
-import { StateCreator } from 'zustand';
 import {
-  NewsletterItemDetails,
   NewsletterItemTemplateBase,
   CreateNewsletterItemTemplateInput,
   NewsletterItemTemplate,
 } from '@athena/athena-common';
-import { Slices } from '.';
+import { Slices } from '../store';
+import { StateCreator } from 'zustand';
 import { asyncTrpcClient } from '../../trpc';
 
-export type ItemTemplateDetailsType<T = void> = T extends void
-  ? {
-      details?: NewsletterItemDetails | undefined;
-    }
-  : {
-      details: T;
-    };
-
-export type StoreNewsletterItemTemplate<T = void> = NewsletterItemTemplateBase;
-//  & ItemTemplateDetailsType<T>;
-
-type StoreNewsletterItemTemplatesData = Record<
-  number,
-  StoreNewsletterItemTemplate
->;
+type StoreNewsletterItemTemplatesData = Record<number, NewsletterItemTemplateBase>;
 
 export interface NewsletterItemTemplatesSlice {
   newsletterItemTemplates: {
@@ -31,9 +15,7 @@ export interface NewsletterItemTemplatesSlice {
     data: StoreNewsletterItemTemplatesData;
     fetch: (id: number) => Promise<NewsletterItemTemplate>;
     save: (input: CreateNewsletterItemTemplateInput) => Promise<number>;
-    addTemplates: (
-      templates: Omit<NewsletterItemTemplateBase, 'items'>[]
-    ) => void;
+    addTemplates: (templates: Omit<NewsletterItemTemplateBase, 'items'>[]) => void;
   };
 }
 
@@ -68,9 +50,7 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
       set((state) => {
         state.newsletterItemTemplates.loading = true;
       });
-      const id = await asyncTrpcClient.newsletterItemTemplates.create.mutate(
-        input
-      );
+      const id = await asyncTrpcClient.newsletterItemTemplates.create.mutate(input);
       set((state) => {
         state.newsletterItemTemplates.loading = true;
       });

@@ -1,8 +1,9 @@
 import _ from 'lodash';
-import { Fab, IconButton } from '@mui/material';
-import ArrowbackBtn from '@mui/icons-material/ArrowBack';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
+
+import { IconButton } from '@mui/material';
+import { ArrowBackIcon } from '../../icons';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export function BackButton() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export function BackButtonIcon(props: BackButtonIconProps) {
   const { onClick } = props;
   return (
     <IconButton onClick={onClick}>
-      <ArrowbackBtn htmlColor={'#fff'} />
+      <ArrowBackIcon htmlColor={'#fff'} />
     </IconButton>
   );
 }
