@@ -1,6 +1,6 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
 import {
-  Connection,
+  DBConnection,
   Table,
   ITable,
   UniqueId,
@@ -21,15 +21,12 @@ export interface FederatedCredentialTable {
   columns: FederatedCredentialTableColumns;
 }
 
-export type SelectFederatedCredential =
-  Selectable<FederatedCredentialTableColumns>;
-export type InsertFederatedCredential =
-  Insertable<FederatedCredentialTableColumns>;
-export type UpdateFederatedCredential =
-  Updateable<FederatedCredentialTableColumns>;
+export type SelectFederatedCredential = Selectable<FederatedCredentialTableColumns>;
+export type InsertFederatedCredential = Insertable<FederatedCredentialTableColumns>;
+export type UpdateFederatedCredential = Updateable<FederatedCredentialTableColumns>;
 
 export class FederatedCredentialTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
   async createTable() {

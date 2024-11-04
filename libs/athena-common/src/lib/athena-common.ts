@@ -178,9 +178,15 @@ export interface UserBase {
   lastName: string | null;
 }
 
+export type UserNewsletters = NewsletterBase[];
+export type UserNewsletterItemTemplates = Omit<
+  NewsletterItemTemplateBase,
+  'items'
+>[];
+
 export interface User extends UserBase {
-  newsletters: NewsletterBase[];
-  newsletterItemTemplates: Omit<NewsletterItemTemplateBase, 'items'>[];
+  newsletters: UserNewsletters;
+  newsletterItemTemplates: UserNewsletterItemTemplates;
 }
 
 /**
@@ -264,8 +270,9 @@ export type CreateItemDetailsInputMap = {
   media: CreateItemDetailsInputMedia;
   text: CreateItemDetailsInputText;
 };
-export type CreateNewsletterItemDetailsTypeFromName<T extends NewsletterItemTypeName> =
-  CreateItemDetailsInputMap[T];
+export type CreateNewsletterItemDetailsTypeFromName<
+  T extends NewsletterItemTypeName
+> = CreateItemDetailsInputMap[T];
 
 export type CreateItemDetailsInput<
   T extends NewsletterItemTypeName = NewsletterItemTypeName
@@ -287,7 +294,9 @@ export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
 export type CreateNewsletterItemBatchInputItem = z.infer<
   typeof postNewsletterItemBatchInputItem
 >;
-export type CreateNewsletterItemBatchInput = z.infer<typeof postNewsletterItemBatchInput>;
+export type CreateNewsletterItemBatchInput = z.infer<
+  typeof postNewsletterItemBatchInput
+>;
 export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
 export type ReadNewsletterItemTreeInput = z.infer<typeof getNewsletterItemTreeInput>;
 export type UpdateNewsletterItemInput = z.infer<typeof updateNewsletterItemInput>;
@@ -327,8 +336,9 @@ export type NewsletterItemDetailsMap = {
 
 export type NewsletterItemTypeName = keyof NewsletterItemDetailsMap;
 
-type NewsletterItemDetails<T extends NewsletterItemTypeName = NewsletterItemTypeName> =
-  NewsletterItemDetailsTypeFromName<T>;
+type NewsletterItemDetails<
+  T extends NewsletterItemTypeName = NewsletterItemTypeName
+> = NewsletterItemDetailsTypeFromName<T>;
 
 export type NewsletterItemDetailsTypeFromName<T extends NewsletterItemTypeName> =
   NewsletterItemDetailsMap[T];
@@ -359,8 +369,9 @@ export interface NewsletterItemBase<
   details?: NewsletterItemDetailsTypeFromName<T>;
 }
 
-export interface NewsletterItem<T extends NewsletterItemTypeName = NewsletterItemTypeName>
-  extends NewsletterItemBase<T> {
+export interface NewsletterItem<
+  T extends NewsletterItemTypeName = NewsletterItemTypeName
+> extends NewsletterItemBase<T> {
   children: NewsletterItemBase<T>[];
 }
 

@@ -1,29 +1,25 @@
-import { dbClient } from '../db';
+import { Database, DB } from '../db';
 import {
   UserDAO,
   NewsletterDAO,
   LocationDAO,
   NewsletterItemDAO,
-  NewsletterItemDetailsDAO,
   NewsletterItemTemplateDAO,
+  INewsletterDAO,
+  IUserDAO,
+  ILocationDAO,
+  INewsletterItemDAO,
+  INewsletterItemTemplateDAO,
 } from '../dao';
-import { GCSManager } from '../services';
+import { GCSManager, IGCSManager } from '../services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/athena-common';
+import { container } from '../inversify.config';
+import { TYPES } from '../types/types';
 
-const gcs = new GCSManager();
-
-const locationDAO = new LocationDAO(dbClient);
-const newsletterItemDetailsDAO = new NewsletterItemDetailsDAO(dbClient);
-const newsletterItemDAO = new NewsletterItemDAO(
-  dbClient,
-  locationDAO,
-  newsletterItemDetailsDAO
-);
-const newsletterDAO = new NewsletterDAO(dbClient, gcs, newsletterItemDAO);
-const userDAO = new UserDAO(dbClient);
-
-const newsletterItemTemplateDAO = new NewsletterItemTemplateDAO(dbClient);
+// const newsletterItemDetailsDAO = container.get<NewsletterItemDetailsDAO>(
+//   NewsletterItemDetailsDAO
+// );
 
 type ContextInput = {
   req: Request & {
@@ -40,6 +36,7 @@ export type Context = {
   };
   res: Response;
   gcs: GCSManager;
+  db: DB<Database>;
   dao: {
     user: UserDAO;
     newsletter: NewsletterDAO;
@@ -53,14 +50,16 @@ export function createContext({ req, res }: ContextInput) {
   return {
     req,
     res,
-    gcs: gcs,
-    db: dbClient,
+    gcs: container.get<IGCSManager>(TYPES.IGCSManager),
+    db: container.get<DB<Database>>(TYPES.DBClient),
     dao: {
-      user: userDAO,
-      newsletter: newsletterDAO,
-      location: locationDAO,
-      newsletterItem: newsletterItemDAO,
-      newsletterItemTemplate: newsletterItemTemplateDAO,
+      user: container.get<IUserDAO>(TYPES.IUserDAO),
+      newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),
+      location: container.get<ILocationDAO>(TYPES.ILocationDAO),
+      newsletterItem: container.get<INewsletterItemDAO>(TYPES.INewsletterItemDAO),
+      newsletterItemTemplate: container.get<INewsletterItemTemplateDAO>(
+        TYPES.INewsletterItemTemplateDAO
+      ),
     },
   };
 }

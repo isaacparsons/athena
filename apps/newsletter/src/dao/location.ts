@@ -1,17 +1,27 @@
-import { Connection } from '../db';
+import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
+import { DBConnection } from '../db';
 import { LocationInput } from '@athena/athena-common';
+import { TYPES } from '../types/types';
 
-export class LocationDAO {
-  constructor(readonly db: Connection) {}
+export interface ILocationDAO {
+  post(input: LocationInput): Promise<number>;
+}
+
+@injectable()
+export class LocationDAO implements ILocationDAO {
+  constructor(@inject(TYPES.DBClient) readonly db: DBConnection) {}
 
   async post(input: LocationInput) {
-    return this.db
+    const res = await this.db
       .insertInto('location')
       .values({
         ...input,
         name: input?.name ?? 'untitled',
       })
-      .returningAll()
+      .returning('id')
       .executeTakeFirstOrThrow();
+
+    return res.id;
   }
 }

@@ -1,5 +1,5 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
+import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
 
 export interface LocationTableColumns {
   id: UniqueId;
@@ -19,7 +19,7 @@ export type InsertLocation = Insertable<LocationTableColumns>;
 export type UpdateLocation = Updateable<LocationTableColumns>;
 
 export class LocationTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 

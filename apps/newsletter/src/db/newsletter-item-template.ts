@@ -1,5 +1,5 @@
 import { Insertable, Selectable, Updateable, sql } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES, Meta } from '../db';
+import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES, Meta } from '../db';
 
 export interface NewsletterItemTemplateTableColumns extends Meta {
   id: UniqueId;
@@ -19,7 +19,7 @@ export type UpdateNewsletterItemTemplate =
   Updateable<NewsletterItemTemplateTableColumns>;
 
 export class NewsletterItemTemplateTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 
@@ -29,9 +29,7 @@ export class NewsletterItemTemplateTableClient extends Table implements ITable {
       .ifNotExists()
       .addColumn('id', 'serial', (cb) => cb.primaryKey())
       .addColumn('name', 'varchar', (cb) => cb.notNull())
-      .addColumn('created', 'timestamp', (cb) =>
-        cb.notNull().defaultTo(sql`now()`)
-      )
+      .addColumn('created', 'timestamp', (cb) => cb.notNull().defaultTo(sql`now()`))
       .addColumn('creatorId', 'integer', (col) =>
         col.references(`${TABLE_NAMES.USER}.id`).onDelete('cascade')
       )
@@ -65,11 +63,8 @@ export type InsertNewsletterItemTemplateData =
 export type UpdateNewsletterItemTemplateData =
   Updateable<NewsletterItemTemplateDataTableColumns>;
 
-export class NewsletterItemTemplateDataTableClient
-  extends Table
-  implements ITable
-{
-  constructor(db: Connection, name: string) {
+export class NewsletterItemTemplateDataTableClient extends Table implements ITable {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 

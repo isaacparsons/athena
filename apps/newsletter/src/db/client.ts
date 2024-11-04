@@ -1,3 +1,6 @@
+import 'reflect-metadata';
+import { container } from '../inversify.config';
+import { INewsletterDAO, INewsletterItemDAO } from '../dao';
 import {
   CountryTableClient,
   UserNewsletterTableClient,
@@ -12,29 +15,21 @@ import {
   NewsletterItemTemplateDataTableClient,
   UserTemplateTableClient,
   ITable,
-  PostgresDialect,
-  Pool,
-  DB,
-  Database,
   TABLE_NAMES,
+  DBConnection,
 } from '../db';
+import { TYPES } from '../types/types';
+import { nanoid } from 'nanoid';
+import {
+  CreateNewsletterItemBatchInput,
+  CreateNewsletterItemBatchInputItem,
+} from '@athena/athena-common';
 
-const env = process.env as any; //parseEnv();
-
-const dialect = new PostgresDialect({
-  pool: new Pool({
-    database: env['DB_NAME'],
-    host: env['DB_HOST'],
-    user: env['DB_USERNAME'],
-    password: env['DB_PASSWORD'],
-    port: env['DB_PORT'],
-    max: 10,
-  }),
-});
-
-export const dbClient = new DB<Database>({
-  dialect,
-});
+const newsletterDAO = container.get<INewsletterDAO>(TYPES.INewsletterDAO);
+const newsletterItemsDAO = container.get<INewsletterItemDAO>(
+  TYPES.INewsletterItemDAO
+);
+const dbClient = container.get<DBConnection>(TYPES.DBClient);
 
 export class DBManagerClient {
   tables: ITable[];
@@ -54,10 +49,7 @@ export class DBManagerClient {
         dbClient,
         TABLE_NAMES.NEWSLETTER_ITEM_MEDIA
       ),
-      new NewsletterItemTextTableClient(
-        dbClient,
-        TABLE_NAMES.NEWSLETTER_ITEM_TEXT
-      ),
+      new NewsletterItemTextTableClient(dbClient, TABLE_NAMES.NEWSLETTER_ITEM_TEXT),
       new NewsletterItemTemplateTableClient(
         dbClient,
         TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE
@@ -95,12 +87,78 @@ export class DBManagerClient {
 
     console.log('user created!');
     console.log(user);
-    // const newsletter = await new NewsletterDAO(dbClient).post({
-    //   name: 'Test newsletter 1',
-    //   startDate: new Date(2024, 1, 1).toISOString(),
-    //   endDate: new Date(2024, 1, 30).toISOString(),
-    // });
-    // console.log('newsletter created!');
-    // console.log(newsletter);
+    const newsletterId = await newsletterDAO.post(user.id, {
+      name: 'Monthly Newsletter',
+      startDate: new Date(2024, 1, 1).toISOString(),
+      endDate: new Date(2024, 1, 30).toISOString(),
+    });
+    console.log('newsletter created!');
+    console.log(newsletterId);
+
+    const movieReviewId = nanoid();
+    const movieReviewRatingId = nanoid();
+    const movieReviewThoughtsId = nanoid();
+
+    const movieReview: CreateNewsletterItemBatchInputItem = {
+      title: 'Movie Review',
+      newsletterId,
+      temp: {
+        id: movieReviewId,
+        parentId: null,
+        nextId: null,
+        prevId: null,
+      },
+    };
+
+    const movieReviewThoughts: CreateNewsletterItemBatchInputItem = {
+      title: 'Thoughts',
+      newsletterId,
+      temp: {
+        id: movieReviewThoughtsId,
+        parentId: movieReviewId,
+        nextId: movieReviewRatingId,
+        prevId: null,
+      },
+      details: {
+        type: 'text',
+        name: 'It was pretty good',
+      },
+    };
+    const movieReviewRating: CreateNewsletterItemBatchInputItem = {
+      title: 'Rating',
+      newsletterId,
+      temp: {
+        id: movieReviewRatingId,
+        parentId: movieReviewId,
+        nextId: null,
+        prevId: movieReviewThoughtsId,
+      },
+      details: {
+        type: 'text',
+        name: '7/10',
+      },
+    };
+    const inputBatch = {
+      newsletterId,
+      parentId: null,
+      nextItemId: null,
+      previousItemId: null,
+      batch: [movieReview, movieReviewThoughts, movieReviewRating],
+    };
+
+    const ids = await newsletterItemsDAO.postBatch(user.id, inputBatch);
   }
 }
+
+// Monthly newsletter
+// kitty of the month
+//  - photo
+//  - winner
+//  - summary of why they won
+
+// movie review
+//  - link to the movie
+//  - rating
+//  - thoughts
+
+//

@@ -1,6 +1,6 @@
 import { Insertable, Selectable, Updateable, sql } from 'kysely';
 import {
-  Connection,
+  DBConnection,
   Table,
   ITable,
   UniqueId,
@@ -27,7 +27,7 @@ export type InsertNewsletter = Insertable<NewsletterTableColumns>;
 export type UpdateNewsletter = Updateable<NewsletterTableColumns>;
 
 export class NewsletterTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
   async createTable() {
@@ -36,9 +36,7 @@ export class NewsletterTableClient extends Table implements ITable {
       .ifNotExists()
       .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
       .addColumn('name', 'varchar', (cb) => cb.notNull())
-      .addColumn('created', 'timestamp', (cb) =>
-        cb.notNull().defaultTo(sql`now()`)
-      )
+      .addColumn('created', 'timestamp', (cb) => cb.notNull().defaultTo(sql`now()`))
       .addColumn('creatorId', 'integer', (col) =>
         col.references(`${TABLE_NAMES.USER}.id`).onDelete('cascade')
       )

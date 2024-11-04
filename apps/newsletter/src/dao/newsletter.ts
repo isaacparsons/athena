@@ -1,11 +1,8 @@
+import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 import _ from 'lodash';
-import { mapNewsletterItem, NewsletterItemDAO } from '.';
-import {
-  Connection as DBConnection,
-  Transaction,
-  jsonArrayFrom,
-  jsonObjectFrom,
-} from '../db';
+import { INewsletterItemDAO, mapNewsletterItem } from '.';
+import { DBConnection, Transaction, jsonArrayFrom, jsonObjectFrom } from '../db';
 import {
   Newsletter,
   CreateNewsletterInput,
@@ -13,13 +10,22 @@ import {
   NewsletterItemDetailsMedia,
 } from '@athena/athena-common';
 import { creator, modifier, user, parseDateRange, location } from '../util';
-import { GCSManager } from '../services';
+import { IGCSManager } from '../services';
+import { TYPES } from '../types/types';
 
-export class NewsletterDAO {
+export interface INewsletterDAO {
+  get(id: number): Promise<Newsletter>;
+  post(userId: number, input: CreateNewsletterInput): Promise<number>;
+  update(userId: number, input: UpdateNewsletterInput): Promise<number>;
+  delete(userId: number, id: number): Promise<number>;
+}
+
+@injectable()
+export class NewsletterDAO implements INewsletterDAO {
   constructor(
-    readonly db: DBConnection,
-    readonly gcs: GCSManager,
-    readonly newsletterItemDAO: NewsletterItemDAO
+    @inject(TYPES.DBClient) readonly db: DBConnection,
+    @inject(TYPES.IGCSManager) readonly gcs: IGCSManager,
+    @inject(TYPES.INewsletterItemDAO) readonly newsletterItemDAO: INewsletterItemDAO
   ) {}
 
   async get(id: number): Promise<Newsletter> {
@@ -110,7 +116,7 @@ export class NewsletterDAO {
     };
   }
 
-  async post(userId: number, input: CreateNewsletterInput) {
+  async post(userId: number, input: CreateNewsletterInput): Promise<number> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletter = await trx
         .insertInto('newsletter')
@@ -133,24 +139,29 @@ export class NewsletterDAO {
     });
   }
 
-  async update(userId: number, input: UpdateNewsletterInput) {
+  async update(userId: number, input: UpdateNewsletterInput): Promise<number> {
     const inputWithoutId = _.omit(input, 'id');
-    return this.db
+    const res = await this.db
       .updateTable('newsletter')
       .set({
         ...inputWithoutId,
         modifierId: userId,
         modified: new Date().toISOString(),
       })
+      .returning('id')
       .where('id', '=', input.id)
       .executeTakeFirstOrThrow();
+    return res.id;
   }
 
-  async delete(userId: number, id: number) {
-    return this.db
+  async delete(userId: number, id: number): Promise<number> {
+    const res = await this.db
       .deleteFrom('newsletter')
       .where('id', '=', id)
       .where('ownerId', '=', userId)
-      .execute();
+      .returning('id')
+      .executeTakeFirstOrThrow();
+
+    return res.id;
   }
 }

@@ -1,5 +1,5 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
+import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
 import { NewsletterItemTypeName } from '@athena/athena-common';
 
 interface NewsletterItemDetailsBase {
@@ -41,7 +41,7 @@ export type InsertNewsletterItemText = Insertable<NewsletterItemTextTableColumns
 export type UpdateNewsletterItemText = Updateable<NewsletterItemTextTableColumns>;
 
 export class NewsletterItemMediaTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
   async createTable() {
@@ -54,7 +54,10 @@ export class NewsletterItemMediaTableClient extends Table implements ITable {
       .addColumn('fileName', 'varchar', (col) => col.notNull())
       .addColumn('type', 'varchar', (col) => col.notNull())
       .addColumn('newsletterItemId', 'integer', (col) =>
-        col.references(`${TABLE_NAMES.NEWSLETTER_ITEM}.id`).notNull().onDelete('cascade')
+        col
+          .references(`${TABLE_NAMES.NEWSLETTER_ITEM}.id`)
+          .notNull()
+          .onDelete('cascade')
       )
       .execute();
     return;
@@ -62,7 +65,7 @@ export class NewsletterItemMediaTableClient extends Table implements ITable {
 }
 
 export class NewsletterItemTextTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
   async createTable() {
@@ -75,7 +78,10 @@ export class NewsletterItemTextTableClient extends Table implements ITable {
       .addColumn('type', 'varchar', (col) => col.notNull())
       .addColumn('description', 'varchar')
       .addColumn('newsletterItemId', 'integer', (col) =>
-        col.references(`${TABLE_NAMES.NEWSLETTER_ITEM}.id`).notNull().onDelete('cascade')
+        col
+          .references(`${TABLE_NAMES.NEWSLETTER_ITEM}.id`)
+          .notNull()
+          .onDelete('cascade')
       )
       .execute();
     return;

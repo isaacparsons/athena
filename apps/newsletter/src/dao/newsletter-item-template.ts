@@ -1,10 +1,6 @@
 import _ from 'lodash';
-import {
-  Connection as DBConnection,
-  jsonObjectFrom,
-  TABLE_NAMES,
-  Transaction,
-} from '../db';
+import 'reflect-metadata';
+import { DBConnection, TABLE_NAMES, Transaction } from '../db';
 
 import {
   CreateNewsletterItemTemplateInput,
@@ -13,9 +9,17 @@ import {
   NewsletterItemTemplateDataDetails,
 } from '@athena/athena-common';
 import { creator, modifier } from '../util';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../types/types';
 
-export class NewsletterItemTemplateDAO {
-  constructor(readonly db: DBConnection) {}
+export interface INewsletterItemTemplateDAO {
+  post(userId: number, input: CreateNewsletterItemTemplateInput): Promise<number>;
+  get(id: number): Promise<NewsletterItemTemplate>;
+}
+
+@injectable()
+export class NewsletterItemTemplateDAO implements INewsletterItemTemplateDAO {
+  constructor(@inject(TYPES.DBClient) readonly db: DBConnection) {}
 
   async post(userId: number, input: CreateNewsletterItemTemplateInput) {
     return this.db.transaction().execute(async (trx: Transaction) => {
@@ -87,6 +91,7 @@ export class NewsletterItemTemplateDAO {
       return template.id;
     });
   }
+
   async get(id: number): Promise<NewsletterItemTemplate> {
     const template = await this.getTemplate(id);
     const templates = await Promise.all(

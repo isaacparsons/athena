@@ -1,6 +1,6 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
 import {
-  Connection,
+  DBConnection,
   Table,
   ITable,
   UniqueId,
@@ -26,7 +26,7 @@ export type InsertUser = Insertable<UserTableColumns>;
 export type UpdateUser = Updateable<UserTableColumns>;
 
 export class UserTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 
@@ -58,7 +58,7 @@ export type InsertUserNewsletter = Insertable<UserNewsletterTableColumns>;
 export type UpdateUserNewsletter = Updateable<UserNewsletterTableColumns>;
 
 export class UserNewsletterTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 
@@ -70,10 +70,7 @@ export class UserNewsletterTableClient extends Table implements ITable {
         col.references(`${TABLE_NAMES.USER}.id`).onDelete('cascade').notNull()
       )
       .addColumn('newsletterId', 'integer', (col) =>
-        col
-          .references(`${TABLE_NAMES.NEWSLETTER}.id`)
-          .onDelete('cascade')
-          .notNull()
+        col.references(`${TABLE_NAMES.NEWSLETTER}.id`).onDelete('cascade').notNull()
       )
       .execute();
     return;
@@ -95,7 +92,7 @@ export type InsertUserTemplate = Insertable<UserTemplateTableColumns>;
 export type UpdateUserTemplate = Updateable<UserTemplateTableColumns>;
 
 export class UserTemplateTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 

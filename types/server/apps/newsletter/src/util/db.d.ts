@@ -1,42 +1,79 @@
-import { Connection, Expression } from '../db';
-export declare const newsletterItemDetailsMedia: (db: Connection, id: Expression<number>) => import("kysely").AliasedRawBuilder<{
+import { DBConnection, Expression } from '../db';
+export declare const newsletterItemDetailsMedia: (
+  db: DBConnection,
+  id: Expression<number>
+) => import('kysely').AliasedRawBuilder<
+  {
     id: number;
     name: string;
-    type: "media";
+    type: 'media';
     fileName: string;
     caption: string | null;
     newsletterItemId: number;
-} | null, "mediaDetails">;
-export declare const newsletterItemDetailsText: (db: Connection, id: Expression<number>) => import("kysely").AliasedRawBuilder<{
+  } | null,
+  'mediaDetails'
+>;
+export declare const newsletterItemDetailsText: (
+  db: DBConnection,
+  id: Expression<number>
+) => import('kysely').AliasedRawBuilder<
+  {
     id: number;
     name: string;
-    type: "text";
+    type: 'text';
     description: string | null;
     link: string | null;
     newsletterItemId: number;
-} | null, "textDetails">;
-export declare const location: (db: Connection, id: Expression<number | null>) => import("kysely").AliasedRawBuilder<{
+  } | null,
+  'textDetails'
+>;
+export declare const location: (
+  db: DBConnection,
+  id: Expression<number | null>
+) => import('kysely').AliasedRawBuilder<
+  {
     id: number;
     name: string | null;
     longitude: number | null;
     lattitude: number | null;
     countryCode: string | null;
-} | null, "location">;
-export declare const creator: (db: Connection, id: Expression<number>) => import("kysely").AliasedRawBuilder<{
+  } | null,
+  'location'
+>;
+export declare const creator: (
+  db: DBConnection,
+  id: Expression<number>
+) => import('kysely').AliasedRawBuilder<
+  {
     id: number;
     firstName: string | null;
     lastName: string | null;
     email: string;
-}, "creator">;
-export declare const modifier: (db: Connection, id: Expression<number | null>) => import("kysely").AliasedRawBuilder<{
+  },
+  'creator'
+>;
+export declare const modifier: (
+  db: DBConnection,
+  id: Expression<number | null>
+) => import('kysely').AliasedRawBuilder<
+  {
     id: number;
     firstName: string | null;
     lastName: string | null;
     email: string;
-} | null, "modifier">;
-export declare const user: (db: Connection, id: Expression<number | null>, label?: string) => import("kysely").AliasedRawBuilder<{
+  } | null,
+  'modifier'
+>;
+export declare const user: (
+  db: DBConnection,
+  id: Expression<number | null>,
+  label?: string
+) => import('kysely').AliasedRawBuilder<
+  {
     id: number;
     firstName: string | null;
     lastName: string | null;
     email: string;
-}, string>;
+  },
+  string
+>;

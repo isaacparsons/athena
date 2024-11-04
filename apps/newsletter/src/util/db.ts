@@ -1,6 +1,9 @@
-import { Connection, Expression, jsonObjectFrom } from '../db';
+import { DBConnection, Expression, jsonObjectFrom } from '../db';
 
-export const newsletterItemDetailsMedia = (db: Connection, id: Expression<number>) =>
+export const newsletterItemDetailsMedia = (
+  db: DBConnection,
+  id: Expression<number>
+) =>
   jsonObjectFrom(
     db
       .selectFrom('newsletter_item_media')
@@ -8,7 +11,10 @@ export const newsletterItemDetailsMedia = (db: Connection, id: Expression<number
       .where(`newsletter_item_media.id`, '=', id)
   ).as('mediaDetails');
 
-export const newsletterItemDetailsText = (db: Connection, id: Expression<number>) =>
+export const newsletterItemDetailsText = (
+  db: DBConnection,
+  id: Expression<number>
+) =>
   jsonObjectFrom(
     db
       .selectFrom('newsletter_item_text')
@@ -16,22 +22,26 @@ export const newsletterItemDetailsText = (db: Connection, id: Expression<number>
       .where(`newsletter_item_text.id`, '=', id)
   ).as('textDetails');
 
-export const location = (db: Connection, id: Expression<number | null>) =>
-  jsonObjectFrom(db.selectFrom('location').selectAll().where(`location.id`, '=', id)).as(
-    'location'
-  );
+export const location = (db: DBConnection, id: Expression<number | null>) =>
+  jsonObjectFrom(
+    db.selectFrom('location').selectAll().where(`location.id`, '=', id)
+  ).as('location');
 
-export const creator = (db: Connection, id: Expression<number>) =>
+export const creator = (db: DBConnection, id: Expression<number>) =>
   jsonObjectFrom(db.selectFrom('user').selectAll().where(`user.id`, '=', id))
     .$notNull()
     .as('creator');
 
-export const modifier = (db: Connection, id: Expression<number | null>) =>
+export const modifier = (db: DBConnection, id: Expression<number | null>) =>
   jsonObjectFrom(db.selectFrom('user').selectAll().where(`user.id`, '=', id)).as(
     'modifier'
   );
 
-export const user = (db: Connection, id: Expression<number | null>, label?: string) =>
+export const user = (
+  db: DBConnection,
+  id: Expression<number | null>,
+  label?: string
+) =>
   jsonObjectFrom(db.selectFrom('user').selectAll().where(`user.id`, '=', id))
     .$notNull()
     .as(label ?? 'user');

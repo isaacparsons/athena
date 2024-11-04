@@ -1,6 +1,7 @@
 import _ from 'lodash';
+import 'reflect-metadata';
 import {
-  Connection as DBConnection,
+  DBConnection,
   Transaction,
   SelectLocation,
   SelectNewsletterItem,
@@ -9,7 +10,12 @@ import {
   SelectUser,
 } from '../db';
 
-import { LocationDAO, NewsletterItemDetailsDAO } from '.';
+import {
+  ILocationDAO,
+  INewsletterItemDetailsDAO,
+  LocationDAO,
+  NewsletterItemDetailsDAO,
+} from '.';
 import {
   CreateNewsletterItemBatchInput,
   CreateNewsletterItemInput,
@@ -26,6 +32,8 @@ import {
   creator,
   modifier,
 } from '../util';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../types/types';
 
 type MappedItem = Omit<
   SelectNewsletterItem,
@@ -94,11 +102,24 @@ const mapNewsletterItemDetails = (
     };
 };
 
-export class NewsletterItemDAO {
+export interface INewsletterItemDAO {
+  deleteMany(input: DeleteManyNewsletterItemsInput): Promise<void>;
+  post(userId: number, input: CreateNewsletterItemInput): Promise<number>;
+  postBatch(
+    userId: number,
+    input: CreateNewsletterItemBatchInput
+  ): Promise<number[]>;
+  get(id: number): Promise<NewsletterItem>;
+  update(userId: number, input: UpdateNewsletterItemInput): Promise<void>;
+}
+
+@injectable()
+export class NewsletterItemDAO implements INewsletterItemDAO {
   constructor(
-    readonly db: DBConnection,
-    readonly locationDAO: LocationDAO,
-    readonly newsletterItemDetailsDAO: NewsletterItemDetailsDAO
+    @inject(TYPES.DBClient) readonly db: DBConnection,
+    @inject(TYPES.ILocationDAO) readonly locationDAO: ILocationDAO,
+    @inject(TYPES.INewsletterItemDetailsDAO)
+    readonly newsletterItemDetailsDAO: INewsletterItemDetailsDAO
   ) {}
 
   async deleteMany(input: DeleteManyNewsletterItemsInput) {
@@ -142,14 +163,14 @@ export class NewsletterItemDAO {
 
   async post(userId: number, input: CreateNewsletterItemInput) {
     return this.db.transaction().execute(async (trx: Transaction) => {
-      const location = await new LocationDAO(trx).post(input.location);
+      const locationId = await new LocationDAO(trx).post(input.location);
       const details = input.details;
 
       const createdNewsletterItem = await trx
         .insertInto('newsletter_item')
         .values({
           ..._.omit(input, ['location', 'details']),
-          locationId: location.id,
+          locationId: locationId,
           created: new Date().toISOString(),
           creatorId: userId,
         })
@@ -241,7 +262,7 @@ export class NewsletterItemDAO {
         return tempIdRealIdMap.get(id) ?? null;
       };
 
-      return Promise.all(
+      const res = await Promise.all(
         input.batch.map(async (item) =>
           this.db
             .updateTable('newsletter_item')
@@ -264,6 +285,7 @@ export class NewsletterItemDAO {
             .executeTakeFirstOrThrow()
         )
       );
+      return res.map((r) => r.id);
     });
   }
 

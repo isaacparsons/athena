@@ -1,4 +1,9 @@
-import { Kysely, Transaction as KyselyTransaction, ColumnType, Selectable } from 'kysely';
+import {
+  Kysely,
+  Transaction as KyselyTransaction,
+  ColumnType,
+  Selectable,
+} from 'kysely';
 import {
   CountryTableColumns,
   FederatedCredentialTableColumns,
@@ -22,7 +27,11 @@ export type Created = ColumnType<string, string, never>;
 export type Modified = ColumnType<string | null, never, string>;
 export type Creator = ColumnType<number, number, never>;
 export type Modifier = ColumnType<number | null, never, number>;
-export type MutableNullableDate = ColumnType<string | null, string | null, string | null>;
+export type MutableNullableDate = ColumnType<
+  string | null,
+  string | null,
+  string | null
+>;
 export type MutableDate = ColumnType<string, string, string>;
 export type MutableForeignKey = ColumnType<number, number, number>;
 export type ForeignKey = ColumnType<number, number, never>;
@@ -34,7 +43,12 @@ export type SelectMutableNullableDate = Selectable<MutableNullableDate>;
 export type InsertMutableNullableDate = Selectable<MutableNullableDate>;
 export type UpdateMutableNullableDate = Selectable<MutableNullableDate>;
 
-export const MetaColumns = ['created', 'modified', 'creatorId', 'modifierId'] as const;
+export const MetaColumns = [
+  'created',
+  'modified',
+  'creatorId',
+  'modifierId',
+] as const;
 export type Meta = {
   created: Created;
   modified: Modified;
@@ -78,20 +92,20 @@ export interface Database {
   newsletter_item_template_data: NewsletterItemTemplateDataTableColumns;
 }
 
-export type Connection = Kysely<Database>;
+export type DBConnection = Kysely<Database>;
 export type Transaction = KyselyTransaction<Database>;
 
 export interface ITable {
-  db: Connection;
+  db: DBConnection;
   name: string;
   createTable: () => Promise<void>;
   deleteTable: () => Promise<void>;
 }
 
 export abstract class Table implements ITable {
-  db: Connection;
+  db: DBConnection;
   name: string;
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     this.name = name;
     this.db = db;
   }

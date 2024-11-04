@@ -1,6 +1,6 @@
 import { Insertable, Selectable } from 'kysely';
 import {
-  Connection,
+  DBConnection,
   Table,
   ITable,
   UniqueId,
@@ -31,7 +31,7 @@ export type SelectCountry = Selectable<CountryTableColumns>;
 export type InsertCountry = Insertable<CountryTableColumns>;
 
 export class CountryTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 

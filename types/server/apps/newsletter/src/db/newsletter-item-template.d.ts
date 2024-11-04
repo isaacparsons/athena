@@ -1,38 +1,50 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { Connection, Table, ITable, UniqueId, TABLE_NAMES, Meta } from '../db';
+import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES, Meta } from '../db';
 export interface NewsletterItemTemplateTableColumns extends Meta {
-    id: UniqueId;
-    name: string;
+  id: UniqueId;
+  name: string;
 }
 export interface NewsletterItemTemplateTable {
-    name: TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE;
-    columns: NewsletterItemTemplateTableColumns;
+  name: TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE;
+  columns: NewsletterItemTemplateTableColumns;
 }
-export type SelectNewsletterItemTemplate = Selectable<NewsletterItemTemplateTableColumns>;
-export type InsertNewsletterItemTemplate = Insertable<NewsletterItemTemplateTableColumns>;
-export type UpdateNewsletterItemTemplate = Updateable<NewsletterItemTemplateTableColumns>;
-export declare class NewsletterItemTemplateTableClient extends Table implements ITable {
-    constructor(db: Connection, name: string);
-    createTable(): Promise<void>;
+export type SelectNewsletterItemTemplate =
+  Selectable<NewsletterItemTemplateTableColumns>;
+export type InsertNewsletterItemTemplate =
+  Insertable<NewsletterItemTemplateTableColumns>;
+export type UpdateNewsletterItemTemplate =
+  Updateable<NewsletterItemTemplateTableColumns>;
+export declare class NewsletterItemTemplateTableClient
+  extends Table
+  implements ITable
+{
+  constructor(db: DBConnection, name: string);
+  createTable(): Promise<void>;
 }
 export interface NewsletterItemTemplateDataTableColumns {
-    id: UniqueId;
-    data: object | null;
-    templateId: number | null;
-    parentId: number | null;
-    prevId: number | null;
-    nextId: number | null;
+  id: UniqueId;
+  data: object | null;
+  templateId: number | null;
+  parentId: number | null;
+  prevId: number | null;
+  nextId: number | null;
 }
 export interface NewsletterItemTemplateDataTable {
-    name: TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE_DATA;
-    columns: NewsletterItemTemplateDataTableColumns;
+  name: TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE_DATA;
+  columns: NewsletterItemTemplateDataTableColumns;
 }
-export type SelectNewsletterItemTemplateData = Selectable<NewsletterItemTemplateDataTableColumns>;
-export type InsertNewsletterItemTemplateData = Insertable<NewsletterItemTemplateDataTableColumns>;
-export type UpdateNewsletterItemTemplateData = Updateable<NewsletterItemTemplateDataTableColumns>;
-export declare class NewsletterItemTemplateDataTableClient extends Table implements ITable {
-    constructor(db: Connection, name: string);
-    createTable(): Promise<void>;
+export type SelectNewsletterItemTemplateData =
+  Selectable<NewsletterItemTemplateDataTableColumns>;
+export type InsertNewsletterItemTemplateData =
+  Insertable<NewsletterItemTemplateDataTableColumns>;
+export type UpdateNewsletterItemTemplateData =
+  Updateable<NewsletterItemTemplateDataTableColumns>;
+export declare class NewsletterItemTemplateDataTableClient
+  extends Table
+  implements ITable
+{
+  constructor(db: DBConnection, name: string);
+  createTable(): Promise<void>;
 }
 /** input
  * name

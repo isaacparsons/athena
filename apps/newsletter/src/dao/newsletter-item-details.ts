@@ -1,14 +1,30 @@
-import { Connection } from '../db';
+import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
+import { DBConnection } from '../db';
 import {
   NewsletterItemDetailsMedia,
   NewsletterItemDetailsText,
   CreateNewsletterItemDetailsInput,
 } from '@athena/athena-common';
+import { TYPES } from '../types/types';
 
-export class NewsletterItemDetailsDAO {
-  constructor(readonly db: Connection) {}
+export interface INewsletterItemDetailsDAO {
+  get(
+    newsletterItemId: number
+  ): Promise<NewsletterItemDetailsText | NewsletterItemDetailsMedia | undefined>;
+  post(
+    newsletterItemId: number,
+    input: CreateNewsletterItemDetailsInput
+  ): Promise<void>;
+}
 
-  async get(newsletterItemId: number) {
+@injectable()
+export class NewsletterItemDetailsDAO implements INewsletterItemDetailsDAO {
+  constructor(@inject(TYPES.DBClient) readonly db: DBConnection) {}
+
+  async get(
+    newsletterItemId: number
+  ): Promise<NewsletterItemDetailsText | NewsletterItemDetailsMedia | undefined> {
     const details = await this.db
       .selectFrom(['newsletter_item_media as nim', 'newsletter_item_text as nit'])
       .selectAll()
@@ -40,21 +56,25 @@ export class NewsletterItemDetailsDAO {
     }
     throw new Error('unrecognized type');
   }
-  async post(newsletterItemId: number, input: CreateNewsletterItemDetailsInput) {
-    if (!input) {
-      return;
-    } else if (input.type === 'text') {
-      return this.db
+  async post(
+    newsletterItemId: number,
+    input: CreateNewsletterItemDetailsInput
+  ): Promise<void | undefined> {
+    if (!input) return;
+    if (input.type === 'text') {
+      await this.db
         .insertInto('newsletter_item_text')
         .values({ ...input, newsletterItemId })
         .executeTakeFirstOrThrow();
-    } else if (input.type === 'media') {
-      return this.db
+      return;
+    }
+    if (input.type === 'media') {
+      await this.db
         .insertInto('newsletter_item_media')
         .values({ ...input, newsletterItemId })
         .executeTakeFirstOrThrow();
-    } else {
-      throw new Error('unrecognized item type');
+      return;
     }
+    throw new Error('unrecognized item type');
   }
 }

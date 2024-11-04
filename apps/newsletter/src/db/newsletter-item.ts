@@ -1,6 +1,6 @@
 import { ColumnType, Insertable, Selectable, Updateable, sql } from 'kysely';
 import {
-  Connection,
+  DBConnection,
   Table,
   ITable,
   UniqueId,
@@ -45,7 +45,7 @@ export type InsertNewsletterItem = Insertable<NewsletterItemTableColumns>;
 export type UpdateNewsletterItem = Updateable<NewsletterItemTableColumns>;
 
 export class NewsletterItemTableClient extends Table implements ITable {
-  constructor(db: Connection, name: string) {
+  constructor(db: DBConnection, name: string) {
     super(db, name);
   }
   async createTable() {
@@ -55,18 +55,13 @@ export class NewsletterItemTableClient extends Table implements ITable {
       .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
       .addColumn('title', 'varchar', (cb) => cb.notNull())
       .addColumn('newsletterId', 'integer', (col) =>
-        col
-          .references(`${TABLE_NAMES.NEWSLETTER}.id`)
-          .notNull()
-          .onDelete('cascade')
+        col.references(`${TABLE_NAMES.NEWSLETTER}.id`).notNull().onDelete('cascade')
       )
       .addColumn('date', 'timestamp')
       .addColumn('locationId', 'integer', (col) =>
         col.references(`${TABLE_NAMES.LOCATION}.id`).onDelete('set null')
       )
-      .addColumn('created', 'timestamp', (cb) =>
-        cb.notNull().defaultTo(sql`now()`)
-      )
+      .addColumn('created', 'timestamp', (cb) => cb.notNull().defaultTo(sql`now()`))
       .addColumn('creatorId', 'integer', (cb) =>
         cb.references(`${TABLE_NAMES.USER}.id`).notNull()
       )

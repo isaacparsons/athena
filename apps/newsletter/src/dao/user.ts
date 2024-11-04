@@ -1,9 +1,24 @@
-import { User } from '@athena/athena-common';
-import { Connection as DBConnection, jsonObjectFrom } from '../db';
+import {
+  NewsletterBase,
+  User,
+  UserNewsletterItemTemplates,
+  UserNewsletters,
+} from '@athena/athena-common';
+import 'reflect-metadata';
+import { DBConnection } from '../db';
 import { creator, modifier, user } from '../util';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../types/types';
 
-export class UserDAO {
-  constructor(readonly db: DBConnection) {}
+export interface IUserDAO {
+  get(id: number): Promise<User>;
+  newsletters: (userId: number) => Promise<UserNewsletters>;
+  newsletterItemTemplates: (userId: number) => Promise<UserNewsletterItemTemplates>;
+}
+
+@injectable()
+export class UserDAO implements IUserDAO {
+  constructor(@inject(TYPES.DBClient) readonly db: DBConnection) {}
 
   async get(id: number): Promise<User> {
     const user = await this.db
@@ -20,7 +35,8 @@ export class UserDAO {
       newsletterItemTemplates,
     };
   }
-  async newsletters(userId: number) {
+
+  async newsletters(userId: number): Promise<NewsletterBase[]> {
     const newsletters = await this.db
       .selectFrom('user_newsletter as un')
       .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
