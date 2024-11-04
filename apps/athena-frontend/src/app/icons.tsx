@@ -15,5 +15,6 @@ export {
     Add as AddIcon,
     Delete as DeleteIcon,
     CalendarToday as CalendarTodayIcon,
-    CalendarMonth as CalendarMonthIcon
+    CalendarMonth as CalendarMonthIcon,
+    MoreVert as MoreVertIcon
 } from '@mui/icons-material';

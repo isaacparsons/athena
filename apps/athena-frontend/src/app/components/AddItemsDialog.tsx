@@ -91,7 +91,6 @@ export function AddItemsDialog() {
         },
       }));
 
-    console.log(files)
     addItems(tempParentId, files);
   };
 

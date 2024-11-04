@@ -15,8 +15,6 @@ import {
   CreateNewsletterItemInput,
   DeleteManyNewsletterItemsInput,
   UpdateNewsletterItemInput,
-  ReadNewsletterItemTreeInput,
-  NewsletterItemBase,
   NewsletterItemDetailsMedia,
   NewsletterItemDetailsText,
   NewsletterItem,
@@ -159,7 +157,10 @@ export class NewsletterItemDAO {
         .executeTakeFirstOrThrow();
 
       if (details) {
-        await new NewsletterItemDetailsDAO(trx).post(createdNewsletterItem.id, details);
+        await new NewsletterItemDetailsDAO(trx).post(
+          createdNewsletterItem.id,
+          details
+        );
       }
 
       await trx
@@ -287,7 +288,10 @@ export class NewsletterItemDAO {
           modifier(this.db, eb.ref('newsletter_item.modifierId')),
         ])
         .where(({ or, eb }) =>
-          or([eb('newsletter_item.id', '=', id), eb('newsletter_item.parentId', '=', id)])
+          or([
+            eb('newsletter_item.id', '=', id),
+            eb('newsletter_item.parentId', '=', id),
+          ])
         )
         .executeTakeFirstOrThrow();
 
@@ -318,61 +322,6 @@ export class NewsletterItemDAO {
       };
     });
   }
-
-  // async getTree(input: ReadNewsletterItemTreeInput): Promise<NewsletterItemBase[]> {
-  //   const result: MappedItem[] = await this.db
-  //     .withRecursive('newsletter_items_tree', (db) =>
-  //       db
-  //         .selectFrom('newsletter_item as ni1')
-  //         .select((eb) => [
-  //           'id',
-  //           'newsletterId',
-  //           'title',
-  //           'date',
-  //           'parentId',
-  //           'nextItemId',
-  //           'previousItemId',
-  //           'created',
-  //           'modified',
-  //           newsletterItemDetailsMedia(this.db, eb.ref('ni1.id')),
-  //           newsletterItemDetailsText(this.db, eb.ref('ni1.id')),
-  //           location(this.db, eb.ref('ni1.locationId')),
-  //           creator(this.db, eb.ref('ni1.creatorId')),
-  //           modifier(this.db, eb.ref('ni1.modifierId')),
-  //         ])
-  //         .where('ni1.parentId', input.parentId ? '=' : 'is', input.parentId)
-  //         .unionAll(
-  //           db
-  //             .selectFrom('newsletter_item as ni2')
-  //             .select((eb) => [
-  //               'id',
-  //               'newsletterId',
-  //               'title',
-  //               'date',
-  //               'parentId',
-  //               'nextItemId',
-  //               'previousItemId',
-  //               'created',
-  //               'modified',
-  //               newsletterItemDetailsMedia(this.db, eb.ref('ni2.id')),
-  //               newsletterItemDetailsText(this.db, eb.ref('ni2.id')),
-  //               location(this.db, eb.ref('ni2.locationId')),
-  //               creator(this.db, eb.ref('ni2.creatorId')),
-  //               modifier(this.db, eb.ref('ni2.modifierId')),
-  //             ])
-  //             .innerJoin(
-  //               'newsletter_items_tree',
-  //               'ni2.id',
-  //               'newsletter_items_tree.parentId'
-  //             )
-  //         )
-  //     )
-  //     .selectFrom('newsletter_items_tree')
-  //     .selectAll()
-  //     .execute();
-
-  //   return result.map(mapNewsletterItem);
-  // }
 
   async update(userId: number, input: UpdateNewsletterItemInput) {
     const newsletterItemUpdate = _.omit(input, ['location', 'newsletterItemId']);

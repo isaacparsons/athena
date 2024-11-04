@@ -19,10 +19,12 @@ interface NewsletterItemCardProps {
 export function NewsletterItemCard({ item, selectable, selected, onToggleSelect }: NewsletterItemCardProps) {
   const navigate = useNavigate();
 
+  const hasChildren = item.childrenIds.length > 0;
+
   const handleCardClick = () => navigate(`/newsletters/${item.newsletterId}/items/${item.id}`)
   return (
     <CustomCard
-      onClick={selectable ? undefined : handleCardClick}
+      onClick={selectable || !hasChildren ? undefined : handleCardClick}
       src={item.details?.type === 'media' ? item.details.fileName : undefined}
     >
       <CustomCardHeader
@@ -53,7 +55,7 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
           )}
         </Box>)}
       <CustomCardFooter right={
-        item.childrenIds.length > 0 &&
+        hasChildren &&
         <CustomIconButton
           onClick={handleCardClick}
           icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />} />}>

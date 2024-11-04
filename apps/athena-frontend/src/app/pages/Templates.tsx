@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import { Typography } from '@mui/material'
-import { CustomCard, CustomContainer, CustomList, CustomListItem } from '../components';
+import { CustomContainer, CustomList, CustomListItem, UserTemplateCard } from '../components';
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { mapToArray } from '../../util';
@@ -13,6 +12,7 @@ export function Templates() {
       loading: state.newsletterItemTemplates.loading,
     }))
   );
+
 
   const templates = useMemo(
     () => mapToArray(newsletterItemTemplates),
@@ -44,14 +44,3 @@ export function UserTemplatesList(props: UserTemplatesListProps) {
   );
 }
 
-interface UserTemplatesCardProps {
-  template: NewsletterItemTemplateBase;
-}
-
-export function UserTemplateCard({ template }: UserTemplatesCardProps) {
-  return (
-    <CustomCard>
-      <Typography sx={{ color: 'primary.main' }}>{template.name}</Typography>
-    </CustomCard>
-  );
-}

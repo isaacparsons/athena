@@ -68,7 +68,6 @@ export function AddItemTemplateDialog(props: AddItemTemplateDialog) {
   const handleSaveTemplate: SubmitHandler<
     CreateNewsletterItemTemplateInput
   > = async (data) => {
-    console.log(data)
     promiseWithNotifications.execute(saveTemplate(data), {
       successMsg: 'Templated created!',
       errorMsg: 'Unable to create Template :(',

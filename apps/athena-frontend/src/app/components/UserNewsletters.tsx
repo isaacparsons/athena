@@ -13,7 +13,7 @@ export function UserNewsletters(props: NewslettersProps) {
     <CustomList>
       {newsletters.map((newsletter) => {
         return (
-          <CustomListItem id={newsletter.id}>
+          <CustomListItem id={newsletter.id} key={newsletter.id}>
             <UserNewsletterCard
               newsletter={newsletter}
               onClick={() => navigate(`/newsletters/${newsletter.id}`)}

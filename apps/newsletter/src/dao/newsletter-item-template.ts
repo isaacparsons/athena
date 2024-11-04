@@ -12,6 +12,7 @@ import {
   NewsletterItemTemplateBase,
   NewsletterItemTemplateDataDetails,
 } from '@athena/athena-common';
+import { creator, modifier } from '../util';
 
 export class NewsletterItemTemplateDAO {
   constructor(readonly db: DBConnection) {}
@@ -109,20 +110,8 @@ export class NewsletterItemTemplateDAO {
         'nit.name',
         'nit.created',
         'nit.modified',
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as creator')
-            .selectAll('creator')
-            .whereRef('creator.id', '=', 'nit.creatorId')
-        )
-          .$notNull()
-          .as('creator'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as modifier')
-            .selectAll('modifier')
-            .whereRef('modifier.id', '=', 'nit.modifierId')
-        ).as('modifier'),
+        creator(this.db, eb.ref('nit.creatorId')),
+        modifier(this.db, eb.ref('nit.modifierId')),
       ])
       .executeTakeFirstOrThrow();
 

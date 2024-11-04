@@ -36,6 +36,7 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
       const template = await asyncTrpcClient.newsletterItemTemplates.get.query({
         id,
       });
+      console.log(template);
       set((state) => {
         state.newsletterItemTemplates.loading = false;
         const { templates, ...rest } = template;

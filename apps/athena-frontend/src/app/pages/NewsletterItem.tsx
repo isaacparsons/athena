@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { NewsletterItemsList, CustomContainer, ActionBar, BackButtonIcon } from '../components';
+import { NewsletterItemsList, CustomContainer, ActionBar, BackButtonIcon, CustomIconButton } from '../components';
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
+import { MoreVertIcon } from '../icons';
+
 
 
 export function NewsletterItem() {
@@ -45,7 +47,13 @@ export function NewsletterItem() {
   }
   return (
     <>
-      <ActionBar backBtn={item !== null ? (<BackButtonIcon onClick={handleBackBtnClick} />) : null} />
+      <ActionBar
+        backBtn={item !== null ? (<BackButtonIcon onClick={handleBackBtnClick} />) : null} >
+        <CustomIconButton
+          onClick={() => console.log('clicked')}
+          icon={<MoreVertIcon htmlColor="#fff" fontSize="inherit" />} />
+      </ActionBar>
+
       <CustomContainer>
         <NewsletterItemsList
           editing={false}
@@ -54,6 +62,5 @@ export function NewsletterItem() {
         />
       </CustomContainer>
     </>
-
   );
 }

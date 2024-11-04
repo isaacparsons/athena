@@ -1,5 +1,6 @@
 import { User } from '@athena/athena-common';
 import { Connection as DBConnection, jsonObjectFrom } from '../db';
+import { creator, modifier, user } from '../util';
 
 export class UserDAO {
   constructor(readonly db: DBConnection) {}
@@ -31,28 +32,9 @@ export class UserDAO {
         'n.name',
         'n.startDate',
         'n.endDate',
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as creator')
-            .selectAll('creator')
-            .whereRef('n.creatorId', '=', 'creator.id')
-        )
-          .$notNull()
-          .as('creator'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as modifier')
-            .selectAll('modifier')
-            .whereRef('n.modifierId', '=', 'modifier.id')
-        ).as('modifier'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as owner')
-            .selectAll('owner')
-            .whereRef('n.ownerId', '=', 'owner.id')
-        )
-          .$notNull()
-          .as('owner'),
+        creator(this.db, eb.ref('n.creatorId')),
+        modifier(this.db, eb.ref('n.modifierId')),
+        user(this.db, eb.ref('n.ownerId'), 'owner'),
       ])
       .execute();
 
@@ -88,20 +70,8 @@ export class UserDAO {
         'nit.name',
         'nit.created',
         'nit.modified',
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as creator')
-            .selectAll('creator')
-            .whereRef('creator.id', '=', 'nit.creatorId')
-        )
-          .$notNull()
-          .as('creator'),
-        jsonObjectFrom(
-          eb
-            .selectFrom('user as modifier')
-            .selectAll('modifier')
-            .whereRef('modifier.id', '=', 'nit.modifierId')
-        ).as('modifier'),
+        creator(this.db, eb.ref('nit.creatorId')),
+        modifier(this.db, eb.ref('nit.modifierId')),
       ])
       .where('ut.userId', '=', userId)
       .execute();

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Fab } from '@mui/material';
 import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '../components';
-import { CloseIcon, DeleteIcon, TemplateIcon } from '../icons';
+import { DeleteIcon, TemplateIcon } from '../icons';
 import { StoreNewsletterItem, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { usePromiseWithNotification } from '../hooks';

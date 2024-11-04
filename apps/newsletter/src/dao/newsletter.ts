@@ -12,7 +12,7 @@ import {
   UpdateNewsletterInput,
   NewsletterItemDetailsMedia,
 } from '@athena/athena-common';
-import { creator, modifier, user, parseDateRange } from '../util';
+import { creator, modifier, user, parseDateRange, location } from '../util';
 import { GCSManager } from '../services';
 
 export class NewsletterDAO {
@@ -66,26 +66,9 @@ export class NewsletterDAO {
                   .selectAll('text-details')
                   .whereRef('text-details.newsletterItemId', '=', 'ni.id')
               ).as('textDetails'),
-              jsonObjectFrom(
-                eb
-                  .selectFrom('location')
-                  .selectAll('location')
-                  .whereRef('location.id', '=', 'ni.locationId')
-              ).as('location'),
-              jsonObjectFrom(
-                eb
-                  .selectFrom('user as creator')
-                  .selectAll('creator')
-                  .whereRef('creator.id', '=', 'ni.creatorId')
-              )
-                .$notNull()
-                .as('creator'),
-              jsonObjectFrom(
-                eb
-                  .selectFrom('user as modifier')
-                  .selectAll('modifier')
-                  .whereRef('modifier.id', '=', 'ni.modifierId')
-              ).as('modifier'),
+              location(this.db, eb.ref('ni.locationId')),
+              creator(this.db, eb.ref('ni.creatorId')),
+              modifier(this.db, eb.ref('ni.modifierId')),
             ])
         ).as('items')
       )
