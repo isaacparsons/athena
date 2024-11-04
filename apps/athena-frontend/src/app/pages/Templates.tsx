@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Card, CardContent, List, ListItem, Typography } from '@mui/material'
-import { CustomContainer } from '../components';
+import { Typography } from '@mui/material'
+import { CustomCard, CustomContainer, CustomList, CustomListItem } from '../components';
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { mapToArray } from '../../util';
@@ -34,13 +34,13 @@ export function UserTemplatesList(props: UserTemplatesListProps) {
   const { templates } = props;
 
   return (
-    <List>
+    <CustomList>
       {templates.map((template) => (
-        <ListItem key={template.id}>
+        <CustomListItem id={template.id}>
           <UserTemplateCard template={template} />
-        </ListItem>
+        </CustomListItem>
       ))}
-    </List>
+    </CustomList>
   );
 }
 
@@ -48,14 +48,10 @@ interface UserTemplatesCardProps {
   template: NewsletterItemTemplateBase;
 }
 
-export function UserTemplateCard(props: UserTemplatesCardProps) {
-  const { template } = props;
-
+export function UserTemplateCard({ template }: UserTemplatesCardProps) {
   return (
-    <Card sx={{ width: '100%' }}>
-      <CardContent>
-        <Typography>{template.name}</Typography>
-      </CardContent>
-    </Card>
+    <CustomCard>
+      <Typography sx={{ color: 'primary.main' }}>{template.name}</Typography>
+    </CustomCard>
   );
 }

@@ -1,88 +1,64 @@
 import {
-  NewsletterItemDetailsMedia,
-  NewsletterItemDetailsText,
-} from '@athena/athena-common';
-import {
   Box,
-  Button,
-  ButtonBase,
-  Card,
-  CardContent,
-  CardMedia,
-  Stack,
   Typography,
 } from '@mui/material';
 import { StoreNewsletterItem } from '../../../store';
 import { useNavigate } from 'react-router-dom';
+import { CustomCard, CustomCardFooter, CustomCardHeader } from '../CustomCard';
+import { CustomCheckbox } from '../CustomCheckbox';
+import { CustomIconButton } from '../CustomIconButton';
+import { ArrowForwardIcon } from '../../../icons';
 
 interface NewsletterItemCardProps {
   item: StoreNewsletterItem;
+  selectable: boolean;
+  selected: boolean;
+  onToggleSelect: (id: number) => void;
 }
 
-export function NewsletterItemCard(props: NewsletterItemCardProps) {
-  const { item } = props;
+export function NewsletterItemCard({ item, selectable, selected, onToggleSelect }: NewsletterItemCardProps) {
   const navigate = useNavigate();
-  return (
-    <Card>
-      <ButtonBase onClick={() => navigate(`items/${item.id}`)}>
-        {item.details?.type === 'media' && (
-          <NewsletterItemMediaCardDisplay
-            details={item.details as NewsletterItemDetailsMedia}
-          />
-        )}
-        {item.details?.type === 'text' && (
-          <NewsletterItemTextCardDisplay
-            details={item.details as NewsletterItemDetailsText}
-          />
-        )}
-      </ButtonBase>
-    </Card>
-  );
-}
 
-interface NewsletterItemMediaCardDisplayProps {
-  details: NewsletterItemDetailsMedia;
-}
-export function NewsletterItemMediaCardDisplay(
-  props: NewsletterItemMediaCardDisplayProps
-) {
-  const { details } = props;
+  const handleCardClick = () => navigate(`/newsletters/${item.newsletterId}/items/${item.id}`)
   return (
-    <Stack>
-      <CardMedia component="img" image={`${details.fileName}`} />
-      <CardContent>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {details.caption}
-        </Typography>
-      </CardContent>
-    </Stack>
-  );
-}
+    <CustomCard
+      onClick={selectable ? undefined : handleCardClick}
+      src={item.details?.type === 'media' ? item.details.fileName : undefined}
+    >
+      <CustomCardHeader
+        left={selectable ?
+          <CustomCheckbox
+            id={item.id}
+            value={selected}
+            onClick={() => onToggleSelect(item.id)} /> : null
+        }
+      />
+      {item.details?.type === 'media' && (
+        <Box sx={{ height: 400 }} />
+      )}
+      {item.details?.type === 'text' && (
+        <Box sx={{ direction: "column" }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {item.details.name}
+          </Typography>
+          {item.details.description && (
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {item.details.description}
+            </Typography>
+          )}
+          {item.details.link && (
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {item.details.link}
+            </Typography>
+          )}
+        </Box>)}
+      <CustomCardFooter right={
+        item.childrenIds.length > 0 &&
+        <CustomIconButton
+          onClick={handleCardClick}
+          icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />} />}>
 
-interface NewsletterItemTextCardDisplayProps {
-  details: NewsletterItemDetailsText;
-}
-export function NewsletterItemTextCardDisplay(
-  props: NewsletterItemTextCardDisplayProps
-) {
-  const { details } = props;
-  return (
-    <Stack>
-      <CardContent>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {details.name}
-        </Typography>
-        {details.description && (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {details.description}
-          </Typography>
-        )}
-        {details.link && (
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {details.link}
-          </Typography>
-        )}
-      </CardContent>
-    </Stack>
+      </CustomCardFooter>
+    </CustomCard>
   );
 }

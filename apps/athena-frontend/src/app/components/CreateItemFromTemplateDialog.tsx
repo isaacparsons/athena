@@ -1,20 +1,18 @@
 import { useMemo, useState } from 'react';
-
 import {
   Button,
-  ButtonBase,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  List,
-  ListItem,
+  Typography,
 } from '@mui/material';
-import { UserTemplateCard } from '../pages';
+
 import { mapToArray } from '../../util';
 import { useAddItemsStore, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
+import { CustomCard, CustomList, CustomListItem } from './common';
 
 interface CreateItemFromTemplateDialogProps {
   parentId: string | null;
@@ -35,7 +33,7 @@ export function CreateItemFromTemplateDialog(
     }))
   );
 
-  const { items, addItems } = useAddItemsStore(
+  const { addItems } = useAddItemsStore(
     useShallow((state) => ({
       items: state.data,
       addItems: state.addItems,
@@ -55,14 +53,9 @@ export function CreateItemFromTemplateDialog(
     setSelectedTemplateId((prev) => (prev === id ? null : id));
   };
 
-
-
   const handleAddTemplate = async () => {
     if (selectedTemplateId !== null) {
       const template = await fetchTemplate(selectedTemplateId);
-
-      console.log(template)
-
       addItems(parentId, template.items.filter((i) => i.data).map((i) => ({
         location: undefined,
         date: new Date().toISOString(),
@@ -76,38 +69,21 @@ export function CreateItemFromTemplateDialog(
 
   return (
     <Dialog
+      fullWidth
       open={open}
       onClose={() => onClose()}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">
-        {'Create from template'}
-      </DialogTitle>
-      <DialogContent>
-        <List>
+      <DialogTitle>{'Create from template'}</DialogTitle>
+      <DialogContent sx={{ width: '100%' }}>
+        <CustomList>
           {templates.map((template) => (
-            <ListItem key={template.id}>
-              <ButtonBase
-                sx={
-                  selectedTemplateId === template.id
-                    ? {
-                      borderWidth: 5,
-                      borderColor: 'black',
-                      borderStyle: 'solid',
-                      opacity: 1,
-                    }
-                    : {
-                      opacity: 0.5,
-                    }
-                }
-                onClick={() => handleTemplateSelected(template.id)}
-              >
-                <UserTemplateCard template={template} />
-              </ButtonBase>
-            </ListItem>
+            <CustomListItem id={template.id}>
+              <CustomCard onClick={() => handleTemplateSelected(template.id)} bgColor={selectedTemplateId === template.id ? 'primary.main' : 'secondary.light'}>
+                <Typography sx={{ color: selectedTemplateId === template.id ? 'secondary.light' : 'primary.main' }}>{template.name}</Typography>
+              </CustomCard>
+            </CustomListItem>
           ))}
-        </List>
+        </CustomList>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => onClose()}>Cancel</Button>
@@ -119,6 +95,6 @@ export function CreateItemFromTemplateDialog(
           </Button>
         )}
       </DialogActions>
-    </Dialog>
+    </Dialog >
   );
 }

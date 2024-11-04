@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import { useAddItemsStore, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { EditIcon, AddIcon } from '../icons';
+import { EditIcon, AddIcon, CloseIcon } from '../icons';
 import { mapToArray } from '../../util';
 
 export function Newsletter() {
@@ -83,11 +83,12 @@ export function Newsletter() {
   return (
     <>
       <ActionBar backBtn={<BackButton />}>
-        <IconButton size="large" onClick={handleOpenMediaItemsDialog}>
+        {!editing && <IconButton size="large" onClick={handleOpenMediaItemsDialog}>
           <AddIcon htmlColor="#fff" fontSize="inherit" />
-        </IconButton>
-        <IconButton size="large" onClick={() => setEditing(true)}>
-          <EditIcon htmlColor="#fff" fontSize="inherit" />
+        </IconButton>}
+        <IconButton size="large" onClick={() => setEditing(prev => !prev)}>
+          {editing ? <CloseIcon sx={{ color: 'secondary.light' }} /> :
+            <EditIcon htmlColor="#fff" fontSize="inherit" />}
         </IconButton>
       </ActionBar>
       <CustomContainer>

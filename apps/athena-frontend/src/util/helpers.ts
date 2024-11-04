@@ -12,5 +12,5 @@ export function formatDateRange(dateRange: DateRange) {
   if (!dateRange.start) return null;
   const start = formatDate(dateRange.start);
   const end = dateRange.end ? formatDate(dateRange.end) : null;
-  return `${start} - ${end}`;
+  return end ? `${start} - ${end}` : start;
 }

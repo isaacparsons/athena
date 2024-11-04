@@ -1,5 +1,4 @@
-import { UserNewsletterCard } from '../components';
-import { List, } from '@mui/material'
+import { UserNewsletterCard, CustomList, CustomListItem } from '../components';
 import { StoreNewsletter } from '../store';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,16 +10,17 @@ export function UserNewsletters(props: NewslettersProps) {
   const navigate = useNavigate();
 
   return (
-    <List sx={{ width: '100%' }}>
+    <CustomList>
       {newsletters.map((newsletter) => {
         return (
-          <UserNewsletterCard
-            key={newsletter.id}
-            newsletter={newsletter}
-            onClick={() => navigate(`/newsletters/${newsletter.id}`)}
-          />
+          <CustomListItem id={newsletter.id}>
+            <UserNewsletterCard
+              newsletter={newsletter}
+              onClick={() => navigate(`/newsletters/${newsletter.id}`)}
+            />
+          </CustomListItem>
         );
       })}
-    </List>
+    </CustomList>
   );
 }

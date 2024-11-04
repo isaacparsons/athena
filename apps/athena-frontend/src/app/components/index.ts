@@ -6,7 +6,6 @@ export * from './AddNewsletterDialog';
 // export * from './Carousel'
 export * from './ConfirmationDialog';
 export * from './CreateItemFromTemplateDialog';
-export * from './CustomSpeedDial';
 export * from './EditItemLocation';
 export * from './LocationInput';
 export * from './NewsletterItemsList';

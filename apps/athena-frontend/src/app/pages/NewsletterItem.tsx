@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NewsletterItemsList, CustomContainer, ActionBar, BackButtonIcon } from '../components';
 import { useStore } from '../store';
@@ -19,9 +19,8 @@ export function NewsletterItem() {
       ? _.parseInt(params.newsletterItemId)
       : null;
 
-  const { fetch, newsletterItems, loading } = useStore(
+  const { newsletterItems, loading } = useStore(
     useShallow((state) => ({
-      fetch: state.newsletterItems.fetch,
       newsletterItems: state.newsletterItems.data,
       loading: state.newsletterItems.loading,
     }))

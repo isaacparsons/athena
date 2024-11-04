@@ -18,6 +18,8 @@ import {
   ActionBar,
   AddItemCard,
   BackButtonIcon,
+  CustomList,
+  CustomListItem,
 } from '../components'
 
 import {
@@ -89,6 +91,7 @@ export function AddItemsDialog() {
         },
       }));
 
+    console.log(files)
     addItems(tempParentId, files);
   };
 
@@ -129,13 +132,13 @@ export function AddItemsDialog() {
     <>
       <Dialog fullScreen open={Boolean(existingItem)}>
         <ActionBar
+          title="Add Items"
           backBtn={
             tempParentId !== null ? (
               <BackButtonIcon onClick={handleBackBtnClick} />
             ) : null
           }
         />
-        <DialogTitle>Add Items</DialogTitle>
         <DialogContent>
           <input
             type="file"
@@ -145,16 +148,16 @@ export function AddItemsDialog() {
             name="media"
             onChange={handleFileSelection}
           />
-          <List>
+          <CustomList >
             {itemsArr.map((item) => (
-              <ListItem key={item.temp.id}>
+              <CustomListItem id={item.temp.id}>
                 <AddItemCard
                   item={item}
                   onClick={() => handleItemClick(item.temp.id)}
                 />
-              </ListItem>
+              </CustomListItem>
             ))}
-          </List>
+          </CustomList>
           <ButtonGroup>
             <Button
               startIcon={<TemplateIcon />}

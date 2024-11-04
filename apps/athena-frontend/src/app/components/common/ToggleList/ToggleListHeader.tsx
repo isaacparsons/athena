@@ -1,12 +1,12 @@
-import { Checkbox, IconButton, Paper, Stack, Typography } from '@mui/material';
-import { DeleteIcon } from '../../../icons';
+import { Box, Typography } from '@mui/material';
+import { CustomCardHeader } from '../CustomCard';
+import { CustomCheckbox } from '../CustomCheckbox';
 
 interface ToggleListHeaderProps {
   allSelected: boolean;
   selectable: boolean;
   selectedItemIds: Set<number>;
   onToggleSelectAll: () => void;
-  onDelete: () => void;
 }
 
 export function ToggleListHeader(props: ToggleListHeaderProps) {
@@ -15,22 +15,14 @@ export function ToggleListHeader(props: ToggleListHeaderProps) {
     selectable,
     selectedItemIds,
     onToggleSelectAll,
-    onDelete,
   } = props;
 
   if (!selectable) return null;
   return (
-    <Paper elevation={2}>
-      <Stack direction="row" spacing={1}>
-        <Stack direction="row">
-          <Checkbox value={allSelected} onClick={onToggleSelectAll} />
-          <Typography>Select all</Typography>
-        </Stack>
-
-        <IconButton onClick={onDelete} disabled={selectedItemIds.size === 0}>
-          <DeleteIcon />
-        </IconButton>
-      </Stack>
-    </Paper>
+    <Box sx={{ borderRadius: 5, bgColor: 'white', boxShadow: 1 }}>
+      <CustomCardHeader left={<CustomCheckbox id='select-all' value={selectedItemIds.size > 0 && allSelected} onClick={onToggleSelectAll} />}>
+        <Typography>Select all</Typography>
+      </CustomCardHeader>
+    </Box>
   );
 }

@@ -1,14 +1,19 @@
-import { List, Stack } from '@mui/material';
+import React from 'react';
+import { Stack } from '@mui/material';
 import { ToggleListHeader } from './ToggleListHeader';
-import { ToggleListItem } from './ToggleListItem';
+import { CustomList, CustomListItem } from '../CustomList';
 
 interface ToggleListProps<T> {
   selectedItemIds: Set<number>;
   setSelectedItemIds: (items: Set<number>) => void;
   items: T[];
   selectable: boolean;
-  onDelete: (ids: number[]) => void;
-  renderItem: (item: T) => React.ReactNode;
+  renderItem: (props: {
+    item: T,
+    selectable: boolean,
+    selected: boolean,
+    onToggleSelect: (id: number) => void
+  }) => React.ReactNode;
 }
 export function ToggleList<T extends { id: number }>(
   props: ToggleListProps<T>
@@ -16,7 +21,6 @@ export function ToggleList<T extends { id: number }>(
   const {
     items,
     selectable,
-    onDelete,
     renderItem,
     selectedItemIds,
     setSelectedItemIds,
@@ -49,24 +53,22 @@ export function ToggleList<T extends { id: number }>(
         selectable={selectable}
         selectedItemIds={selectedItemIds}
         onToggleSelectAll={handleToggleSelectAll}
-        onDelete={() => onDelete(Array.from(selectedItemIds))}
       />
-      <List>
+      <CustomList>
         {items.map((item) => {
           const isSelected = selectedItemIds.has(item.id);
           return (
-            <ToggleListItem
-              key={item.id.toString()}
-              id={item.id}
-              selectable={selectable}
-              selected={isSelected}
-              onToggleSelect={handleToggleSelect}
-            >
-              {renderItem(item)}
-            </ToggleListItem>
+            <CustomListItem id={item.id} >
+              {renderItem({
+                item,
+                selectable: selectable,
+                selected: isSelected,
+                onToggleSelect: handleToggleSelect
+              })}
+            </CustomListItem>
           );
         })}
-      </List>
+      </CustomList>
     </Stack>
   );
 }

@@ -1,19 +1,18 @@
 import React from 'react';
 
-import { Container, useTheme } from '@mui/material';
+import { Container } from '@mui/material';
 
 interface CustomContainerProps {
   children: React.ReactNode;
 }
 
-export function CustomContainer(props: CustomContainerProps) {
-  const { children } = props;
-  const theme = useTheme();
+export function CustomContainer({ children }: CustomContainerProps) {
   return (
     <Container
       sx={{
         minHeight: '100vh',
-        padding: theme.spacing(2),
+        padding: 2,
+        bgcolor: 'secondary.light'
       }}
       maxWidth="md"
     >

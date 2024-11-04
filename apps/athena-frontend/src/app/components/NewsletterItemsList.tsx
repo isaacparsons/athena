@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Fab } from '@mui/material';
 import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '../components';
-import { CloseIcon, TemplateIcon } from '../icons';
+import { CloseIcon, DeleteIcon, TemplateIcon } from '../icons';
 import { StoreNewsletterItem, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { usePromiseWithNotification } from '../hooks';
@@ -74,9 +74,12 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
       /> */}
       {editing &&
         <>
-          <Fab onClick={stopEditing} sx={{ position: 'fixed', bottom: 32, right: 32, bgcolor: 'red', color: 'white' }}>
-            <CloseIcon />
-          </Fab>
+          {editing && <Fab
+            disabled={selectedItemIds.size === 0}
+            onClick={() => handleDeleteItems(Array.from(selectedItemIds))}
+            sx={{ position: 'fixed', bottom: 32, right: 32, bgcolor: 'red', color: 'white' }}>
+            <DeleteIcon />
+          </Fab>}
           {selectedItems.length > 0 && <Fab variant="extended" onClick={handleOpenAddTemplateDialog} sx={{ position: 'fixed', bottom: 32 }}>
             <TemplateIcon sx={{ mr: 1 }} />
             Create Template
@@ -95,10 +98,7 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
         selectedItemIds={selectedItemIds}
         setSelectedItemIds={setSelectedItemIds}
         selectable={editing}
-        onDelete={handleDeleteItems}
-        renderItem={(item: StoreNewsletterItem) => (
-          <NewsletterItemCard item={item} />
-        )}
+        renderItem={(props) => (<NewsletterItemCard {...props} />)}
       />
     </>
   );
