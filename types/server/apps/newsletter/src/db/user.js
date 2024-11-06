@@ -32,10 +32,7 @@ class UserNewsletterTableClient extends db_1.Table {
                 .createTable(this.name)
                 .ifNotExists()
                 .addColumn('userId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.USER}.id`).onDelete('cascade').notNull())
-                .addColumn('newsletterId', 'integer', (col) => col
-                .references(`${db_1.TABLE_NAMES.NEWSLETTER}.id`)
-                .onDelete('cascade')
-                .notNull())
+                .addColumn('newsletterId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.NEWSLETTER}.id`).onDelete('cascade').notNull())
                 .execute();
             return;
         });

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 const tslib_1 = require("tslib");
+require("reflect-metadata");
 const express_1 = tslib_1.__importDefault(require("express"));
 const express_2 = require("@trpc/server/adapters/express");
 const cors_1 = tslib_1.__importDefault(require("cors"));

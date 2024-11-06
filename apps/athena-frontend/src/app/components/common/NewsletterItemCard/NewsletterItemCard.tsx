@@ -8,6 +8,7 @@ import { CustomCard, CustomCardFooter, CustomCardHeader } from '../CustomCard';
 import { CustomCheckbox } from '../CustomCheckbox';
 import { CustomIconButton } from '../CustomIconButton';
 import { ArrowForwardIcon } from '../../../icons';
+import { NewsletterItemTypeName } from '@athena/athena-common';
 
 interface NewsletterItemCardProps {
   item: StoreNewsletterItem;
@@ -25,7 +26,7 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
   return (
     <CustomCard
       onClick={selectable || !hasChildren ? undefined : handleCardClick}
-      src={item.details?.type === 'media' ? item.details.fileName : undefined}
+      src={item.details?.type === NewsletterItemTypeName.Media ? item.details.fileName : undefined}
     >
       <CustomCardHeader
         left={selectable ?
@@ -39,10 +40,10 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
           {item.title}
         </Typography>
       </CustomCardHeader>
-      {item.details?.type === 'media' && (
+      {item.details?.type === NewsletterItemTypeName.Media && (
         <Box sx={{ height: 400 }} />
       )}
-      {item.details?.type === 'text' && (
+      {item.details?.type === NewsletterItemTypeName.Text && (
         <Box sx={{ direction: "column" }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {item.details.name}

@@ -1,13 +1,11 @@
+import 'reflect-metadata';
 import { DBConnection } from '../db';
 import { LocationInput } from '@athena/athena-common';
-export declare class LocationDAO {
-  readonly db: DBConnection;
-  constructor(db: DBConnection);
-  post(input: LocationInput): Promise<{
-    id: number;
-    name: string | null;
-    longitude: number | null;
-    lattitude: number | null;
-    countryCode: string | null;
-  }>;
+export interface ILocationDAO {
+    post(input: LocationInput): Promise<number>;
+}
+export declare class LocationDAO implements ILocationDAO {
+    readonly db: DBConnection;
+    constructor(db: DBConnection);
+    post(input: LocationInput): Promise<number>;
 }

@@ -23,6 +23,7 @@ import { nanoid } from 'nanoid';
 import {
   CreateNewsletterItemBatchInput,
   CreateNewsletterItemBatchInputItem,
+  NewsletterItemTypeName,
 } from '@athena/athena-common';
 
 const newsletterDAO = container.get<INewsletterDAO>(TYPES.INewsletterDAO);
@@ -120,7 +121,7 @@ export class DBManagerClient {
         prevId: null,
       },
       details: {
-        type: 'text',
+        type: NewsletterItemTypeName.Text,
         name: 'It was pretty good',
       },
     };
@@ -134,7 +135,7 @@ export class DBManagerClient {
         prevId: movieReviewThoughtsId,
       },
       details: {
-        type: 'text',
+        type: NewsletterItemTypeName.Text,
         name: '7/10',
       },
     };

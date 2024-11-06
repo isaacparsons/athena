@@ -2,20 +2,29 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LocationDAO = void 0;
 const tslib_1 = require("tslib");
-class LocationDAO {
+const inversify_1 = require("inversify");
+require("reflect-metadata");
+const types_1 = require("../types/types");
+let LocationDAO = class LocationDAO {
     constructor(db) {
         this.db = db;
     }
     post(input) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             var _a;
-            return this.db
+            const res = yield this.db
                 .insertInto('location')
                 .values(Object.assign(Object.assign({}, input), { name: (_a = input === null || input === void 0 ? void 0 : input.name) !== null && _a !== void 0 ? _a : 'untitled' }))
-                .returningAll()
+                .returning('id')
                 .executeTakeFirstOrThrow();
+            return res.id;
         });
     }
-}
+};
 exports.LocationDAO = LocationDAO;
+exports.LocationDAO = LocationDAO = tslib_1.__decorate([
+    (0, inversify_1.injectable)(),
+    tslib_1.__param(0, (0, inversify_1.inject)(types_1.TYPES.DBClient)),
+    tslib_1.__metadata("design:paramtypes", [Object])
+], LocationDAO);
 //# sourceMappingURL=location.js.map

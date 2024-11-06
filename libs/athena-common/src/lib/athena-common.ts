@@ -12,15 +12,29 @@ export const locationInput = z
   })
   .optional();
 
+export enum MediaFormat {
+  Image = 'image',
+  Video = 'video',
+  Audio = 'audio',
+}
+
+export enum NewsletterItemTypeName {
+  Media = 'media',
+  Text = 'text',
+}
+
+const mediaFormat = z.nativeEnum(MediaFormat);
+
 export const mediaItemDetails = z.object({
-  type: z.literal('media'),
+  type: z.literal(NewsletterItemTypeName.Media),
   name: z.string(),
   fileName: z.string(),
+  format: mediaFormat,
   caption: z.string().optional().nullable(),
 });
 
 export const textItemDetails = z.object({
-  type: z.literal('text'),
+  type: z.literal(NewsletterItemTypeName.Text),
   name: z.string(),
   description: z.string().optional().nullable(),
   link: z.string().optional().nullable(),
@@ -123,8 +137,8 @@ export const getItemUploadLinksInput = z.object({
 const newsletterItemTemplateDataDetails = z
   .discriminatedUnion('type', [
     mediaItemDetails
-      .pick({ type: true })
-      .merge(mediaItemDetails.omit({ type: true }).partial()),
+      .pick({ type: true, format: true })
+      .merge(mediaItemDetails.omit({ type: true, format: true }).partial()),
     textItemDetails
       .pick({ type: true })
       .merge(textItemDetails.omit({ type: true }).partial()),
@@ -281,13 +295,17 @@ export type CreateItemDetailsInput<
 export function isMediaDetailsInput(
   details: CreateItemDetailsInput | undefined
 ): details is CreateItemDetailsInputMedia {
-  return (details as CreateItemDetailsInputMedia)?.type === 'media';
+  return (
+    (details as CreateItemDetailsInputMedia)?.type === NewsletterItemTypeName.Media
+  );
 }
 
 export function isTextDetailsInput(
   details: CreateItemDetailsInput | undefined
 ): details is CreateItemDetailsInputText {
-  return (details as CreateItemDetailsInputText)?.type === 'text';
+  return (
+    (details as CreateItemDetailsInputText)?.type === NewsletterItemTypeName.Text
+  );
 }
 
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
@@ -318,23 +336,22 @@ export type NewsletterItemDetailsBase = {
 };
 
 export type NewsletterItemDetailsMedia = NewsletterItemDetailsBase & {
-  type: 'media';
+  type: NewsletterItemTypeName.Media;
   fileName: string;
+  format: MediaFormat;
   caption: string | null;
 };
 
 export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
-  type: 'text';
+  type: NewsletterItemTypeName.Text;
   description: string | null;
   link: string | null;
 };
 
 export type NewsletterItemDetailsMap = {
-  media: NewsletterItemDetailsMedia;
-  text: NewsletterItemDetailsText;
+  [NewsletterItemTypeName.Media]: NewsletterItemDetailsMedia;
+  [NewsletterItemTypeName.Text]: NewsletterItemDetailsText;
 };
-
-export type NewsletterItemTypeName = keyof NewsletterItemDetailsMap;
 
 type NewsletterItemDetails<
   T extends NewsletterItemTypeName = NewsletterItemTypeName
@@ -346,13 +363,15 @@ export type NewsletterItemDetailsTypeFromName<T extends NewsletterItemTypeName> 
 export function isMediaDetails(
   details: NewsletterItemDetails
 ): details is NewsletterItemDetailsMedia {
-  return (details as NewsletterItemDetailsMedia).type === 'media';
+  return (
+    (details as NewsletterItemDetailsMedia).type === NewsletterItemTypeName.Media
+  );
 }
 
 export function isTextDetails(
   details: NewsletterItemDetails
 ): details is NewsletterItemDetailsText {
-  return (details as NewsletterItemDetailsText).type === 'text';
+  return (details as NewsletterItemDetailsText).type === NewsletterItemTypeName.Text;
 }
 
 export interface NewsletterItemBase<

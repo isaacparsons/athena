@@ -8,6 +8,7 @@ import {
   CreateNewsletterInput,
   UpdateNewsletterInput,
   NewsletterItemDetailsMedia,
+  NewsletterItemTypeName,
 } from '@athena/athena-common';
 import { creator, modifier, user, parseDateRange, location } from '../util';
 import { IGCSManager } from '../services';
@@ -85,7 +86,7 @@ export class NewsletterDAO implements INewsletterDAO {
     const mappedItems = newsletter.items.map((item) => mapNewsletterItem(item));
     const itemsWithSignedUrl = await Promise.all(
       mappedItems.map(async (item) => {
-        if (item.details?.type === 'media') {
+        if (item.details?.type === NewsletterItemTypeName.Media) {
           const details = item.details as NewsletterItemDetailsMedia;
           const signedUrl = await this.gcs.getSignedUrl(details.fileName, 'read');
           details.fileName = signedUrl;

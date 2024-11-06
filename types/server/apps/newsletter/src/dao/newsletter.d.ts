@@ -1,25 +1,21 @@
-import { NewsletterItemDAO } from '.';
-import { DBConnection as DBConnection } from '../db';
-import {
-  Newsletter,
-  CreateNewsletterInput,
-  UpdateNewsletterInput,
-} from '@athena/athena-common';
-import { GCSManager } from '../services';
-export declare class NewsletterDAO {
-  readonly db: DBConnection;
-  readonly gcs: GCSManager;
-  readonly newsletterItemDAO: NewsletterItemDAO;
-  constructor(
-    db: DBConnection,
-    gcs: GCSManager,
-    newsletterItemDAO: NewsletterItemDAO
-  );
-  get(id: number): Promise<Newsletter>;
-  post(userId: number, input: CreateNewsletterInput): Promise<number>;
-  update(
-    userId: number,
-    input: UpdateNewsletterInput
-  ): Promise<import('kysely').UpdateResult>;
-  delete(userId: number, id: number): Promise<import('kysely').DeleteResult[]>;
+import 'reflect-metadata';
+import { INewsletterItemDAO } from '.';
+import { DBConnection } from '../db';
+import { Newsletter, CreateNewsletterInput, UpdateNewsletterInput } from '@athena/athena-common';
+import { IGCSManager } from '../services';
+export interface INewsletterDAO {
+    get(id: number): Promise<Newsletter>;
+    post(userId: number, input: CreateNewsletterInput): Promise<number>;
+    update(userId: number, input: UpdateNewsletterInput): Promise<number>;
+    delete(userId: number, id: number): Promise<number>;
+}
+export declare class NewsletterDAO implements INewsletterDAO {
+    readonly db: DBConnection;
+    readonly gcs: IGCSManager;
+    readonly newsletterItemDAO: INewsletterItemDAO;
+    constructor(db: DBConnection, gcs: IGCSManager, newsletterItemDAO: INewsletterItemDAO);
+    get(id: number): Promise<Newsletter>;
+    post(userId: number, input: CreateNewsletterInput): Promise<number>;
+    update(userId: number, input: UpdateNewsletterInput): Promise<number>;
+    delete(userId: number, id: number): Promise<number>;
 }

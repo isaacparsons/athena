@@ -9,8 +9,9 @@ import {
   StoreAddNewsletterItemInput,
   useAddItemsStore,
 } from '../store';
-import { DeepPartial, isMediaDetailsInput, isTextDetailsInput, NewsletterItemTypeName } from '@athena/athena-common';
+import { DeepPartial, isMediaDetailsInput, isTextDetailsInput, MediaFormat, NewsletterItemTypeName } from '@athena/athena-common';
 import { CustomCard, CustomCardFooter, CustomCardHeader, CustomIconButton } from './common';
+import ReactPlayer from 'react-player';
 
 
 interface AddItemCardProps {
@@ -38,13 +39,13 @@ export function AddItemCard({ item, onClick, removeItem, updateItemDetails }: Ad
   //   } else {
 
 
-  const handleNameChange = (name: string) => updateItemDetails(item.temp.id, { details: { type: 'text', name } })
-  const handleDescriptionChange = (description: string) => updateItemDetails<'text'>(item.temp.id, { details: { type: 'text', description } })
-  const handleLinkChange = (link: string) => updateItemDetails<'text'>(item.temp.id, { details: { type: 'text', link } })
+  const handleNameChange = (name: string) => updateItemDetails(item.temp.id, { details: { type: NewsletterItemTypeName.Text, name } })
+  const handleDescriptionChange = (description: string) => updateItemDetails<NewsletterItemTypeName.Text>(item.temp.id, { details: { type: NewsletterItemTypeName.Text, description } })
+  const handleLinkChange = (link: string) => updateItemDetails<NewsletterItemTypeName.Text>(item.temp.id, { details: { type: NewsletterItemTypeName.Text, link } })
 
   return (
     <CustomCard
-      src={isMediaDetailsInput(item.details) && item.details.file ? URL.createObjectURL(item.details.file) : undefined}
+      src={isMediaDetailsInput(item.details) && item.details.file && item.details.format === MediaFormat.Image ? URL.createObjectURL(item.details.file) : undefined}
     >
       <CustomCardHeader
         right={
@@ -79,7 +80,16 @@ interface AddItemCardDetailsProps {
 export function AddItemCardDetails({ item, onNameChange, onDescriptionChange, onLinkChange }: AddItemCardDetailsProps) {
   return (
     <>
-      {isMediaDetailsInput(item.details) && <Box sx={{ height: 400 }} />}
+      {isMediaDetailsInput(item.details) && item.details.format === MediaFormat.Image && <Box sx={{ height: 400 }} />}
+      {isMediaDetailsInput(item.details)
+        && item.details.format === MediaFormat.Video && item.details.file
+        && <ReactPlayer
+          url={URL.createObjectURL(item.details.file)}
+          controls={true}
+          width={"100%"}
+          height={"100%"} />}
+
+
       {
         isTextDetailsInput(item.details) &&
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>

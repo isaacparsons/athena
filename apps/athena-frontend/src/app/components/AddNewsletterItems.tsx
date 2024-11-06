@@ -1,12 +1,13 @@
 import _ from 'lodash'
 import { StoreAddNewsletterItem, StoreAddNewsletterItemInput } from "../store";
 import { useRef, useState } from "react";
-import { DeepPartial, NewsletterItemTypeName, range } from "@athena/athena-common";
+import { DeepPartial, MediaFormat, NewsletterItemTypeName, range } from "@athena/athena-common";
 import { CustomList, CustomListItem } from "./common";
 import { AddItemCard } from "./AddItemCard";
 import { Button, ButtonGroup } from "@mui/material";
 import { MediaIcon, TemplateIcon, TextIcon } from "../icons";
 import { CreateItemFromTemplateDialog } from "./CreateItemFromTemplateDialog";
+import { mimeTypeToMediaFormat } from '../../util';
 
 interface AddNewsletterItemsProps {
     handleItemClick: (id: string) => void;
@@ -47,11 +48,14 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
                 details: {
                     name: f.name,
                     caption: '',
-                    type: 'media' as NewsletterItemTypeName,
+                    type: NewsletterItemTypeName.Media,
                     fileName: '',
                     file: f,
+                    format: mimeTypeToMediaFormat(f.type)
                 },
             }));
+
+        console.log('files', files)
 
         addItems(parentId, files);
     };
@@ -64,7 +68,7 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
                 location: undefined,
                 details: {
                     name: '',
-                    type: 'text',
+                    type: NewsletterItemTypeName.Text,
                 },
             },
         ]);

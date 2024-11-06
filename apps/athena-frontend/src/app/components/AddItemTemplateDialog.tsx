@@ -11,49 +11,15 @@ import {
 import { StoreAddNewsletterItem, StoreAddNewsletterItemInput, StoreNewsletterItem, traverseItemIds, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import {
-  CreateNewsletterItemTemplateInput,
   DeepPartial,
   NewsletterItemTypeName,
 } from '@athena/athena-common';
 import { usePromiseWithNotification } from '../hooks';
-import { convertToTemplateItems, mapToArray } from '../../util';
+import { convertToEditableItems, mapToArray } from '../../util';
 import { AddNewsletterItems } from './AddNewsletterItems';
 import { nanoid } from 'nanoid';
 import { ActionBar, BackButtonIcon } from './common';
 
-export const convertToItems = (items: StoreNewsletterItem[]): StoreAddNewsletterItem<NewsletterItemTypeName | undefined>[] => {
-  const realIdTempIdMap: Map<number, string> = new Map(
-    items.reduce((ids, i) => {
-      ids.push([i.id, nanoid()]);
-      if (i.nextItemId) ids.push([i.nextItemId, nanoid()]);
-      if (i.previousItemId) ids.push([i.previousItemId, nanoid()]);
-      if (i.parentId) ids.push([i.parentId, nanoid()]);
-      return ids;
-    }, [] as [number, string][])
-  );
-
-  const getTempId = (id: number) => {
-    const tempId = realIdTempIdMap.get(id);
-    if (!tempId) throw new Error('Invalid id');
-    return tempId;
-  };
-
-  return items.map((i) => {
-    const parent = items.find((item) => item.childrenIds.includes(i.id));
-    return {
-      title: i.title,
-      date: i.date === null ? undefined : i.date,
-      location: undefined, // TODO: fix this
-      details: i.details?.type === 'media' ? { ...i.details, file: null } : i.details,
-      temp: {
-        id: getTempId(i.id),
-        parentId: parent ? getTempId(parent.id) : null,
-        nextId: i.nextItemId ? getTempId(i.nextItemId) : null,
-        prevId: i.previousItemId ? getTempId(i.previousItemId) : null,
-      },
-    };
-  });
-};
 
 interface AddItemTemplateDialog {
   open: boolean;
@@ -88,15 +54,13 @@ export function AddItemTemplateDialog({ open, handleClose, items }: AddItemTempl
       const parentIds = items.map((i) => i.id)
       const ids = traverseItemIds(newsletterItems, parentIds, parentIds);
       const allItems = mapToArray(newsletterItems).filter((i) => ids.includes(i.id));
-      setTemplate({ name: '', items: convertToItems(allItems) })
+      setTemplate({ name: '', items: convertToEditableItems(allItems) })
     }
   }, [items, setTemplate, newsletterItems]);
 
   const [tempParentId, setTempParentId] = useState<null | string>(null);
   const [saving, setSaving] = useState(false);
-  // const templateItems = useMemo(() => convertToTemplateItems(items), [items]);
   const handleItemClick = (id: string) => setTempParentId(id);
-
 
   const handleBackBtnClick = () => {
     const item = template.items.find((i) => i.temp.id === tempParentId);

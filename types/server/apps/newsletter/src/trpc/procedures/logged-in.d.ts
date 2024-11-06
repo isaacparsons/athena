@@ -6,14 +6,14 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
-            gcs: import("../../services").GCSManager;
+            gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
             dao: {
-                user: import("../../dao").UserDAO;
-                newsletter: import("../../dao").NewsletterDAO;
-                location: import("../../dao").LocationDAO;
-                newsletterItem: import("../../dao").NewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                user: import("../../dao").IUserDAO;
+                newsletter: import("../../dao").INewsletterDAO;
+                location: import("../../dao").ILocationDAO;
+                newsletterItem: import("../../dao").INewsletterItemDAO;
+                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
             };
         };
         meta: object;
@@ -33,14 +33,14 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
             isAuthenticated(): () => boolean;
         };
         res: import("express").Response<any, Record<string, any>>;
-        gcs: import("../../services").GCSManager;
+        gcs: import("../../services").IGCSManager;
         db: import("kysely").Kysely<import("../../db").Database>;
         dao: {
-            user: import("../../dao").UserDAO;
-            newsletter: import("../../dao").NewsletterDAO;
-            location: import("../../dao").LocationDAO;
-            newsletterItem: import("../../dao").NewsletterItemDAO;
-            newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+            user: import("../../dao").IUserDAO;
+            newsletter: import("../../dao").INewsletterDAO;
+            location: import("../../dao").ILocationDAO;
+            newsletterItem: import("../../dao").INewsletterItemDAO;
+            newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
         };
     };
     _input_in: typeof import("@trpc/server").unsetMarker;

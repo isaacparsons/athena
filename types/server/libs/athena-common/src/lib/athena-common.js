@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteNewsletterItemTemplateInput = exports.getNewsletterItemTemplateInput = exports.postNewsletterItemTemplateInput = exports.getItemUploadLinksInput = exports.deleteManyNewsletterItemsInput = exports.deleteNewsletterInput = exports.updateNewsletterInput = exports.postNewsletterInput = exports.getNewsletterInput = exports.updateNewsletterItemInput = exports.postNewsletterItemBatchInput = exports.postNewsletterItemBatchInputItem = exports.tempNewsletterItemIds = exports.postNewsletterItemInput = exports.postNewsletterItemInputBase = exports.getNewsletterItemTreeInput = exports.getNewsletterItemInput = exports.newsletterItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.locationInput = void 0;
+exports.deleteNewsletterItemTemplateInput = exports.getNewsletterItemTemplateInput = exports.postNewsletterItemTemplateInput = exports.getItemUploadLinksInput = exports.deleteManyNewsletterItemsInput = exports.deleteNewsletterInput = exports.updateNewsletterInput = exports.postNewsletterInput = exports.getNewsletterInput = exports.updateNewsletterItemInput = exports.postNewsletterItemBatchInput = exports.postNewsletterItemBatchInputItem = exports.tempNewsletterItemIds = exports.postNewsletterItemInput = exports.postNewsletterItemInputBase = exports.getNewsletterItemTreeInput = exports.getNewsletterItemInput = exports.newsletterItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.NewsletterItemTypeName = exports.MediaFormat = exports.locationInput = void 0;
 exports.isMediaDetailsInput = isMediaDetailsInput;
 exports.isTextDetailsInput = isTextDetailsInput;
 exports.isMediaDetails = isMediaDetails;
@@ -17,14 +17,27 @@ exports.locationInput = zod_1.z
     longitude: zod_1.z.coerce.number().optional(),
 })
     .optional();
+var MediaFormat;
+(function (MediaFormat) {
+    MediaFormat["Image"] = "image";
+    MediaFormat["Video"] = "video";
+    MediaFormat["Audio"] = "audio";
+})(MediaFormat || (exports.MediaFormat = MediaFormat = {}));
+var NewsletterItemTypeName;
+(function (NewsletterItemTypeName) {
+    NewsletterItemTypeName["Media"] = "media";
+    NewsletterItemTypeName["Text"] = "text";
+})(NewsletterItemTypeName || (exports.NewsletterItemTypeName = NewsletterItemTypeName = {}));
+const mediaFormat = zod_1.z.nativeEnum(MediaFormat);
 exports.mediaItemDetails = zod_1.z.object({
-    type: zod_1.z.literal('media'),
+    type: zod_1.z.literal(NewsletterItemTypeName.Media),
     name: zod_1.z.string(),
     fileName: zod_1.z.string(),
+    format: mediaFormat,
     caption: zod_1.z.string().optional().nullable(),
 });
 exports.textItemDetails = zod_1.z.object({
-    type: zod_1.z.literal('text'),
+    type: zod_1.z.literal(NewsletterItemTypeName.Text),
     name: zod_1.z.string(),
     description: zod_1.z.string().optional().nullable(),
     link: zod_1.z.string().optional().nullable(),
@@ -109,21 +122,21 @@ exports.getItemUploadLinksInput = zod_1.z.object({
 const newsletterItemTemplateDataDetails = zod_1.z
     .discriminatedUnion('type', [
     exports.mediaItemDetails
-        .pick({ type: true })
-        .merge(exports.mediaItemDetails.omit({ type: true }).partial()),
+        .pick({ type: true, format: true })
+        .merge(exports.mediaItemDetails.omit({ type: true, format: true }).partial()),
     exports.textItemDetails
         .pick({ type: true })
         .merge(exports.textItemDetails.omit({ type: true }).partial()),
 ])
     .optional();
-const baseNewsletterItemTemplateData = zod_1.z.object({
-    id: zod_1.z.number(),
-    nextId: zod_1.z.number().nullable(),
-    prevId: zod_1.z.number().nullable(),
-    parentId: zod_1.z.number().nullable(),
-    templateId: zod_1.z.number().nullable(),
-    data: newsletterItemTemplateDataDetails,
-});
+// const baseNewsletterItemTemplateData = z.object({
+//   id: z.number(),
+//   nextId: z.number().nullable(),
+//   prevId: z.number().nullable(),
+//   parentId: z.number().nullable(),
+//   templateId: z.number().nullable(),
+//   data: newsletterItemTemplateDataDetails,
+// });
 exports.postNewsletterItemTemplateInput = zod_1.z.object({
     name: zod_1.z.string(),
     data: zod_1.z.array(zod_1.z.object({
@@ -139,15 +152,15 @@ exports.deleteNewsletterItemTemplateInput = zod_1.z.object({
     id: zod_1.z.number(),
 });
 function isMediaDetailsInput(details) {
-    return details.type === 'media';
+    return ((details === null || details === void 0 ? void 0 : details.type) === NewsletterItemTypeName.Media);
 }
 function isTextDetailsInput(details) {
-    return details.type === 'text';
+    return ((details === null || details === void 0 ? void 0 : details.type) === NewsletterItemTypeName.Text);
 }
 function isMediaDetails(details) {
-    return details.type === 'media';
+    return (details.type === NewsletterItemTypeName.Media);
 }
 function isTextDetails(details) {
-    return details.type === 'text';
+    return details.type === NewsletterItemTypeName.Text;
 }
 //# sourceMappingURL=athena-common.js.map

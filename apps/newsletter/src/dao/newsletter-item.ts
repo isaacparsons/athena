@@ -90,6 +90,7 @@ const mapNewsletterItemDetails = (
       name: media.name,
       type: media.type,
       fileName: media.fileName,
+      format: media.format,
       caption: media.caption,
     };
   if (text)

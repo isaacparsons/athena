@@ -29,10 +29,7 @@ class NewsletterItemTableClient extends db_1.Table {
                 .ifNotExists()
                 .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
                 .addColumn('title', 'varchar', (cb) => cb.notNull())
-                .addColumn('newsletterId', 'integer', (col) => col
-                .references(`${db_1.TABLE_NAMES.NEWSLETTER}.id`)
-                .notNull()
-                .onDelete('cascade'))
+                .addColumn('newsletterId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.NEWSLETTER}.id`).notNull().onDelete('cascade'))
                 .addColumn('date', 'timestamp')
                 .addColumn('locationId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.LOCATION}.id`).onDelete('set null'))
                 .addColumn('created', 'timestamp', (cb) => cb.notNull().defaultTo((0, kysely_1.sql) `now()`))

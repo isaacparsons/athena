@@ -2,8 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserDAO = void 0;
 const tslib_1 = require("tslib");
-const db_1 = require("../db");
-class UserDAO {
+require("reflect-metadata");
+const util_1 = require("../util");
+const inversify_1 = require("inversify");
+const types_1 = require("../types/types");
+let UserDAO = class UserDAO {
     constructor(db) {
         this.db = db;
     }
@@ -33,22 +36,9 @@ class UserDAO {
                 'n.name',
                 'n.startDate',
                 'n.endDate',
-                (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('user as creator')
-                    .selectAll('creator')
-                    .whereRef('n.creatorId', '=', 'creator.id'))
-                    .$notNull()
-                    .as('creator'),
-                (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('user as modifier')
-                    .selectAll('modifier')
-                    .whereRef('n.modifierId', '=', 'modifier.id')).as('modifier'),
-                (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('user as owner')
-                    .selectAll('owner')
-                    .whereRef('n.ownerId', '=', 'owner.id'))
-                    .$notNull()
-                    .as('owner'),
+                (0, util_1.creator)(this.db, eb.ref('n.creatorId')),
+                (0, util_1.modifier)(this.db, eb.ref('n.modifierId')),
+                (0, util_1.user)(this.db, eb.ref('n.ownerId'), 'owner'),
             ])
                 .execute();
             return newsletters.map((newsletter) => ({
@@ -80,16 +70,8 @@ class UserDAO {
                 'nit.name',
                 'nit.created',
                 'nit.modified',
-                (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('user as creator')
-                    .selectAll('creator')
-                    .whereRef('creator.id', '=', 'nit.creatorId'))
-                    .$notNull()
-                    .as('creator'),
-                (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('user as modifier')
-                    .selectAll('modifier')
-                    .whereRef('modifier.id', '=', 'nit.modifierId')).as('modifier'),
+                (0, util_1.creator)(this.db, eb.ref('nit.creatorId')),
+                (0, util_1.modifier)(this.db, eb.ref('nit.modifierId')),
             ])
                 .where('ut.userId', '=', userId)
                 .execute();
@@ -105,6 +87,11 @@ class UserDAO {
             }));
         });
     }
-}
+};
 exports.UserDAO = UserDAO;
+exports.UserDAO = UserDAO = tslib_1.__decorate([
+    (0, inversify_1.injectable)(),
+    tslib_1.__param(0, (0, inversify_1.inject)(types_1.TYPES.DBClient)),
+    tslib_1.__metadata("design:paramtypes", [Object])
+], UserDAO);
 //# sourceMappingURL=user.js.map

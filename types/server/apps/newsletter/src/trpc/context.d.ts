@@ -1,5 +1,6 @@
-import { UserDAO, NewsletterDAO, LocationDAO, NewsletterItemDAO, NewsletterItemTemplateDAO } from '../dao';
-import { GCSManager } from '../services';
+import { Database, DB } from '../db';
+import { UserDAO, NewsletterDAO, LocationDAO, NewsletterItemDAO, NewsletterItemTemplateDAO, INewsletterDAO, IUserDAO, ILocationDAO, INewsletterItemDAO, INewsletterItemTemplateDAO } from '../dao';
+import { GCSManager, IGCSManager } from '../services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/athena-common';
 type ContextInput = {
@@ -16,6 +17,7 @@ export type Context = {
     };
     res: Response;
     gcs: GCSManager;
+    db: DB<Database>;
     dao: {
         user: UserDAO;
         newsletter: NewsletterDAO;
@@ -30,14 +32,14 @@ export declare function createContext({ req, res }: ContextInput): {
         isAuthenticated(): () => boolean;
     };
     res: Response<any, Record<string, any>>;
-    gcs: GCSManager;
-    db: import("kysely/dist/cjs/kysely").Kysely<import("../db").Database>;
+    gcs: IGCSManager;
+    db: DB<Database>;
     dao: {
-        user: UserDAO;
-        newsletter: NewsletterDAO;
-        location: LocationDAO;
-        newsletterItem: NewsletterItemDAO;
-        newsletterItemTemplate: NewsletterItemTemplateDAO;
+        user: IUserDAO;
+        newsletter: INewsletterDAO;
+        location: ILocationDAO;
+        newsletterItem: INewsletterItemDAO;
+        newsletterItemTemplate: INewsletterItemTemplateDAO;
     };
 };
 export {};

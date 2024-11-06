@@ -1,5 +1,5 @@
-import { ITable, DB, Database } from '../db';
-export declare const dbClient: DB<Database>;
+import 'reflect-metadata';
+import { ITable } from '../db';
 export declare class DBManagerClient {
     tables: ITable[];
     constructor();

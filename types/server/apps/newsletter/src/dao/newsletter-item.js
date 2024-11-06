@@ -3,8 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemDAO = exports.mapNewsletterItem = void 0;
 const tslib_1 = require("tslib");
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
+require("reflect-metadata");
 const _1 = require(".");
 const util_1 = require("../util");
+const inversify_1 = require("inversify");
+const types_1 = require("../types/types");
 const mapNewsletterItem = (item) => ({
     id: item.id,
     newsletterId: item.newsletterId,
@@ -43,6 +46,7 @@ const mapNewsletterItemDetails = (media, text) => {
             name: media.name,
             type: media.type,
             fileName: media.fileName,
+            format: media.format,
             caption: media.caption,
         };
     if (text)
@@ -54,7 +58,7 @@ const mapNewsletterItemDetails = (media, text) => {
             link: text.link,
         };
 };
-class NewsletterItemDAO {
+let NewsletterItemDAO = class NewsletterItemDAO {
     constructor(db, locationDAO, newsletterItemDetailsDAO) {
         this.db = db;
         this.locationDAO = locationDAO;
@@ -99,11 +103,11 @@ class NewsletterItemDAO {
     post(userId, input) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return this.db.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                const location = yield new _1.LocationDAO(trx).post(input.location);
+                const locationId = yield new _1.LocationDAO(trx).post(input.location);
                 const details = input.details;
                 const createdNewsletterItem = yield trx
                     .insertInto('newsletter_item')
-                    .values(Object.assign(Object.assign({}, lodash_1.default.omit(input, ['location', 'details'])), { locationId: location.id, created: new Date().toISOString(), creatorId: userId }))
+                    .values(Object.assign(Object.assign({}, lodash_1.default.omit(input, ['location', 'details'])), { locationId: locationId, created: new Date().toISOString(), creatorId: userId }))
                     .returningAll()
                     .executeTakeFirstOrThrow();
                 if (details) {
@@ -159,7 +163,7 @@ class NewsletterItemDAO {
                         return null;
                     return (_a = tempIdRealIdMap.get(id)) !== null && _a !== void 0 ? _a : null;
                 };
-                return Promise.all(input.batch.map((item) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                const res = yield Promise.all(input.batch.map((item) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                     return this.db
                         .updateTable('newsletter_item')
                         .set({
@@ -177,6 +181,7 @@ class NewsletterItemDAO {
                         .where('newsletter_item.id', '=', getRealId(item.temp.id))
                         .executeTakeFirstOrThrow();
                 })));
+                return res.map((r) => r.id);
             }));
         });
     }
@@ -201,7 +206,10 @@ class NewsletterItemDAO {
                     (0, util_1.creator)(this.db, eb.ref('newsletter_item.creatorId')),
                     (0, util_1.modifier)(this.db, eb.ref('newsletter_item.modifierId')),
                 ])
-                    .where(({ or, eb }) => or([eb('newsletter_item.id', '=', id), eb('newsletter_item.parentId', '=', id)]))
+                    .where(({ or, eb }) => or([
+                    eb('newsletter_item.id', '=', id),
+                    eb('newsletter_item.parentId', '=', id),
+                ]))
                     .executeTakeFirstOrThrow();
                 const children = yield trx
                     .selectFrom('newsletter_item')
@@ -225,53 +233,6 @@ class NewsletterItemDAO {
                     .execute();
                 return Object.assign(Object.assign({}, (0, exports.mapNewsletterItem)(parentItem)), { children: children.map(exports.mapNewsletterItem) });
             }));
-        });
-    }
-    getTree(input) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const result = yield this.db
-                .withRecursive('newsletter_items_tree', (db) => db
-                .selectFrom('newsletter_item as ni1')
-                .select((eb) => [
-                'id',
-                'newsletterId',
-                'title',
-                'date',
-                'parentId',
-                'nextItemId',
-                'previousItemId',
-                'created',
-                'modified',
-                (0, util_1.newsletterItemDetailsMedia)(this.db, eb.ref('ni1.id')),
-                (0, util_1.newsletterItemDetailsText)(this.db, eb.ref('ni1.id')),
-                (0, util_1.location)(this.db, eb.ref('ni1.locationId')),
-                (0, util_1.creator)(this.db, eb.ref('ni1.creatorId')),
-                (0, util_1.modifier)(this.db, eb.ref('ni1.modifierId')),
-            ])
-                .where('ni1.parentId', input.parentId ? '=' : 'is', input.parentId)
-                .unionAll(db
-                .selectFrom('newsletter_item as ni2')
-                .select((eb) => [
-                'id',
-                'newsletterId',
-                'title',
-                'date',
-                'parentId',
-                'nextItemId',
-                'previousItemId',
-                'created',
-                'modified',
-                (0, util_1.newsletterItemDetailsMedia)(this.db, eb.ref('ni2.id')),
-                (0, util_1.newsletterItemDetailsText)(this.db, eb.ref('ni2.id')),
-                (0, util_1.location)(this.db, eb.ref('ni2.locationId')),
-                (0, util_1.creator)(this.db, eb.ref('ni2.creatorId')),
-                (0, util_1.modifier)(this.db, eb.ref('ni2.modifierId')),
-            ])
-                .innerJoin('newsletter_items_tree', 'ni2.id', 'newsletter_items_tree.parentId')))
-                .selectFrom('newsletter_items_tree')
-                .selectAll()
-                .execute();
-            return result.map(exports.mapNewsletterItem);
         });
     }
     update(userId, input) {
@@ -308,6 +269,13 @@ class NewsletterItemDAO {
             }));
         });
     }
-}
+};
 exports.NewsletterItemDAO = NewsletterItemDAO;
+exports.NewsletterItemDAO = NewsletterItemDAO = tslib_1.__decorate([
+    (0, inversify_1.injectable)(),
+    tslib_1.__param(0, (0, inversify_1.inject)(types_1.TYPES.DBClient)),
+    tslib_1.__param(1, (0, inversify_1.inject)(types_1.TYPES.ILocationDAO)),
+    tslib_1.__param(2, (0, inversify_1.inject)(types_1.TYPES.INewsletterItemDetailsDAO)),
+    tslib_1.__metadata("design:paramtypes", [Object, Object, Object])
+], NewsletterItemDAO);
 //# sourceMappingURL=newsletter-item.js.map

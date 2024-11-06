@@ -16,8 +16,12 @@ class NewsletterItemMediaTableClient extends db_1.Table {
                 .addColumn('name', 'varchar', (col) => col.notNull())
                 .addColumn('caption', 'varchar')
                 .addColumn('fileName', 'varchar', (col) => col.notNull())
+                .addColumn('format', 'varchar', (col) => col.notNull())
                 .addColumn('type', 'varchar', (col) => col.notNull())
-                .addColumn('newsletterItemId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`).notNull().onDelete('cascade'))
+                .addColumn('newsletterItemId', 'integer', (col) => col
+                .references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`)
+                .notNull()
+                .onDelete('cascade'))
                 .execute();
             return;
         });
@@ -38,7 +42,10 @@ class NewsletterItemTextTableClient extends db_1.Table {
                 .addColumn('link', 'varchar')
                 .addColumn('type', 'varchar', (col) => col.notNull())
                 .addColumn('description', 'varchar')
-                .addColumn('newsletterItemId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`).notNull().onDelete('cascade'))
+                .addColumn('newsletterItemId', 'integer', (col) => col
+                .references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM}.id`)
+                .notNull()
+                .onDelete('cascade'))
                 .execute();
             return;
         });

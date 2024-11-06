@@ -1,6 +1,6 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
 import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
-import { NewsletterItemTypeName } from '@athena/athena-common';
+import { MediaFormat, NewsletterItemTypeName } from '@athena/athena-common';
 
 interface NewsletterItemDetailsBase {
   id: UniqueId;
@@ -9,10 +9,11 @@ interface NewsletterItemDetailsBase {
 }
 
 export interface NewsletterItemMediaTableColumns extends NewsletterItemDetailsBase {
-  type: 'media';
+  type: NewsletterItemTypeName.Media;
   name: string;
   caption: string | null;
   fileName: string;
+  format: MediaFormat;
 }
 
 export interface NewsletterItemMediaTable {
@@ -25,7 +26,7 @@ export type InsertNewsletterItemMedia = Insertable<NewsletterItemMediaTableColum
 export type UpdateNewsletterItemMedia = Updateable<NewsletterItemMediaTableColumns>;
 
 export interface NewsletterItemTextTableColumns extends NewsletterItemDetailsBase {
-  type: 'text';
+  type: NewsletterItemTypeName.Text;
   name: string;
   description: string | null;
   link: string | null;
@@ -52,6 +53,7 @@ export class NewsletterItemMediaTableClient extends Table implements ITable {
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('caption', 'varchar')
       .addColumn('fileName', 'varchar', (col) => col.notNull())
+      .addColumn('format', 'varchar', (col) => col.notNull())
       .addColumn('type', 'varchar', (col) => col.notNull())
       .addColumn('newsletterItemId', 'integer', (col) =>
         col

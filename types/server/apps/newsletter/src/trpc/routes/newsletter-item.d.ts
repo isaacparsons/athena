@@ -5,14 +5,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             isAuthenticated(): () => boolean;
         };
         res: import("express").Response<any, Record<string, any>>;
-        gcs: import("../../services").GCSManager;
+        gcs: import("../../services").IGCSManager;
         db: import("kysely").Kysely<import("../../db").Database>;
         dao: {
-            user: import("../../dao").UserDAO;
-            newsletter: import("../../dao").NewsletterDAO;
-            location: import("../../dao").LocationDAO;
-            newsletterItem: import("../../dao").NewsletterItemDAO;
-            newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+            user: import("../../dao").IUserDAO;
+            newsletter: import("../../dao").INewsletterDAO;
+            location: import("../../dao").ILocationDAO;
+            newsletterItem: import("../../dao").INewsletterItemDAO;
+            newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
         };
     };
     meta: object;
@@ -27,14 +27,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
-                gcs: import("../../services").GCSManager;
+                gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
                 dao: {
-                    user: import("../../dao").UserDAO;
-                    newsletter: import("../../dao").NewsletterDAO;
-                    location: import("../../dao").LocationDAO;
-                    newsletterItem: import("../../dao").NewsletterItemDAO;
-                    newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                    user: import("../../dao").IUserDAO;
+                    newsletter: import("../../dao").INewsletterDAO;
+                    location: import("../../dao").ILocationDAO;
+                    newsletterItem: import("../../dao").INewsletterItemDAO;
+                    newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
                 };
             };
             meta: object;
@@ -54,14 +54,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
-            gcs: import("../../services").GCSManager;
+            gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
             dao: {
-                user: import("../../dao").UserDAO;
-                newsletter: import("../../dao").NewsletterDAO;
-                location: import("../../dao").LocationDAO;
-                newsletterItem: import("../../dao").NewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                user: import("../../dao").IUserDAO;
+                newsletter: import("../../dao").INewsletterDAO;
+                location: import("../../dao").ILocationDAO;
+                newsletterItem: import("../../dao").INewsletterItemDAO;
+                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
             };
         };
         _input_in: {
@@ -72,7 +72,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, import("@athena/athena-common").NewsletterItem<keyof import("@athena/athena-common").NewsletterItemDetailsMap>>;
+    }, import("@athena/athena-common").NewsletterItem<import("@athena/athena-common").NewsletterItemTypeName>>;
     getItemUploadLinks: import("@trpc/server").BuildProcedure<"query", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
@@ -81,14 +81,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
-                gcs: import("../../services").GCSManager;
+                gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
                 dao: {
-                    user: import("../../dao").UserDAO;
-                    newsletter: import("../../dao").NewsletterDAO;
-                    location: import("../../dao").LocationDAO;
-                    newsletterItem: import("../../dao").NewsletterItemDAO;
-                    newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                    user: import("../../dao").IUserDAO;
+                    newsletter: import("../../dao").INewsletterDAO;
+                    location: import("../../dao").ILocationDAO;
+                    newsletterItem: import("../../dao").INewsletterItemDAO;
+                    newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
                 };
             };
             meta: object;
@@ -108,14 +108,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
-            gcs: import("../../services").GCSManager;
+            gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
             dao: {
-                user: import("../../dao").UserDAO;
-                newsletter: import("../../dao").NewsletterDAO;
-                location: import("../../dao").LocationDAO;
-                newsletterItem: import("../../dao").NewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                user: import("../../dao").IUserDAO;
+                newsletter: import("../../dao").INewsletterDAO;
+                location: import("../../dao").ILocationDAO;
+                newsletterItem: import("../../dao").INewsletterItemDAO;
+                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
             };
         };
         _input_in: {
@@ -143,14 +143,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
-                gcs: import("../../services").GCSManager;
+                gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
                 dao: {
-                    user: import("../../dao").UserDAO;
-                    newsletter: import("../../dao").NewsletterDAO;
-                    location: import("../../dao").LocationDAO;
-                    newsletterItem: import("../../dao").NewsletterItemDAO;
-                    newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                    user: import("../../dao").IUserDAO;
+                    newsletter: import("../../dao").INewsletterDAO;
+                    location: import("../../dao").ILocationDAO;
+                    newsletterItem: import("../../dao").INewsletterItemDAO;
+                    newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
                 };
             };
             meta: object;
@@ -170,14 +170,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
-            gcs: import("../../services").GCSManager;
+            gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
             dao: {
-                user: import("../../dao").UserDAO;
-                newsletter: import("../../dao").NewsletterDAO;
-                location: import("../../dao").LocationDAO;
-                newsletterItem: import("../../dao").NewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                user: import("../../dao").IUserDAO;
+                newsletter: import("../../dao").INewsletterDAO;
+                location: import("../../dao").ILocationDAO;
+                newsletterItem: import("../../dao").INewsletterItemDAO;
+                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
             };
         };
         _input_in: {
@@ -186,21 +186,22 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             nextItemId: number | null;
             previousItemId: number | null;
             title: string;
-            date?: string | undefined;
             location?: {
                 name?: string | undefined;
                 longitude?: number | undefined;
                 lattitude?: number | undefined;
                 countryCode?: string | undefined;
             } | undefined;
+            date?: string | undefined;
             details?: {
                 name: string;
-                type: "media";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
                 fileName: string;
+                format: import("@athena/athena-common").MediaFormat;
                 caption?: string | null | undefined;
             } | {
                 name: string;
-                type: "text";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
                 description?: string | null | undefined;
                 link?: string | null | undefined;
             } | undefined;
@@ -211,21 +212,22 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             nextItemId: number | null;
             previousItemId: number | null;
             title: string;
-            date?: string | undefined;
             location?: {
                 name?: string | undefined;
                 longitude?: number | undefined;
                 lattitude?: number | undefined;
                 countryCode?: string | undefined;
             } | undefined;
+            date?: string | undefined;
             details?: {
                 name: string;
-                type: "media";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
                 fileName: string;
+                format: import("@athena/athena-common").MediaFormat;
                 caption?: string | null | undefined;
             } | {
                 name: string;
-                type: "text";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
                 description?: string | null | undefined;
                 link?: string | null | undefined;
             } | undefined;
@@ -241,14 +243,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
-                gcs: import("../../services").GCSManager;
+                gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
                 dao: {
-                    user: import("../../dao").UserDAO;
-                    newsletter: import("../../dao").NewsletterDAO;
-                    location: import("../../dao").LocationDAO;
-                    newsletterItem: import("../../dao").NewsletterItemDAO;
-                    newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                    user: import("../../dao").IUserDAO;
+                    newsletter: import("../../dao").INewsletterDAO;
+                    location: import("../../dao").ILocationDAO;
+                    newsletterItem: import("../../dao").INewsletterItemDAO;
+                    newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
                 };
             };
             meta: object;
@@ -268,14 +270,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
-            gcs: import("../../services").GCSManager;
+            gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
             dao: {
-                user: import("../../dao").UserDAO;
-                newsletter: import("../../dao").NewsletterDAO;
-                location: import("../../dao").LocationDAO;
-                newsletterItem: import("../../dao").NewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                user: import("../../dao").IUserDAO;
+                newsletter: import("../../dao").INewsletterDAO;
+                location: import("../../dao").ILocationDAO;
+                newsletterItem: import("../../dao").INewsletterItemDAO;
+                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
             };
         };
         _input_in: {
@@ -292,21 +294,22 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     nextId: string | null;
                     prevId: string | null;
                 };
-                date?: string | undefined;
                 location?: {
                     name?: string | undefined;
                     longitude?: number | undefined;
                     lattitude?: number | undefined;
                     countryCode?: string | undefined;
                 } | undefined;
+                date?: string | undefined;
                 details?: {
                     name: string;
-                    type: "media";
+                    type: import("@athena/athena-common").NewsletterItemTypeName.Media;
                     fileName: string;
+                    format: import("@athena/athena-common").MediaFormat;
                     caption?: string | null | undefined;
                 } | {
                     name: string;
-                    type: "text";
+                    type: import("@athena/athena-common").NewsletterItemTypeName.Text;
                     description?: string | null | undefined;
                     link?: string | null | undefined;
                 } | undefined;
@@ -326,21 +329,22 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     nextId: string | null;
                     prevId: string | null;
                 };
-                date?: string | undefined;
                 location?: {
                     name?: string | undefined;
                     longitude?: number | undefined;
                     lattitude?: number | undefined;
                     countryCode?: string | undefined;
                 } | undefined;
+                date?: string | undefined;
                 details?: {
                     name: string;
-                    type: "media";
+                    type: import("@athena/athena-common").NewsletterItemTypeName.Media;
                     fileName: string;
+                    format: import("@athena/athena-common").MediaFormat;
                     caption?: string | null | undefined;
                 } | {
                     name: string;
-                    type: "text";
+                    type: import("@athena/athena-common").NewsletterItemTypeName.Text;
                     description?: string | null | undefined;
                     link?: string | null | undefined;
                 } | undefined;
@@ -348,9 +352,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, {
-        id: number;
-    }[]>;
+    }, number[]>;
     update: import("@trpc/server").BuildProcedure<"mutation", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
@@ -359,14 +361,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
-                gcs: import("../../services").GCSManager;
+                gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
                 dao: {
-                    user: import("../../dao").UserDAO;
-                    newsletter: import("../../dao").NewsletterDAO;
-                    location: import("../../dao").LocationDAO;
-                    newsletterItem: import("../../dao").NewsletterItemDAO;
-                    newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                    user: import("../../dao").IUserDAO;
+                    newsletter: import("../../dao").INewsletterDAO;
+                    location: import("../../dao").ILocationDAO;
+                    newsletterItem: import("../../dao").INewsletterItemDAO;
+                    newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
                 };
             };
             meta: object;
@@ -386,58 +388,60 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
-            gcs: import("../../services").GCSManager;
+            gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
             dao: {
-                user: import("../../dao").UserDAO;
-                newsletter: import("../../dao").NewsletterDAO;
-                location: import("../../dao").LocationDAO;
-                newsletterItem: import("../../dao").NewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                user: import("../../dao").IUserDAO;
+                newsletter: import("../../dao").INewsletterDAO;
+                location: import("../../dao").ILocationDAO;
+                newsletterItem: import("../../dao").INewsletterItemDAO;
+                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
             };
         };
         _input_in: {
             newsletterItemId: number;
-            date?: string | null | undefined;
-            nextItemId?: number | undefined;
-            title?: string | undefined;
             location?: {
                 name?: string | undefined;
                 longitude?: number | undefined;
                 lattitude?: number | undefined;
                 countryCode?: string | undefined;
             } | undefined;
+            date?: string | null | undefined;
+            nextItemId?: number | undefined;
+            title?: string | undefined;
             details?: {
                 name: string;
-                type: "media";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
                 fileName: string;
+                format: import("@athena/athena-common").MediaFormat;
                 caption?: string | null | undefined;
             } | {
                 name: string;
-                type: "text";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
                 description?: string | null | undefined;
                 link?: string | null | undefined;
             } | undefined;
         };
         _input_out: {
             newsletterItemId: number;
-            date?: string | null | undefined;
-            nextItemId?: number | undefined;
-            title?: string | undefined;
             location?: {
                 name?: string | undefined;
                 longitude?: number | undefined;
                 lattitude?: number | undefined;
                 countryCode?: string | undefined;
             } | undefined;
+            date?: string | null | undefined;
+            nextItemId?: number | undefined;
+            title?: string | undefined;
             details?: {
                 name: string;
-                type: "media";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
                 fileName: string;
+                format: import("@athena/athena-common").MediaFormat;
                 caption?: string | null | undefined;
             } | {
                 name: string;
-                type: "text";
+                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
                 description?: string | null | undefined;
                 link?: string | null | undefined;
             } | undefined;
@@ -453,14 +457,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
-                gcs: import("../../services").GCSManager;
+                gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
                 dao: {
-                    user: import("../../dao").UserDAO;
-                    newsletter: import("../../dao").NewsletterDAO;
-                    location: import("../../dao").LocationDAO;
-                    newsletterItem: import("../../dao").NewsletterItemDAO;
-                    newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                    user: import("../../dao").IUserDAO;
+                    newsletter: import("../../dao").INewsletterDAO;
+                    location: import("../../dao").ILocationDAO;
+                    newsletterItem: import("../../dao").INewsletterItemDAO;
+                    newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
                 };
             };
             meta: object;
@@ -480,14 +484,14 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
-            gcs: import("../../services").GCSManager;
+            gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
             dao: {
-                user: import("../../dao").UserDAO;
-                newsletter: import("../../dao").NewsletterDAO;
-                location: import("../../dao").LocationDAO;
-                newsletterItem: import("../../dao").NewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").NewsletterItemTemplateDAO;
+                user: import("../../dao").IUserDAO;
+                newsletter: import("../../dao").INewsletterDAO;
+                location: import("../../dao").ILocationDAO;
+                newsletterItem: import("../../dao").INewsletterItemDAO;
+                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
             };
         };
         _input_in: {

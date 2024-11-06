@@ -2,20 +2,22 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GCSManager = void 0;
 const tslib_1 = require("tslib");
+const inversify_1 = require("inversify");
+require("reflect-metadata");
 const storage_1 = require("@google-cloud/storage");
-const util_1 = require("../util");
-const env = (0, util_1.parseEnv)();
 const storage = new storage_1.Storage({
     keyFilename: '/Users/isaacparsons/Documents/Projects/athena/apps/newsletter/athena-435518-246fc2bb15a8.json',
 });
-class GCSManager {
+let GCSManager = class GCSManager {
     constructor() {
-        this.bucket = storage.bucket(env.gcs.bucketName);
+        this.bucketName = process.env['GOOGLE_STORAGE_BUCKET_NAME'];
+        // this.bucket = storage.bucket(this.env.gcs.bucketName);
+        this.bucket = storage.bucket(this.bucketName);
     }
     getSignedUrl(fileName, action) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const [url] = yield storage
-                .bucket(env.gcs.bucketName)
+                .bucket(this.bucketName)
                 .file(fileName)
                 .getSignedUrl({
                 version: 'v4',
@@ -25,6 +27,10 @@ class GCSManager {
             return url;
         });
     }
-}
+};
 exports.GCSManager = GCSManager;
+exports.GCSManager = GCSManager = tslib_1.__decorate([
+    (0, inversify_1.injectable)(),
+    tslib_1.__metadata("design:paramtypes", [])
+], GCSManager);
 //# sourceMappingURL=gcs.js.map

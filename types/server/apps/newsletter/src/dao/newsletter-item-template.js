@@ -3,8 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterItemTemplateDAO = void 0;
 const tslib_1 = require("tslib");
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
+require("reflect-metadata");
 const db_1 = require("../db");
-class NewsletterItemTemplateDAO {
+const util_1 = require("../util");
+const inversify_1 = require("inversify");
+const types_1 = require("../types/types");
+let NewsletterItemTemplateDAO = class NewsletterItemTemplateDAO {
     constructor(db) {
         this.db = db;
     }
@@ -93,16 +97,8 @@ class NewsletterItemTemplateDAO {
                 'nit.name',
                 'nit.created',
                 'nit.modified',
-                (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('user as creator')
-                    .selectAll('creator')
-                    .whereRef('creator.id', '=', 'nit.creatorId'))
-                    .$notNull()
-                    .as('creator'),
-                (0, db_1.jsonObjectFrom)(eb
-                    .selectFrom('user as modifier')
-                    .selectAll('modifier')
-                    .whereRef('modifier.id', '=', 'nit.modifierId')).as('modifier'),
+                (0, util_1.creator)(this.db, eb.ref('nit.creatorId')),
+                (0, util_1.modifier)(this.db, eb.ref('nit.modifierId')),
             ])
                 .executeTakeFirstOrThrow();
             const items = yield this.db
@@ -137,6 +133,11 @@ class NewsletterItemTemplateDAO {
             };
         });
     }
-}
+};
 exports.NewsletterItemTemplateDAO = NewsletterItemTemplateDAO;
+exports.NewsletterItemTemplateDAO = NewsletterItemTemplateDAO = tslib_1.__decorate([
+    (0, inversify_1.injectable)(),
+    tslib_1.__param(0, (0, inversify_1.inject)(types_1.TYPES.DBClient)),
+    tslib_1.__metadata("design:paramtypes", [Object])
+], NewsletterItemTemplateDAO);
 //# sourceMappingURL=newsletter-item-template.js.map

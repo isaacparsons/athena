@@ -24,9 +24,9 @@ export type NewsletterItemDetailsType = NewsletterItemTypeName | undefined;
 
 export type StoreItemDetails<
   T extends NewsletterItemDetailsType = NewsletterItemDetailsType
-> = T extends 'media'
-  ? CreateItemDetailsInput<'media'> & { file: File | null }
-  : T extends 'text'
+> = T extends NewsletterItemTypeName.Media
+  ? CreateItemDetailsInput<NewsletterItemTypeName.Media> & { file: File | null }
+  : T extends NewsletterItemTypeName.Text
   ? CreateItemDetailsInput<T>
   : undefined;
 
@@ -146,7 +146,7 @@ export const createCreateNewslettersItemsSlice: StateCreator<
     const existingItem = get().existingItem;
     const items = mapToArray(data);
     const mediaItemIds = items
-      .filter((i) => i.details?.type === 'media')
+      .filter((i) => i.details?.type === NewsletterItemTypeName.Media)
       .map((i) => ({ id: i.temp.id.toString() }));
     const signedUrls =
       await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({

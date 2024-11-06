@@ -5,6 +5,7 @@ import {
   NewsletterItemDetailsMedia,
   NewsletterItemDetailsText,
   CreateNewsletterItemDetailsInput,
+  NewsletterItemTypeName,
 } from '@athena/athena-common';
 import { TYPES } from '../types/types';
 
@@ -36,19 +37,19 @@ export class NewsletterItemDetailsDAO implements INewsletterItemDetailsDAO {
       )
       .executeTakeFirst();
     if (!details) return;
-    if (details.type === 'text') {
+    if (details.type === NewsletterItemTypeName.Text) {
       return {
         id: details.id,
-        type: 'text',
+        type: NewsletterItemTypeName.Text,
         name: details.name,
         description: details.description,
         link: details.link,
       } as NewsletterItemDetailsText;
     }
-    if (details.type === 'media') {
+    if (details.type === NewsletterItemTypeName.Media) {
       return {
         id: details.id,
-        type: 'media',
+        type: NewsletterItemTypeName.Media,
         fileName: details.fileName,
         name: details.name,
         caption: details.caption,
@@ -61,14 +62,14 @@ export class NewsletterItemDetailsDAO implements INewsletterItemDetailsDAO {
     input: CreateNewsletterItemDetailsInput
   ): Promise<void | undefined> {
     if (!input) return;
-    if (input.type === 'text') {
+    if (input.type === NewsletterItemTypeName.Text) {
       await this.db
         .insertInto('newsletter_item_text')
         .values({ ...input, newsletterItemId })
         .executeTakeFirstOrThrow();
       return;
     }
-    if (input.type === 'media') {
+    if (input.type === NewsletterItemTypeName.Media) {
       await this.db
         .insertInto('newsletter_item_media')
         .values({ ...input, newsletterItemId })
