@@ -279,15 +279,15 @@ export type CreateItemDetailsInput<
 > = CreateNewsletterItemDetailsTypeFromName<T>;
 
 export function isMediaDetailsInput(
-  details: CreateItemDetailsInput
+  details: CreateItemDetailsInput | undefined
 ): details is CreateItemDetailsInputMedia {
-  return (details as CreateItemDetailsInputMedia).type === 'media';
+  return (details as CreateItemDetailsInputMedia)?.type === 'media';
 }
 
 export function isTextDetailsInput(
-  details: CreateItemDetailsInput
+  details: CreateItemDetailsInput | undefined
 ): details is CreateItemDetailsInputText {
-  return (details as CreateItemDetailsInputText).type === 'text';
+  return (details as CreateItemDetailsInputText)?.type === 'text';
 }
 
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;

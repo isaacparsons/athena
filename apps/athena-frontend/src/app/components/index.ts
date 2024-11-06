@@ -14,3 +14,5 @@ export * from './NewsletterProperties';
 export * from './UserNewsletterCard';
 export * from './UserNewsletters';
 export * from './NewsletterItemTemplate';
+export * from './NewsletterItemsProvider';
+export * from './AddNewsletterItems';

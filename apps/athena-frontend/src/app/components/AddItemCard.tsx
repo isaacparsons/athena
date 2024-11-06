@@ -6,21 +6,24 @@ import {
 import { CancelIcon, ArrowForwardIcon } from '../icons';
 import {
   StoreAddNewsletterItem,
+  StoreAddNewsletterItemInput,
   useAddItemsStore,
 } from '../store';
-import { isMediaDetailsInput, isTextDetailsInput } from '@athena/athena-common';
+import { DeepPartial, isMediaDetailsInput, isTextDetailsInput, NewsletterItemTypeName } from '@athena/athena-common';
 import { CustomCard, CustomCardFooter, CustomCardHeader, CustomIconButton } from './common';
 
 
 interface AddItemCardProps {
   item: StoreAddNewsletterItem;
   onClick: (id: string) => void;
+  removeItem: (id: string) => void;
+  updateItemDetails: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+    id: string,
+    item: DeepPartial<StoreAddNewsletterItemInput<T>>
+  ) => void;
 }
 
-export function AddItemCard(props: AddItemCardProps) {
-  const { item, onClick } = props;
-  const { removeItem, updateItemDetails } = useAddItemsStore();
-
+export function AddItemCard({ item, onClick, removeItem, updateItemDetails }: AddItemCardProps) {
   //   const [editLocationOpen, setEditLocationOpen] = useState(false);
   //   const handleCloseEditLocation = () => {
   //     setEditLocationOpen(false);
@@ -34,7 +37,11 @@ export function AddItemCard(props: AddItemCardProps) {
   //     );
   //   } else {
 
-  const itemId = item.temp.id;
+
+  const handleNameChange = (name: string) => updateItemDetails(item.temp.id, { details: { type: 'text', name } })
+  const handleDescriptionChange = (description: string) => updateItemDetails<'text'>(item.temp.id, { details: { type: 'text', description } })
+  const handleLinkChange = (link: string) => updateItemDetails<'text'>(item.temp.id, { details: { type: 'text', link } })
+
   return (
     <CustomCard
       src={isMediaDetailsInput(item.details) && item.details.file ? URL.createObjectURL(item.details.file) : undefined}
@@ -46,52 +53,74 @@ export function AddItemCard(props: AddItemCardProps) {
             icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />} />
         }
       />
+      <AddItemCardDetails
+        item={item}
+        onNameChange={handleNameChange}
+        onDescriptionChange={handleDescriptionChange}
+        onLinkChange={handleLinkChange}
+      />
+
+      <CustomCardFooter right={<CustomIconButton
+        onClick={() => onClick(item.temp.id)}
+        icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />} />}>
+        {isMediaDetailsInput(item.details) && <Typography>{"Sat Jun 3, 2024"}</Typography>}
+      </CustomCardFooter>
+    </CustomCard>
+  );
+}
+
+interface AddItemCardDetailsProps {
+  item: StoreAddNewsletterItem;
+  onNameChange: (name: string) => void;
+  onDescriptionChange: (name: string) => void;
+  onLinkChange: (name: string) => void;
+}
+
+export function AddItemCardDetails({ item, onNameChange, onDescriptionChange, onLinkChange }: AddItemCardDetailsProps) {
+  return (
+    <>
       {isMediaDetailsInput(item.details) && <Box sx={{ height: 400 }} />}
-      {isTextDetailsInput(item.details) &&
+      {
+        isTextDetailsInput(item.details) &&
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <TextField
             required
             margin="dense"
-            id={itemId.toString()}
+            id={item.temp.id.toString()}
             label="Name"
             type="text"
             fullWidth
             variant="standard"
             defaultValue={item.details.name}
             name={item.details.name}
-            onChange={(e) => updateItemDetails(itemId, { details: { type: 'text', name: e.target.value } })}
+            onChange={(e) => onNameChange(e.target.value)}
           />
           <TextField
             required
             margin="dense"
-            id={itemId.toString()}
+            id={item.temp.id.toString()}
             label="Description"
             type="text"
             fullWidth
             variant="standard"
             name={item.details.description ?? ''}
             defaultValue={item.details.description ?? ''}
-            onChange={(e) => updateItemDetails<'text'>(itemId, { details: { type: 'text', description: e.target.value } })}
+            onChange={(e) => onDescriptionChange(e.target.value)}
           />
           <TextField
             required
             margin="dense"
-            id={itemId.toString()}
+            id={item.temp.id.toString()}
             label="Link"
             type="text"
             fullWidth
             variant="standard"
             name={item.details.link ?? ''}
             defaultValue={item.details.link ?? ''}
-            onChange={(e) => updateItemDetails<'text'>(itemId, { details: { type: 'text', link: e.target.value } })}
+            onChange={(e) => onLinkChange(e.target.value)}
           />
-        </Box>}
-      <CustomCardFooter right={<CustomIconButton
-        onClick={() => onClick(item.temp.id)}
-        icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />} />}>
-        {isMediaDetailsInput(item.details) && <Typography>{"Sat Jun 3, 2024"}</Typography>}
-
-      </CustomCardFooter>
-    </CustomCard>
-  );
+        </Box>
+      }
+    </>
+  )
 }

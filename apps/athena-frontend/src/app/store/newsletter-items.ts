@@ -18,6 +18,31 @@ const mapToStoreItem = <T extends NewsletterItemTypeName = NewsletterItemTypeNam
     childrenIds: item.children.map((c) => c.id),
   };
 };
+
+export const traverseItemIds = (
+  items: Record<number, StoreNewsletterItem>,
+  selectedIds: number[],
+  ids: number[]
+) => _traverseItemIds(items, selectedIds, ids);
+
+const _traverseItemIds = (
+  items: Record<number, StoreNewsletterItem>,
+  selectedIds: number[],
+  ids: number[]
+) => {
+  if (ids.length === 0) return _.uniq(selectedIds);
+
+  selectedIds.push(...ids);
+  return _traverseItemIds(
+    items,
+    selectedIds,
+    _.flatMap(ids, (id) => {
+      const item = items[id];
+      return item.childrenIds;
+    })
+  );
+};
+
 export type StoreNewsletterItem<
   T extends NewsletterItemTypeName = NewsletterItemTypeName
 > = NewsletterItemBase<T> & {
@@ -30,6 +55,10 @@ export interface NewsletterItemsSlice {
   newsletterItems: {
     loading: boolean;
     data: Record<number, StoreNewsletterItem>;
+    editing: boolean;
+    setEditing: (editing: boolean) => void;
+    selectedItemIds: number[];
+    selectItemIds: (itemsIds: number[]) => void;
     fetch: (id: number) => Promise<void>;
     deleteItems: (ids: number[]) => Promise<void>;
     addItems: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
@@ -48,6 +77,22 @@ export const createNewsletterItemsSlice: StateCreator<
   newsletterItems: {
     loading: false,
     data: {},
+    editing: false,
+    setEditing: (editing: boolean) => {
+      set((state) => {
+        state.newsletterItems.editing = editing;
+      });
+    },
+    selectedItemIds: [],
+    selectItemIds: (itemsIds: number[]) => {
+      set((state) => {
+        state.newsletterItems.selectedItemIds = traverseItemIds(
+          _.cloneDeep(state.newsletterItems.data),
+          _.cloneDeep(state.newsletterItems.selectedItemIds),
+          _.cloneDeep(itemsIds)
+        );
+      });
+    },
     fetch: async (id: number) => {
       set((state) => {
         state.newsletterItems.loading = true;

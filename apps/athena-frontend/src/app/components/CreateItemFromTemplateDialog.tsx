@@ -9,10 +9,11 @@ import {
   Typography,
 } from '@mui/material';
 
-import { mapToArray } from '../../util';
+import { convertFromTemplateItems, mapToArray } from '../../util';
 import { useAddItemsStore, useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { CustomCard, CustomList, CustomListItem } from './common';
+
 
 interface CreateItemFromTemplateDialogProps {
   parentId: string | null;
@@ -56,13 +57,12 @@ export function CreateItemFromTemplateDialog(
   const handleAddTemplate = async () => {
     if (selectedTemplateId !== null) {
       const template = await fetchTemplate(selectedTemplateId);
-      addItems(parentId, template.items.filter((i) => i.data).map((i) => ({
-        location: undefined,
-        date: new Date().toISOString(),
-        title: '',
-        details: i.data.type === 'media' ? { ...i.data, file: null } : i.data
-      })))
-
+      const parentItem = template.items.find((i) => i.parentId === null);
+      const templateItems = template.items.map((i) => ({
+        ...i,
+        parentId: i.parentId === parentItem?.id ? null : i.parentId
+      })).filter((i) => i.data)
+      addItems(parentId, convertFromTemplateItems(templateItems))
       onClose()
     }
   };

@@ -8,24 +8,22 @@ import { usePromiseWithNotification } from '../hooks';
 
 
 interface NewsletterItemsListProps {
-  editing: boolean;
-  stopEditing?: () => void;
   items: StoreNewsletterItem[];
   newsletterId: number;
+  parentId: number | null;
 }
 
-export function NewsletterItemsList(props: NewsletterItemsListProps) {
-  const { items, newsletterId, editing, stopEditing } = props;
+export function NewsletterItemsList({ items, newsletterId, parentId }: NewsletterItemsListProps) {
   const promiseWithNotifications = usePromiseWithNotification();
-  const { fetchNewsletter, deleteNewsletterItems } = useStore(
+  const { fetchNewsletter, deleteNewsletterItems, selectedItemIds, selectItemIds, editing, setEditing } = useStore(
     useShallow((state) => ({
       fetchNewsletter: state.newsletters.fetch,
       deleteNewsletterItems: state.newsletterItems.deleteItems,
+      selectedItemIds: state.newsletterItems.selectedItemIds,
+      selectItemIds: state.newsletterItems.selectItemIds,
+      editing: state.newsletterItems.editing,
+      setEditing: state.newsletterItems.setEditing
     }))
-  );
-
-  const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(
-    new Set()
   );
 
   const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
@@ -54,13 +52,13 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
         setDeletingItems(false);
       },
     });
-    await deleteNewsletterItems(ids);
   };
 
+  const filteredItems = useMemo(() => items.filter((i) => i.parentId === parentId), [items, parentId]);
+
   const selectedItems = useMemo(() => {
-    const ids = Array.from(selectedItemIds);
-    return items.filter((i) => ids.includes(i.id));
-  }, [items, selectedItemIds]);
+    return filteredItems.filter((i) => selectedItemIds.includes(i.id));
+  }, [filteredItems, selectedItemIds]);
 
   return (
     <>
@@ -75,7 +73,7 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
       {editing &&
         <>
           {editing && <Fab
-            disabled={selectedItemIds.size === 0}
+            disabled={selectedItemIds.length === 0}
             onClick={() => handleDeleteItems(Array.from(selectedItemIds))}
             sx={{ position: 'fixed', bottom: 32, right: 32, bgcolor: 'red', color: 'white' }}>
             <DeleteIcon />
@@ -88,15 +86,16 @@ export function NewsletterItemsList(props: NewsletterItemsListProps) {
       }
 
       <AddItemTemplateDialog
+        // parentId={parentId}
         open={addTemplateDialogOpen}
         handleClose={handleCloseAddTemplateDialog}
         items={selectedItems}
       />
       <AddItemsDialog />
       <ToggleList
-        items={items}
-        selectedItemIds={selectedItemIds}
-        setSelectedItemIds={setSelectedItemIds}
+        items={filteredItems}
+        selectedItemIds={new Set(selectedItemIds)}
+        setSelectedItemIds={(items) => selectItemIds(Array.from(items))}
         selectable={editing}
         renderItem={(props) => (<NewsletterItemCard {...props} />)}
       />

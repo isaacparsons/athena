@@ -1,4 +1,5 @@
-import React from 'react';
+import _ from 'lodash';
+import React, { useMemo } from 'react';
 import { Stack } from '@mui/material';
 import { ToggleListHeader } from './ToggleListHeader';
 import { CustomList, CustomListItem } from '../CustomList';
@@ -46,10 +47,11 @@ export function ToggleList<T extends { id: number }>(
     setSelectedItemIds(newSelectedItemIds);
   };
 
+  const allSelected = useMemo(() => _.difference(items.map((i) => i.id), Array.from(selectedItemIds)).length === 0, [selectedItemIds, items])
   return (
     <Stack>
       <ToggleListHeader
-        allSelected={items.length === selectedItemIds.size}
+        allSelected={allSelected}
         selectable={selectable}
         selectedItemIds={selectedItemIds}
         onToggleSelectAll={handleToggleSelectAll}

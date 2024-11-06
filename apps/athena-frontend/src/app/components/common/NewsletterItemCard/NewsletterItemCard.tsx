@@ -34,7 +34,11 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
             value={selected}
             onClick={() => onToggleSelect(item.id)} /> : null
         }
-      />
+      >
+        <Typography sx={{ color: 'text.secondary' }}>
+          {item.title}
+        </Typography>
+      </CustomCardHeader>
       {item.details?.type === 'media' && (
         <Box sx={{ height: 400 }} />
       )}

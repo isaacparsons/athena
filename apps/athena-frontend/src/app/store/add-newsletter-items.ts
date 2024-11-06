@@ -20,21 +20,27 @@ import { asyncTrpcClient } from '../../trpc';
 
 type ParentId = string | null;
 
-export type StoreItemDetailsMedia = CreateItemDetailsInput<'media'> & { file: File };
+export type NewsletterItemDetailsType = NewsletterItemTypeName | undefined;
+
+export type StoreItemDetails<
+  T extends NewsletterItemDetailsType = NewsletterItemDetailsType
+> = T extends 'media'
+  ? CreateItemDetailsInput<'media'> & { file: File | null }
+  : T extends 'text'
+  ? CreateItemDetailsInput<T>
+  : undefined;
 
 export type StoreAddNewsletterItemInput<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
+  T extends NewsletterItemDetailsType = NewsletterItemDetailsType
 > = Omit<
   CreateNewsletterItemInput,
   'newsletterId' | 'nextItemId' | 'previousItemId' | 'parentId' | 'details'
 > & {
-  details: T extends 'media'
-    ? CreateItemDetailsInput<'media'> & { file: File | null }
-    : CreateItemDetailsInput<T>;
+  details: StoreItemDetails<T>;
 } & { temp?: TempNewsletterItemIds };
 
 export type StoreAddNewsletterItem<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
+  T extends NewsletterItemDetailsType = NewsletterItemDetailsType
 > = StoreAddNewsletterItemInput<T> & { temp: TempNewsletterItemIds };
 
 export type StoreAddNewsletterItemsData = Record<string, StoreAddNewsletterItem>;
@@ -51,7 +57,9 @@ export interface CreateNewsletterItemsSlice {
   openDialog: (existingItem: StoreAddNewsletterItemsExistingItem) => void;
   addItems: (parentId: ParentId, items: StoreAddNewsletterItemInput[]) => void;
   removeItem: (id: string) => void;
-  updateItemDetails: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+  updateItemDetails: <
+    T extends NewsletterItemDetailsType = NewsletterItemDetailsType
+  >(
     id: string,
     item: DeepPartial<StoreAddNewsletterItemInput<T>>
   ) => void;
@@ -121,7 +129,9 @@ export const createCreateNewslettersItemsSlice: StateCreator<
     set((state) => {
       delete state.data[id];
     }),
-  updateItemDetails: <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
+  updateItemDetails: <
+    T extends NewsletterItemDetailsType = NewsletterItemDetailsType
+  >(
     id: string,
     item: DeepPartial<StoreAddNewsletterItemInput<T>>
   ) =>
@@ -138,9 +148,10 @@ export const createCreateNewslettersItemsSlice: StateCreator<
     const mediaItemIds = items
       .filter((i) => i.details?.type === 'media')
       .map((i) => ({ id: i.temp.id.toString() }));
-    const signedUrls = await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
-      items: mediaItemIds,
-    });
+    const signedUrls =
+      await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
+        items: mediaItemIds,
+      });
     const signedUrlsMap = new Map(signedUrls.map((su) => [su.id, su]));
 
     if (existingItem === null) return;
