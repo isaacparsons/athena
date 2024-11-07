@@ -4,9 +4,7 @@ import {
 } from '@mui/material';
 import { StoreNewsletterItem } from '../../../store';
 import { useNavigate } from 'react-router-dom';
-import { CustomCard, CustomCardFooter, CustomCardHeader } from '../CustomCard';
-import { CustomCheckbox } from '../CustomCheckbox';
-import { CustomIconButton } from '../CustomIconButton';
+import { CustomCard, CustomCardFooter, CustomCardHeader, CustomCheckbox, CustomIconButton } from '../..';
 import { ArrowForwardIcon } from '../../../icons';
 import { MediaFormat, NewsletterItemTypeName } from '@athena/athena-common';
 import ReactPlayer from 'react-player';
@@ -26,7 +24,7 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
   const handleCardClick = () => navigate(`/newsletters/${item.newsletterId}/items/${item.id}`)
   return (
     <CustomCard
-      onClick={selectable || !hasChildren ? undefined : handleCardClick}
+      onClick={selectable ? undefined : handleCardClick}
       src={item.details?.type === NewsletterItemTypeName.Media && item.details.format === MediaFormat.Image ? item.details.fileName : undefined}
     >
       <CustomCardHeader

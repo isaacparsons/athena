@@ -8,29 +8,29 @@ import {
   DialogContent,
   TextField,
 } from '@mui/material';
-import { StoreAddNewsletterItem, StoreAddNewsletterItemInput, StoreNewsletterItem, traverseItemIds, useStore } from '../store';
+import { StoreAddNewsletterItem, StoreAddNewsletterItemInput, StoreNewsletterItem, traverseItemIds, useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
 import {
   DeepPartial,
   NewsletterItemTypeName,
 } from '@athena/athena-common';
-import { usePromiseWithNotification } from '../hooks';
-import { convertToEditableItems, mapToArray } from '../../util';
-import { AddNewsletterItems } from './AddNewsletterItems';
+import { usePromiseWithNotification } from '../../hooks';
+import { convertToEditableItems, mapToArray } from '../../../util';
+import { AddNewsletterItems } from '..';
 import { nanoid } from 'nanoid';
-import { ActionBar, BackButtonIcon } from './common';
+import { ActionBar, BackButtonIcon } from '../common';
 
 
 interface AddItemTemplateDialog {
   open: boolean;
   handleClose: () => void;
   items: StoreNewsletterItem[];
-  // parentId: number | null;
 }
 
 const defaultTemplate = { name: '', items: [] }
 
 export function AddItemTemplateDialog({ open, handleClose, items }: AddItemTemplateDialog) {
+
   const promiseWithNotifications = usePromiseWithNotification();
   const { newsletterItems } = useStore(
     useShallow((state) => ({
@@ -71,7 +71,6 @@ export function AddItemTemplateDialog({ open, handleClose, items }: AddItemTempl
   const itemsArr = useMemo(
     () => template.items.filter((i) => i.temp.parentId === tempParentId),
     [template, tempParentId])
-
 
   const handleAddItems = (parentId: string | null, items: StoreAddNewsletterItemInput[]) => {
     setTemplate((prev) => {

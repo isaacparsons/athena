@@ -1,13 +1,13 @@
 import _ from 'lodash'
-import { StoreAddNewsletterItem, StoreAddNewsletterItemInput } from "../store";
+import { StoreAddNewsletterItem, StoreAddNewsletterItemInput } from "../../store";
 import { useRef, useState } from "react";
-import { DeepPartial, MediaFormat, NewsletterItemTypeName, range } from "@athena/athena-common";
-import { CustomList, CustomListItem } from "./common";
+import { DeepPartial, NewsletterItemTypeName, range } from "@athena/athena-common";
+import { CustomList, CustomListItem } from "../common";
 import { AddItemCard } from "./AddItemCard";
 import { Button, ButtonGroup } from "@mui/material";
-import { MediaIcon, TemplateIcon, TextIcon } from "../icons";
-import { CreateItemFromTemplateDialog } from "./CreateItemFromTemplateDialog";
-import { mimeTypeToMediaFormat } from '../../util';
+import { MediaIcon, TemplateIcon, TextIcon } from "../../icons";
+import { AddItemFromTemplateDialog } from "./AddItemFromTemplateDialog";
+import { mimeTypeToMediaFormat } from '../../../util';
 
 interface AddNewsletterItemsProps {
     handleItemClick: (id: string) => void;
@@ -54,9 +54,6 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
                     format: mimeTypeToMediaFormat(f.type)
                 },
             }));
-
-        console.log('files', files)
-
         addItems(parentId, files);
     };
 
@@ -89,7 +86,7 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
             />
             <CustomList >
                 {items.map((item) => (
-                    <CustomListItem id={item.temp.id}>
+                    <CustomListItem id={item.temp.id} key={item.temp.id}>
                         <AddItemCard
                             item={item}
                             removeItem={removeItem}
@@ -115,7 +112,7 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
                 </Button>
             </ButtonGroup>
 
-            <CreateItemFromTemplateDialog
+            <AddItemFromTemplateDialog
                 parentId={parentId}
                 open={createItemFromTemplateDialogOpen}
                 onClose={handleCloseCreateItemFromTemplateDialog}

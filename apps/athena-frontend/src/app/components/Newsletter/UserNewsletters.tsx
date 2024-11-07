@@ -1,5 +1,5 @@
-import { UserNewsletterCard, CustomList, CustomListItem } from '../components';
-import { StoreNewsletter } from '../store';
+import { UserNewsletterCard, CustomList, CustomListItem } from '..';
+import { StoreNewsletter } from '../../store';
 import { useNavigate } from 'react-router-dom';
 
 interface NewslettersProps {

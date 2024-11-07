@@ -3,9 +3,9 @@ import {
   Typography,
 } from '@mui/material';
 import { NewsletterBase } from '@athena/athena-common';
-import { formatDate, formatDateRange } from '../../util';
-import { ArrowForwardIcon, CalendarMonthIcon } from '../icons';
-import { CustomCard, CustomCardFooter, CustomIconButton } from './common';
+import { formatDate, formatDateRange } from '../../../util';
+import { ArrowForwardIcon, CalendarMonthIcon } from '../../icons';
+import { CustomCard, CustomCardFooter, CustomIconButton } from '../common';
 
 interface UserNewsletterCardProps {
   newsletter: NewsletterBase;

@@ -103,7 +103,7 @@ export const convertToEditableItems = (
     const parent = items.find((item) => item.childrenIds.includes(i.id));
     return {
       title: i.title,
-      date: i.date === null ? undefined : i.date,
+      date: undefined,
       location: undefined, // TODO: fix this
       details:
         i.details?.type === NewsletterItemTypeName.Media

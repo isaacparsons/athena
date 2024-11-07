@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/material';
-import { DateRange } from '../components'
+import { DateRange } from '..'
 
 import { NewsletterProperties as INewsletterProperties } from '@athena/athena-common';
 

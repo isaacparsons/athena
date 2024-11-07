@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Fab } from '@mui/material';
-import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '../components';
-import { DeleteIcon, TemplateIcon } from '../icons';
-import { StoreNewsletterItem, useStore } from '../store';
+import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '..';
+import { DeleteIcon, TemplateIcon } from '../../icons';
+import { StoreNewsletterItem, useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
-import { usePromiseWithNotification } from '../hooks';
+import { usePromiseWithNotification } from '../../hooks';
 
 
 interface NewsletterItemsListProps {
@@ -26,21 +26,18 @@ export function NewsletterItemsList({ items, newsletterId, parentId }: Newslette
     }))
   );
 
-  const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
   const [deletingItems, setDeletingItems] = useState(false);
-
   const [addTemplateDialogOpen, setAddTemplateDialogOpen] = useState(false);
 
   const handleOpenAddTemplateDialog = () => setAddTemplateDialogOpen(true);
   const handleCloseAddTemplateDialog = () => {
     setAddTemplateDialogOpen(false);
-    // handleMakeUnSelectable();
+    handleFinishEditing()
   };
-
-  const handleDeleteItemsClick = () => setConfirmDeleteDialogOpen(true);
-  const handleCloseConfirmDeleteDialog = () =>
-    setConfirmDeleteDialogOpen(false);
-
+  const handleFinishEditing = () => {
+    selectItemIds([])
+    setEditing(false)
+  }
   const handleDeleteItems = async (ids: number[]) => {
     setDeletingItems(true);
     promiseWithNotifications.execute(deleteNewsletterItems(ids), {
@@ -48,10 +45,8 @@ export function NewsletterItemsList({ items, newsletterId, parentId }: Newslette
       errorMsg: 'Unable to delete items :(',
       onSuccess: () => {
         fetchNewsletter(newsletterId);
-        handleCloseConfirmDeleteDialog();
         setDeletingItems(false);
-        selectItemIds([])
-        setEditing(false)
+        handleFinishEditing()
       },
     });
   };
@@ -64,31 +59,19 @@ export function NewsletterItemsList({ items, newsletterId, parentId }: Newslette
 
   return (
     <>
-      {/* <ConfirmationDialog
-        open={confirmDeleteDialogOpen}
-        loading={deletingItems}
-        onCloseDialog={handleCloseConfirmDeleteDialog}
-        onConfirm={handleDeleteItems}
-        title={'Delete items'}
-        content={'are you sure you want to delete the selected items?'}
-      /> */}
-      {editing &&
-        <>
-          {editing && <Fab
-            disabled={selectedItemIds.length === 0}
-            onClick={() => handleDeleteItems(Array.from(selectedItemIds))}
-            sx={{ position: 'fixed', bottom: 32, right: 32, bgcolor: 'red', color: 'white' }}>
-            <DeleteIcon />
-          </Fab>}
-          {selectedItems.length > 0 && <Fab variant="extended" onClick={handleOpenAddTemplateDialog} sx={{ position: 'fixed', bottom: 32 }}>
-            <TemplateIcon sx={{ mr: 1 }} />
-            Create Template
-          </Fab>}
-        </>
-      }
+
+      {editing && <Fab
+        disabled={selectedItemIds.length === 0}
+        onClick={() => handleDeleteItems(Array.from(selectedItemIds))}
+        sx={{ position: 'fixed', bottom: 16, right: 16, bgcolor: 'red', color: 'white' }}>
+        <DeleteIcon />
+      </Fab>}
+      {selectedItems.length > 0 && <Fab variant="extended" onClick={handleOpenAddTemplateDialog} sx={{ position: 'fixed', bottom: 32 }}>
+        <TemplateIcon sx={{ mr: 1 }} />
+        Create Template
+      </Fab>}
 
       <AddItemTemplateDialog
-        // parentId={parentId}
         open={addTemplateDialogOpen}
         handleClose={handleCloseAddTemplateDialog}
         items={selectedItems}

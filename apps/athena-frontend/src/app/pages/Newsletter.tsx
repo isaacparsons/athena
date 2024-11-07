@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import {
   NewsletterProperties,
   NewsletterMembers,
-
+  NewsletterItemsProvider
 } from '../components';
 import {
   CircularProgress,
@@ -12,7 +12,6 @@ import {
 } from '@mui/material'
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { NewsletterItemsProvider } from '../components/NewsletterItemsProvider';
 
 export function Newsletter() {
   const params = useParams();

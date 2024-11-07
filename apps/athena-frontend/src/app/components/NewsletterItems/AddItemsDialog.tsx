@@ -10,11 +10,11 @@ import {
   ActionBar,
   BackButtonIcon,
   AddNewsletterItems,
-} from '../components'
+} from '..'
 
-import { useStore, useAddItemsStore } from '../store';
+import { useStore, useAddItemsStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
-import { mapToArray } from '../../util';
+import { mapToArray } from '../../../util';
 
 export function AddItemsDialog() {
   const { fetchNewsletter, fetchNewsletterItems } = useStore(

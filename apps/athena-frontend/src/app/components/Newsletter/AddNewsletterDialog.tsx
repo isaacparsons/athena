@@ -12,7 +12,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
-import { trpc } from '../../trpc';
+import { trpc } from '../../../trpc';
 import {
   CreateNewsletterInput,
   postNewsletterInput,
@@ -20,7 +20,7 @@ import {
 import { SubmitHandler, useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { usePromiseWithNotification } from '../hooks';
+import { usePromiseWithNotification } from '../../hooks';
 
 interface AddNewsletterDialogProps {
   open: boolean;

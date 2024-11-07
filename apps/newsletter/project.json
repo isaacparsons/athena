@@ -86,10 +86,14 @@
           "commands": ["nx run newsletter:db:destroy && nx newsletter:db:start"]
         },
         "create-tables": {
-          "commands": ["npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/create-tables.ts"]
+          "commands": [
+            "npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/create-tables.ts"
+          ]
         },
         "seed": {
-          "commands": ["npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/seed.ts"]
+          "commands": [
+            "npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/seed.ts"
+          ]
         },
         "init": {
           "commands": [

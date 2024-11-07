@@ -3,16 +3,17 @@ import {
     ActionBar,
     CustomContainer,
     BackButton,
-    NewsletterItemsList
-} from '../components';
+    NewsletterItemsList,
+    CustomFab
+} from '..';
 import {
     CircularProgress,
     IconButton,
 } from '@mui/material'
-import { useAddItemsStore, useStore } from '../store';
+import { useAddItemsStore, useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
-import { EditIcon, AddIcon, CloseIcon } from '../icons';
-import { mapToArray } from '../../util';
+import { EditIcon, AddIcon, CloseIcon } from '../../icons';
+import { mapToArray } from '../../../util';
 
 interface NewsletterItemsProvider {
     newsletterId: number;
@@ -55,9 +56,9 @@ export function NewsletterItemsProvider({ newsletterId, parentId, children }: Ne
     return (
         <>
             <ActionBar backBtn={<BackButton />}>
-                {!editing && <IconButton size="large" onClick={handleOpenMediaItemsDialog}>
+                {/* {!editing && <IconButton size="large" onClick={handleOpenMediaItemsDialog}>
                     <AddIcon htmlColor="#fff" fontSize="inherit" />
-                </IconButton>}
+                </IconButton>} */}
                 <IconButton size="large" onClick={() => setEditing(!editing)}>
                     {editing ? <CloseIcon sx={{ color: 'secondary.light' }} /> :
                         <EditIcon htmlColor="#fff" fontSize="inherit" />}
@@ -71,6 +72,7 @@ export function NewsletterItemsProvider({ newsletterId, parentId, children }: Ne
                     items={items}
                 />
             </CustomContainer>
+            {!editing ? <CustomFab onClick={handleOpenMediaItemsDialog} /> : null}
         </>
     );
 }

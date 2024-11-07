@@ -3,15 +3,15 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { CancelIcon, ArrowForwardIcon } from '../icons';
+import { CancelIcon, ArrowForwardIcon } from '../../icons';
 import {
   StoreAddNewsletterItem,
   StoreAddNewsletterItemInput,
-  useAddItemsStore,
-} from '../store';
+} from '../../store';
 import { DeepPartial, isMediaDetailsInput, isTextDetailsInput, MediaFormat, NewsletterItemTypeName } from '@athena/athena-common';
-import { CustomCard, CustomCardFooter, CustomCardHeader, CustomIconButton } from './common';
+import { CustomCard, CustomCardFooter, CustomCardHeader, CustomIconButton } from '../common';
 import ReactPlayer from 'react-player';
+import { formatDate } from '../../../util';
 
 
 interface AddItemCardProps {
@@ -64,7 +64,11 @@ export function AddItemCard({ item, onClick, removeItem, updateItemDetails }: Ad
       <CustomCardFooter right={<CustomIconButton
         onClick={() => onClick(item.temp.id)}
         icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />} />}>
-        {isMediaDetailsInput(item.details) && <Typography>{"Sat Jun 3, 2024"}</Typography>}
+        {item.date && <Box sx={{
+          bgcolor: 'primary.main', borderRadius: 5, p: 1
+        }}>
+          <Typography>{formatDate(item.date)}</Typography>
+        </Box>}
       </CustomCardFooter>
     </CustomCard>
   );

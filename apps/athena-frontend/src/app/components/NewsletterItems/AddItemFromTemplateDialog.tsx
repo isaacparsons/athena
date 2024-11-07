@@ -9,20 +9,20 @@ import {
   Typography,
 } from '@mui/material';
 
-import { convertFromTemplateItems, mapToArray } from '../../util';
-import { useAddItemsStore, useStore } from '../store';
+import { convertFromTemplateItems, mapToArray } from '../../../util';
+import { useAddItemsStore, useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
-import { CustomCard, CustomList, CustomListItem } from './common';
+import { CustomCard, CustomList, CustomListItem } from '../common';
 
 
-interface CreateItemFromTemplateDialogProps {
+interface AddItemFromTemplateDialogProps {
   parentId: string | null;
   open: boolean;
   onClose: () => void;
 }
 
-export function CreateItemFromTemplateDialog(
-  props: CreateItemFromTemplateDialogProps
+export function AddItemFromTemplateDialog(
+  props: AddItemFromTemplateDialogProps
 ) {
   const { parentId, open, onClose } = props;
 
