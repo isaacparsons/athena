@@ -8,7 +8,8 @@ import { CustomCard, CustomCardFooter, CustomCardHeader } from '../CustomCard';
 import { CustomCheckbox } from '../CustomCheckbox';
 import { CustomIconButton } from '../CustomIconButton';
 import { ArrowForwardIcon } from '../../../icons';
-import { NewsletterItemTypeName } from '@athena/athena-common';
+import { MediaFormat, NewsletterItemTypeName } from '@athena/athena-common';
+import ReactPlayer from 'react-player';
 
 interface NewsletterItemCardProps {
   item: StoreNewsletterItem;
@@ -26,7 +27,7 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
   return (
     <CustomCard
       onClick={selectable || !hasChildren ? undefined : handleCardClick}
-      src={item.details?.type === NewsletterItemTypeName.Media ? item.details.fileName : undefined}
+      src={item.details?.type === NewsletterItemTypeName.Media && item.details.format === MediaFormat.Image ? item.details.fileName : undefined}
     >
       <CustomCardHeader
         left={selectable ?
@@ -40,9 +41,16 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
           {item.title}
         </Typography>
       </CustomCardHeader>
-      {item.details?.type === NewsletterItemTypeName.Media && (
+      {item.details?.type === NewsletterItemTypeName.Media && item.details.format === MediaFormat.Image && (
         <Box sx={{ height: 400 }} />
       )}
+      {item.details?.type === NewsletterItemTypeName.Media
+        && item.details.format === MediaFormat.Video
+        && <ReactPlayer
+          url={item.details.fileName}
+          controls={true}
+          width={"100%"}
+          height={"100%"} />}
       {item.details?.type === NewsletterItemTypeName.Text && (
         <Box sx={{ direction: "column" }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>

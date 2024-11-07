@@ -88,10 +88,7 @@ export function AddItemCardDetails({ item, onNameChange, onDescriptionChange, on
           controls={true}
           width={"100%"}
           height={"100%"} />}
-
-
-      {
-        isTextDetailsInput(item.details) &&
+      {isTextDetailsInput(item.details) &&
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <TextField
             required

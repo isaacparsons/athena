@@ -88,7 +88,8 @@ export const createNewsletterItemsSlice: StateCreator<
       set((state) => {
         state.newsletterItems.selectedItemIds = traverseItemIds(
           _.cloneDeep(state.newsletterItems.data),
-          _.cloneDeep(state.newsletterItems.selectedItemIds),
+          // _.cloneDeep(state.newsletterItems.selectedItemIds),
+          [],
           _.cloneDeep(itemsIds)
         );
       });

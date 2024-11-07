@@ -50,6 +50,8 @@ export function NewsletterItemsList({ items, newsletterId, parentId }: Newslette
         fetchNewsletter(newsletterId);
         handleCloseConfirmDeleteDialog();
         setDeletingItems(false);
+        selectItemIds([])
+        setEditing(false)
       },
     });
   };
