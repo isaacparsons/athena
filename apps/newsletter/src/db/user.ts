@@ -7,7 +7,7 @@ import {
   ImmutableString,
   ImmutableNumber,
   TABLE_NAMES,
-} from '../db';
+} from '@athena/db';
 
 export interface UserTableColumns {
   id: UniqueId;

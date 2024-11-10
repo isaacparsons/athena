@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LocationTableClient = void 0;
 const tslib_1 = require("tslib");
-const db_1 = require("../db");
+const db_1 = require("@athena/db");
 class LocationTableClient extends db_1.Table {
     constructor(db, name) {
         super(db, name);
@@ -16,7 +16,7 @@ class LocationTableClient extends db_1.Table {
                 .addColumn('countryCode', 'varchar')
                 .addColumn('name', 'varchar')
                 .addColumn('longitude', 'double precision')
-                .addColumn('lattitude', 'double precision')
+                .addColumn('latitude', 'double precision')
                 .execute();
             return;
         });

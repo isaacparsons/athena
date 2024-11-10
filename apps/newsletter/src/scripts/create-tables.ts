@@ -1,3 +1,3 @@
-import { DBManagerClient } from '../db';
+import { DBManagerClient } from '@athena/db';
 
 new DBManagerClient().createTables();

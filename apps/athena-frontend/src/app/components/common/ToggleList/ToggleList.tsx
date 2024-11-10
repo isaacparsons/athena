@@ -1,8 +1,7 @@
 import _ from 'lodash';
 import React, { useMemo } from 'react';
 import { Stack } from '@mui/material';
-import { ToggleListHeader } from './ToggleListHeader';
-import { CustomList, CustomListItem } from '../CustomList';
+import { CustomList, CustomListItem, ToggleListHeader } from '@athena/components';
 
 interface ToggleListProps<T> {
   selectedItemIds: Set<number>;

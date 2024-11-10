@@ -2,12 +2,14 @@ import { trpc, loggedInProcedure } from '..';
 import {
   getNewsletterItemTemplateInput,
   postNewsletterItemTemplateInput,
-} from '@athena/athena-common';
+} from '@athena/common';
 
 const router = trpc.router({
-  get: loggedInProcedure.input(getNewsletterItemTemplateInput).query(({ input, ctx }) => {
-    return ctx.dao.newsletterItemTemplate.get(input.id);
-  }),
+  get: loggedInProcedure
+    .input(getNewsletterItemTemplateInput)
+    .query(({ input, ctx }) => {
+      return ctx.dao.newsletterItemTemplate.get(input.id);
+    }),
   create: loggedInProcedure
     .input(postNewsletterItemTemplateInput)
     .mutation(({ input, ctx }) => {

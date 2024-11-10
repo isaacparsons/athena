@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsletterTableClient = void 0;
 const tslib_1 = require("tslib");
 const kysely_1 = require("kysely");
-const db_1 = require("../db");
+const db_1 = require("@athena/db");
 class NewsletterTableClient extends db_1.Table {
     constructor(db, name) {
         super(db, name);

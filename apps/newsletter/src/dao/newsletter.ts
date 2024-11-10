@@ -1,17 +1,22 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import _ from 'lodash';
-import { INewsletterItemDAO, mapNewsletterItem } from '.';
-import { DBConnection, Transaction, jsonArrayFrom, jsonObjectFrom } from '../db';
+import { INewsletterItemDAO, mapNewsletterItem } from '@athena/dao';
+import {
+  DBConnection,
+  Transaction,
+  jsonArrayFrom,
+  jsonObjectFrom,
+} from '@athena/db';
 import {
   Newsletter,
   CreateNewsletterInput,
   UpdateNewsletterInput,
   NewsletterItemDetailsMedia,
   NewsletterItemTypeName,
-} from '@athena/athena-common';
+} from '@athena/common';
 import { creator, modifier, user, parseDateRange, location } from '../util';
-import { IGCSManager } from '../services';
+import { IGCSManager } from '@athena/services';
 import { TYPES } from '../types/types';
 
 export interface INewsletterDAO {
@@ -73,6 +78,12 @@ export class NewsletterDAO implements INewsletterDAO {
                   .selectAll('text-details')
                   .whereRef('text-details.newsletterItemId', '=', 'ni.id')
               ).as('textDetails'),
+              jsonObjectFrom(
+                eb
+                  .selectFrom('newsletter_item_container as container-details')
+                  .selectAll('container-details')
+                  .whereRef('container-details.newsletterItemId', '=', 'ni.id')
+              ).as('containerDetails'),
               location(this.db, eb.ref('ni.locationId')),
               creator(this.db, eb.ref('ni.creatorId')),
               modifier(this.db, eb.ref('ni.modifierId')),

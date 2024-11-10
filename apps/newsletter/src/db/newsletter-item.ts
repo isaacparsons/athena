@@ -7,7 +7,7 @@ import {
   TABLE_NAMES,
   Meta,
   MetaColumns,
-} from '../db';
+} from '@athena/db';
 
 export interface NewsletterItemTableColumns extends Meta {
   id: UniqueId;

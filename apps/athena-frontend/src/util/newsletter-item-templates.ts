@@ -4,12 +4,8 @@ import {
   StoreAddNewsletterItem,
   StoreAddNewsletterItemInput,
   StoreNewsletterItem,
-} from '../app/store';
-import {
-  NewsletterItemTemplate,
-  NewsletterItemTemplateData,
-  NewsletterItemTypeName,
-} from '@athena/athena-common';
+} from '@athena/store';
+import { NewsletterItemTemplateData, NewsletterItemTypeName } from '@athena/common';
 
 export const convertToTemplateItems = (items: StoreNewsletterItem[]) => {
   const realIdTempIdMap: Map<number, string> = new Map(
@@ -82,7 +78,7 @@ export const convertFromTemplateItems = (
 
 export const convertToEditableItems = (
   items: StoreNewsletterItem[]
-): StoreAddNewsletterItem<NewsletterItemTypeName | undefined>[] => {
+): StoreAddNewsletterItem<NewsletterItemTypeName>[] => {
   const realIdTempIdMap: Map<number, string> = new Map(
     items.reduce((ids, i) => {
       ids.push([i.id, nanoid()]);

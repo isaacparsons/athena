@@ -1,7 +1,6 @@
 import { Stack, Typography } from '@mui/material';
-import { DateRange } from '..'
-
-import { NewsletterProperties as INewsletterProperties } from '@athena/athena-common';
+import { DateRange } from '@athena/components'
+import { NewsletterProperties as INewsletterProperties } from '@athena/common';
 
 interface NewsletterPropertiesProps {
   properties: INewsletterProperties;

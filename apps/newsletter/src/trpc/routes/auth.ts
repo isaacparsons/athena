@@ -1,10 +1,14 @@
 import { Router, Express, Request, Response } from 'express';
 import passport from 'passport';
-import { Profile, Strategy, StrategyOptionsWithRequest } from 'passport-google-oauth20';
+import {
+  Profile,
+  Strategy,
+  StrategyOptionsWithRequest,
+} from 'passport-google-oauth20';
 import { first } from 'remeda';
 import session from 'express-session';
 import { parseEnv } from '../../util';
-import { UserSession } from '@athena/athena-common';
+import { UserSession } from '@athena/common';
 
 const env = parseEnv();
 

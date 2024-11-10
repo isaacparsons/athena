@@ -1,3 +1,6 @@
+import { useNavigate } from 'react-router-dom';
+import { SubmitHandler, useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   CircularProgress,
@@ -16,11 +19,8 @@ import { trpc } from '../../../trpc';
 import {
   CreateNewsletterInput,
   postNewsletterInput,
-} from '@athena/athena-common';
-import { SubmitHandler, useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
-import { usePromiseWithNotification } from '../../hooks';
+} from '@athena/common';
+import { usePromiseWithNotification } from '@athena/hooks';
 
 interface AddNewsletterDialogProps {
   open: boolean;

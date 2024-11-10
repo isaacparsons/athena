@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useMemo, useState } from 'react';
 import {
   Button,
@@ -10,11 +11,9 @@ import {
   ActionBar,
   BackButtonIcon,
   AddNewsletterItems,
-} from '..'
-
-import { useStore, useAddItemsStore } from '../../store';
-import { useShallow } from 'zustand/react/shallow';
-import { mapToArray } from '../../../util';
+} from '@athena/components'
+import { useStore, useAddItemsStore } from '@athena/store';
+import { mapToArray } from '@athena/common';
 
 export function AddItemsDialog() {
   const { fetchNewsletter, fetchNewsletterItems } = useStore(
@@ -61,20 +60,20 @@ export function AddItemsDialog() {
     [items, tempParentId]
   );
 
+  const parentItem = useMemo(() => tempParentId ? items[tempParentId] : null, [tempParentId, items])
+
   return (
     <Dialog fullScreen open={Boolean(existingItem)}>
       <ActionBar
         title="Add Items"
-        backBtn={
-          tempParentId !== null ? (
-            <BackButtonIcon onClick={handleBackBtnClick} />
-          ) : null
-        }
+        backBtn={tempParentId ? (
+          <BackButtonIcon onClick={handleBackBtnClick} />
+        ) : null}
       />
       <DialogContent>
         <AddNewsletterItems
           handleItemClick={handleItemClick}
-          parentId={tempParentId}
+          parentItem={parentItem}
           items={itemsArr}
           addItems={addItems}
           removeItem={removeItem}

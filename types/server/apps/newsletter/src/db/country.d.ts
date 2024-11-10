@@ -1,11 +1,11 @@
 import { Insertable, Selectable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '../db';
+import { DBConnection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '@athena/db';
 export interface CountryTableColumns {
     id: UniqueId;
     code: ImmutableString;
     name: ImmutableString;
     longitude: ImmutableNumber;
-    lattitude: ImmutableNumber;
+    latitude: ImmutableNumber;
 }
 export declare const CountryTable: {
     tableName: TABLE_NAMES;
@@ -14,7 +14,7 @@ export declare const CountryTable: {
     code: string;
     name: string;
     longtitude: string;
-    lattitude: string;
+    latitude: string;
 };
 export type SelectCountry = Selectable<CountryTableColumns>;
 export type InsertCountry = Insertable<CountryTableColumns>;

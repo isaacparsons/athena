@@ -1,11 +1,11 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
+import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '@athena/db';
 export interface LocationTableColumns {
     id: UniqueId;
     countryCode: string | null;
     name: string | null;
     longitude: number | null;
-    lattitude: number | null;
+    latitude: number | null;
 }
 export interface LocationTable {
     name: TABLE_NAMES.LOCATION;

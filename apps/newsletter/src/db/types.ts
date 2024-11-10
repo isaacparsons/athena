@@ -8,6 +8,7 @@ import {
   CountryTableColumns,
   FederatedCredentialTableColumns,
   LocationTableColumns,
+  NewsletterItemContainerTableColumns,
   NewsletterItemMediaTableColumns,
   NewsletterItemTableColumns,
   NewsletterItemTemplateDataTableColumns,
@@ -17,7 +18,7 @@ import {
   UserNewsletterTableColumns,
   UserTableColumns,
   UserTemplateTableColumns,
-} from '../db';
+} from '.';
 export { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres';
 export { Pool } from 'pg';
 export { sql, Expression, PostgresDialect, Kysely as DB } from 'kysely';
@@ -67,6 +68,7 @@ export enum TABLE_NAMES {
   NEWSLETTER_ITEM = 'newsletter_item',
   NEWSLETTER_ITEM_MEDIA = 'newsletter_item_media',
   NEWSLETTER_ITEM_TEXT = 'newsletter_item_text',
+  NEWSLETTER_ITEM_CONTAINER = 'newsletter_item_container',
   NEWSLETTER_ITEM_TEMPLATE = 'newsletter_item_template',
   NEWSLETTER_ITEM_TEMPLATE_DATA = 'newsletter_item_template_data',
   NEWSLETTER_ITEM_TEMPLATE_MAPPING = 'newsletter_item_template_mapping',
@@ -85,6 +87,7 @@ export interface Database {
   newsletter_item: NewsletterItemTableColumns;
   newsletter_item_media: NewsletterItemMediaTableColumns;
   newsletter_item_text: NewsletterItemTextTableColumns;
+  newsletter_item_container: NewsletterItemContainerTableColumns;
   country: CountryTableColumns;
   federated_credential: FederatedCredentialTableColumns;
   location: LocationTableColumns;

@@ -2,7 +2,7 @@ export declare const trpc: {
     _config: import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -24,7 +24,7 @@ export declare const trpc: {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -44,7 +44,7 @@ export declare const trpc: {
         }>;
         _ctx_out: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -68,7 +68,7 @@ export declare const trpc: {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -96,7 +96,7 @@ export declare const trpc: {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -124,7 +124,7 @@ export declare const trpc: {
     router: <TProcRouterRecord extends import("@trpc/server").ProcedureRouterRecord>(procedures: TProcRouterRecord) => import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -146,7 +146,7 @@ export declare const trpc: {
     createCallerFactory: <TRouter extends import("@trpc/server").Router<import("@trpc/server").AnyRouterDef<import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -169,7 +169,7 @@ export declare const publicProcedure: import("@trpc/server").ProcedureBuilder<{
     _config: import("@trpc/server").RootConfig<{
         ctx: {
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -189,7 +189,7 @@ export declare const publicProcedure: import("@trpc/server").ProcedureBuilder<{
     }>;
     _ctx_out: {
         req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/athena-common").UserSession;
+            user?: import("@athena/common").UserSession;
             isAuthenticated(): () => boolean;
         };
         res: import("express").Response<any, Record<string, any>>;

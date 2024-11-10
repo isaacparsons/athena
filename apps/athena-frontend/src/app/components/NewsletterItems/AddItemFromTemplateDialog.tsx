@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useMemo, useState } from 'react';
 import {
   Button,
@@ -8,11 +9,10 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-
-import { convertFromTemplateItems, mapToArray } from '../../../util';
-import { useAddItemsStore, useStore } from '../../store';
-import { useShallow } from 'zustand/react/shallow';
-import { CustomCard, CustomList, CustomListItem } from '../common';
+import { mapToArray } from "@athena/common"
+import { convertFromTemplateItems, } from '../../../util';
+import { useAddItemsStore, useStore } from '@athena/store';
+import { CustomCard, CustomList, CustomListItem } from '@athena/components';
 
 
 interface AddItemFromTemplateDialogProps {

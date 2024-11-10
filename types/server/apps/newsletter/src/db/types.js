@@ -29,6 +29,7 @@ var TABLE_NAMES;
     TABLE_NAMES["NEWSLETTER_ITEM"] = "newsletter_item";
     TABLE_NAMES["NEWSLETTER_ITEM_MEDIA"] = "newsletter_item_media";
     TABLE_NAMES["NEWSLETTER_ITEM_TEXT"] = "newsletter_item_text";
+    TABLE_NAMES["NEWSLETTER_ITEM_CONTAINER"] = "newsletter_item_container";
     TABLE_NAMES["NEWSLETTER_ITEM_TEMPLATE"] = "newsletter_item_template";
     TABLE_NAMES["NEWSLETTER_ITEM_TEMPLATE_DATA"] = "newsletter_item_template_data";
     TABLE_NAMES["NEWSLETTER_ITEM_TEMPLATE_MAPPING"] = "newsletter_item_template_mapping";

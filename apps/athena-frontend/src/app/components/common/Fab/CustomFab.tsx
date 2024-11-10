@@ -1,5 +1,5 @@
 import { Fab } from '@mui/material';
-import { AddIcon } from '../../icons';
+import { AddIcon } from '@athena/icons';
 
 interface CustomFabProps {
   onClick: () => void;

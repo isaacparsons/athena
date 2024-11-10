@@ -1,12 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.user = exports.modifier = exports.creator = exports.location = exports.newsletterItemDetailsText = exports.newsletterItemDetailsMedia = void 0;
-const db_1 = require("../db");
+exports.user = exports.modifier = exports.creator = exports.location = exports.newsletterItemDetailsText = exports.newsletterItemDetailsContainer = exports.newsletterItemDetailsMedia = void 0;
+const db_1 = require("@athena/db");
 const newsletterItemDetailsMedia = (db, id) => (0, db_1.jsonObjectFrom)(db
     .selectFrom('newsletter_item_media')
     .selectAll()
     .where(`newsletter_item_media.id`, '=', id)).as('mediaDetails');
 exports.newsletterItemDetailsMedia = newsletterItemDetailsMedia;
+const newsletterItemDetailsContainer = (db, id) => (0, db_1.jsonObjectFrom)(db
+    .selectFrom('newsletter_item_container')
+    .selectAll()
+    .where(`newsletter_item_container.id`, '=', id)).as('containerDetails');
+exports.newsletterItemDetailsContainer = newsletterItemDetailsContainer;
 const newsletterItemDetailsText = (db, id) => (0, db_1.jsonObjectFrom)(db
     .selectFrom('newsletter_item_text')
     .selectAll()

@@ -7,7 +7,7 @@ import {
   postNewsletterItemBatchInput,
   postNewsletterItemInput,
   updateNewsletterItemInput,
-} from '@athena/athena-common';
+} from '@athena/common';
 
 const router = trpc.router({
   get: loggedInProcedure.input(getNewsletterItemInput).query(({ input, ctx }) => {
@@ -29,9 +29,11 @@ const router = trpc.router({
       );
     }),
 
-  create: loggedInProcedure.input(postNewsletterItemInput).mutation(({ input, ctx }) => {
-    return ctx.dao.newsletterItem.post(ctx.user.userId, input);
-  }),
+  create: loggedInProcedure
+    .input(postNewsletterItemInput)
+    .mutation(({ input, ctx }) => {
+      return ctx.dao.newsletterItem.post(ctx.user.userId, input);
+    }),
   createBatch: loggedInProcedure
     .input(postNewsletterItemBatchInput)
     .mutation(({ input, ctx }) => {

@@ -1,11 +1,12 @@
 import 'reflect-metadata';
-import { DBConnection, SelectLocation, SelectNewsletterItem, SelectNewsletterItemMedia, SelectNewsletterItemText, SelectUser } from '../db';
-import { ILocationDAO, INewsletterItemDetailsDAO } from '.';
-import { CreateNewsletterItemBatchInput, CreateNewsletterItemInput, DeleteManyNewsletterItemsInput, UpdateNewsletterItemInput, NewsletterItem } from '@athena/athena-common';
+import { DBConnection, SelectLocation, SelectNewsletterItem, SelectNewsletterItemMedia, SelectNewsletterItemText, SelectUser, SelectNewsletterItemContainer } from '@athena/db';
+import { ILocationDAO, INewsletterItemDetailsDAO } from '@athena/dao';
+import { CreateNewsletterItemBatchInput, CreateNewsletterItemInput, DeleteManyNewsletterItemsInput, UpdateNewsletterItemInput, NewsletterItem } from '@athena/common';
 type MappedItem = Omit<SelectNewsletterItem, 'locationId' | 'creatorId' | 'modifierId'> & {
     location: SelectLocation | null;
     mediaDetails: SelectNewsletterItemMedia | null;
     textDetails: SelectNewsletterItemText | null;
+    containerDetails: SelectNewsletterItemContainer | null;
     creator: SelectUser;
     modifier: SelectUser | null;
 };
@@ -33,7 +34,7 @@ export declare const mapNewsletterItem: (item: MappedItem) => {
         name: string | null;
         country: string | null;
         position: {
-            lattitude: number;
+            latitude: number;
             longitude: number;
         } | null;
     } | null;
@@ -45,22 +46,31 @@ export declare const mapNewsletterItem: (item: MappedItem) => {
     details: {
         id: number;
         name: string;
-        type: import("@athena/athena-common").NewsletterItemTypeName.Media;
+        type: import("@athena/common").NewsletterItemTypeName.Media;
         fileName: string;
-        format: import("@athena/athena-common").MediaFormat;
+        format: import("@athena/common").MediaFormat;
         caption: string | null;
         description?: undefined;
         link?: undefined;
     } | {
         id: number;
         name: string;
-        type: import("@athena/athena-common").NewsletterItemTypeName.Text;
+        type: import("@athena/common").NewsletterItemTypeName.Text;
         description: string | null;
         link: string | null;
         fileName?: undefined;
         format?: undefined;
         caption?: undefined;
-    } | undefined;
+    } | {
+        id: number;
+        name: string;
+        type: import("@athena/common").NewsletterItemTypeName.Container;
+        fileName?: undefined;
+        format?: undefined;
+        caption?: undefined;
+        description?: undefined;
+        link?: undefined;
+    };
 };
 export interface INewsletterItemDAO {
     deleteMany(input: DeleteManyNewsletterItemsInput): Promise<void>;

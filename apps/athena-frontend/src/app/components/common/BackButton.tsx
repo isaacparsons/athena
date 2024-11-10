@@ -1,5 +1,5 @@
 import { IconButton } from '@mui/material';
-import { ArrowBackIcon } from '../../icons';
+import { ArrowBackIcon } from '@athena/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 

@@ -1,5 +1,5 @@
-import { UserNewsletterCard, CustomList, CustomListItem } from '..';
-import { StoreNewsletter } from '../../store';
+import { UserNewsletterCard, CustomList, CustomListItem } from '@athena/components';
+import { StoreNewsletter } from '@athena/store';
 import { useNavigate } from 'react-router-dom';
 
 interface NewslettersProps {

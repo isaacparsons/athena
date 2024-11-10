@@ -3,15 +3,15 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { CancelIcon, ArrowForwardIcon } from '../../icons';
+import { CancelIcon, ArrowForwardIcon } from '@athena/icons';
 import {
   StoreAddNewsletterItem,
   StoreAddNewsletterItemInput,
-} from '../../store';
-import { DeepPartial, isMediaDetailsInput, isTextDetailsInput, MediaFormat, NewsletterItemTypeName } from '@athena/athena-common';
-import { CustomCard, CustomCardFooter, CustomCardHeader, CustomIconButton } from '../common';
+} from '@athena/store';
+import { DeepPartial, isMediaDetailsInput, isTextDetailsInput, MediaFormat, NewsletterItemTypeName, formatDate } from '@athena/common';
+import { CustomCard, CustomCardFooter, CustomCardHeader, CustomIconButton } from '@athena/components';
 import ReactPlayer from 'react-player';
-import { formatDate } from '../../../util';
+
 
 
 interface AddItemCardProps {
@@ -25,18 +25,7 @@ interface AddItemCardProps {
 }
 
 export function AddItemCard({ item, onClick, removeItem, updateItemDetails }: AddItemCardProps) {
-  //   const [editLocationOpen, setEditLocationOpen] = useState(false);
-  //   const handleCloseEditLocation = () => {
-  //     setEditLocationOpen(false);
-  //   };
-  //   const handleOpenEditLocation = () => {
-  //     setEditLocationOpen(true);
-  //   };
-  //   if (editLocationOpen) {
-  //     return (
-  //       <EditItemLocation open={true} handleClose={handleCloseEditLocation} />
-  //     );
-  //   } else {
+
 
 
   const handleNameChange = (name: string) => updateItemDetails(item.temp.id, { details: { type: NewsletterItemTypeName.Text, name } })
@@ -48,12 +37,11 @@ export function AddItemCard({ item, onClick, removeItem, updateItemDetails }: Ad
       src={isMediaDetailsInput(item.details) && item.details.file && item.details.format === MediaFormat.Image ? URL.createObjectURL(item.details.file) : undefined}
     >
       <CustomCardHeader
-        right={
-          <CustomIconButton
-            onClick={() => removeItem(item.temp.id)}
-            icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />} />
-        }
+        right={<CustomIconButton
+          onClick={() => removeItem(item.temp.id)}
+          icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />} />}
       />
+
       <AddItemCardDetails
         item={item}
         onNameChange={handleNameChange}
@@ -64,9 +52,7 @@ export function AddItemCard({ item, onClick, removeItem, updateItemDetails }: Ad
       <CustomCardFooter right={<CustomIconButton
         onClick={() => onClick(item.temp.id)}
         icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />} />}>
-        {item.date && <Box sx={{
-          bgcolor: 'primary.main', borderRadius: 5, p: 1
-        }}>
+        {item.date && <Box sx={{ bgcolor: 'primary.main', borderRadius: 5, p: 1 }}>
           <Typography>{formatDate(item.date)}</Typography>
         </Box>}
       </CustomCardFooter>

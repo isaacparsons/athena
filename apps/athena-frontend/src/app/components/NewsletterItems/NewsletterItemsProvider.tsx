@@ -1,3 +1,8 @@
+import { useShallow } from 'zustand/react/shallow';
+import {
+    CircularProgress,
+    IconButton,
+} from '@mui/material'
 import { useMemo } from 'react';
 import {
     ActionBar,
@@ -5,15 +10,10 @@ import {
     BackButton,
     NewsletterItemsList,
     CustomFab
-} from '..';
-import {
-    CircularProgress,
-    IconButton,
-} from '@mui/material'
-import { useAddItemsStore, useStore } from '../../store';
-import { useShallow } from 'zustand/react/shallow';
-import { EditIcon, AddIcon, CloseIcon } from '../../icons';
-import { mapToArray } from '../../../util';
+} from '@athena/components';
+import { useAddItemsStore, useStore } from '@athena/store';
+import { EditIcon, CloseIcon } from '@athena/icons';
+import { mapToArray } from '@athena/common';
 
 interface NewsletterItemsProvider {
     newsletterId: number;

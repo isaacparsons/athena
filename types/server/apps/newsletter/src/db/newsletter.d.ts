@@ -1,5 +1,5 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES, MutableForeignKey, MutableNullableDate, Meta } from '../db';
+import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES, MutableForeignKey, MutableNullableDate, Meta } from '@athena/db';
 export interface NewsletterTableColumns extends Meta {
     id: UniqueId;
     name: string;

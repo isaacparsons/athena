@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { useParams } from 'react-router-dom';
-import { ActionBar, BackButton, CustomContainer } from '../components';
-import { useStore } from '../store';
+import { ActionBar, BackButton, CustomContainer } from '@athena/components';
+import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect, useMemo } from 'react';
 

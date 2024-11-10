@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { CircularProgress } from '@mui/material';
-import { useStore } from '../store';
+import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';

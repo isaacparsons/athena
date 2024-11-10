@@ -4,10 +4,10 @@ exports.DBManagerClient = void 0;
 const tslib_1 = require("tslib");
 require("reflect-metadata");
 const inversify_config_1 = require("../inversify.config");
-const db_1 = require("../db");
+const db_1 = require("@athena/db");
 const types_1 = require("../types/types");
 const nanoid_1 = require("nanoid");
-const athena_common_1 = require("@athena/athena-common");
+const common_1 = require("@athena/common");
 const newsletterDAO = inversify_config_1.container.get(types_1.TYPES.INewsletterDAO);
 const newsletterItemsDAO = inversify_config_1.container.get(types_1.TYPES.INewsletterItemDAO);
 const dbClient = inversify_config_1.container.get(types_1.TYPES.DBClient);
@@ -23,6 +23,7 @@ class DBManagerClient {
             new db_1.NewsletterItemTableClient(dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM),
             new db_1.NewsletterItemMediaTableClient(dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_MEDIA),
             new db_1.NewsletterItemTextTableClient(dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_TEXT),
+            new db_1.NewsletterItemContainerTableClient(dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_CONTAINER),
             new db_1.NewsletterItemTemplateTableClient(dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE),
             new db_1.NewsletterItemTemplateDataTableClient(dbClient, db_1.TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE_DATA),
             new db_1.UserTemplateTableClient(dbClient, db_1.TABLE_NAMES.USER_TEMPLATE),
@@ -75,6 +76,10 @@ class DBManagerClient {
                     nextId: null,
                     prevId: null,
                 },
+                details: {
+                    type: common_1.NewsletterItemTypeName.Container,
+                    name: 'Movie Review',
+                },
             };
             const movieReviewThoughts = {
                 title: 'Thoughts',
@@ -86,7 +91,7 @@ class DBManagerClient {
                     prevId: null,
                 },
                 details: {
-                    type: athena_common_1.NewsletterItemTypeName.Text,
+                    type: common_1.NewsletterItemTypeName.Text,
                     name: 'It was pretty good',
                 },
             };
@@ -100,7 +105,7 @@ class DBManagerClient {
                     prevId: movieReviewThoughtsId,
                 },
                 details: {
-                    type: athena_common_1.NewsletterItemTypeName.Text,
+                    type: common_1.NewsletterItemTypeName.Text,
                     name: '7/10',
                 },
             };

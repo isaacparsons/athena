@@ -8,14 +8,15 @@ import {
   SelectNewsletterItemMedia,
   SelectNewsletterItemText,
   SelectUser,
-} from '../db';
+  SelectNewsletterItemContainer,
+} from '@athena/db';
 
 import {
   ILocationDAO,
   INewsletterItemDetailsDAO,
   LocationDAO,
   NewsletterItemDetailsDAO,
-} from '.';
+} from '@athena/dao';
 import {
   CreateNewsletterItemBatchInput,
   CreateNewsletterItemInput,
@@ -24,13 +25,15 @@ import {
   NewsletterItemDetailsMedia,
   NewsletterItemDetailsText,
   NewsletterItem,
-} from '@athena/athena-common';
+  NewsletterItemDetailsContainer,
+} from '@athena/common';
 import {
   location,
   newsletterItemDetailsMedia,
   newsletterItemDetailsText,
   creator,
   modifier,
+  newsletterItemDetailsContainer,
 } from '../util';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types/types';
@@ -42,6 +45,7 @@ type MappedItem = Omit<
   location: SelectLocation | null;
   mediaDetails: SelectNewsletterItemMedia | null;
   textDetails: SelectNewsletterItemText | null;
+  containerDetails: SelectNewsletterItemContainer | null;
   creator: SelectUser;
   modifier: SelectUser | null;
 };
@@ -61,7 +65,11 @@ export const mapNewsletterItem = (item: MappedItem) => ({
   parentId: item.parentId,
   nextItemId: item.nextItemId,
   previousItemId: item.previousItemId,
-  details: mapNewsletterItemDetails(item.mediaDetails, item.textDetails),
+  details: mapNewsletterItemDetails(
+    item.mediaDetails,
+    item.textDetails,
+    item.containerDetails
+  ),
 });
 
 const mapLocation = (location: SelectLocation | null) =>
@@ -71,9 +79,9 @@ const mapLocation = (location: SelectLocation | null) =>
         name: location.name,
         country: location.countryCode,
         position:
-          location.lattitude && location.longitude
+          location.latitude && location.longitude
             ? {
-                lattitude: location.lattitude,
+                latitude: location.latitude,
                 longitude: location.longitude,
               }
             : null,
@@ -82,7 +90,8 @@ const mapLocation = (location: SelectLocation | null) =>
 
 const mapNewsletterItemDetails = (
   media: NewsletterItemDetailsMedia | null,
-  text: NewsletterItemDetailsText | null
+  text: NewsletterItemDetailsText | null,
+  container: NewsletterItemDetailsContainer | null
 ) => {
   if (media)
     return {
@@ -101,6 +110,14 @@ const mapNewsletterItemDetails = (
       description: text.description,
       link: text.link,
     };
+  if (container)
+    return {
+      id: container.id,
+      name: container.name,
+      type: container.type,
+    };
+
+  throw new Error('no valid details');
 };
 
 export interface INewsletterItemDAO {
@@ -306,6 +323,7 @@ export class NewsletterItemDAO implements INewsletterItemDAO {
           'modified',
           newsletterItemDetailsMedia(this.db, eb.ref('newsletter_item.id')),
           newsletterItemDetailsText(this.db, eb.ref('newsletter_item.id')),
+          newsletterItemDetailsContainer(this.db, eb.ref('newsletter_item.id')),
           location(this.db, eb.ref('newsletter_item.locationId')),
           creator(this.db, eb.ref('newsletter_item.creatorId')),
           modifier(this.db, eb.ref('newsletter_item.modifierId')),
@@ -332,6 +350,7 @@ export class NewsletterItemDAO implements INewsletterItemDAO {
           'modified',
           newsletterItemDetailsMedia(this.db, eb.ref('newsletter_item.id')),
           newsletterItemDetailsText(this.db, eb.ref('newsletter_item.id')),
+          newsletterItemDetailsContainer(this.db, eb.ref('newsletter_item.id')),
           location(this.db, eb.ref('newsletter_item.locationId')),
           creator(this.db, eb.ref('newsletter_item.creatorId')),
           modifier(this.db, eb.ref('newsletter_item.modifierId')),

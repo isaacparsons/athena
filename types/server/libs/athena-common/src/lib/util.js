@@ -2,6 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logObject = void 0;
 exports.range = range;
+exports.mapToArray = mapToArray;
+exports.formatDate = formatDate;
+exports.formatDateRange = formatDateRange;
+exports.mimeTypeToMediaFormat = mimeTypeToMediaFormat;
+const athena_common_1 = require("./athena-common");
 const logObject = (item, label) => {
     if (label) {
         console.log(label, JSON.stringify(item, null, 4));
@@ -13,5 +18,28 @@ const logObject = (item, label) => {
 exports.logObject = logObject;
 function range(x) {
     return Array.from({ length: x + 1 }, (_, i) => i);
+}
+function mapToArray(obj) {
+    return Object.keys(obj).map((key) => obj[key]);
+}
+function formatDate(date) {
+    return new Date(date).toDateString();
+}
+function formatDateRange(dateRange) {
+    if (!dateRange.start)
+        return null;
+    const start = formatDate(dateRange.start);
+    const end = dateRange.end ? formatDate(dateRange.end) : null;
+    return end ? `${start} - ${end}` : start;
+}
+function mimeTypeToMediaFormat(mimeType) {
+    const type = mimeType.split('/')[0];
+    if (type === 'image')
+        return athena_common_1.MediaFormat.Image;
+    if (type === 'video')
+        return athena_common_1.MediaFormat.Video;
+    if (type === 'audio')
+        return athena_common_1.MediaFormat.Audio;
+    throw new Error('Unsupported mime type');
 }
 //# sourceMappingURL=util.js.map

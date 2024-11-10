@@ -5,12 +5,12 @@ import {
   NewsletterProperties,
   NewsletterMembers,
   NewsletterItemsProvider
-} from '../components';
+} from '@athena/components';
 import {
   CircularProgress,
   Skeleton,
 } from '@mui/material'
-import { useStore } from '../store';
+import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 
 export function Newsletter() {

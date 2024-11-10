@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { container } from '../inversify.config';
-import { INewsletterDAO, INewsletterItemDAO } from '../dao';
+import { INewsletterDAO, INewsletterItemDAO } from '@athena/dao';
 import {
   CountryTableClient,
   UserNewsletterTableClient,
@@ -17,14 +17,14 @@ import {
   ITable,
   TABLE_NAMES,
   DBConnection,
-} from '../db';
+  NewsletterItemContainerTableClient,
+} from '@athena/db';
 import { TYPES } from '../types/types';
 import { nanoid } from 'nanoid';
 import {
-  CreateNewsletterItemBatchInput,
   CreateNewsletterItemBatchInputItem,
   NewsletterItemTypeName,
-} from '@athena/athena-common';
+} from '@athena/common';
 
 const newsletterDAO = container.get<INewsletterDAO>(TYPES.INewsletterDAO);
 const newsletterItemsDAO = container.get<INewsletterItemDAO>(
@@ -51,6 +51,10 @@ export class DBManagerClient {
         TABLE_NAMES.NEWSLETTER_ITEM_MEDIA
       ),
       new NewsletterItemTextTableClient(dbClient, TABLE_NAMES.NEWSLETTER_ITEM_TEXT),
+      new NewsletterItemContainerTableClient(
+        dbClient,
+        TABLE_NAMES.NEWSLETTER_ITEM_CONTAINER
+      ),
       new NewsletterItemTemplateTableClient(
         dbClient,
         TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE
@@ -108,6 +112,10 @@ export class DBManagerClient {
         parentId: null,
         nextId: null,
         prevId: null,
+      },
+      details: {
+        type: NewsletterItemTypeName.Container,
+        name: 'Movie Review',
       },
     };
 

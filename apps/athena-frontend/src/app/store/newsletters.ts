@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
-import { Slices } from '../store';
-import { Newsletter, NewsletterBase } from '@athena/athena-common';
+import { Slices } from '@athena/store';
+import { Newsletter, NewsletterBase } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 
 export type StoreNewsletter = Omit<Newsletter, 'items'> & {

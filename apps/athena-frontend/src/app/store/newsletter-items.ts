@@ -3,12 +3,12 @@ import {
   NewsletterItem,
   NewsletterItemBase,
   NewsletterItemTypeName,
-} from '@athena/athena-common';
-import { Slices } from '../store';
+  mapToArray,
+} from '@athena/common';
+import { Slices } from '@athena/store';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { asyncTrpcClient } from '../../trpc';
-import { mapToArray } from '../../util';
 
 const mapToStoreItem = <T extends NewsletterItemTypeName = NewsletterItemTypeName>(
   item: NewsletterItem<T>
@@ -88,7 +88,6 @@ export const createNewsletterItemsSlice: StateCreator<
       set((state) => {
         state.newsletterItems.selectedItemIds = traverseItemIds(
           _.cloneDeep(state.newsletterItems.data),
-          // _.cloneDeep(state.newsletterItems.selectedItemIds),
           [],
           _.cloneDeep(itemsIds)
         );

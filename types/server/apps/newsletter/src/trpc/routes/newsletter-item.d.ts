@@ -1,7 +1,7 @@
 declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
     ctx: {
         req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/athena-common").UserSession;
+            user?: import("@athena/common").UserSession;
             isAuthenticated(): () => boolean;
         };
         res: import("express").Response<any, Record<string, any>>;
@@ -23,7 +23,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -50,7 +50,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 refreshToken: string;
             };
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -72,12 +72,12 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, import("@athena/athena-common").NewsletterItem<import("@athena/athena-common").NewsletterItemTypeName>>;
+    }, import("@athena/common").NewsletterItem<import("@athena/common").NewsletterItemTypeName>>;
     getItemUploadLinks: import("@trpc/server").BuildProcedure<"query", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -104,7 +104,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 refreshToken: string;
             };
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -139,7 +139,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -166,7 +166,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 refreshToken: string;
             };
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -186,25 +186,28 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             nextItemId: number | null;
             previousItemId: number | null;
             title: string;
-            location?: {
-                name?: string | undefined;
-                longitude?: number | undefined;
-                lattitude?: number | undefined;
-                countryCode?: string | undefined;
-            } | undefined;
-            date?: string | undefined;
-            details?: {
+            details: {
                 name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
+                type: import("@athena/common").NewsletterItemTypeName.Media;
                 fileName: string;
-                format: import("@athena/athena-common").MediaFormat;
+                format: import("@athena/common").MediaFormat;
                 caption?: string | null | undefined;
             } | {
                 name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
+                type: import("@athena/common").NewsletterItemTypeName.Text;
                 description?: string | null | undefined;
                 link?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Container;
+            };
+            location?: {
+                name?: string | undefined;
+                longitude?: number | undefined;
+                latitude?: number | undefined;
+                countryCode?: string | undefined;
             } | undefined;
+            date?: string | undefined;
         };
         _input_out: {
             parentId: number | null;
@@ -212,25 +215,28 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             nextItemId: number | null;
             previousItemId: number | null;
             title: string;
-            location?: {
-                name?: string | undefined;
-                longitude?: number | undefined;
-                lattitude?: number | undefined;
-                countryCode?: string | undefined;
-            } | undefined;
-            date?: string | undefined;
-            details?: {
+            details: {
                 name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
+                type: import("@athena/common").NewsletterItemTypeName.Media;
                 fileName: string;
-                format: import("@athena/athena-common").MediaFormat;
+                format: import("@athena/common").MediaFormat;
                 caption?: string | null | undefined;
             } | {
                 name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
+                type: import("@athena/common").NewsletterItemTypeName.Text;
                 description?: string | null | undefined;
                 link?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Container;
+            };
+            location?: {
+                name?: string | undefined;
+                longitude?: number | undefined;
+                latitude?: number | undefined;
+                countryCode?: string | undefined;
             } | undefined;
+            date?: string | undefined;
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
@@ -239,7 +245,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -266,7 +272,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 refreshToken: string;
             };
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -288,6 +294,21 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             batch: {
                 newsletterId: number;
                 title: string;
+                details: {
+                    name: string;
+                    type: import("@athena/common").NewsletterItemTypeName.Media;
+                    fileName: string;
+                    format: import("@athena/common").MediaFormat;
+                    caption?: string | null | undefined;
+                } | {
+                    name: string;
+                    type: import("@athena/common").NewsletterItemTypeName.Text;
+                    description?: string | null | undefined;
+                    link?: string | null | undefined;
+                } | {
+                    name: string;
+                    type: import("@athena/common").NewsletterItemTypeName.Container;
+                };
                 temp: {
                     id: string;
                     parentId: string | null;
@@ -297,22 +318,10 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 location?: {
                     name?: string | undefined;
                     longitude?: number | undefined;
-                    lattitude?: number | undefined;
+                    latitude?: number | undefined;
                     countryCode?: string | undefined;
                 } | undefined;
                 date?: string | undefined;
-                details?: {
-                    name: string;
-                    type: import("@athena/athena-common").NewsletterItemTypeName.Media;
-                    fileName: string;
-                    format: import("@athena/athena-common").MediaFormat;
-                    caption?: string | null | undefined;
-                } | {
-                    name: string;
-                    type: import("@athena/athena-common").NewsletterItemTypeName.Text;
-                    description?: string | null | undefined;
-                    link?: string | null | undefined;
-                } | undefined;
             }[];
         };
         _input_out: {
@@ -323,6 +332,21 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             batch: {
                 newsletterId: number;
                 title: string;
+                details: {
+                    name: string;
+                    type: import("@athena/common").NewsletterItemTypeName.Media;
+                    fileName: string;
+                    format: import("@athena/common").MediaFormat;
+                    caption?: string | null | undefined;
+                } | {
+                    name: string;
+                    type: import("@athena/common").NewsletterItemTypeName.Text;
+                    description?: string | null | undefined;
+                    link?: string | null | undefined;
+                } | {
+                    name: string;
+                    type: import("@athena/common").NewsletterItemTypeName.Container;
+                };
                 temp: {
                     id: string;
                     parentId: string | null;
@@ -332,22 +356,10 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 location?: {
                     name?: string | undefined;
                     longitude?: number | undefined;
-                    lattitude?: number | undefined;
+                    latitude?: number | undefined;
                     countryCode?: string | undefined;
                 } | undefined;
                 date?: string | undefined;
-                details?: {
-                    name: string;
-                    type: import("@athena/athena-common").NewsletterItemTypeName.Media;
-                    fileName: string;
-                    format: import("@athena/athena-common").MediaFormat;
-                    caption?: string | null | undefined;
-                } | {
-                    name: string;
-                    type: import("@athena/athena-common").NewsletterItemTypeName.Text;
-                    description?: string | null | undefined;
-                    link?: string | null | undefined;
-                } | undefined;
             }[];
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
@@ -357,7 +369,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -384,7 +396,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 refreshToken: string;
             };
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;
@@ -400,51 +412,57 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         };
         _input_in: {
             newsletterItemId: number;
+            details: {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Media;
+                fileName: string;
+                format: import("@athena/common").MediaFormat;
+                caption?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Text;
+                description?: string | null | undefined;
+                link?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Container;
+            };
             location?: {
                 name?: string | undefined;
                 longitude?: number | undefined;
-                lattitude?: number | undefined;
+                latitude?: number | undefined;
                 countryCode?: string | undefined;
             } | undefined;
             date?: string | null | undefined;
             nextItemId?: number | undefined;
             title?: string | undefined;
-            details?: {
-                name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
-                fileName: string;
-                format: import("@athena/athena-common").MediaFormat;
-                caption?: string | null | undefined;
-            } | {
-                name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
-                description?: string | null | undefined;
-                link?: string | null | undefined;
-            } | undefined;
         };
         _input_out: {
             newsletterItemId: number;
+            details: {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Media;
+                fileName: string;
+                format: import("@athena/common").MediaFormat;
+                caption?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Text;
+                description?: string | null | undefined;
+                link?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Container;
+            };
             location?: {
                 name?: string | undefined;
                 longitude?: number | undefined;
-                lattitude?: number | undefined;
+                latitude?: number | undefined;
                 countryCode?: string | undefined;
             } | undefined;
             date?: string | null | undefined;
             nextItemId?: number | undefined;
             title?: string | undefined;
-            details?: {
-                name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Media;
-                fileName: string;
-                format: import("@athena/athena-common").MediaFormat;
-                caption?: string | null | undefined;
-            } | {
-                name: string;
-                type: import("@athena/athena-common").NewsletterItemTypeName.Text;
-                description?: string | null | undefined;
-                link?: string | null | undefined;
-            } | undefined;
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
@@ -453,7 +471,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         _config: import("@trpc/server").RootConfig<{
             ctx: {
                 req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/athena-common").UserSession;
+                    user?: import("@athena/common").UserSession;
                     isAuthenticated(): () => boolean;
                 };
                 res: import("express").Response<any, Record<string, any>>;
@@ -480,7 +498,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 refreshToken: string;
             };
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/athena-common").UserSession;
+                user?: import("@athena/common").UserSession;
                 isAuthenticated(): () => boolean;
             };
             res: import("express").Response<any, Record<string, any>>;

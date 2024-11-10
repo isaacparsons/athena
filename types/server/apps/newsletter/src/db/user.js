@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserTemplateTableClient = exports.UserNewsletterTableClient = exports.UserTableClient = void 0;
 const tslib_1 = require("tslib");
-const db_1 = require("../db");
+const db_1 = require("@athena/db");
 class UserTableClient extends db_1.Table {
     constructor(db, name) {
         super(db, name);

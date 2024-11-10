@@ -1,6 +1,6 @@
-import { NewsletterBase, User, UserNewsletterItemTemplates, UserNewsletters } from '@athena/athena-common';
+import { NewsletterBase, User, UserNewsletterItemTemplates, UserNewsletters } from '@athena/common';
 import 'reflect-metadata';
-import { DBConnection } from '../db';
+import { DBConnection } from '@athena/db';
 export interface IUserDAO {
     get(id: number): Promise<User>;
     newsletters: (userId: number) => Promise<UserNewsletters>;

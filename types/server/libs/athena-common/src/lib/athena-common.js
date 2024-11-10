@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteNewsletterItemTemplateInput = exports.getNewsletterItemTemplateInput = exports.postNewsletterItemTemplateInput = exports.getItemUploadLinksInput = exports.deleteManyNewsletterItemsInput = exports.deleteNewsletterInput = exports.updateNewsletterInput = exports.postNewsletterInput = exports.getNewsletterInput = exports.updateNewsletterItemInput = exports.postNewsletterItemBatchInput = exports.postNewsletterItemBatchInputItem = exports.tempNewsletterItemIds = exports.postNewsletterItemInput = exports.postNewsletterItemInputBase = exports.getNewsletterItemTreeInput = exports.getNewsletterItemInput = exports.newsletterItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.NewsletterItemTypeName = exports.MediaFormat = exports.locationInput = void 0;
+exports.deleteNewsletterItemTemplateInput = exports.getNewsletterItemTemplateInput = exports.postNewsletterItemTemplateInput = exports.getItemUploadLinksInput = exports.deleteManyNewsletterItemsInput = exports.deleteNewsletterInput = exports.updateNewsletterInput = exports.postNewsletterInput = exports.getNewsletterInput = exports.updateNewsletterItemInput = exports.postNewsletterItemBatchInput = exports.postNewsletterItemBatchInputItem = exports.tempNewsletterItemIds = exports.postNewsletterItemInput = exports.postNewsletterItemInputBase = exports.getNewsletterItemTreeInput = exports.getNewsletterItemInput = exports.newsletterItemDetails = exports.containerItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.NewsletterItemTypeName = exports.MediaFormat = exports.locationInput = void 0;
 exports.isMediaDetailsInput = isMediaDetailsInput;
 exports.isTextDetailsInput = isTextDetailsInput;
+exports.isContainerDetailsInput = isContainerDetailsInput;
 exports.isMediaDetails = isMediaDetails;
 exports.isTextDetails = isTextDetails;
+exports.isContainerDetails = isContainerDetails;
 const zod_1 = require("zod");
 /**
  * Input validation
@@ -13,7 +15,7 @@ exports.locationInput = zod_1.z
     .object({
     name: zod_1.z.string().optional(),
     countryCode: zod_1.z.string().optional(),
-    lattitude: zod_1.z.coerce.number().optional(),
+    latitude: zod_1.z.coerce.number().optional(),
     longitude: zod_1.z.coerce.number().optional(),
 })
     .optional();
@@ -27,6 +29,7 @@ var NewsletterItemTypeName;
 (function (NewsletterItemTypeName) {
     NewsletterItemTypeName["Media"] = "media";
     NewsletterItemTypeName["Text"] = "text";
+    NewsletterItemTypeName["Container"] = "container";
 })(NewsletterItemTypeName || (exports.NewsletterItemTypeName = NewsletterItemTypeName = {}));
 const mediaFormat = zod_1.z.nativeEnum(MediaFormat);
 exports.mediaItemDetails = zod_1.z.object({
@@ -42,9 +45,15 @@ exports.textItemDetails = zod_1.z.object({
     description: zod_1.z.string().optional().nullable(),
     link: zod_1.z.string().optional().nullable(),
 });
-exports.newsletterItemDetails = zod_1.z
-    .discriminatedUnion('type', [exports.mediaItemDetails, exports.textItemDetails])
-    .optional();
+exports.containerItemDetails = zod_1.z.object({
+    type: zod_1.z.literal(NewsletterItemTypeName.Container),
+    name: zod_1.z.string(),
+});
+exports.newsletterItemDetails = zod_1.z.discriminatedUnion('type', [
+    exports.mediaItemDetails,
+    exports.textItemDetails,
+    exports.containerItemDetails,
+]);
 exports.getNewsletterItemInput = zod_1.z.object({
     newsletterItemId: zod_1.z.coerce.number(),
 });
@@ -127,16 +136,11 @@ const newsletterItemTemplateDataDetails = zod_1.z
     exports.textItemDetails
         .pick({ type: true })
         .merge(exports.textItemDetails.omit({ type: true }).partial()),
+    exports.containerItemDetails
+        .pick({ type: true })
+        .merge(exports.containerItemDetails.omit({ type: true }).partial()),
 ])
     .optional();
-// const baseNewsletterItemTemplateData = z.object({
-//   id: z.number(),
-//   nextId: z.number().nullable(),
-//   prevId: z.number().nullable(),
-//   parentId: z.number().nullable(),
-//   templateId: z.number().nullable(),
-//   data: newsletterItemTemplateDataDetails,
-// });
 exports.postNewsletterItemTemplateInput = zod_1.z.object({
     name: zod_1.z.string(),
     data: zod_1.z.array(zod_1.z.object({
@@ -157,10 +161,18 @@ function isMediaDetailsInput(details) {
 function isTextDetailsInput(details) {
     return ((details === null || details === void 0 ? void 0 : details.type) === NewsletterItemTypeName.Text);
 }
+function isContainerDetailsInput(details) {
+    return ((details === null || details === void 0 ? void 0 : details.type) ===
+        NewsletterItemTypeName.Container);
+}
 function isMediaDetails(details) {
     return (details.type === NewsletterItemTypeName.Media);
 }
 function isTextDetails(details) {
     return details.type === NewsletterItemTypeName.Text;
+}
+function isContainerDetails(details) {
+    return (details.type ===
+        NewsletterItemTypeName.Container);
 }
 //# sourceMappingURL=athena-common.js.map

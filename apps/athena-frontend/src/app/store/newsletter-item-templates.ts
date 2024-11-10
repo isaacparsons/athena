@@ -2,8 +2,8 @@ import {
   NewsletterItemTemplateBase,
   CreateNewsletterItemTemplateInput,
   NewsletterItemTemplate,
-} from '@athena/athena-common';
-import { Slices } from '../store';
+} from '@athena/common';
+import { Slices } from '@athena/store';
 import { StateCreator } from 'zustand';
 import { asyncTrpcClient } from '../../trpc';
 
@@ -36,7 +36,6 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
       const template = await asyncTrpcClient.newsletterItemTemplates.get.query({
         id,
       });
-      console.log(template);
       set((state) => {
         state.newsletterItemTemplates.loading = false;
         const { templates, ...rest } = template;

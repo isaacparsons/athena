@@ -1,10 +1,10 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useMemo, useState } from 'react';
 import { Fab } from '@mui/material';
-import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '..';
-import { DeleteIcon, TemplateIcon } from '../../icons';
-import { StoreNewsletterItem, useStore } from '../../store';
-import { useShallow } from 'zustand/react/shallow';
-import { usePromiseWithNotification } from '../../hooks';
+import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '@athena/components';
+import { DeleteIcon, TemplateIcon } from '@athena/icons';
+import { StoreNewsletterItem, useStore } from '@athena/store';
+import { usePromiseWithNotification } from '@athena/hooks';
 
 
 interface NewsletterItemsListProps {

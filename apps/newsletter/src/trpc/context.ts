@@ -1,4 +1,4 @@
-import { Database, DB } from '../db';
+import { Database, DB } from '@athena/db';
 import {
   UserDAO,
   NewsletterDAO,
@@ -10,10 +10,10 @@ import {
   ILocationDAO,
   INewsletterItemDAO,
   INewsletterItemTemplateDAO,
-} from '../dao';
-import { GCSManager, IGCSManager } from '../services';
+} from '@athena/dao';
+import { GCSManager, IGCSManager } from '@athena/services';
 import { Request, Response } from 'express';
-import { UserSession } from '@athena/athena-common';
+import { UserSession } from '@athena/common';
 import { container } from '../inversify.config';
 import { TYPES } from '../types/types';
 

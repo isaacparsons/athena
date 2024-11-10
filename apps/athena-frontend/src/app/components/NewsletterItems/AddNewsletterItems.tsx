@@ -1,17 +1,14 @@
 import _ from 'lodash'
-import { StoreAddNewsletterItem, StoreAddNewsletterItemInput } from "../../store";
-import { useRef, useState } from "react";
-import { DeepPartial, NewsletterItemTypeName, range } from "@athena/athena-common";
-import { CustomList, CustomListItem } from "../common";
-import { AddItemCard } from "./AddItemCard";
 import { Button, ButtonGroup } from "@mui/material";
-import { MediaIcon, TemplateIcon, TextIcon } from "../../icons";
-import { AddItemFromTemplateDialog } from "./AddItemFromTemplateDialog";
-import { mimeTypeToMediaFormat } from '../../../util';
+import { useRef, useState } from "react";
+import { StoreAddNewsletterItem, StoreAddNewsletterItemInput } from "@athena/store";
+import { DeepPartial, LocationInput as ILocationInput, NewsletterItemTypeName, range, mimeTypeToMediaFormat } from "@athena/common";
+import { CustomList, CustomListItem, LocationDialog, LocationInput, AddItemCard, AddItemFromTemplateDialog } from "@athena/components";
+import { MediaIcon, TemplateIcon, TextIcon } from "@athena/icons";
 
 interface AddNewsletterItemsProps {
     handleItemClick: (id: string) => void;
-    parentId: string | null;
+    parentItem: StoreAddNewsletterItem | null;
     items: StoreAddNewsletterItem[];
     addItems: (parentId: string | null, items: StoreAddNewsletterItemInput[]) => void;
     removeItem: (id: string) => void;
@@ -21,17 +18,17 @@ interface AddNewsletterItemsProps {
     ) => void;
 }
 
-export function AddNewsletterItems({ parentId, handleItemClick, items, addItems, removeItem, updateItemDetails }: AddNewsletterItemsProps) {
+export function AddNewsletterItems({ parentItem, handleItemClick, items, addItems, removeItem, updateItemDetails }: AddNewsletterItemsProps) {
     const [
         createItemFromTemplateDialogOpen,
         setCreateItemFromTemplateDialogOpen,
     ] = useState(false);
+    const handleOpenCreateItemFromTemplateDialog = () => setCreateItemFromTemplateDialogOpen(true);
+    const handleCloseCreateItemFromTemplateDialog = () => setCreateItemFromTemplateDialogOpen(false);
 
-    const handleOpenCreateItemFromTemplateDialog = () =>
-        setCreateItemFromTemplateDialogOpen(true);
-
-    const handleCloseCreateItemFromTemplateDialog = () =>
-        setCreateItemFromTemplateDialogOpen(false);
+    const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+    const handleCloseLocationDialog = () => setLocationDialogOpen(false);
+    const handleOpenLocationDialog = () => setLocationDialogOpen(true);
 
     const inputFile = useRef<HTMLInputElement | null>(null);
 
@@ -54,11 +51,11 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
                     format: mimeTypeToMediaFormat(f.type)
                 },
             }));
-        addItems(parentId, files);
+        addItems(parentItem?.temp.id ?? null, files);
     };
 
     const handleAddTextItem = () =>
-        addItems(parentId, [
+        addItems(parentItem?.temp.id ?? null, [
             {
                 title: '',
                 date: new Date().toISOString(),
@@ -74,6 +71,11 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
         if (inputFile.current) inputFile.current.click();
     };
 
+    const handleLocationChange = (location: ILocationInput) => {
+        if (parentItem) updateItemDetails(parentItem.temp.id, { location })
+        handleCloseLocationDialog()
+    }
+
     return (
         <>
             <input
@@ -84,6 +86,11 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
                 name="media"
                 onChange={handleFileSelection}
             />
+            <LocationDialog open={locationDialogOpen} onClose={handleCloseLocationDialog} onSave={handleLocationChange} />
+            {parentItem && <LocationInput
+                onClick={handleOpenLocationDialog}
+                location={parentItem.location}
+            />}
             <CustomList >
                 {items.map((item) => (
                     <CustomListItem id={item.temp.id} key={item.temp.id}>
@@ -113,7 +120,7 @@ export function AddNewsletterItems({ parentId, handleItemClick, items, addItems,
             </ButtonGroup>
 
             <AddItemFromTemplateDialog
-                parentId={parentId}
+                parentId={parentItem?.temp.id ?? null}
                 open={createItemFromTemplateDialogOpen}
                 onClose={handleCloseCreateItemFromTemplateDialog}
             />

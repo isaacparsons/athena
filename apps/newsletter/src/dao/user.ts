@@ -3,9 +3,9 @@ import {
   User,
   UserNewsletterItemTemplates,
   UserNewsletters,
-} from '@athena/athena-common';
+} from '@athena/common';
 import 'reflect-metadata';
-import { DBConnection } from '../db';
+import { DBConnection } from '@athena/db';
 import { creator, modifier, user } from '../util';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types/types';

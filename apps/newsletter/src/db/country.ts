@@ -7,24 +7,24 @@ import {
   ImmutableString,
   ImmutableNumber,
   TABLE_NAMES,
-} from '../db';
+} from '@athena/db';
 
 export interface CountryTableColumns {
   id: UniqueId;
   code: ImmutableString;
   name: ImmutableString;
   longitude: ImmutableNumber;
-  lattitude: ImmutableNumber;
+  latitude: ImmutableNumber;
 }
 
 export const CountryTable = {
   tableName: TABLE_NAMES.COUNTRY,
-  columns: ['id', 'code', 'name', 'longitude', 'lattitude'],
+  columns: ['id', 'code', 'name', 'longitude', 'latitude'],
   id: `${TABLE_NAMES.COUNTRY}.id`,
   code: `${TABLE_NAMES.COUNTRY}.code`,
   name: `${TABLE_NAMES.COUNTRY}.name`,
   longtitude: `${TABLE_NAMES.COUNTRY}.longtitude`,
-  lattitude: `${TABLE_NAMES.COUNTRY}.lattitude`,
+  latitude: `${TABLE_NAMES.COUNTRY}.latitude`,
 };
 
 export type SelectCountry = Selectable<CountryTableColumns>;
@@ -43,7 +43,7 @@ export class CountryTableClient extends Table implements ITable {
       .addColumn('code', 'varchar', (col) => col.notNull())
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('longitude', 'double precision', (col) => col.notNull())
-      .addColumn('lattitude', 'double precision', (col) => col.notNull())
+      .addColumn('latitude', 'double precision', (col) => col.notNull())
       .execute();
     return;
   }

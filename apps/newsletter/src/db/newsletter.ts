@@ -8,7 +8,7 @@ import {
   MutableForeignKey,
   MutableNullableDate,
   Meta,
-} from '../db';
+} from '@athena/db';
 
 export interface NewsletterTableColumns extends Meta {
   id: UniqueId;

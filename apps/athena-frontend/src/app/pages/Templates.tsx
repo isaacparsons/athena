@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
-import { CustomContainer, CustomList, CustomListItem, UserTemplateCard } from '../components';
-import { useStore } from '../store';
+import { CustomContainer, CustomList, CustomListItem, UserTemplateCard } from '@athena/components';
+import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
-import { mapToArray } from '../../util';
-import { NewsletterItemTemplateBase } from '@athena/athena-common';
+import { NewsletterItemTemplateBase, mapToArray } from '@athena/common';
 
 export function Templates() {
   const { loading, newsletterItemTemplates } = useStore(

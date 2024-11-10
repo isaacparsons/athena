@@ -1,6 +1,10 @@
-import { createTRPCProxyClient, createTRPCReact, httpBatchLink } from '@trpc/react-query';
-// import type { AppRouter } from '@athena/backend';
-import { AppRouter } from '@athena/backend';
+import {
+  createTRPCProxyClient,
+  createTRPCReact,
+  httpBatchLink,
+} from '@trpc/react-query';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import type { AppRouter } from '@athena/trpc';
 
 const apiUrl = 'http://localhost:3000/api/v1/trpc';
 

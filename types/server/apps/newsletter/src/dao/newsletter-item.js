@@ -4,7 +4,7 @@ exports.NewsletterItemDAO = exports.mapNewsletterItem = void 0;
 const tslib_1 = require("tslib");
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
 require("reflect-metadata");
-const _1 = require(".");
+const dao_1 = require("@athena/dao");
 const util_1 = require("../util");
 const inversify_1 = require("inversify");
 const types_1 = require("../types/types");
@@ -23,7 +23,7 @@ const mapNewsletterItem = (item) => ({
     parentId: item.parentId,
     nextItemId: item.nextItemId,
     previousItemId: item.previousItemId,
-    details: mapNewsletterItemDetails(item.mediaDetails, item.textDetails),
+    details: mapNewsletterItemDetails(item.mediaDetails, item.textDetails, item.containerDetails),
 });
 exports.mapNewsletterItem = mapNewsletterItem;
 const mapLocation = (location) => location
@@ -31,15 +31,15 @@ const mapLocation = (location) => location
         id: location.id,
         name: location.name,
         country: location.countryCode,
-        position: location.lattitude && location.longitude
+        position: location.latitude && location.longitude
             ? {
-                lattitude: location.lattitude,
+                latitude: location.latitude,
                 longitude: location.longitude,
             }
             : null,
     }
     : null;
-const mapNewsletterItemDetails = (media, text) => {
+const mapNewsletterItemDetails = (media, text, container) => {
     if (media)
         return {
             id: media.id,
@@ -57,6 +57,13 @@ const mapNewsletterItemDetails = (media, text) => {
             description: text.description,
             link: text.link,
         };
+    if (container)
+        return {
+            id: container.id,
+            name: container.name,
+            type: container.type,
+        };
+    throw new Error('no valid details');
 };
 let NewsletterItemDAO = class NewsletterItemDAO {
     constructor(db, locationDAO, newsletterItemDetailsDAO) {
@@ -103,7 +110,7 @@ let NewsletterItemDAO = class NewsletterItemDAO {
     post(userId, input) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return this.db.transaction().execute((trx) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                const locationId = yield new _1.LocationDAO(trx).post(input.location);
+                const locationId = yield new dao_1.LocationDAO(trx).post(input.location);
                 const details = input.details;
                 const createdNewsletterItem = yield trx
                     .insertInto('newsletter_item')
@@ -111,7 +118,7 @@ let NewsletterItemDAO = class NewsletterItemDAO {
                     .returningAll()
                     .executeTakeFirstOrThrow();
                 if (details) {
-                    yield new _1.NewsletterItemDetailsDAO(trx).post(createdNewsletterItem.id, details);
+                    yield new dao_1.NewsletterItemDetailsDAO(trx).post(createdNewsletterItem.id, details);
                 }
                 yield trx
                     .updateTable('newsletter_item as ni')
@@ -147,7 +154,7 @@ let NewsletterItemDAO = class NewsletterItemDAO {
                         .returning('id')
                         .executeTakeFirstOrThrow();
                     if (item.details) {
-                        yield new _1.NewsletterItemDetailsDAO(trx).post(res.id, item.details);
+                        yield new dao_1.NewsletterItemDetailsDAO(trx).post(res.id, item.details);
                     }
                     return [item.temp.id, res.id];
                 })));
@@ -202,6 +209,7 @@ let NewsletterItemDAO = class NewsletterItemDAO {
                     'modified',
                     (0, util_1.newsletterItemDetailsMedia)(this.db, eb.ref('newsletter_item.id')),
                     (0, util_1.newsletterItemDetailsText)(this.db, eb.ref('newsletter_item.id')),
+                    (0, util_1.newsletterItemDetailsContainer)(this.db, eb.ref('newsletter_item.id')),
                     (0, util_1.location)(this.db, eb.ref('newsletter_item.locationId')),
                     (0, util_1.creator)(this.db, eb.ref('newsletter_item.creatorId')),
                     (0, util_1.modifier)(this.db, eb.ref('newsletter_item.modifierId')),
@@ -225,6 +233,7 @@ let NewsletterItemDAO = class NewsletterItemDAO {
                     'modified',
                     (0, util_1.newsletterItemDetailsMedia)(this.db, eb.ref('newsletter_item.id')),
                     (0, util_1.newsletterItemDetailsText)(this.db, eb.ref('newsletter_item.id')),
+                    (0, util_1.newsletterItemDetailsContainer)(this.db, eb.ref('newsletter_item.id')),
                     (0, util_1.location)(this.db, eb.ref('newsletter_item.locationId')),
                     (0, util_1.creator)(this.db, eb.ref('newsletter_item.creatorId')),
                     (0, util_1.modifier)(this.db, eb.ref('newsletter_item.modifierId')),

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useParams } from 'react-router-dom';
-import { NewsletterItemsProvider } from '../components';
+import { NewsletterItemsProvider } from '@athena/components';
 
 export function NewsletterItem() {
   const params = useParams();

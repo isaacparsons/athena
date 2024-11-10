@@ -6,8 +6,8 @@ import {
   RouteObject,
 } from 'react-router-dom';
 import { Login, Newsletter, Home, NotFound, NewsletterItem, Templates, NewsletterItemTemplate, Newsletters } from './pages';
-import { UserBase } from '@athena/athena-common';
-import { Appbar } from './components';
+import { UserBase } from '@athena/common';
+import { Appbar } from '@athena/components';
 
 export enum RoutePaths {
   home = '/',

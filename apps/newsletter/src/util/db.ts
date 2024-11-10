@@ -1,4 +1,4 @@
-import { DBConnection, Expression, jsonObjectFrom } from '../db';
+import { DBConnection, Expression, jsonObjectFrom } from '@athena/db';
 
 export const newsletterItemDetailsMedia = (
   db: DBConnection,
@@ -10,6 +10,17 @@ export const newsletterItemDetailsMedia = (
       .selectAll()
       .where(`newsletter_item_media.id`, '=', id)
   ).as('mediaDetails');
+
+export const newsletterItemDetailsContainer = (
+  db: DBConnection,
+  id: Expression<number>
+) =>
+  jsonObjectFrom(
+    db
+      .selectFrom('newsletter_item_container')
+      .selectAll()
+      .where(`newsletter_item_container.id`, '=', id)
+  ).as('containerDetails');
 
 export const newsletterItemDetailsText = (
   db: DBConnection,

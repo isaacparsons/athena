@@ -2,11 +2,11 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import { StoreNewsletterItem } from '../../../store';
+import { StoreNewsletterItem } from '@athena/store';
 import { useNavigate } from 'react-router-dom';
-import { CustomCard, CustomCardFooter, CustomCardHeader, CustomCheckbox, CustomIconButton } from '../..';
-import { ArrowForwardIcon } from '../../../icons';
-import { MediaFormat, NewsletterItemTypeName } from '@athena/athena-common';
+import { CustomCard, CustomCardFooter, CustomCardHeader, CustomCheckbox, CustomIconButton } from '@athena/components';
+import { ArrowForwardIcon } from '@athena/icons';
+import { MediaFormat, NewsletterItemTypeName } from '@athena/common';
 import ReactPlayer from 'react-player';
 
 interface NewsletterItemCardProps {

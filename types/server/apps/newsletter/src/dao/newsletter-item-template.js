@@ -4,7 +4,7 @@ exports.NewsletterItemTemplateDAO = void 0;
 const tslib_1 = require("tslib");
 const lodash_1 = tslib_1.__importDefault(require("lodash"));
 require("reflect-metadata");
-const db_1 = require("../db");
+const db_1 = require("@athena/db");
 const util_1 = require("../util");
 const inversify_1 = require("inversify");
 const types_1 = require("../types/types");

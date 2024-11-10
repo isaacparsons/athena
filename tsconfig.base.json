@@ -16,9 +16,17 @@
     "baseUrl": ".",
     "strictNullChecks": true,
     "paths": {
+      "@athena/theme": ["apps/athena-frontend/src/theme"],
+      "@athena/store": ["apps/athena-frontend/src/app/store"],
+      "@athena/hooks": ["apps/athena-frontend/src/app/hooks"],
+      "@athena/icons": ["apps/athena-frontend/src/app/icons"],
+      "@athena/components": ["apps/athena-frontend/src/app/components"],
       "@athena/api": ["types/athena.ts"],
-      "@athena/backend": ["types/server/apps/newsletter/src/trpc/routes"],
-      "@athena/athena-common": ["libs/athena-common/src/index.ts"]
+      "@athena/trpc": ["types/server/apps/newsletter/src/trpc/index.d.ts"],
+      "@athena/common": ["libs/athena-common/src/index.ts"],
+      "@athena/db": ["apps/newsletter/src/db/index.ts"],
+      "@athena/services": ["apps/newsletter/src/services/index.ts"],
+      "@athena/dao": ["apps/newsletter/src/dao/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

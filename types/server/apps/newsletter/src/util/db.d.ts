@@ -1,17 +1,23 @@
-import { DBConnection, Expression } from '../db';
+import { DBConnection, Expression } from '@athena/db';
 export declare const newsletterItemDetailsMedia: (db: DBConnection, id: Expression<number>) => import("kysely").AliasedRawBuilder<{
     id: number;
     name: string;
-    type: import("@athena/athena-common").NewsletterItemTypeName.Media;
+    type: import("@athena/common").NewsletterItemTypeName.Media;
     fileName: string;
-    format: import("@athena/athena-common").MediaFormat;
+    format: import("@athena/common").MediaFormat;
     caption: string | null;
     newsletterItemId: number;
 } | null, "mediaDetails">;
+export declare const newsletterItemDetailsContainer: (db: DBConnection, id: Expression<number>) => import("kysely").AliasedRawBuilder<{
+    id: number;
+    name: string;
+    type: import("@athena/common").NewsletterItemTypeName.Container;
+    newsletterItemId: number;
+} | null, "containerDetails">;
 export declare const newsletterItemDetailsText: (db: DBConnection, id: Expression<number>) => import("kysely").AliasedRawBuilder<{
     id: number;
     name: string;
-    type: import("@athena/athena-common").NewsletterItemTypeName.Text;
+    type: import("@athena/common").NewsletterItemTypeName.Text;
     description: string | null;
     link: string | null;
     newsletterItemId: number;
@@ -20,7 +26,7 @@ export declare const location: (db: DBConnection, id: Expression<number | null>)
     id: number;
     name: string | null;
     longitude: number | null;
-    lattitude: number | null;
+    latitude: number | null;
     countryCode: string | null;
 } | null, "location">;
 export declare const creator: (db: DBConnection, id: Expression<number>) => import("kysely").AliasedRawBuilder<{

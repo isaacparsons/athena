@@ -1,3 +1,5 @@
+import { nanoid } from 'nanoid';
+
 import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -8,17 +10,16 @@ import {
   DialogContent,
   TextField,
 } from '@mui/material';
-import { StoreAddNewsletterItem, StoreAddNewsletterItemInput, StoreNewsletterItem, traverseItemIds, useStore } from '../../store';
 import { useShallow } from 'zustand/react/shallow';
+import { StoreAddNewsletterItem, StoreAddNewsletterItemInput, StoreNewsletterItem, traverseItemIds, useStore } from '@athena/store';
 import {
   DeepPartial,
   NewsletterItemTypeName,
-} from '@athena/athena-common';
-import { usePromiseWithNotification } from '../../hooks';
-import { convertToEditableItems, mapToArray } from '../../../util';
-import { AddNewsletterItems } from '..';
-import { nanoid } from 'nanoid';
-import { ActionBar, BackButtonIcon } from '../common';
+} from '@athena/common';
+import { usePromiseWithNotification } from '@athena/hooks';
+import { convertToEditableItems } from '../../../util';
+import { mapToArray } from '@athena/common'
+import { ActionBar, BackButtonIcon, AddNewsletterItems } from '@athena/components';
 
 
 interface AddItemTemplateDialog {
@@ -45,7 +46,7 @@ export function AddItemTemplateDialog({ open, handleClose, items }: AddItemTempl
 
   const [template, setTemplate] = useState<{
     name: string;
-    items: StoreAddNewsletterItem<NewsletterItemTypeName | undefined>[]
+    items: StoreAddNewsletterItem<NewsletterItemTypeName>[]
   }>(defaultTemplate);
 
 
@@ -134,6 +135,14 @@ export function AddItemTemplateDialog({ open, handleClose, items }: AddItemTempl
     });
   };
 
+  const parentItem = useMemo(() => {
+    if (tempParentId) {
+      const item = template.items.find((i) => i.temp.id === tempParentId)
+      return item ?? null
+    }
+    return null
+  }, [tempParentId, template.items])
+
 
   return (
     <Dialog fullScreen open={open} onClose={handleClose}>
@@ -156,7 +165,7 @@ export function AddItemTemplateDialog({ open, handleClose, items }: AddItemTempl
       <DialogContent>
         <AddNewsletterItems
           handleItemClick={handleItemClick}
-          parentId={tempParentId}
+          parentItem={parentItem}
           items={itemsArr}
           addItems={handleAddItems}
           removeItem={handleRemoveItem}

@@ -1,4 +1,7 @@
 import type { StorybookConfig } from '@storybook/react-webpack5';
+import path from 'path';
+
+const toPath = (filePath: string) => path.join(process.cwd(), filePath);
 
 const config: StorybookConfig = {
   stories: ['../src/app/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
@@ -10,6 +13,19 @@ const config: StorybookConfig = {
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
+  },
+  webpackFinal: async (config) => {
+    return {
+      ...config,
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config.resolve?.alias,
+          '@emotion/core': toPath('node_modules/@emotion/react'),
+          'emotion-theming': toPath('node_modules/@emotion/react'),
+        },
+      },
+    };
   },
 };
 

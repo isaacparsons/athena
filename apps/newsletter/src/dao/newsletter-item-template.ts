@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import 'reflect-metadata';
-import { DBConnection, TABLE_NAMES, Transaction } from '../db';
+import { DBConnection, TABLE_NAMES, Transaction } from '@athena/db';
 
 import {
   CreateNewsletterItemTemplateInput,
   NewsletterItemTemplate,
   NewsletterItemTemplateBase,
   NewsletterItemTemplateDataDetails,
-} from '@athena/athena-common';
+} from '@athena/common';
 import { creator, modifier } from '../util';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types/types';

@@ -1,12 +1,12 @@
 import { Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '../db';
+import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '@athena/db';
 
 export interface LocationTableColumns {
   id: UniqueId;
   countryCode: string | null;
   name: string | null;
   longitude: number | null;
-  lattitude: number | null;
+  latitude: number | null;
 }
 
 export interface LocationTable {
@@ -31,7 +31,7 @@ export class LocationTableClient extends Table implements ITable {
       .addColumn('countryCode', 'varchar')
       .addColumn('name', 'varchar')
       .addColumn('longitude', 'double precision')
-      .addColumn('lattitude', 'double precision')
+      .addColumn('latitude', 'double precision')
       .execute();
     return;
   }

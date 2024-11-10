@@ -1,8 +1,8 @@
-import { Typography } from "@mui/material";
-import { CustomCard, CustomCardFooter, CustomIconButton } from "..";
-import { NewsletterItemTemplateBase } from '@athena/athena-common';
 import { useNavigate } from "react-router-dom";
-import { ArrowForwardIcon } from "../../icons";
+import { Typography } from "@mui/material";
+import { CustomCard, CustomCardFooter, CustomIconButton } from "@athena/components";
+import { NewsletterItemTemplateBase } from '@athena/common';
+import { ArrowForwardIcon } from "@athena/icons";
 
 
 interface UserTemplatesCardProps {

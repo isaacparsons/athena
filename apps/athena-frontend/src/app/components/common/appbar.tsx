@@ -15,8 +15,8 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { AccountCircleIcon, MenuIcon, TemplateIcon, SettingsIcon, HomeIcon } from '../../icons'
-import { useStore } from '../../store';
+import { AccountCircleIcon, MenuIcon, TemplateIcon, SettingsIcon, HomeIcon } from '@athena/icons'
+import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 

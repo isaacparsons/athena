@@ -10,25 +10,23 @@ import {
   NewsletterItem,
   isMediaDetailsInput,
   DeepPartial,
-} from '@athena/athena-common';
+  mapToArray,
+} from '@athena/common';
 import { create, StateCreator } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type {} from '@redux-devtools/extension';
-import { mapToArray } from '../../util';
 import { asyncTrpcClient } from '../../trpc';
 
 type ParentId = string | null;
 
-export type NewsletterItemDetailsType = NewsletterItemTypeName | undefined;
+export type NewsletterItemDetailsType = NewsletterItemTypeName;
 
 export type StoreItemDetails<
   T extends NewsletterItemDetailsType = NewsletterItemDetailsType
 > = T extends NewsletterItemTypeName.Media
   ? CreateItemDetailsInput<NewsletterItemTypeName.Media> & { file: File | null }
-  : T extends NewsletterItemTypeName.Text
-  ? CreateItemDetailsInput<T>
-  : undefined;
+  : CreateItemDetailsInput<T>;
 
 export type StoreAddNewsletterItemInput<
   T extends NewsletterItemDetailsType = NewsletterItemDetailsType
@@ -152,28 +150,20 @@ export const createCreateNewslettersItemsSlice: StateCreator<
       await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
         items: mediaItemIds,
       });
+
     const signedUrlsMap = new Map(signedUrls.map((su) => [su.id, su]));
 
     if (existingItem === null) return;
 
     const batch = await Promise.all(
       items.map(async (item) => {
-        let resolvedItem = item;
-        const itemUploadInfo = signedUrlsMap.get(item.temp.id);
         if (isMediaDetailsInput(item.details)) {
-          const { details } = item;
+          const itemUploadInfo = signedUrlsMap.get(item.temp.id);
           if (!itemUploadInfo) throw new Error('no signed url to upload photo');
-          await axios.put(itemUploadInfo.url, details.file);
-          const fileName = itemUploadInfo.fileName as string;
-          resolvedItem = {
-            ...item,
-            details: {
-              ...details,
-              fileName,
-            },
-          };
+          await axios.put(itemUploadInfo.url, item.details.file);
+          item.details.fileName = itemUploadInfo.fileName;
         }
-        return { newsletterId: existingItem.newsletterId, ...resolvedItem };
+        return { newsletterId: existingItem.newsletterId, ...item };
       })
     );
 

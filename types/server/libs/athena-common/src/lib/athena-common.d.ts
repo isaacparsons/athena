@@ -5,17 +5,17 @@ import { z } from 'zod';
 export declare const locationInput: z.ZodOptional<z.ZodObject<{
     name: z.ZodOptional<z.ZodString>;
     countryCode: z.ZodOptional<z.ZodString>;
-    lattitude: z.ZodOptional<z.ZodNumber>;
+    latitude: z.ZodOptional<z.ZodNumber>;
     longitude: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
     name?: string | undefined;
     longitude?: number | undefined;
-    lattitude?: number | undefined;
+    latitude?: number | undefined;
     countryCode?: string | undefined;
 }, {
     name?: string | undefined;
     longitude?: number | undefined;
-    lattitude?: number | undefined;
+    latitude?: number | undefined;
     countryCode?: string | undefined;
 }>>;
 export declare enum MediaFormat {
@@ -25,7 +25,8 @@ export declare enum MediaFormat {
 }
 export declare enum NewsletterItemTypeName {
     Media = "media",
-    Text = "text"
+    Text = "text",
+    Container = "container"
 }
 export declare const mediaItemDetails: z.ZodObject<{
     type: z.ZodLiteral<NewsletterItemTypeName.Media>;
@@ -62,7 +63,17 @@ export declare const textItemDetails: z.ZodObject<{
     description?: string | null | undefined;
     link?: string | null | undefined;
 }>;
-export declare const newsletterItemDetails: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+export declare const containerItemDetails: z.ZodObject<{
+    type: z.ZodLiteral<NewsletterItemTypeName.Container>;
+    name: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    type: NewsletterItemTypeName.Container;
+}, {
+    name: string;
+    type: NewsletterItemTypeName.Container;
+}>;
+export declare const newsletterItemDetails: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
     type: z.ZodLiteral<NewsletterItemTypeName.Media>;
     name: z.ZodString;
     fileName: z.ZodString;
@@ -95,7 +106,16 @@ export declare const newsletterItemDetails: z.ZodOptional<z.ZodDiscriminatedUnio
     type: NewsletterItemTypeName.Text;
     description?: string | null | undefined;
     link?: string | null | undefined;
-}>]>>;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<NewsletterItemTypeName.Container>;
+    name: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    type: NewsletterItemTypeName.Container;
+}, {
+    name: string;
+    type: NewsletterItemTypeName.Container;
+}>]>;
 export declare const getNewsletterItemInput: z.ZodObject<{
     newsletterItemId: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
@@ -120,17 +140,17 @@ export declare const postNewsletterItemInputBase: z.ZodObject<{
     location: z.ZodOptional<z.ZodObject<{
         name: z.ZodOptional<z.ZodString>;
         countryCode: z.ZodOptional<z.ZodString>;
-        lattitude: z.ZodOptional<z.ZodNumber>;
+        latitude: z.ZodOptional<z.ZodNumber>;
         longitude: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
@@ -142,7 +162,7 @@ export declare const postNewsletterItemInputBase: z.ZodObject<{
     location?: {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     } | undefined;
     date?: string | undefined;
@@ -155,7 +175,7 @@ export declare const postNewsletterItemInputBase: z.ZodObject<{
     location?: {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     } | undefined;
     date?: string | undefined;
@@ -170,21 +190,21 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
     location: z.ZodOptional<z.ZodObject<{
         name: z.ZodOptional<z.ZodString>;
         countryCode: z.ZodOptional<z.ZodString>;
-        lattitude: z.ZodOptional<z.ZodNumber>;
+        latitude: z.ZodOptional<z.ZodNumber>;
         longitude: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }>>;
 }, {
-    details: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+    details: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
         type: z.ZodLiteral<NewsletterItemTypeName.Media>;
         name: z.ZodString;
         fileName: z.ZodString;
@@ -217,21 +237,23 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
-    }>]>>;
+    }>, z.ZodObject<{
+        type: z.ZodLiteral<NewsletterItemTypeName.Container>;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    }, {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    }>]>;
 }>, "strip", z.ZodTypeAny, {
     parentId: number | null;
     newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     title: string;
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -242,21 +264,24 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | undefined;
 }, {
     parentId: number | null;
     newsletterId: number;
     nextItemId: number | null;
     previousItemId: number | null;
     title: string;
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -267,7 +292,17 @@ export declare const postNewsletterItemInput: z.ZodObject<z.objectUtil.extendSha
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | undefined;
 }>;
 export declare const tempNewsletterItemIds: z.ZodObject<{
     id: z.ZodString;
@@ -295,21 +330,21 @@ export declare const postNewsletterItemBatchInputItem: z.ZodObject<z.objectUtil.
     location: z.ZodOptional<z.ZodObject<{
         name: z.ZodOptional<z.ZodString>;
         countryCode: z.ZodOptional<z.ZodString>;
-        lattitude: z.ZodOptional<z.ZodNumber>;
+        latitude: z.ZodOptional<z.ZodNumber>;
         longitude: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }>>;
 }, {
-    details: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+    details: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
         type: z.ZodLiteral<NewsletterItemTypeName.Media>;
         name: z.ZodString;
         fileName: z.ZodString;
@@ -342,7 +377,16 @@ export declare const postNewsletterItemBatchInputItem: z.ZodObject<z.objectUtil.
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
-    }>]>>;
+    }>, z.ZodObject<{
+        type: z.ZodLiteral<NewsletterItemTypeName.Container>;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    }, {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    }>]>;
 }>, "parentId" | "nextItemId" | "previousItemId">, {
     temp: z.ZodObject<{
         id: z.ZodString;
@@ -363,20 +407,7 @@ export declare const postNewsletterItemBatchInputItem: z.ZodObject<z.objectUtil.
 }>, "strip", z.ZodTypeAny, {
     newsletterId: number;
     title: string;
-    temp: {
-        id: string;
-        parentId: string | null;
-        nextId: string | null;
-        prevId: string | null;
-    };
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -387,24 +418,27 @@ export declare const postNewsletterItemBatchInputItem: z.ZodObject<z.objectUtil.
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    temp: {
+        id: string;
+        parentId: string | null;
+        nextId: string | null;
+        prevId: string | null;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | undefined;
 }, {
     newsletterId: number;
     title: string;
-    temp: {
-        id: string;
-        parentId: string | null;
-        nextId: string | null;
-        prevId: string | null;
-    };
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -415,7 +449,23 @@ export declare const postNewsletterItemBatchInputItem: z.ZodObject<z.objectUtil.
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    temp: {
+        id: string;
+        parentId: string | null;
+        nextId: string | null;
+        prevId: string | null;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | undefined;
 }>;
 export declare const postNewsletterItemBatchInput: z.ZodObject<{
     newsletterId: z.ZodNumber;
@@ -432,21 +482,21 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
         location: z.ZodOptional<z.ZodObject<{
             name: z.ZodOptional<z.ZodString>;
             countryCode: z.ZodOptional<z.ZodString>;
-            lattitude: z.ZodOptional<z.ZodNumber>;
+            latitude: z.ZodOptional<z.ZodNumber>;
             longitude: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
             name?: string | undefined;
             longitude?: number | undefined;
-            lattitude?: number | undefined;
+            latitude?: number | undefined;
             countryCode?: string | undefined;
         }, {
             name?: string | undefined;
             longitude?: number | undefined;
-            lattitude?: number | undefined;
+            latitude?: number | undefined;
             countryCode?: string | undefined;
         }>>;
     }, {
-        details: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+        details: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
             type: z.ZodLiteral<NewsletterItemTypeName.Media>;
             name: z.ZodString;
             fileName: z.ZodString;
@@ -479,7 +529,16 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             type: NewsletterItemTypeName.Text;
             description?: string | null | undefined;
             link?: string | null | undefined;
-        }>]>>;
+        }>, z.ZodObject<{
+            type: z.ZodLiteral<NewsletterItemTypeName.Container>;
+            name: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            type: NewsletterItemTypeName.Container;
+        }, {
+            name: string;
+            type: NewsletterItemTypeName.Container;
+        }>]>;
     }>, "parentId" | "nextItemId" | "previousItemId">, {
         temp: z.ZodObject<{
             id: z.ZodString;
@@ -500,20 +559,7 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
     }>, "strip", z.ZodTypeAny, {
         newsletterId: number;
         title: string;
-        temp: {
-            id: string;
-            parentId: string | null;
-            nextId: string | null;
-            prevId: string | null;
-        };
-        location?: {
-            name?: string | undefined;
-            longitude?: number | undefined;
-            lattitude?: number | undefined;
-            countryCode?: string | undefined;
-        } | undefined;
-        date?: string | undefined;
-        details?: {
+        details: {
             name: string;
             type: NewsletterItemTypeName.Media;
             fileName: string;
@@ -524,24 +570,27 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             type: NewsletterItemTypeName.Text;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            name: string;
+            type: NewsletterItemTypeName.Container;
+        };
+        temp: {
+            id: string;
+            parentId: string | null;
+            nextId: string | null;
+            prevId: string | null;
+        };
+        location?: {
+            name?: string | undefined;
+            longitude?: number | undefined;
+            latitude?: number | undefined;
+            countryCode?: string | undefined;
         } | undefined;
+        date?: string | undefined;
     }, {
         newsletterId: number;
         title: string;
-        temp: {
-            id: string;
-            parentId: string | null;
-            nextId: string | null;
-            prevId: string | null;
-        };
-        location?: {
-            name?: string | undefined;
-            longitude?: number | undefined;
-            lattitude?: number | undefined;
-            countryCode?: string | undefined;
-        } | undefined;
-        date?: string | undefined;
-        details?: {
+        details: {
             name: string;
             type: NewsletterItemTypeName.Media;
             fileName: string;
@@ -552,7 +601,23 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             type: NewsletterItemTypeName.Text;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            name: string;
+            type: NewsletterItemTypeName.Container;
+        };
+        temp: {
+            id: string;
+            parentId: string | null;
+            nextId: string | null;
+            prevId: string | null;
+        };
+        location?: {
+            name?: string | undefined;
+            longitude?: number | undefined;
+            latitude?: number | undefined;
+            countryCode?: string | undefined;
         } | undefined;
+        date?: string | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
     parentId: number | null;
@@ -562,20 +627,7 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
     batch: {
         newsletterId: number;
         title: string;
-        temp: {
-            id: string;
-            parentId: string | null;
-            nextId: string | null;
-            prevId: string | null;
-        };
-        location?: {
-            name?: string | undefined;
-            longitude?: number | undefined;
-            lattitude?: number | undefined;
-            countryCode?: string | undefined;
-        } | undefined;
-        date?: string | undefined;
-        details?: {
+        details: {
             name: string;
             type: NewsletterItemTypeName.Media;
             fileName: string;
@@ -586,7 +638,23 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             type: NewsletterItemTypeName.Text;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            name: string;
+            type: NewsletterItemTypeName.Container;
+        };
+        temp: {
+            id: string;
+            parentId: string | null;
+            nextId: string | null;
+            prevId: string | null;
+        };
+        location?: {
+            name?: string | undefined;
+            longitude?: number | undefined;
+            latitude?: number | undefined;
+            countryCode?: string | undefined;
         } | undefined;
+        date?: string | undefined;
     }[];
 }, {
     parentId: number | null;
@@ -596,20 +664,7 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
     batch: {
         newsletterId: number;
         title: string;
-        temp: {
-            id: string;
-            parentId: string | null;
-            nextId: string | null;
-            prevId: string | null;
-        };
-        location?: {
-            name?: string | undefined;
-            longitude?: number | undefined;
-            lattitude?: number | undefined;
-            countryCode?: string | undefined;
-        } | undefined;
-        date?: string | undefined;
-        details?: {
+        details: {
             name: string;
             type: NewsletterItemTypeName.Media;
             fileName: string;
@@ -620,7 +675,23 @@ export declare const postNewsletterItemBatchInput: z.ZodObject<{
             type: NewsletterItemTypeName.Text;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            name: string;
+            type: NewsletterItemTypeName.Container;
+        };
+        temp: {
+            id: string;
+            parentId: string | null;
+            nextId: string | null;
+            prevId: string | null;
+        };
+        location?: {
+            name?: string | undefined;
+            longitude?: number | undefined;
+            latitude?: number | undefined;
+            countryCode?: string | undefined;
         } | undefined;
+        date?: string | undefined;
     }[];
 }>;
 export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
@@ -631,20 +702,20 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
     location: z.ZodOptional<z.ZodObject<{
         name: z.ZodOptional<z.ZodString>;
         countryCode: z.ZodOptional<z.ZodString>;
-        lattitude: z.ZodOptional<z.ZodNumber>;
+        latitude: z.ZodOptional<z.ZodNumber>;
         longitude: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }, {
         name?: string | undefined;
         longitude?: number | undefined;
-        lattitude?: number | undefined;
+        latitude?: number | undefined;
         countryCode?: string | undefined;
     }>>;
-    details: z.ZodOptional<z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
+    details: z.ZodDiscriminatedUnion<"type", [z.ZodObject<{
         type: z.ZodLiteral<NewsletterItemTypeName.Media>;
         name: z.ZodString;
         fileName: z.ZodString;
@@ -677,19 +748,19 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
-    }>]>>;
+    }>, z.ZodObject<{
+        type: z.ZodLiteral<NewsletterItemTypeName.Container>;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    }, {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    }>]>;
 }, "strip", z.ZodTypeAny, {
     newsletterItemId: number;
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | null | undefined;
-    nextItemId?: number | undefined;
-    title?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -700,19 +771,22 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | null | undefined;
+    nextItemId?: number | undefined;
+    title?: string | undefined;
 }, {
     newsletterItemId: number;
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | null | undefined;
-    nextItemId?: number | undefined;
-    title?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -723,19 +797,22 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | null | undefined;
+    nextItemId?: number | undefined;
+    title?: string | undefined;
 }>, {
     newsletterItemId: number;
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | null | undefined;
-    nextItemId?: number | undefined;
-    title?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -746,19 +823,22 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | null | undefined;
+    nextItemId?: number | undefined;
+    title?: string | undefined;
 }, {
     newsletterItemId: number;
-    location?: {
-        name?: string | undefined;
-        longitude?: number | undefined;
-        lattitude?: number | undefined;
-        countryCode?: string | undefined;
-    } | undefined;
-    date?: string | null | undefined;
-    nextItemId?: number | undefined;
-    title?: string | undefined;
-    details?: {
+    details: {
         name: string;
         type: NewsletterItemTypeName.Media;
         fileName: string;
@@ -769,7 +849,19 @@ export declare const updateNewsletterItemInput: z.ZodEffects<z.ZodObject<{
         type: NewsletterItemTypeName.Text;
         description?: string | null | undefined;
         link?: string | null | undefined;
+    } | {
+        name: string;
+        type: NewsletterItemTypeName.Container;
+    };
+    location?: {
+        name?: string | undefined;
+        longitude?: number | undefined;
+        latitude?: number | undefined;
+        countryCode?: string | undefined;
     } | undefined;
+    date?: string | null | undefined;
+    nextItemId?: number | undefined;
+    title?: string | undefined;
 }>;
 export declare const getNewsletterInput: z.ZodObject<{
     newsletterId: z.ZodNumber;
@@ -899,6 +991,17 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             name?: string | undefined;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        }>, z.ZodObject<z.objectUtil.extendShape<Pick<{
+            type: z.ZodLiteral<NewsletterItemTypeName.Container>;
+            name: z.ZodString;
+        }, "type">, {
+            name: z.ZodOptional<z.ZodString>;
+        }>, "strip", z.ZodTypeAny, {
+            type: NewsletterItemTypeName.Container;
+            name?: string | undefined;
+        }, {
+            type: NewsletterItemTypeName.Container;
+            name?: string | undefined;
         }>]>>;
     }, "strip", z.ZodTypeAny, {
         temp: {
@@ -918,6 +1021,9 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             name?: string | undefined;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            type: NewsletterItemTypeName.Container;
+            name?: string | undefined;
         } | undefined;
         templateId?: number | undefined;
     }, {
@@ -938,6 +1044,9 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             name?: string | undefined;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            type: NewsletterItemTypeName.Container;
+            name?: string | undefined;
         } | undefined;
         templateId?: number | undefined;
     }>, "many">;
@@ -961,6 +1070,9 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             name?: string | undefined;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            type: NewsletterItemTypeName.Container;
+            name?: string | undefined;
         } | undefined;
         templateId?: number | undefined;
     }[];
@@ -984,6 +1096,9 @@ export declare const postNewsletterItemTemplateInput: z.ZodObject<{
             name?: string | undefined;
             description?: string | null | undefined;
             link?: string | null | undefined;
+        } | {
+            type: NewsletterItemTypeName.Container;
+            name?: string | undefined;
         } | undefined;
         templateId?: number | undefined;
     }[];
@@ -1031,7 +1146,7 @@ export interface User extends UserBase {
  * Common
  */
 export type Position = {
-    lattitude: number;
+    latitude: number;
     longitude: number;
 };
 interface MetaBase {
@@ -1090,14 +1205,17 @@ export type DeleteNewsletterInput = z.infer<typeof deleteNewsletterInput>;
  */
 type CreateItemDetailsInputMedia = z.infer<typeof mediaItemDetails>;
 type CreateItemDetailsInputText = z.infer<typeof textItemDetails>;
+type CreateItemDetailsInputContainer = z.infer<typeof containerItemDetails>;
 export type CreateItemDetailsInputMap = {
     media: CreateItemDetailsInputMedia;
     text: CreateItemDetailsInputText;
+    container: CreateItemDetailsInputContainer;
 };
 export type CreateNewsletterItemDetailsTypeFromName<T extends NewsletterItemTypeName> = CreateItemDetailsInputMap[T];
 export type CreateItemDetailsInput<T extends NewsletterItemTypeName = NewsletterItemTypeName> = CreateNewsletterItemDetailsTypeFromName<T>;
 export declare function isMediaDetailsInput(details: CreateItemDetailsInput | undefined): details is CreateItemDetailsInputMedia;
 export declare function isTextDetailsInput(details: CreateItemDetailsInput | undefined): details is CreateItemDetailsInputText;
+export declare function isContainerDetailsInput(details: CreateItemDetailsInput | undefined): details is CreateItemDetailsInputContainer;
 export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
 export type CreateNewsletterItemBatchInputItem = z.infer<typeof postNewsletterItemBatchInputItem>;
 export type CreateNewsletterItemBatchInput = z.infer<typeof postNewsletterItemBatchInput>;
@@ -1127,14 +1245,19 @@ export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
     description: string | null;
     link: string | null;
 };
+export type NewsletterItemDetailsContainer = NewsletterItemDetailsBase & {
+    type: NewsletterItemTypeName.Container;
+};
 export type NewsletterItemDetailsMap = {
     [NewsletterItemTypeName.Media]: NewsletterItemDetailsMedia;
     [NewsletterItemTypeName.Text]: NewsletterItemDetailsText;
+    [NewsletterItemTypeName.Container]: NewsletterItemDetailsContainer;
 };
 type NewsletterItemDetails<T extends NewsletterItemTypeName = NewsletterItemTypeName> = NewsletterItemDetailsTypeFromName<T>;
 export type NewsletterItemDetailsTypeFromName<T extends NewsletterItemTypeName> = NewsletterItemDetailsMap[T];
 export declare function isMediaDetails(details: NewsletterItemDetails): details is NewsletterItemDetailsMedia;
 export declare function isTextDetails(details: NewsletterItemDetails): details is NewsletterItemDetailsText;
+export declare function isContainerDetails(details: NewsletterItemDetails): details is NewsletterItemDetailsContainer;
 export interface NewsletterItemBase<T extends NewsletterItemTypeName = NewsletterItemTypeName> extends Meta {
     newsletterId: number;
     id: number;
@@ -1144,7 +1267,7 @@ export interface NewsletterItemBase<T extends NewsletterItemTypeName = Newslette
     parentId: number | null;
     nextItemId: number | null;
     previousItemId: number | null;
-    details?: NewsletterItemDetailsTypeFromName<T>;
+    details: NewsletterItemDetailsTypeFromName<T>;
 }
 export interface NewsletterItem<T extends NewsletterItemTypeName = NewsletterItemTypeName> extends NewsletterItemBase<T> {
     children: NewsletterItemBase<T>[];

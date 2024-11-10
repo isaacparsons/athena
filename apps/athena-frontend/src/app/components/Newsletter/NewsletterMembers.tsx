@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { Chip, Stack, Avatar } from '@mui/material';
-import { UserBase } from '@athena/athena-common';
+import { UserBase } from '@athena/common';
 
 interface NewsletterMembersProps {
   members: UserBase[];

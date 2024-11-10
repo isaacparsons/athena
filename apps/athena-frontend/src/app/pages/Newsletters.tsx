@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react';
-import { useStore } from '../store';
+import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 import {
   CustomFab,
   AddNewsletterDialog,
   UserNewsletters,
   CustomContainer,
-} from '../components';
+} from '@athena/components';
 import { CircularProgress } from '@mui/material';
-import { mapToArray } from '../../util';
+import { mapToArray } from '@athena/common';
 
 export function Newsletters() {
   const { newsletters, loading } = useStore(

@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ITable } from '../db';
+import { ITable } from '@athena/db';
 export declare class DBManagerClient {
     tables: ITable[];
     constructor();

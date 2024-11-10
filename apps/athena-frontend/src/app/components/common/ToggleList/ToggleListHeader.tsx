@@ -1,6 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { CustomCardHeader } from '../CustomCard';
-import { CustomCheckbox } from '../CustomCheckbox';
+import { CustomCheckbox, CustomCardHeader } from '@athena/components';
 
 interface ToggleListHeaderProps {
   allSelected: boolean;

@@ -7,7 +7,7 @@ export const locationInput = z
   .object({
     name: z.string().optional(),
     countryCode: z.string().optional(),
-    lattitude: z.coerce.number().optional(),
+    latitude: z.coerce.number().optional(),
     longitude: z.coerce.number().optional(),
   })
   .optional();
@@ -21,6 +21,7 @@ export enum MediaFormat {
 export enum NewsletterItemTypeName {
   Media = 'media',
   Text = 'text',
+  Container = 'container',
 }
 
 const mediaFormat = z.nativeEnum(MediaFormat);
@@ -40,9 +41,16 @@ export const textItemDetails = z.object({
   link: z.string().optional().nullable(),
 });
 
-export const newsletterItemDetails = z
-  .discriminatedUnion('type', [mediaItemDetails, textItemDetails])
-  .optional();
+export const containerItemDetails = z.object({
+  type: z.literal(NewsletterItemTypeName.Container),
+  name: z.string(),
+});
+
+export const newsletterItemDetails = z.discriminatedUnion('type', [
+  mediaItemDetails,
+  textItemDetails,
+  containerItemDetails,
+]);
 
 export const getNewsletterItemInput = z.object({
   newsletterItemId: z.coerce.number(),
@@ -142,16 +150,11 @@ const newsletterItemTemplateDataDetails = z
     textItemDetails
       .pick({ type: true })
       .merge(textItemDetails.omit({ type: true }).partial()),
+    containerItemDetails
+      .pick({ type: true })
+      .merge(containerItemDetails.omit({ type: true }).partial()),
   ])
   .optional();
-// const baseNewsletterItemTemplateData = z.object({
-//   id: z.number(),
-//   nextId: z.number().nullable(),
-//   prevId: z.number().nullable(),
-//   parentId: z.number().nullable(),
-//   templateId: z.number().nullable(),
-//   data: newsletterItemTemplateDataDetails,
-// });
 export const postNewsletterItemTemplateInput = z.object({
   name: z.string(),
   data: z.array(
@@ -207,7 +210,7 @@ export interface User extends UserBase {
  * Common
  */
 export type Position = {
-  lattitude: number;
+  latitude: number;
   longitude: number;
 };
 
@@ -245,7 +248,6 @@ export interface Location {
   position: Position | null;
 }
 export type LocationInput = z.infer<typeof locationInput>;
-
 export type TempNewsletterItemIds = z.infer<typeof tempNewsletterItemIds>;
 
 /**
@@ -279,10 +281,12 @@ export type DeleteNewsletterInput = z.infer<typeof deleteNewsletterInput>;
 
 type CreateItemDetailsInputMedia = z.infer<typeof mediaItemDetails>;
 type CreateItemDetailsInputText = z.infer<typeof textItemDetails>;
+type CreateItemDetailsInputContainer = z.infer<typeof containerItemDetails>;
 
 export type CreateItemDetailsInputMap = {
   media: CreateItemDetailsInputMedia;
   text: CreateItemDetailsInputText;
+  container: CreateItemDetailsInputContainer;
 };
 export type CreateNewsletterItemDetailsTypeFromName<
   T extends NewsletterItemTypeName
@@ -305,6 +309,15 @@ export function isTextDetailsInput(
 ): details is CreateItemDetailsInputText {
   return (
     (details as CreateItemDetailsInputText)?.type === NewsletterItemTypeName.Text
+  );
+}
+
+export function isContainerDetailsInput(
+  details: CreateItemDetailsInput | undefined
+): details is CreateItemDetailsInputContainer {
+  return (
+    (details as CreateItemDetailsInputContainer)?.type ===
+    NewsletterItemTypeName.Container
   );
 }
 
@@ -348,9 +361,14 @@ export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
   link: string | null;
 };
 
+export type NewsletterItemDetailsContainer = NewsletterItemDetailsBase & {
+  type: NewsletterItemTypeName.Container;
+};
+
 export type NewsletterItemDetailsMap = {
   [NewsletterItemTypeName.Media]: NewsletterItemDetailsMedia;
   [NewsletterItemTypeName.Text]: NewsletterItemDetailsText;
+  [NewsletterItemTypeName.Container]: NewsletterItemDetailsContainer;
 };
 
 type NewsletterItemDetails<
@@ -374,6 +392,15 @@ export function isTextDetails(
   return (details as NewsletterItemDetailsText).type === NewsletterItemTypeName.Text;
 }
 
+export function isContainerDetails(
+  details: NewsletterItemDetails
+): details is NewsletterItemDetailsContainer {
+  return (
+    (details as NewsletterItemDetailsContainer).type ===
+    NewsletterItemTypeName.Container
+  );
+}
+
 export interface NewsletterItemBase<
   T extends NewsletterItemTypeName = NewsletterItemTypeName
 > extends Meta {
@@ -385,7 +412,7 @@ export interface NewsletterItemBase<
   parentId: number | null;
   nextItemId: number | null;
   previousItemId: number | null;
-  details?: NewsletterItemDetailsTypeFromName<T>;
+  details: NewsletterItemDetailsTypeFromName<T>;
 }
 
 export interface NewsletterItem<

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
-import { Slices } from '../store';
-import { User } from '@athena/athena-common';
+import { Slices } from '@athena/store';
+import { User } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 
 export interface UserSlice {

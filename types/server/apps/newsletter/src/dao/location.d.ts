@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { DBConnection } from '../db';
-import { LocationInput } from '@athena/athena-common';
+import { DBConnection } from '@athena/db';
+import { LocationInput } from '@athena/common';
 export interface ILocationDAO {
     post(input: LocationInput): Promise<number>;
 }

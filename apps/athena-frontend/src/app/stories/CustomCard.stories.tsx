@@ -3,11 +3,9 @@ import { fn } from "@storybook/test";
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
-import { CustomCard } from '../components'
 import { Box } from '@mui/material';
-import { CustomCardHeader, CustomCardFooter, CustomIconButton } from '../components';
-import { ArrowBackIcon, CancelIcon } from '../icons';
-import { CustomCheckbox } from '../components/common/CustomCheckbox';
+import { CustomCardHeader, CustomCardFooter, CustomIconButton, CustomCard, CustomCheckbox } from '@athena/components';
+import { ArrowBackIcon, CancelIcon } from '@athena/icons';
 
 const meta: Meta<typeof CustomCard> = {
   component: CustomCard,

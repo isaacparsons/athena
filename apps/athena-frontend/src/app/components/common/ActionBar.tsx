@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { AppBar, Stack, Grid2 as Grid, Typography, } from '@mui/material';
-import { APPBAR_HEIGHT } from '../../../theme';
+import { AppBar, Grid2 as Grid, Typography, } from '@mui/material';
+import { APPBAR_HEIGHT } from '@athena/theme';
 
 interface ActionBarProps {
   title?: string;
-  backBtn?: React.ReactElement | null;
+  backBtn?: React.ReactElement | null | undefined
   children?: React.ReactNode;
 }
 

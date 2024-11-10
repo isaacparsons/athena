@@ -1,8 +1,8 @@
-import { Database, DB } from '../db';
-import { UserDAO, NewsletterDAO, LocationDAO, NewsletterItemDAO, NewsletterItemTemplateDAO, INewsletterDAO, IUserDAO, ILocationDAO, INewsletterItemDAO, INewsletterItemTemplateDAO } from '../dao';
-import { GCSManager, IGCSManager } from '../services';
+import { Database, DB } from '@athena/db';
+import { UserDAO, NewsletterDAO, LocationDAO, NewsletterItemDAO, NewsletterItemTemplateDAO, INewsletterDAO, IUserDAO, ILocationDAO, INewsletterItemDAO, INewsletterItemTemplateDAO } from '@athena/dao';
+import { GCSManager, IGCSManager } from '@athena/services';
 import { Request, Response } from 'express';
-import { UserSession } from '@athena/athena-common';
+import { UserSession } from '@athena/common';
 type ContextInput = {
     req: Request & {
         user?: UserSession;

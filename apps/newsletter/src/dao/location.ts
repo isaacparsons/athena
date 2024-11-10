@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { DBConnection } from '../db';
-import { LocationInput } from '@athena/athena-common';
+import { DBConnection } from '@athena/db';
+import { LocationInput } from '@athena/common';
 import { TYPES } from '../types/types';
 
 export interface ILocationDAO {
