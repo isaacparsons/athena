@@ -1,19 +1,27 @@
 ## dev setup
 
-1. setup db
+### db
+
+#### setup
 
 ```sh
 nx run newsletter:db:init
 ```
 
-3. run server
-
-```sh
-nx run newsletter:serve:development
-```
-
-### clean up
+#### clean up
 
 ```sh
 nx run newsletter:serve:destroy
+```
+
+### testing
+
+```sh
+nx run newsletter:test
+```
+
+### run server
+
+```sh
+nx run newsletter:serve:development
 ```
