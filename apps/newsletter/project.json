@@ -69,17 +69,17 @@
       "configurations": {
         "start": {
           "commands": [
-            "docker-compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml up -d"
+            "docker compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml up -d"
           ]
         },
         "stop": {
           "commands": [
-            "docker-compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml down"
+            "docker compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml down"
           ]
         },
         "destroy": {
           "commands": [
-            "docker-compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml down -v"
+            "docker compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml down -v"
           ]
         },
         "create-tables": {
@@ -106,7 +106,9 @@
       "executor": "nx:run-commands",
       "configurations": {
         "db": {
-          "commands": ["kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"]
+          "commands": [
+            "kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"
+          ]
         }
       }
     }

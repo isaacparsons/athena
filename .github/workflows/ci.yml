@@ -2,6 +2,11 @@ name: CI
 
 on: [push]
 
+# on:
+#   push:
+#     branches:
+#       - main  # Only runs when changes are pushed to the main branch
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,3 +28,6 @@ jobs:
 
       - name: Run tests
         run: jest -- newsletters.spec.ts
+
+      - name: Stop and Clean Up
+        run: npx nx run newsletter:db:destroy
