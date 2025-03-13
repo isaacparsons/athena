@@ -32,7 +32,7 @@ jobs:
         run: npx nx run newsletter:db:init
 
       - name: Run tests
-        run: jest -- newsletters.spec.ts
+        run: npx nx run newsletter:test
 
       - name: Stop and Clean Up
         run: npx nx run newsletter:db:destroy

@@ -51,7 +51,7 @@
       "include": ["apps/newsletter/**/*"],
       "options": {
         "jestConfig": "apps/newsletter/jest.config.ts",
-        "targetName": "backend-test"
+        "targetName": "test"
       }
     },
     {
