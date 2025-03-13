@@ -2,10 +2,10 @@ import 'reflect-metadata';
 import express from 'express';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import cors from 'cors';
-import { parseEnv } from './util';
+import { getConfig } from './util';
 import { createContext, appRouter, initPassport } from './trpc';
 
-const env = parseEnv();
+const config = getConfig();
 
 export let app = express();
 app.use(
@@ -17,7 +17,7 @@ app.use(
     //   'https://storage.googleapis.com/athena-newsletter',
     // ],
     origin: '*',
-    AccessControlAllowOrigin: '*',
+    // AccessControlAllowOrigin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   })
 );
@@ -43,6 +43,6 @@ app.use(
   })
 );
 
-app.listen(env.app.port, env.app.host, () => {
-  console.log(`[ ready ] http://${env.app.host}:${env.app.port}`);
+app.listen(config.app.port, config.app.host, () => {
+  console.log(`[ ready ] http://${config.app.host}:${config.app.port}`);
 });

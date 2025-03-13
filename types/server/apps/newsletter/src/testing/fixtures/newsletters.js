@@ -1,3 +1,4 @@
+"use strict";
 // import {
 //   TABLE_NAMES,
 //   Transaction,

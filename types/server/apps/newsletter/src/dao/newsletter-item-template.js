@@ -8,6 +8,7 @@ const db_1 = require("@athena/db");
 const util_1 = require("../util");
 const inversify_1 = require("inversify");
 const types_1 = require("../types/types");
+const mapping_1 = require("./mapping");
 let NewsletterItemTemplateDAO = class NewsletterItemTemplateDAO {
     constructor(db) {
         this.db = db;
@@ -97,8 +98,8 @@ let NewsletterItemTemplateDAO = class NewsletterItemTemplateDAO {
                 'nit.name',
                 'nit.created',
                 'nit.modified',
-                (0, util_1.creator)(this.db, eb.ref('nit.creatorId')),
-                (0, util_1.modifier)(this.db, eb.ref('nit.modifierId')),
+                (0, util_1.creator)(this.db, eb.ref('nit.creatorId')).as('creator'),
+                (0, util_1.modifier)(this.db, eb.ref('nit.modifierId')).as('modifier'),
             ])
                 .executeTakeFirstOrThrow();
             const items = yield this.db
@@ -123,13 +124,17 @@ let NewsletterItemTemplateDAO = class NewsletterItemTemplateDAO {
             return {
                 id: template.id,
                 name: template.name,
-                meta: {
-                    created: template.created,
-                    modified: template.modified,
-                    creator: template.creator,
-                    modifier: template.modifier,
-                },
-                items: items.map((i) => (Object.assign(Object.assign({}, i), { data: lodash_1.default.get(i, ['data']) }))),
+                meta: (0, mapping_1.mapMeta)(template),
+                items: items.map((i) => ({
+                    id: i.id,
+                    templateId: lodash_1.default.isNull(i.templateId) ? undefined : i.templateId,
+                    position: {
+                        parentId: i.parentId,
+                        nextId: i.nextId,
+                        prevId: i.prevId,
+                    },
+                    data: lodash_1.default.get(i, ['data']),
+                })),
             };
         });
     }

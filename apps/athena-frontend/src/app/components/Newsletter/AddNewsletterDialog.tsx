@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -15,43 +14,49 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
-import { trpc } from '../../../trpc';
 import {
-  CreateNewsletterInput,
-  postNewsletterInput,
+  CreateNewsletter,
+  createNewsletter as createNewsletterInput,
 } from '@athena/common';
+import { StyledDialog } from '@athena/components';
 import { usePromiseWithNotification } from '@athena/hooks';
+import { useShallow } from 'zustand/react/shallow';
+import { useStore } from '@athena/store';
 
 interface AddNewsletterDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-
 export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
   const { onClose, open } = props;
   const promiseWithNotifications = usePromiseWithNotification();
   const navigate = useNavigate();
-  const createNewsletter = trpc.newsletters.post.useMutation();
-
+  const { createNewsletter } = useStore(
+    useShallow((state) => ({ createNewsletter: state.newsletters.upload }))
+  );
   const {
     control,
     register,
     handleSubmit,
     reset,
     formState: { errors, isValid, isSubmitting },
-  } = useForm<CreateNewsletterInput>({
-    resolver: zodResolver(postNewsletterInput),
+  } = useForm<CreateNewsletter>({
+    resolver: zodResolver(createNewsletterInput),
     mode: 'onChange',
     defaultValues: {
-      name: '',
-      startDate: new Date().toISOString(),
-      endDate: undefined
+      properties: {
+        name: '',
+        dateRange: {
+          start: new Date().toISOString(),
+          end: undefined,
+        },
+      },
     },
   });
 
-  const handleSave: SubmitHandler<CreateNewsletterInput> = async (data) => {
-    promiseWithNotifications.execute(createNewsletter.mutateAsync(data), {
+  const handleSave: SubmitHandler<CreateNewsletter> = async (data) => {
+    promiseWithNotifications.execute(createNewsletter(data), {
       successMsg: 'Newsletter created!',
       errorMsg: 'Unable to create newsletter :(',
       onSuccess: (newsletterId) => {
@@ -63,28 +68,30 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
   };
 
   return (
-    <Dialog fullScreen open={open}>
+    <StyledDialog fullScreen open={open}>
       <DialogTitle>Add Newsletter</DialogTitle>
       <DialogContent>
         <TextField
-          {...register('name')}
+          {...register('properties.name')}
           margin="dense"
           label="Name"
           type="text"
           fullWidth
           variant="outlined"
-          helperText={errors.name?.message}
-          error={Boolean(errors.name)}
+          helperText={errors.properties?.name?.message}
+          error={Boolean(errors.properties?.name)}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Stack direction="row" display="flex" justifyContent="space-between">
             <Controller
               control={control}
-              name="startDate"
+              name="properties.dateRange.start"
               render={({ field: { onChange, value } }) => (
                 <DesktopDatePicker
                   value={dayjs(value)}
-                  onChange={(value) => { onChange(value?.toISOString()) }}
+                  onChange={(value) => {
+                    onChange(value?.toISOString());
+                  }}
                   slotProps={{
                     field: { clearable: true, onClear: () => onChange(undefined) },
                   }}
@@ -93,11 +100,13 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
             />
             <Controller
               control={control}
-              name="endDate"
+              name="properties.dateRange.end"
               render={({ field: { onChange, value } }) => (
                 <DesktopDatePicker
                   value={value ? dayjs(value) : undefined}
-                  onChange={(value) => { onChange(value?.toISOString()) }}
+                  onChange={(value) => {
+                    onChange(value?.toISOString());
+                  }}
                   slotProps={{
                     field: { clearable: true, onClear: () => onChange(undefined) },
                   }}
@@ -117,6 +126,6 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
           {isSubmitting ? <CircularProgress /> : 'Save'}
         </Button>
       </DialogActions>
-    </Dialog>
+    </StyledDialog>
   );
 }

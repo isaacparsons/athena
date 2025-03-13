@@ -82,9 +82,6 @@
             "docker-compose --env-file apps/newsletter/.env.local -f apps/newsletter/docker-compose.yaml down -v"
           ]
         },
-        "reset": {
-          "commands": ["nx run newsletter:db:destroy && nx newsletter:db:start"]
-        },
         "create-tables": {
           "commands": [
             "npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/create-tables.ts"
@@ -99,6 +96,9 @@
           "commands": [
             "nx run newsletter:db:start  && nx run newsletter:db:create-tables && nx run newsletter:db:seed"
           ]
+        },
+        "reset": {
+          "commands": ["nx run newsletter:db:destroy && nx run newsletter:db:init"]
         }
       }
     },
@@ -106,7 +106,7 @@
       "executor": "nx:run-commands",
       "configurations": {
         "db": {
-          "commands": ["kysely-codegen --env-file apps/newsletter/.env.local"]
+          "commands": ["kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"]
         }
       }
     }

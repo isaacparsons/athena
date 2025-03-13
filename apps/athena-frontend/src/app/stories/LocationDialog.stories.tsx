@@ -1,19 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from "@storybook/test";
+import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
-import { LocationDialog } from '@athena/components'
+import { CustomLocationDialog } from '@athena/components';
 
-const meta: Meta<typeof LocationDialog> = {
-  component: LocationDialog,
-  title: 'LocationDialog',
+const meta: Meta<typeof CustomLocationDialog> = {
+  component: CustomLocationDialog,
+  title: 'CustomLocationDialog',
 };
 export default meta;
-type Story = StoryObj<typeof LocationDialog>;
-
+type Story = StoryObj<typeof CustomLocationDialog>;
 
 export const Primary = {
   args: {
-    open: true
+    open: true,
   },
 };

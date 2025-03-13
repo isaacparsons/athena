@@ -1,7 +1,7 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Bucket, Storage } from '@google-cloud/storage';
-import { parseEnv } from '../util';
+import { GCSConfig, TYPES } from '../types/types';
 
 const storage = new Storage({
   keyFilename:
@@ -18,10 +18,10 @@ export interface IGCSManager {
 @injectable()
 export class GCSManager implements IGCSManager {
   bucket: Bucket;
-  bucketName = process.env['GOOGLE_STORAGE_BUCKET_NAME'] as string;
-  constructor() {
+  // config: GCSConfig
+  constructor(@inject(TYPES.gcsConfig) readonly config: GCSConfig) {
     // this.bucket = storage.bucket(this.env.gcs.bucketName);
-    this.bucket = storage.bucket(this.bucketName);
+    this.bucket = storage.bucket(config.bucketName);
   }
 
   async getSignedUrl(
@@ -29,7 +29,7 @@ export class GCSManager implements IGCSManager {
     action: 'read' | 'write' | 'delete' | 'resumable'
   ) {
     const [url] = await storage
-      .bucket(this.bucketName)
+      .bucket(this.config.bucketName)
       .file(fileName)
       .getSignedUrl({
         version: 'v4',

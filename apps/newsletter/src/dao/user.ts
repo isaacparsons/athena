@@ -1,106 +1,71 @@
-import {
-  NewsletterBase,
-  User,
-  UserNewsletterItemTemplates,
-  UserNewsletters,
-} from '@athena/common';
+import _ from 'lodash';
+import { NewsletterBase, User } from '@athena/common';
 import 'reflect-metadata';
 import { DBConnection } from '@athena/db';
-import { creator, modifier, user } from '../util';
+import { creator, modifier, owner } from '../util';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types/types';
+import { mapMeta, mapUser } from './mapping';
+import { INewsletterDAO } from './newsletter';
 
 export interface IUserDAO {
   get(id: number): Promise<User>;
-  newsletters: (userId: number) => Promise<UserNewsletters>;
-  newsletterItemTemplates: (userId: number) => Promise<UserNewsletterItemTemplates>;
+  newsletters: (userId: number) => Promise<NewsletterBase[]>;
+  // newsletterItemTemplates: (userId: number) => Promise<NewsletterPostTemplateBase[]>;
 }
 
 @injectable()
 export class UserDAO implements IUserDAO {
-  constructor(@inject(TYPES.DBClient) readonly db: DBConnection) {}
+  constructor(
+    @inject(TYPES.DBClient) readonly db: DBConnection,
+    @inject(TYPES.INewsletterDAO) readonly newsletterDAO: INewsletterDAO
+  ) {}
 
   async get(id: number): Promise<User> {
     const user = await this.db
       .selectFrom('user')
-      .where(`user.id`, '=', id)
+      .where('user.id', '=', id)
       .selectAll()
       .executeTakeFirstOrThrow();
 
     const newsletters = await this.newsletters(user.id);
-    const newsletterItemTemplates = await this.newsletterItemTemplates(user.id);
+    // const newsletterItemTemplates = await this.newsletterItemTemplates(user.id);
     return {
-      ...user,
+      ...mapUser(user),
       newsletters,
-      newsletterItemTemplates,
+      // newsletterPostTemplates,
     };
   }
 
   async newsletters(userId: number): Promise<NewsletterBase[]> {
-    const newsletters = await this.db
-      .selectFrom('user_newsletter as un')
-      .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
-      .where('un.userId', '=', userId)
-      .select((eb) => [
-        'n.id',
-        'n.created',
-        'n.modified',
-        'n.name',
-        'n.startDate',
-        'n.endDate',
-        creator(this.db, eb.ref('n.creatorId')),
-        modifier(this.db, eb.ref('n.modifierId')),
-        user(this.db, eb.ref('n.ownerId'), 'owner'),
-      ])
-      .execute();
-
-    return newsletters.map((newsletter) => ({
-      id: newsletter.id,
-      meta: {
-        created: newsletter.created,
-        modified: newsletter.modified,
-        creator: newsletter.creator,
-        modifier: newsletter.modifier,
-      },
-      properties: {
-        name: newsletter.name,
-        dateRange: {
-          start: newsletter.startDate,
-          end: newsletter.endDate,
-        },
-      },
-      owner: newsletter.owner,
-    }));
+    return this.newsletterDAO.getByUserId(userId);
   }
 
-  async newsletterItemTemplates(userId: number) {
-    const templates = await this.db
-      .selectFrom('user_template as ut')
-      .innerJoin(
-        'newsletter_item_template as nit',
-        'nit.id',
-        'ut.newsletterItemTemplateId'
-      )
-      .select((eb) => [
-        'nit.id',
-        'nit.name',
-        'nit.created',
-        'nit.modified',
-        creator(this.db, eb.ref('nit.creatorId')),
-        modifier(this.db, eb.ref('nit.modifierId')),
-      ])
-      .where('ut.userId', '=', userId)
-      .execute();
+  // async newsletterItemTemplates(
+  //   userId: number
+  // ): Promise<NewsletterPostTemplateBase[]> {
+  //   const templates = await this.db
+  //     .selectFrom('user_template as ut')
+  //     .innerJoin(
+  //       'newsletter_item_template as nit',
+  //       'nit.id',
+  //       'ut.newsletterItemTemplateId'
+  //     )
+  //     .select((eb) => [
+  //       'nit.id',
+  //       'nit.name',
+  //       'nit.created',
+  //       'nit.modified',
+  //       creator(this.db, eb.ref('nit.creatorId')).as('creator'),
+  //       modifier(this.db, eb.ref('nit.modifierId')).as('modifier'),
+  //     ])
+  //     .where('ut.userId', '=', userId)
+  //     .execute();
 
-    return templates.map((t) => ({
-      id: t.id,
-      name: t.name,
-      meta: {
-        created: t.created,
-        modified: t.modified,
-        creator: t.creator,
-        modifier: t.modifier,
-      },
-    }));
-  }
+  //   return templates.map((t) => ({
+  //     id: t.id,
+  //     name: t.name,
+  //     meta: mapMeta(t),
+  //   }));
+  // }
 }

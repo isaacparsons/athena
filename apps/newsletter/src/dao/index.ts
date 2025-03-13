@@ -1,6 +1,6 @@
 export * from './location';
 export * from './newsletter';
-export * from './newsletter-item';
-export * from './newsletter-item-details';
-export * from './newsletter-item-template';
+export * from './newsletter-post';
+export * from './newsletter-post-details';
+// export * from './newsletter-post-template';
 export * from './user';

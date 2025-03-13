@@ -83,6 +83,26 @@ let NewsletterItemDetailsDAO = class NewsletterItemDetailsDAO {
             throw new Error('unrecognized item type');
         });
     }
+    update(input) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const table = input.type === common_1.NewsletterItemTypeName.Text
+                ? 'newsletter_item_text'
+                : input.type === common_1.NewsletterItemTypeName.Container
+                    ? 'newsletter_item_container'
+                    : input.type === common_1.NewsletterItemTypeName.Media
+                        ? 'newsletter_item_media'
+                        : null;
+            if (!table)
+                throw new Error('unrecognized item type');
+            const result = yield this.db
+                .updateTable(table)
+                .set(input)
+                .returning('id')
+                .where('id', '=', input.id)
+                .executeTakeFirstOrThrow();
+            return result.id;
+        });
+    }
 };
 exports.NewsletterItemDetailsDAO = NewsletterItemDetailsDAO;
 exports.NewsletterItemDetailsDAO = NewsletterItemDetailsDAO = tslib_1.__decorate([

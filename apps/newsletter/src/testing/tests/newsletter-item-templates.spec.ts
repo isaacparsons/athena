@@ -1,7 +1,7 @@
 // import { createNewsletter } from '../fixtures/newsletters';
 // import { trpc, createContext, appRouter as router } from '../../trpc';
 
-// import { CreateNewsletterItemTemplateInput } from '@athena/athena-common';
+// import { CreateNewsletterPostTemplateInput } from '@athena/athena-common';
 
 // const testCaller = trpc.createCallerFactory(router)(
 //   createContext({
@@ -28,7 +28,7 @@
 //     newsletter = await createNewsletter(1, newsletterName);
 //   });
 
-//   const movieReviewInput: CreateNewsletterItemTemplateInput = {
+//   const movieReviewInput: CreateNewsletterPostTemplateInput = {
 //     name: 'movie review',
 //     data: [
 //       {
@@ -76,7 +76,7 @@
 //         movieReviewInput
 //       );
 
-//       const movieTheatreReviewInput: CreateNewsletterItemTemplateInput = {
+//       const movieTheatreReviewInput: CreateNewsletterPostTemplateInput = {
 //         name: 'movie theatre review',
 //         data: [
 //           {

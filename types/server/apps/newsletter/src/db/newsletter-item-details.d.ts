@@ -1,5 +1,5 @@
-import { Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES } from '@athena/db';
+import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
+import { DBConnection, Table, UniqueId, TABLE_NAMES } from '@athena/db';
 import { MediaFormat, NewsletterItemTypeName } from '@athena/common';
 interface NewsletterItemDetailsBase {
     id: UniqueId;
@@ -44,16 +44,16 @@ export interface NewsletterItemContainerTable {
 export type SelectNewsletterItemContainer = Selectable<NewsletterItemContainerTableColumns>;
 export type InsertNewsletterItemContainer = Insertable<NewsletterItemContainerTableColumns>;
 export type UpdateNewsletterItemContainer = Updateable<NewsletterItemContainerTableColumns>;
-export declare class NewsletterItemMediaTableClient extends Table implements ITable {
+export declare class NewsletterItemMediaTableClient extends Table<'newsletter_item_media', 'id' | 'name' | 'caption' | 'fileName' | 'format' | 'type' | 'newsletterItemId'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'newsletter_item_media', 'id' | 'name' | 'caption' | 'fileName' | 'format' | 'type' | 'newsletterItemId'>;
 }
-export declare class NewsletterItemTextTableClient extends Table implements ITable {
+export declare class NewsletterItemTextTableClient extends Table<'newsletter_item_text', 'id' | 'name' | 'link' | 'type' | 'description' | 'newsletterItemId'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'newsletter_item_text', 'id' | 'name' | 'link' | 'type' | 'description' | 'newsletterItemId'>;
 }
-export declare class NewsletterItemContainerTableClient extends Table implements ITable {
+export declare class NewsletterItemContainerTableClient extends Table<'newsletter_item_container', 'id' | 'name' | 'type' | 'newsletterItemId'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'newsletter_item_container', 'id' | 'name' | 'type' | 'newsletterItemId'>;
 }
 export {};

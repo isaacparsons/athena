@@ -10,7 +10,7 @@ export function NewsletterMembers(props: NewsletterMembersProps) {
   const { members } = props;
 
   return (
-    <Stack>
+    <Stack spacing={2} sx={{ pb: 1 }}>
       {members.map((member) => (
         <Stack direction="row" spacing={1} key={member.id.toString()}>
           <Chip

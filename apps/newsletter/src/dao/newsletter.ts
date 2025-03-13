@@ -1,139 +1,131 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import _ from 'lodash';
-import { INewsletterItemDAO, mapNewsletterItem } from '@athena/dao';
+import { INewsletterPostDAO } from '@athena/dao';
 import {
   DBConnection,
+  SelectNewsletter,
+  SelectUser,
   Transaction,
   jsonArrayFrom,
-  jsonObjectFrom,
 } from '@athena/db';
 import {
-  Newsletter,
-  CreateNewsletterInput,
-  UpdateNewsletterInput,
-  NewsletterItemDetailsMedia,
-  NewsletterItemTypeName,
+  Newsletter as NewsletterEntity,
+  CreateNewsletter,
+  UpdateNewsletter,
+  NewsletterPost as NewsletterPostEntity,
 } from '@athena/common';
-import { creator, modifier, user, parseDateRange, location } from '../util';
+import { creator, modifier, owner, selectEntityColumns } from '../util';
 import { IGCSManager } from '@athena/services';
 import { TYPES } from '../types/types';
+import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
+import { EntityDAO, EntityMetaRow } from './entity';
 
-export interface INewsletterDAO {
-  get(id: number): Promise<Newsletter>;
-  post(userId: number, input: CreateNewsletterInput): Promise<number>;
-  update(userId: number, input: UpdateNewsletterInput): Promise<number>;
+type NewsletterRow = EntityMetaRow &
+  Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
+    items: Omit<NewsletterPostEntity, 'children'>[];
+    owner: SelectUser;
+    members: SelectUser[];
+  };
+
+export type INewsletterDAO = EntityDAO<NewsletterRow, NewsletterEntity> & {
+  get(id: number): Promise<NewsletterEntity>;
+  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'items' | 'members'>[]>;
+  post(userId: number, input: CreateNewsletter): Promise<number>;
+  update(userId: number, input: UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
-}
+};
 
 @injectable()
 export class NewsletterDAO implements INewsletterDAO {
   constructor(
     @inject(TYPES.DBClient) readonly db: DBConnection,
     @inject(TYPES.IGCSManager) readonly gcs: IGCSManager,
-    @inject(TYPES.INewsletterItemDAO) readonly newsletterItemDAO: INewsletterItemDAO
+    @inject(TYPES.INewsletterPostDAO) readonly newsletterItemDAO: INewsletterPostDAO
   ) {}
 
-  async get(id: number): Promise<Newsletter> {
-    const newsletter = await this.db
-      .selectFrom('newsletter as n')
-      .where('n.id', '=', id)
-      .selectAll()
-      .select(({ ref }) => user(this.db, ref('n.ownerId'), 'owner'))
-      .select(({ ref }) => creator(this.db, ref('n.creatorId')))
-      .select(({ ref }) => modifier(this.db, ref('n.modifierId')))
-      .select((eb) =>
-        jsonArrayFrom(
-          eb
-            .selectFrom('user_newsletter as un')
-            .whereRef('un.newsletterId', '=', 'n.id')
-            .innerJoin('user', 'user.id', 'un.userId')
-            .selectAll('user')
-        ).as('members')
-      )
-      .select((eb) =>
-        jsonArrayFrom(
-          eb
-            .selectFrom('newsletter_item as ni')
-            .whereRef('ni.newsletterId', '=', 'n.id')
-            .select((eb) => [
-              'id',
-              'newsletterId',
-              'title',
-              'date',
-              'parentId',
-              'nextItemId',
-              'previousItemId',
-              'created',
-              'modified',
-              jsonObjectFrom(
-                eb
-                  .selectFrom('newsletter_item_media as media-details')
-                  .selectAll('media-details')
-                  .whereRef('media-details.newsletterItemId', '=', 'ni.id')
-              ).as('mediaDetails'),
-              jsonObjectFrom(
-                eb
-                  .selectFrom('newsletter_item_text as text-details')
-                  .selectAll('text-details')
-                  .whereRef('text-details.newsletterItemId', '=', 'ni.id')
-              ).as('textDetails'),
-              jsonObjectFrom(
-                eb
-                  .selectFrom('newsletter_item_container as container-details')
-                  .selectAll('container-details')
-                  .whereRef('container-details.newsletterItemId', '=', 'ni.id')
-              ).as('containerDetails'),
-              location(this.db, eb.ref('ni.locationId')),
-              creator(this.db, eb.ref('ni.creatorId')),
-              modifier(this.db, eb.ref('ni.modifierId')),
-            ])
-        ).as('items')
-      )
-      .executeTakeFirstOrThrow(
-        () => new Error(`newsletter with id: ${id} does not exist`)
-      );
-
-    const mappedItems = newsletter.items.map((item) => mapNewsletterItem(item));
-    const itemsWithSignedUrl = await Promise.all(
-      mappedItems.map(async (item) => {
-        if (item.details?.type === NewsletterItemTypeName.Media) {
-          const details = item.details as NewsletterItemDetailsMedia;
-          const signedUrl = await this.gcs.getSignedUrl(details.fileName, 'read');
-          details.fileName = signedUrl;
-          return {
-            ...item,
-            details,
-          };
-        }
-        return item;
-      })
-    );
-
+  toEntity(row: NewsletterRow) {
     return {
-      id: newsletter.id,
-      meta: {
-        created: newsletter.created,
-        modified: newsletter.modified,
-        creator: newsletter.creator,
-        modifier: newsletter.modifier,
-      },
+      id: row.id,
+      meta: mapMeta(row),
       properties: {
-        name: newsletter.name,
-        dateRange: parseDateRange(newsletter.startDate, newsletter.endDate),
+        name: row.name,
+        dateRange: mapDateRange(row),
       },
-      owner: newsletter.owner,
-      members: newsletter.members,
-      items: itemsWithSignedUrl,
+      owner: mapUser(row.owner),
+      members: mapUsers(row.members),
+      items: row.items,
     };
   }
 
-  async post(userId: number, input: CreateNewsletterInput): Promise<number> {
+  async get(id: number): Promise<NewsletterEntity> {
+    return this.db.transaction().execute(async (trx: Transaction) => {
+      const newsletter = await selectEntityColumns(trx, 'newsletter')
+        .where('newsletter.id', '=', id)
+        .select((eb) => [
+          'newsletter.name',
+          'newsletter.startDate',
+          'newsletter.endDate',
+          owner(trx, eb.ref('newsletter.ownerId')).as('owner'),
+          jsonArrayFrom(
+            eb
+              .selectFrom('user_newsletter as un')
+              .where('un.newsletterId', '=', id)
+              .innerJoin('user', 'user.id', 'un.userId')
+              .selectAll('user')
+          ).as('members'),
+        ])
+        .executeTakeFirstOrThrow(
+          () => new Error(`newsletter with id: ${id} does not exist`)
+        );
+
+      const items = await this.newsletterItemDAO.getByNewsletterId(id);
+
+      return this.toEntity({
+        ...newsletter,
+        items,
+      });
+    });
+  }
+
+  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'items' | 'members'>[]> {
+    return this.db.transaction().execute(async (trx: Transaction) => {
+      const newsletters = await trx
+        .selectFrom('user_newsletter as un')
+        .innerJoin('newsletter as n', 'n.id', 'un.newsletterId')
+        .where('un.userId', '=', id)
+        .select((eb) => [
+          'n.id',
+          'n.created',
+          'n.modified',
+          'n.name',
+          'n.startDate',
+          'n.endDate',
+          modifier(trx, eb.ref('n.modifierId')).as('modifier'),
+          creator(trx, eb.ref('n.creatorId')).as('creator'),
+          owner(trx, eb.ref('n.ownerId')).as('owner'),
+        ])
+        .execute();
+
+      return newsletters.map((n) => {
+        const { items, members, ...rest } = this.toEntity({
+          ...n,
+          items: [],
+          members: [],
+        });
+        return rest;
+      });
+    });
+  }
+
+  async post(userId: number, input: CreateNewsletter): Promise<number> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletter = await trx
         .insertInto('newsletter')
         .values({
-          ...input,
+          name: input.properties.name,
+          startDate: input.properties.dateRange?.start,
+          endDate: input.properties.dateRange?.end,
           ownerId: userId,
           created: new Date().toISOString(),
           creatorId: userId,
@@ -147,16 +139,18 @@ export class NewsletterDAO implements INewsletterDAO {
           newsletterId: newsletter.id,
         })
         .executeTakeFirstOrThrow();
+
       return newsletter.id;
     });
   }
 
-  async update(userId: number, input: UpdateNewsletterInput): Promise<number> {
-    const inputWithoutId = _.omit(input, 'id');
+  async update(userId: number, input: UpdateNewsletter): Promise<number> {
     const res = await this.db
       .updateTable('newsletter')
       .set({
-        ...inputWithoutId,
+        name: input.properties.name,
+        startDate: input.properties.dateRange?.start,
+        endDate: input.properties.dateRange?.end,
         modifierId: userId,
         modified: new Date().toISOString(),
       })

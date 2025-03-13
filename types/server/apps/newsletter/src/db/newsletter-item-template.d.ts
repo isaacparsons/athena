@@ -1,5 +1,5 @@
-import { Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES, Meta } from '@athena/db';
+import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
+import { DBConnection, Table, UniqueId, TABLE_NAMES, Meta, EntityTable } from '@athena/db';
 export interface NewsletterItemTemplateTableColumns extends Meta {
     id: UniqueId;
     name: string;
@@ -11,9 +11,9 @@ export interface NewsletterItemTemplateTable {
 export type SelectNewsletterItemTemplate = Selectable<NewsletterItemTemplateTableColumns>;
 export type InsertNewsletterItemTemplate = Insertable<NewsletterItemTemplateTableColumns>;
 export type UpdateNewsletterItemTemplate = Updateable<NewsletterItemTemplateTableColumns>;
-export declare class NewsletterItemTemplateTableClient extends Table implements ITable {
+export declare class NewsletterItemTemplateTableClient extends EntityTable<'newsletter_item_template', 'name'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'newsletter_item_template', 'name'>;
 }
 export interface NewsletterItemTemplateDataTableColumns {
     id: UniqueId;
@@ -30,7 +30,7 @@ export interface NewsletterItemTemplateDataTable {
 export type SelectNewsletterItemTemplateData = Selectable<NewsletterItemTemplateDataTableColumns>;
 export type InsertNewsletterItemTemplateData = Insertable<NewsletterItemTemplateDataTableColumns>;
 export type UpdateNewsletterItemTemplateData = Updateable<NewsletterItemTemplateDataTableColumns>;
-export declare class NewsletterItemTemplateDataTableClient extends Table implements ITable {
+export declare class NewsletterItemTemplateDataTableClient extends Table<'newsletter_item_template_data', 'parentId' | 'nextId' | 'prevId' | 'templateId' | 'data'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'newsletter_item_template_data', 'parentId' | 'nextId' | 'prevId' | 'templateId' | 'data'>;
 }

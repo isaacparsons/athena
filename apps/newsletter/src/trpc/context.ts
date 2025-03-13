@@ -3,31 +3,28 @@ import {
   UserDAO,
   NewsletterDAO,
   LocationDAO,
-  NewsletterItemDAO,
-  NewsletterItemTemplateDAO,
+  NewsletterPostDAO,
+  // NewsletterPostTemplateDAO,
   INewsletterDAO,
   IUserDAO,
   ILocationDAO,
-  INewsletterItemDAO,
-  INewsletterItemTemplateDAO,
+  INewsletterPostDAO,
+  // INewsletterPostTemplateDAO,
 } from '@athena/dao';
 import { GCSManager, IGCSManager } from '@athena/services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/common';
 import { container } from '../inversify.config';
 import { TYPES } from '../types/types';
+import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
 
-// const newsletterItemDetailsDAO = container.get<NewsletterItemDetailsDAO>(
-//   NewsletterItemDetailsDAO
-// );
-
-type ContextInput = {
-  req: Request & {
-    user?: UserSession;
-    isAuthenticated(): () => boolean;
-  };
-  res: Response;
-};
+// type ContextInput = {
+//   req: Request & {
+//     user?: UserSession;
+//     isAuthenticated(): () => boolean;
+//   };
+//   res: Response;
+// };
 
 export type Context = {
   req: Request & {
@@ -41,12 +38,12 @@ export type Context = {
     user: UserDAO;
     newsletter: NewsletterDAO;
     location: LocationDAO;
-    newsletterItem: NewsletterItemDAO;
-    newsletterItemTemplate: NewsletterItemTemplateDAO;
+    newsletterPost: NewsletterPostDAO;
+    // newsletterItemTemplate: NewsletterPostTemplateDAO;
   };
 };
 
-export function createContext({ req, res }: ContextInput) {
+export function createContext({ req, res }: CreateExpressContextOptions) {
   return {
     req,
     res,
@@ -56,10 +53,10 @@ export function createContext({ req, res }: ContextInput) {
       user: container.get<IUserDAO>(TYPES.IUserDAO),
       newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),
       location: container.get<ILocationDAO>(TYPES.ILocationDAO),
-      newsletterItem: container.get<INewsletterItemDAO>(TYPES.INewsletterItemDAO),
-      newsletterItemTemplate: container.get<INewsletterItemTemplateDAO>(
-        TYPES.INewsletterItemTemplateDAO
-      ),
+      newsletterPost: container.get<INewsletterPostDAO>(TYPES.INewsletterPostDAO),
+      // newsletterItemTemplate: container.get<INewsletterPostTemplateDAO>(
+      //   TYPES.INewsletterPostTemplateDAO
+      // ),
     },
   };
 }

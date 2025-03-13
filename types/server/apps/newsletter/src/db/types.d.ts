@@ -1,4 +1,4 @@
-import { Kysely, Transaction as KyselyTransaction, ColumnType, Selectable } from 'kysely';
+import { Kysely, Transaction as KyselyTransaction, ColumnType, Selectable, CreateTableBuilder } from 'kysely';
 import { CountryTableColumns, FederatedCredentialTableColumns, LocationTableColumns, NewsletterItemContainerTableColumns, NewsletterItemMediaTableColumns, NewsletterItemTableColumns, NewsletterItemTemplateDataTableColumns, NewsletterItemTemplateTableColumns, NewsletterItemTextTableColumns, NewsletterTableColumns, UserNewsletterTableColumns, UserTableColumns, UserTemplateTableColumns } from '.';
 export { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres';
 export { Pool } from 'pg';
@@ -23,6 +23,12 @@ export type Meta = {
     modified: Modified;
     creatorId: Creator;
     modifierId: Modifier;
+};
+export type SelectMeta = {
+    created: Selectable<Created>;
+    modified: Selectable<Modified>;
+    creatorId: Selectable<Creator>;
+    modifierId: Selectable<Modifier>;
 };
 export declare enum TABLE_NAMES {
     LOCATION = "location",
@@ -56,18 +62,30 @@ export interface Database {
     newsletter_item_template: NewsletterItemTemplateTableColumns;
     newsletter_item_template_data: NewsletterItemTemplateDataTableColumns;
 }
+export type TableName = keyof Database;
+export type EntityTableName = Extract<TableName, 'newsletter' | 'newsletter_item' | 'newsletter_item_template'>;
 export type DBConnection = Kysely<Database>;
 export type Transaction = KyselyTransaction<Database>;
-export interface ITable {
+export interface ITable<T extends TableName, C extends string = never> {
     db: DBConnection;
     name: string;
+    tableBuilder: CreateTableBuilder<T, C>;
     createTable: () => Promise<void>;
     deleteTable: () => Promise<void>;
 }
-export declare abstract class Table implements ITable {
-    db: DBConnection;
-    name: string;
+export declare abstract class Table<T extends TableName, C extends string = never> implements ITable<T, C> {
+    readonly db: DBConnection;
+    readonly name: string;
     constructor(db: DBConnection, name: string);
+    tableBuilder: CreateTableBuilder<T, C>;
+    createTable(): Promise<void>;
+    deleteTable(): Promise<void>;
+}
+export declare class EntityTable<T extends EntityTableName, C extends string = never> extends Table<T, C | 'id' | 'created' | 'creatorId' | 'modified' | 'modifierId'> implements ITable<T, C | 'id' | 'created' | 'creatorId' | 'modified' | 'modifierId'> {
+    readonly db: DBConnection;
+    readonly name: string;
+    constructor(db: DBConnection, name: string);
+    tableBuilder: CreateTableBuilder<T, C>;
     createTable(): Promise<void>;
     deleteTable(): Promise<void>;
 }

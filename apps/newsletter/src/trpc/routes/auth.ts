@@ -7,17 +7,17 @@ import {
 } from 'passport-google-oauth20';
 import { first } from 'remeda';
 import session from 'express-session';
-import { parseEnv } from '../../util';
+import { getConfig } from '../../util';
 import { UserSession } from '@athena/common';
 
-const env = parseEnv();
+const config = getConfig();
 
 const SCOPES = ['profile', 'email', 'https://www.googleapis.com/auth/drive'];
 
 const GOOGLE_AUTH: StrategyOptionsWithRequest = {
-  clientID: env.google.clientId,
-  clientSecret: env.google.clientSecret,
-  callbackURL: env.google.callbackUrl,
+  clientID: config.google.clientId,
+  clientSecret: config.google.clientSecret,
+  callbackURL: config.google.callbackUrl,
   scope: SCOPES,
   state: true,
   passReqToCallback: true,
@@ -51,8 +51,8 @@ router.get('/logout', (req: Request, res: Response) => {
 export function initPassport(app: Express) {
   app.use(
     session({
-      name: env.app.sessionCookieName,
-      secret: env.app.sessionSecret,
+      name: config.app.sessionCookieName,
+      secret: config.app.sessionSecret,
       resave: false,
       saveUninitialized: true,
       cookie: {

@@ -1,10 +1,7 @@
 export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<{
     _config: import("@trpc/server").RootConfig<{
         ctx: {
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
@@ -28,10 +25,7 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
             accessToken: string;
             refreshToken: string;
         };
-        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/common").UserSession;
-            isAuthenticated(): () => boolean;
-        };
+        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
         res: import("express").Response<any, Record<string, any>>;
         gcs: import("../../services").IGCSManager;
         db: import("kysely").Kysely<import("../../db").Database>;

@@ -1,188 +1,137 @@
 import _ from 'lodash';
-import axios from 'axios';
 import { nanoid } from 'nanoid';
-
 import {
-  NewsletterItemTypeName,
-  CreateNewsletterItemInput,
-  TempNewsletterItemIds,
-  CreateItemDetailsInput,
-  NewsletterItem,
-  isMediaDetailsInput,
+  NewsletterPostPostName,
+  TempNewsletterPostIds,
   DeepPartial,
   mapToArray,
+  CreateNewsletterPostBatchItem,
+  NewsletterPostBase,
+  Nullable,
 } from '@athena/common';
 import { create, StateCreator } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type {} from '@redux-devtools/extension';
-import { asyncTrpcClient } from '../../trpc';
 
 type ParentId = string | null;
 
-export type NewsletterItemDetailsType = NewsletterItemTypeName;
+export type NewsletterPostDetailsType = NewsletterPostPostName;
+export type FileMap = Record<string, File>;
 
-export type StoreItemDetails<
-  T extends NewsletterItemDetailsType = NewsletterItemDetailsType
-> = T extends NewsletterItemTypeName.Media
-  ? CreateItemDetailsInput<NewsletterItemTypeName.Media> & { file: File | null }
-  : CreateItemDetailsInput<T>;
+export type AddStoreNewsletterPost = (
+  parentId: ParentId,
+  item: Omit<CreateNewsletterPostBatchItem, 'temp'>,
+  option?: {
+    file?: File;
+    temp?: TempNewsletterPostIds;
+  }
+) => void;
 
-export type StoreAddNewsletterItemInput<
-  T extends NewsletterItemDetailsType = NewsletterItemDetailsType
-> = Omit<
-  CreateNewsletterItemInput,
-  'newsletterId' | 'nextItemId' | 'previousItemId' | 'parentId' | 'details'
-> & {
-  details: StoreItemDetails<T>;
-} & { temp?: TempNewsletterItemIds };
+export type UpdateStoreNewsletterPost = <
+  T extends NewsletterPostDetailsType = NewsletterPostDetailsType
+>(
+  id: string,
+  item: DeepPartial<CreateNewsletterPostBatchItem<T>>
+) => void;
 
-export type StoreAddNewsletterItem<
-  T extends NewsletterItemDetailsType = NewsletterItemDetailsType
-> = StoreAddNewsletterItemInput<T> & { temp: TempNewsletterItemIds };
-
-export type StoreAddNewsletterItemsData = Record<string, StoreAddNewsletterItem>;
-
-export type StoreAddNewsletterItemsExistingItem = Pick<
-  NewsletterItem,
-  'newsletterId' | 'parentId' | 'nextItemId' | 'previousItemId'
->;
-
-export interface CreateNewsletterItemsSlice {
-  uploading: boolean;
-  existingItem: StoreAddNewsletterItemsExistingItem | null;
-  data: StoreAddNewsletterItemsData;
-  openDialog: (existingItem: StoreAddNewsletterItemsExistingItem) => void;
-  addItems: (parentId: ParentId, items: StoreAddNewsletterItemInput[]) => void;
-  removeItem: (id: string) => void;
-  updateItemDetails: <
-    T extends NewsletterItemDetailsType = NewsletterItemDetailsType
-  >(
-    id: string,
-    item: DeepPartial<StoreAddNewsletterItemInput<T>>
+export interface CreateNewsletterPostsSlice {
+  files: FileMap;
+  newsletterId: Nullable<number>;
+  existingItem: Nullable<NewsletterPostBase>;
+  data: Record<string, CreateNewsletterPostBatchItem>;
+  openDialog: (
+    newsletterId: number,
+    existingItem: Nullable<NewsletterPostBase>
   ) => void;
-  upload: () => Promise<void>;
+  addItem: AddStoreNewsletterPost;
+  removeItem: (id: string) => void;
+  updateItemDetails: UpdateStoreNewsletterPost;
   reset: () => void;
 }
 
 const DEFAULT_DATA = {
-  uploading: false,
   existingItem: null,
+  newsletterId: null,
   data: {},
+  files: {},
 };
 
 export const createCreateNewslettersItemsSlice: StateCreator<
   Slices,
   [['zustand/devtools', never], ['zustand/immer', never]],
   [],
-  CreateNewsletterItemsSlice
+  CreateNewsletterPostsSlice
 > = (set, get) => ({
   ...DEFAULT_DATA,
-  openDialog: (existingItem: StoreAddNewsletterItemsExistingItem) =>
+  openDialog: (newsletterId: number, existingItem: Nullable<NewsletterPostBase>) =>
     set((state) => {
       state.existingItem = existingItem;
+      state.newsletterId = newsletterId;
     }),
-  addItems: (parentId: ParentId, items: StoreAddNewsletterItemInput[]) =>
+  addItem: (
+    parentId: ParentId,
+    item: Omit<CreateNewsletterPostBatchItem, 'temp'>,
+    options?: {
+      file?: File;
+      temp?: TempNewsletterPostIds;
+    }
+  ) =>
     set((state) => {
       // items with temp specified:
       // items where parentId is null, should have a parentId = parentId
       // all other items should be added without setting temp
-      const itemsWithTemp = items.filter((i) => i.temp !== undefined);
 
-      itemsWithTemp
-        .filter((i) => i.temp?.parentId === null)
-        .forEach((i) => {
-          if (i.temp === undefined) return;
-          state.data[i.temp.id] = { ...i, temp: { ...i.temp, parentId: parentId } };
-        });
+      const id = options?.temp?.id ?? nanoid();
 
-      itemsWithTemp
-        .filter((i) => i.temp?.parentId !== null && i.temp !== undefined)
-        .forEach((i) => {
-          if (i.temp) {
-            state.data[i.temp.id] = { ...i, temp: i.temp };
-          }
-        });
+      if (options?.temp && options.temp.parentId === null) {
+        state.data[id] = {
+          ...item,
+          temp: { ...options.temp, parentId: parentId },
+        };
+      }
 
-      // items without temp specified:
-      const itemsWithoutTemp = items.filter((i) => i.temp === undefined);
-      itemsWithoutTemp.forEach((i) => {
-        const id = nanoid();
+      if (options?.temp && options.temp.parentId !== null) {
+        state.data[id] = {
+          ...item,
+          temp: options.temp,
+        };
+      }
+
+      if (!options || !options?.temp) {
         const previousItem = mapToArray(state.data).find(
           (i) => i.temp.parentId === parentId && i.temp.nextId === null
         );
         state.data[id] = {
+          ...item,
           temp: {
             id,
             nextId: null,
             prevId: previousItem?.temp.id ?? null,
             parentId: parentId,
           },
-          ...i,
         };
         if (previousItem) state.data[previousItem.temp.id].temp.nextId = id;
-      });
+      }
+      if (options?.file) state.files[id] = options.file;
     }),
   removeItem: (id: string) =>
     set((state) => {
       delete state.data[id];
     }),
   updateItemDetails: <
-    T extends NewsletterItemDetailsType = NewsletterItemDetailsType
+    T extends NewsletterPostDetailsType = NewsletterPostDetailsType
   >(
     id: string,
-    item: DeepPartial<StoreAddNewsletterItemInput<T>>
+    item: DeepPartial<CreateNewsletterPostBatchItem<T>>
   ) =>
     set((state) => {
       state.data[id] = _.merge(state.data[id], item);
     }),
-  upload: async () => {
-    set((state) => {
-      state.uploading = true;
-    });
-    const data = get().data;
-    const existingItem = get().existingItem;
-    const items = mapToArray(data);
-    const mediaItemIds = items
-      .filter((i) => i.details?.type === NewsletterItemTypeName.Media)
-      .map((i) => ({ id: i.temp.id.toString() }));
-    const signedUrls =
-      await asyncTrpcClient.newsletterItems.getItemUploadLinks.query({
-        items: mediaItemIds,
-      });
-
-    const signedUrlsMap = new Map(signedUrls.map((su) => [su.id, su]));
-
-    if (existingItem === null) return;
-
-    const batch = await Promise.all(
-      items.map(async (item) => {
-        if (isMediaDetailsInput(item.details)) {
-          const itemUploadInfo = signedUrlsMap.get(item.temp.id);
-          if (!itemUploadInfo) throw new Error('no signed url to upload photo');
-          await axios.put(itemUploadInfo.url, item.details.file);
-          item.details.fileName = itemUploadInfo.fileName;
-        }
-        return { newsletterId: existingItem.newsletterId, ...item };
-      })
-    );
-
-    await asyncTrpcClient.newsletterItems.createBatch.mutate({
-      newsletterId: existingItem.newsletterId,
-      parentId: existingItem.parentId,
-      nextItemId: existingItem.nextItemId,
-      previousItemId: existingItem.previousItemId,
-      batch: batch,
-    });
-
-    set((state) => {
-      state.uploading = false;
-    });
-  },
   reset: () => set(DEFAULT_DATA),
 });
 
-export type Slices = CreateNewsletterItemsSlice;
+export type Slices = CreateNewsletterPostsSlice;
 
 export const useAddItemsStore = create<Slices>()(
   devtools(

@@ -1,53 +1,56 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useMemo, useState } from 'react';
-import {
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-} from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import {
   ActionBar,
   BackButtonIcon,
-  AddNewsletterItems,
-} from '@athena/components'
+  AddNewsletterPosts,
+  StyledDialog,
+  StyledDialogContent,
+  StyledDialogActions,
+} from '@athena/components';
 import { useStore, useAddItemsStore } from '@athena/store';
 import { mapToArray } from '@athena/common';
 
 export function AddItemsDialog() {
-  const { fetchNewsletter, fetchNewsletterItems } = useStore(
+  const { uploading, upload } = useStore(
     useShallow((state) => ({
-      fetchNewsletter: state.newsletters.fetch,
-      fetchNewsletterItems: state.newsletterItems.fetch,
+      uploading: state.newsletterItems.uploading,
+      upload: state.newsletterItems.upload,
     }))
   );
-  const { items, existingItem, reset, uploading, upload, addItems, removeItem, updateItemDetails } =
-    useAddItemsStore(
-      useShallow((state) => ({
-        existingItem: state.existingItem,
-        items: state.data,
-        reset: state.reset,
-        uploading: state.uploading,
-        upload: state.upload,
-        addItems: state.addItems,
-        removeItem: state.removeItem,
-        updateItemDetails: state.updateItemDetails
-      }))
-    );
-
+  const {
+    files,
+    items,
+    existingItem,
+    reset,
+    addItem,
+    removeItem,
+    updateItemDetails,
+    newsletterId,
+  } = useAddItemsStore(
+    useShallow((state) => ({
+      existingItem: state.existingItem,
+      newsletterId: state.newsletterId,
+      files: state.files,
+      items: state.data,
+      reset: state.reset,
+      addItem: state.addItem,
+      removeItem: state.removeItem,
+      updateItemDetails: state.updateItemDetails,
+    }))
+  );
 
   const [tempParentId, setTempParentId] = useState<null | string>(null);
   const handleItemClick = (id: string) => setTempParentId(id);
   const handleUploadFiles = async () => {
-    await upload();
-    if (existingItem) {
-      if (existingItem.parentId === null) {
-        await fetchNewsletter(Number(existingItem.newsletterId));
-      } else {
-        await fetchNewsletterItems(existingItem.parentId);
-      }
-    }
+    if (!newsletterId || !existingItem) return;
+    const position = {
+      parentId: existingItem.id,
+      nextId: null,
+      prevId: null,
+    };
+    await upload(newsletterId, position, mapToArray(items), files);
     reset();
   };
 
@@ -60,28 +63,34 @@ export function AddItemsDialog() {
     [items, tempParentId]
   );
 
-  const parentItem = useMemo(() => tempParentId ? items[tempParentId] : null, [tempParentId, items])
+  const parentItem = useMemo(
+    () => (tempParentId ? items[tempParentId] : null),
+    [tempParentId, items]
+  );
+
+  if (!newsletterId) return null;
 
   return (
-    <Dialog fullScreen open={Boolean(existingItem)}>
+    <StyledDialog fullScreen open={newsletterId !== null}>
       <ActionBar
         title="Add Items"
-        backBtn={tempParentId ? (
-          <BackButtonIcon onClick={handleBackBtnClick} />
-        ) : null}
+        backBtn={
+          tempParentId ? <BackButtonIcon onClick={handleBackBtnClick} /> : null
+        }
       />
-      <DialogContent>
-        <AddNewsletterItems
+      <StyledDialogContent>
+        <AddNewsletterPosts
+          files={files}
+          newsletterId={newsletterId}
           handleItemClick={handleItemClick}
           parentItem={parentItem}
           items={itemsArr}
-          addItems={addItems}
+          addItem={addItem}
           removeItem={removeItem}
           updateItemDetails={updateItemDetails}
         />
-
-      </DialogContent>
-      <DialogActions>
+      </StyledDialogContent>
+      <StyledDialogActions>
         <Button onClick={reset}>Cancel</Button>
         <Button
           type="submit"
@@ -90,7 +99,7 @@ export function AddItemsDialog() {
         >
           {uploading ? <CircularProgress /> : 'Upload'}
         </Button>
-      </DialogActions>
-    </Dialog>
+      </StyledDialogActions>
+    </StyledDialog>
   );
 }

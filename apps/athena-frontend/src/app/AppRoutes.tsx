@@ -1,11 +1,15 @@
 import { ReactNode } from 'react';
+import { createHashRouter, Navigate, Outlet, RouteObject } from 'react-router-dom';
 import {
-  createHashRouter,
-  Navigate,
-  Outlet,
-  RouteObject,
-} from 'react-router-dom';
-import { Login, Newsletter, Home, NotFound, NewsletterItem, Templates, NewsletterItemTemplate, Newsletters } from './pages';
+  Login,
+  Newsletter,
+  Home,
+  NotFound,
+  NewsletterPost,
+  Templates,
+  NewsletterPostTemplate,
+  Newsletters,
+} from './pages';
 import { UserBase } from '@athena/common';
 import { Appbar } from '@athena/components';
 
@@ -77,7 +81,7 @@ const routerConfig: RouteObject[] = [
   },
   {
     path: RoutePaths.newsletterItems,
-    element: <NewsletterItem />,
+    element: <NewsletterPost />,
   },
   {
     path: RoutePaths.templates,
@@ -91,7 +95,7 @@ const routerConfig: RouteObject[] = [
   },
   {
     path: RoutePaths.newsletterItemTemplate,
-    element: <NewsletterItemTemplate />,
+    element: <NewsletterPostTemplate />,
   },
 ];
 

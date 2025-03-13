@@ -3,13 +3,7 @@ import { UserDAO, NewsletterDAO, LocationDAO, NewsletterItemDAO, NewsletterItemT
 import { GCSManager, IGCSManager } from '@athena/services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/common';
-type ContextInput = {
-    req: Request & {
-        user?: UserSession;
-        isAuthenticated(): () => boolean;
-    };
-    res: Response;
-};
+import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
 export type Context = {
     req: Request & {
         user?: UserSession;
@@ -26,11 +20,8 @@ export type Context = {
         newsletterItemTemplate: NewsletterItemTemplateDAO;
     };
 };
-export declare function createContext({ req, res }: ContextInput): {
-    req: Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-        user?: UserSession;
-        isAuthenticated(): () => boolean;
-    };
+export declare function createContext({ req, res }: CreateExpressContextOptions): {
+    req: Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
     res: Response<any, Record<string, any>>;
     gcs: IGCSManager;
     db: DB<Database>;
@@ -42,4 +33,3 @@ export declare function createContext({ req, res }: ContextInput): {
         newsletterItemTemplate: INewsletterItemTemplateDAO;
     };
 };
-export {};

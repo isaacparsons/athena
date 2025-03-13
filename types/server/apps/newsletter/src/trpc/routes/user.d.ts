@@ -1,9 +1,6 @@
 export declare const userRouter: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
     ctx: {
-        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/common").UserSession;
-            isAuthenticated(): () => boolean;
-        };
+        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
         res: import("express").Response<any, Record<string, any>>;
         gcs: import("../../services").IGCSManager;
         db: import("kysely").Kysely<import("../../db").Database>;
@@ -22,10 +19,7 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
     get: import("@trpc/server").BuildProcedure<"query", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
@@ -49,10 +43,7 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
                 accessToken: string;
                 refreshToken: string;
             };
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
@@ -68,14 +59,68 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
         _input_out: typeof import("@trpc/server").unsetMarker;
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, import("@athena/common").User>;
+    }, {
+        id: number;
+        email: string;
+        newsletters: {
+            id: number;
+            properties: {
+                name: string;
+                dateRange: {
+                    start?: string | undefined;
+                    end?: string | undefined;
+                };
+            };
+            owner: {
+                id: number;
+                email: string;
+                firstName?: string | undefined;
+                lastName?: string | undefined;
+            };
+            meta: {
+                created: string;
+                creator: {
+                    id: number;
+                    email: string;
+                    firstName?: string | undefined;
+                    lastName?: string | undefined;
+                };
+                modified?: string | undefined;
+                modifier?: {
+                    id: number;
+                    email: string;
+                    firstName?: string | undefined;
+                    lastName?: string | undefined;
+                } | undefined;
+            };
+        }[];
+        newsletterItemTemplates: {
+            id: number;
+            name: string;
+            meta: {
+                created: string;
+                creator: {
+                    id: number;
+                    email: string;
+                    firstName?: string | undefined;
+                    lastName?: string | undefined;
+                };
+                modified?: string | undefined;
+                modifier?: {
+                    id: number;
+                    email: string;
+                    firstName?: string | undefined;
+                    lastName?: string | undefined;
+                } | undefined;
+            };
+        }[];
+        firstName?: string | undefined;
+        lastName?: string | undefined;
+    }>;
     newsletters: import("@trpc/server").BuildProcedure<"query", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
@@ -99,10 +144,7 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
                 accessToken: string;
                 refreshToken: string;
             };
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
@@ -118,14 +160,42 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
         _input_out: typeof import("@trpc/server").unsetMarker;
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, import("@athena/common").UserNewsletters>;
+    }, {
+        id: number;
+        properties: {
+            name: string;
+            dateRange: {
+                start?: string | undefined;
+                end?: string | undefined;
+            };
+        };
+        owner: {
+            id: number;
+            email: string;
+            firstName?: string | undefined;
+            lastName?: string | undefined;
+        };
+        meta: {
+            created: string;
+            creator: {
+                id: number;
+                email: string;
+                firstName?: string | undefined;
+                lastName?: string | undefined;
+            };
+            modified?: string | undefined;
+            modifier?: {
+                id: number;
+                email: string;
+                firstName?: string | undefined;
+                lastName?: string | undefined;
+            } | undefined;
+        };
+    }[]>;
     newsletterItemTemplates: import("@trpc/server").BuildProcedure<"query", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
@@ -149,10 +219,7 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
                 accessToken: string;
                 refreshToken: string;
             };
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
@@ -168,6 +235,25 @@ export declare const userRouter: import("@trpc/server").CreateRouterInner<import
         _input_out: typeof import("@trpc/server").unsetMarker;
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, import("@athena/common").UserNewsletterItemTemplates>;
+    }, {
+        id: number;
+        name: string;
+        meta: {
+            created: string;
+            creator: {
+                id: number;
+                email: string;
+                firstName?: string | undefined;
+                lastName?: string | undefined;
+            };
+            modified?: string | undefined;
+            modifier?: {
+                id: number;
+                email: string;
+                firstName?: string | undefined;
+                lastName?: string | undefined;
+            } | undefined;
+        };
+    }[]>;
 }>;
 export type UserRouter = typeof userRouter;

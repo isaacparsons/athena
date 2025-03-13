@@ -1,58 +1,81 @@
-import { DBConnection, Expression, jsonObjectFrom } from '@athena/db';
+import {
+  DBConnection,
+  EntityTableName,
+  Expression,
+  jsonObjectFrom,
+} from '@athena/db';
 
-export const newsletterItemDetailsMedia = (
+export const newsletterPostDetailsMedia = (
   db: DBConnection,
   id: Expression<number>
 ) =>
   jsonObjectFrom(
     db
-      .selectFrom('newsletter_item_media')
+      .selectFrom('newsletter_post_media')
       .selectAll()
-      .where(`newsletter_item_media.id`, '=', id)
+      .whereRef(`newsletter_post_media.newsletterPostId`, '=', id)
   ).as('mediaDetails');
 
-export const newsletterItemDetailsContainer = (
+export const newsletterPostDetailsContainer = (
   db: DBConnection,
   id: Expression<number>
 ) =>
   jsonObjectFrom(
     db
-      .selectFrom('newsletter_item_container')
+      .selectFrom('newsletter_post_container')
       .selectAll()
-      .where(`newsletter_item_container.id`, '=', id)
+      .whereRef(`newsletter_post_container.newsletterPostId`, '=', id)
   ).as('containerDetails');
 
-export const newsletterItemDetailsText = (
+export const newsletterPostDetailsText = (
   db: DBConnection,
   id: Expression<number>
 ) =>
   jsonObjectFrom(
     db
-      .selectFrom('newsletter_item_text')
+      .selectFrom('newsletter_post_text')
       .selectAll()
-      .where(`newsletter_item_text.id`, '=', id)
+      .whereRef('newsletter_post_text.newsletterPostId', '=', id)
   ).as('textDetails');
 
 export const location = (db: DBConnection, id: Expression<number | null>) =>
   jsonObjectFrom(
-    db.selectFrom('location').selectAll().where(`location.id`, '=', id)
+    db.selectFrom('location').selectAll().whereRef(`location.id`, '=', id)
   ).as('location');
 
 export const creator = (db: DBConnection, id: Expression<number>) =>
-  jsonObjectFrom(db.selectFrom('user').selectAll().where(`user.id`, '=', id))
-    .$notNull()
-    .as('creator');
+  jsonObjectFrom(
+    db.selectFrom('user').selectAll().whereRef('user.id', '=', id)
+  ).$notNull();
 
 export const modifier = (db: DBConnection, id: Expression<number | null>) =>
-  jsonObjectFrom(db.selectFrom('user').selectAll().where(`user.id`, '=', id)).as(
-    'modifier'
-  );
+  jsonObjectFrom(db.selectFrom('user').selectAll().whereRef('user.id', '=', id));
 
-export const user = (
+export const owner = (db: DBConnection, id: Expression<number>) =>
+  jsonObjectFrom(
+    db.selectFrom('user').selectAll().whereRef(`user.id`, '=', id)
+  ).$notNull();
+
+export const selectEntityColumns = <T extends EntityTableName>(
   db: DBConnection,
-  id: Expression<number | null>,
-  label?: string
+  tableName: T
 ) =>
-  jsonObjectFrom(db.selectFrom('user').selectAll().where(`user.id`, '=', id))
-    .$notNull()
-    .as(label ?? 'user');
+  db.selectFrom(tableName).select([
+    `id`,
+    `created`,
+    `modified`,
+    jsonObjectFrom(
+      db
+        .selectFrom('user')
+        .selectAll()
+        .whereRef('user.id', '=', db.dynamic.ref(`${tableName}.creatorId`))
+    )
+      .$notNull()
+      .as('creator'),
+    jsonObjectFrom(
+      db
+        .selectFrom('user')
+        .selectAll()
+        .whereRef('user.id', '=', db.dynamic.ref(`${tableName}.modifierId`))
+    ).as('modifier'),
+  ]);

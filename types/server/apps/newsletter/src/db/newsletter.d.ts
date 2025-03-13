@@ -1,5 +1,5 @@
-import { Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, TABLE_NAMES, MutableForeignKey, MutableNullableDate, Meta } from '@athena/db';
+import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
+import { DBConnection, UniqueId, TABLE_NAMES, MutableForeignKey, MutableNullableDate, Meta, EntityTable } from '@athena/db';
 export interface NewsletterTableColumns extends Meta {
     id: UniqueId;
     name: string;
@@ -14,7 +14,7 @@ export interface NewsletterTable {
 export type SelectNewsletter = Selectable<NewsletterTableColumns>;
 export type InsertNewsletter = Insertable<NewsletterTableColumns>;
 export type UpdateNewsletter = Updateable<NewsletterTableColumns>;
-export declare class NewsletterTableClient extends Table implements ITable {
+export declare class NewsletterTableClient extends EntityTable<'newsletter', 'name' | 'ownerId' | 'startDate' | 'endDate'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'newsletter', 'name' | 'ownerId' | 'startDate' | 'endDate'>;
 }

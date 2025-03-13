@@ -1,9 +1,6 @@
 declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
     ctx: {
-        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/common").UserSession;
-            isAuthenticated(): () => boolean;
-        };
+        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
         res: import("express").Response<any, Record<string, any>>;
         gcs: import("../../services").IGCSManager;
         db: import("kysely").Kysely<import("../../db").Database>;
@@ -22,10 +19,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
     get: import("@trpc/server").BuildProcedure<"query", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
@@ -49,10 +43,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 accessToken: string;
                 refreshToken: string;
             };
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
@@ -72,14 +63,74 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
         };
         _output_in: typeof import("@trpc/server").unsetMarker;
         _output_out: typeof import("@trpc/server").unsetMarker;
-    }, import("@athena/common").NewsletterItemTemplate>;
+    }, {
+        id: number;
+        name: string;
+        items: {
+            id: number;
+            position: {
+                parentId: number | null;
+                nextId: number | null;
+                prevId: number | null;
+            };
+            templateId?: number | undefined;
+            data?: {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Media;
+                fileName: string;
+                format: import("@athena/common").MediaFormat;
+                caption?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Text;
+                description?: string | null | undefined;
+                link?: string | null | undefined;
+            } | {
+                name: string;
+                type: import("@athena/common").NewsletterItemTypeName.Container;
+            } | undefined;
+        }[];
+        meta: {
+            created: string;
+            creator: {
+                id: number;
+                email: string;
+                firstName?: string | undefined;
+                lastName?: string | undefined;
+            };
+            modified?: string | undefined;
+            modifier?: {
+                id: number;
+                email: string;
+                firstName?: string | undefined;
+                lastName?: string | undefined;
+            } | undefined;
+        };
+        templates: {
+            id: number;
+            name: string;
+            meta: {
+                created: string;
+                creator: {
+                    id: number;
+                    email: string;
+                    firstName?: string | undefined;
+                    lastName?: string | undefined;
+                };
+                modified?: string | undefined;
+                modifier?: {
+                    id: number;
+                    email: string;
+                    firstName?: string | undefined;
+                    lastName?: string | undefined;
+                } | undefined;
+            };
+        }[];
+    }>;
     create: import("@trpc/server").BuildProcedure<"mutation", {
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../../services").IGCSManager;
                 db: import("kysely").Kysely<import("../../db").Database>;
@@ -103,10 +154,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 accessToken: string;
                 refreshToken: string;
             };
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../../services").IGCSManager;
             db: import("kysely").Kysely<import("../../db").Database>;
@@ -127,22 +175,22 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     nextId: string | null;
                     prevId: string | null;
                 };
+                templateId?: number | undefined;
                 data?: {
+                    name: string;
                     type: import("@athena/common").NewsletterItemTypeName.Media;
+                    fileName: string;
                     format: import("@athena/common").MediaFormat;
-                    name?: string | undefined;
-                    fileName?: string | undefined;
                     caption?: string | null | undefined;
                 } | {
+                    name: string;
                     type: import("@athena/common").NewsletterItemTypeName.Text;
-                    name?: string | undefined;
                     description?: string | null | undefined;
                     link?: string | null | undefined;
                 } | {
+                    name: string;
                     type: import("@athena/common").NewsletterItemTypeName.Container;
-                    name?: string | undefined;
                 } | undefined;
-                templateId?: number | undefined;
             }[];
         };
         _input_out: {
@@ -154,22 +202,22 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     nextId: string | null;
                     prevId: string | null;
                 };
+                templateId?: number | undefined;
                 data?: {
+                    name: string;
                     type: import("@athena/common").NewsletterItemTypeName.Media;
+                    fileName: string;
                     format: import("@athena/common").MediaFormat;
-                    name?: string | undefined;
-                    fileName?: string | undefined;
                     caption?: string | null | undefined;
                 } | {
+                    name: string;
                     type: import("@athena/common").NewsletterItemTypeName.Text;
-                    name?: string | undefined;
                     description?: string | null | undefined;
                     link?: string | null | undefined;
                 } | {
+                    name: string;
                     type: import("@athena/common").NewsletterItemTypeName.Container;
-                    name?: string | undefined;
                 } | undefined;
-                templateId?: number | undefined;
             }[];
         };
         _output_in: typeof import("@trpc/server").unsetMarker;

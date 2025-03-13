@@ -1,24 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteNewsletterItemTemplateInput = exports.getNewsletterItemTemplateInput = exports.postNewsletterItemTemplateInput = exports.getItemUploadLinksInput = exports.deleteManyNewsletterItemsInput = exports.deleteNewsletterInput = exports.updateNewsletterInput = exports.postNewsletterInput = exports.getNewsletterInput = exports.updateNewsletterItemInput = exports.postNewsletterItemBatchInput = exports.postNewsletterItemBatchInputItem = exports.tempNewsletterItemIds = exports.postNewsletterItemInput = exports.postNewsletterItemInputBase = exports.getNewsletterItemTreeInput = exports.getNewsletterItemInput = exports.newsletterItemDetails = exports.containerItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.NewsletterItemTypeName = exports.MediaFormat = exports.locationInput = void 0;
-exports.isMediaDetailsInput = isMediaDetailsInput;
-exports.isTextDetailsInput = isTextDetailsInput;
-exports.isContainerDetailsInput = isContainerDetailsInput;
-exports.isMediaDetails = isMediaDetails;
-exports.isTextDetails = isTextDetails;
-exports.isContainerDetails = isContainerDetails;
+exports.createNewsletterItemTemplate = exports.newsletterItemTemplate = exports.newsletterItemTemplateBase = exports.createNewsletterItemTemplateData = exports.newsletterItemTemplateData = exports.updateNewsletter = exports.createNewsletter = exports.newsletter = exports.newsletterBase = exports.newsletterProperties = exports.getItemUploadLinks = exports.createNewsletterItemsBatch = exports.createNewsletterItemsBatchItem = exports.tempNewsletterItemIds = exports.updateNewsletterItem = exports.createNewsletterItem = exports.isContainerItem = exports.isTextItem = exports.isMediaItem = exports.newsletterItem = exports.newsletterItemBase = exports.nodePosition = exports.updateNewsletterItemDetails = exports.updateNewsletterItemDetailsContainer = exports.updateNewsletterItemDetailsText = exports.updateNewsletterItemDetailsMedia = exports.createNewsletterItemDetails = exports.createNewsletterItemDetailsContainer = exports.createNewsletterItemDetailsText = exports.createNewsletterItemDetailsMedia = exports.newsletterItemDetails = exports.containerItemDetails = exports.textItemDetails = exports.mediaItemDetails = exports.baseItemDetails = exports.itemDetailType = exports.updateLocation = exports.createLocation = exports.locationInput = exports.dateRangeInput = exports.dateInput = exports.country = exports.positionInput = exports.meta = exports.userBase = exports.deleteBatchInput = exports.deleteInput = exports.getInput = exports.NewsletterItemTypeName = exports.MediaFormat = void 0;
+exports.user = void 0;
 const zod_1 = require("zod");
-/**
- * Input validation
- */
-exports.locationInput = zod_1.z
-    .object({
-    name: zod_1.z.string().optional(),
-    countryCode: zod_1.z.string().optional(),
-    latitude: zod_1.z.coerce.number().optional(),
-    longitude: zod_1.z.coerce.number().optional(),
-})
-    .optional();
 var MediaFormat;
 (function (MediaFormat) {
     MediaFormat["Image"] = "image";
@@ -31,148 +15,290 @@ var NewsletterItemTypeName;
     NewsletterItemTypeName["Text"] = "text";
     NewsletterItemTypeName["Container"] = "container";
 })(NewsletterItemTypeName || (exports.NewsletterItemTypeName = NewsletterItemTypeName = {}));
-const mediaFormat = zod_1.z.nativeEnum(MediaFormat);
-exports.mediaItemDetails = zod_1.z.object({
-    type: zod_1.z.literal(NewsletterItemTypeName.Media),
+exports.getInput = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
+});
+exports.deleteInput = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
+});
+exports.deleteBatchInput = zod_1.z.object({
+    ids: zod_1.z.array(zod_1.z.coerce.number()),
+});
+/**
+ * User
+ */
+exports.userBase = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
+    email: zod_1.z.string(),
+    firstName: zod_1.z.string().optional(),
+    lastName: zod_1.z.string().optional(),
+});
+/**
+ * Meta data
+ */
+exports.meta = zod_1.z.object({
+    creator: exports.userBase,
+    modifier: exports.userBase.optional(),
+    created: zod_1.z.string(),
+    modified: zod_1.z.string().optional(),
+});
+exports.positionInput = zod_1.z.object({
+    latitude: zod_1.z.coerce.number(),
+    longitude: zod_1.z.coerce.number(),
+});
+/**
+ * Country
+ */
+exports.country = zod_1.z.object({
     name: zod_1.z.string(),
+    position: exports.positionInput,
+});
+/**
+ * Date
+ */
+exports.dateInput = zod_1.z.string().min(8);
+exports.dateRangeInput = zod_1.z.object({
+    start: exports.dateInput.optional(),
+    end: exports.dateInput.optional(),
+});
+/**
+ * Location
+ */
+exports.locationInput = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
+    name: zod_1.z.string().optional(),
+    country: zod_1.z.string().optional(),
+    position: zod_1.z
+        .object({
+        latitude: zod_1.z.coerce.number(),
+        longitude: zod_1.z.coerce.number(),
+    })
+        .optional(),
+});
+exports.createLocation = exports.locationInput.omit({ id: true });
+exports.updateLocation = exports.locationInput;
+/**
+ * Newsletter Item
+ */
+// details
+const mediaFormat = zod_1.z.nativeEnum(MediaFormat);
+exports.itemDetailType = zod_1.z.union([
+    zod_1.z.literal(NewsletterItemTypeName.Media),
+    zod_1.z.literal(NewsletterItemTypeName.Text),
+    zod_1.z.literal(NewsletterItemTypeName.Container),
+]);
+exports.baseItemDetails = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
+    newsletterItemId: zod_1.z.coerce.number(),
+    name: zod_1.z.string(),
+});
+exports.mediaItemDetails = zod_1.z
+    .object({
+    type: zod_1.z.literal(NewsletterItemTypeName.Media),
     fileName: zod_1.z.string(),
     format: mediaFormat,
     caption: zod_1.z.string().optional().nullable(),
-});
-exports.textItemDetails = zod_1.z.object({
+})
+    .merge(exports.baseItemDetails);
+exports.textItemDetails = zod_1.z
+    .object({
     type: zod_1.z.literal(NewsletterItemTypeName.Text),
-    name: zod_1.z.string(),
     description: zod_1.z.string().optional().nullable(),
     link: zod_1.z.string().optional().nullable(),
-});
-exports.containerItemDetails = zod_1.z.object({
+})
+    .merge(exports.baseItemDetails);
+exports.containerItemDetails = zod_1.z
+    .object({
     type: zod_1.z.literal(NewsletterItemTypeName.Container),
-    name: zod_1.z.string(),
-});
+})
+    .merge(exports.baseItemDetails);
 exports.newsletterItemDetails = zod_1.z.discriminatedUnion('type', [
     exports.mediaItemDetails,
     exports.textItemDetails,
     exports.containerItemDetails,
 ]);
-exports.getNewsletterItemInput = zod_1.z.object({
-    newsletterItemId: zod_1.z.coerce.number(),
+exports.createNewsletterItemDetailsMedia = exports.mediaItemDetails.omit({
+    id: true,
+    newsletterItemId: true,
 });
-exports.getNewsletterItemTreeInput = zod_1.z.object({
+exports.createNewsletterItemDetailsText = exports.textItemDetails.omit({
+    id: true,
+    newsletterItemId: true,
+});
+exports.createNewsletterItemDetailsContainer = exports.containerItemDetails.omit({
+    id: true,
+    newsletterItemId: true,
+});
+exports.createNewsletterItemDetails = zod_1.z.discriminatedUnion('type', [
+    exports.createNewsletterItemDetailsMedia,
+    exports.createNewsletterItemDetailsText,
+    exports.createNewsletterItemDetailsContainer,
+]);
+exports.updateNewsletterItemDetailsMedia = exports.mediaItemDetails
+    .pick({ type: true })
+    .merge(exports.mediaItemDetails.omit({ type: true }).partial())
+    .merge(exports.baseItemDetails.omit({ id: true }).partial())
+    .merge(exports.baseItemDetails.pick({ id: true }));
+exports.updateNewsletterItemDetailsText = exports.textItemDetails
+    .pick({ type: true })
+    .merge(exports.textItemDetails.omit({ type: true }).partial())
+    .merge(exports.baseItemDetails.omit({ id: true }).partial())
+    .merge(exports.baseItemDetails.pick({ id: true }));
+exports.updateNewsletterItemDetailsContainer = exports.containerItemDetails
+    .pick({ type: true })
+    .merge(exports.containerItemDetails.omit({ type: true }).partial())
+    .merge(exports.baseItemDetails.omit({ id: true }).partial())
+    .merge(exports.baseItemDetails.pick({ id: true }));
+exports.updateNewsletterItemDetails = zod_1.z.discriminatedUnion('type', [
+    exports.updateNewsletterItemDetailsMedia,
+    exports.updateNewsletterItemDetailsText,
+    exports.updateNewsletterItemDetailsContainer,
+]);
+exports.nodePosition = zod_1.z.object({
     parentId: zod_1.z.coerce.number().nullable(),
+    nextId: zod_1.z.coerce.number().nullable(),
+    prevId: zod_1.z.coerce.number().nullable(),
 });
-exports.postNewsletterItemInputBase = zod_1.z.object({
+exports.newsletterItemBase = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
     newsletterId: zod_1.z.coerce.number(),
-    parentId: zod_1.z.coerce.number().nullable(),
-    nextItemId: zod_1.z.coerce.number().nullable(),
-    previousItemId: zod_1.z.coerce.number().nullable(),
+    position: exports.nodePosition,
     title: zod_1.z.string(),
-    date: zod_1.z.string().optional(),
-    location: exports.locationInput,
-});
-exports.postNewsletterItemInput = exports.postNewsletterItemInputBase.merge(zod_1.z.object({
+    date: zod_1.z.string().nullable().optional(),
+    location: exports.locationInput.optional(),
     details: exports.newsletterItemDetails,
+});
+exports.newsletterItem = exports.newsletterItemBase.merge(zod_1.z.object({
+    children: zod_1.z.array(exports.newsletterItemBase),
+}));
+const isMediaItem = (item) => {
+    return (item.details.type ===
+        NewsletterItemTypeName.Media);
+};
+exports.isMediaItem = isMediaItem;
+const isTextItem = (item) => {
+    return (item.details.type ===
+        NewsletterItemTypeName.Text);
+};
+exports.isTextItem = isTextItem;
+const isContainerItem = (item) => {
+    return (item.details.type ===
+        NewsletterItemTypeName.Container);
+};
+exports.isContainerItem = isContainerItem;
+exports.createNewsletterItem = exports.newsletterItem
+    .omit({
+    id: true,
+    children: true,
+    details: true,
+    location: true,
+})
+    .merge(zod_1.z.object({
+    details: exports.createNewsletterItemDetails,
+    location: exports.createLocation.optional(),
+}));
+exports.updateNewsletterItem = exports.newsletterItem
+    .pick({ id: true, newsletterId: true })
+    .merge(exports.newsletterItem
+    .omit({ id: true, details: true, position: true, children: true })
+    .partial())
+    .merge(zod_1.z.object({ details: exports.updateNewsletterItemDetails.optional() }))
+    .merge(zod_1.z.object({
+    childPositions: zod_1.z
+        .array(exports.nodePosition.merge(zod_1.z.object({ id: zod_1.z.coerce.number() })))
+        .optional(),
 }));
 exports.tempNewsletterItemIds = zod_1.z.object({
     id: zod_1.z.string(),
-    parentId: zod_1.z.string().nullable(),
-    nextId: zod_1.z.string().nullable(),
-    prevId: zod_1.z.string().nullable(),
+    parentId: zod_1.z.coerce.string().nullable(),
+    nextId: zod_1.z.coerce.string().nullable(),
+    prevId: zod_1.z.coerce.string().nullable(),
 });
-exports.postNewsletterItemBatchInputItem = exports.postNewsletterItemInput
-    .omit({
-    nextItemId: true,
-    previousItemId: true,
-    parentId: true,
-})
+exports.createNewsletterItemsBatchItem = exports.createNewsletterItem
+    .omit({ position: true })
     .merge(zod_1.z.object({ temp: exports.tempNewsletterItemIds }));
-exports.postNewsletterItemBatchInput = zod_1.z.object({
+exports.createNewsletterItemsBatch = zod_1.z.object({
     newsletterId: zod_1.z.coerce.number(),
-    parentId: zod_1.z.coerce.number().nullable(),
-    nextItemId: zod_1.z.coerce.number().nullable(),
-    previousItemId: zod_1.z.coerce.number().nullable(),
-    batch: zod_1.z.array(exports.postNewsletterItemBatchInputItem),
+    position: exports.nodePosition,
+    batch: zod_1.z.array(exports.createNewsletterItemsBatchItem),
 });
-// TODO: we can remove below, it should be derived from newsletter item input
-exports.updateNewsletterItemInput = zod_1.z
-    .object({
-    newsletterItemId: zod_1.z.coerce.number(),
-    title: zod_1.z.string().optional(),
-    date: zod_1.z.string().optional().nullable(),
-    // parentId: z.coerce.number().optional(),
-    nextItemId: zod_1.z.coerce.number().optional(),
-    location: exports.locationInput,
-    details: exports.newsletterItemDetails,
-})
-    .refine((obj) => obj.date || obj.nextItemId || obj.title || obj.location);
-exports.getNewsletterInput = zod_1.z.object({
-    newsletterId: zod_1.z.coerce.number(),
+exports.getItemUploadLinks = zod_1.z.object({
+    items: zod_1.z.array(zod_1.z.object({ id: zod_1.z.string() })),
 });
-exports.postNewsletterInput = zod_1.z.object({
+/**
+ * Newsletter
+ */
+exports.newsletterProperties = zod_1.z.object({
     name: zod_1.z
         .string()
         .min(1, { message: 'Name must be at least 1 characters long' })
         .max(100, { message: 'Name must be at less than 100 characters long' }),
-    startDate: zod_1.z.string().min(8).optional(),
-    endDate: zod_1.z.string().min(8).optional(),
+    dateRange: exports.dateRangeInput,
 });
-exports.updateNewsletterInput = zod_1.z.object({
+exports.newsletterBase = zod_1.z
+    .object({
     id: zod_1.z.coerce.number(),
-    name: zod_1.z.string().optional(),
-    startDate: zod_1.z.string().optional().nullable(),
-    endDate: zod_1.z.string().optional().nullable(),
+})
+    .merge(zod_1.z.object({
+    properties: exports.newsletterProperties,
+    owner: exports.userBase,
+    meta: exports.meta,
+}));
+exports.newsletter = exports.newsletterBase.merge(zod_1.z.object({
+    members: zod_1.z.array(exports.userBase),
+    items: zod_1.z.array(exports.newsletterItemBase),
+}));
+exports.createNewsletter = exports.newsletter.omit({
+    id: true,
+    owner: true,
+    meta: true,
+    members: true,
+    items: true,
 });
-exports.deleteNewsletterInput = zod_1.z.object({ id: zod_1.z.coerce.number() });
-exports.deleteManyNewsletterItemsInput = zod_1.z.object({
-    newsletterItemIds: zod_1.z.array(zod_1.z.coerce.number()),
-});
-exports.getItemUploadLinksInput = zod_1.z.object({
-    items: zod_1.z.array(zod_1.z.object({ id: zod_1.z.string() })),
-});
+exports.updateNewsletter = exports.newsletter.pick({ id: true }).merge(zod_1.z.object({
+    properties: exports.newsletterProperties.partial(),
+}));
+/**
+ * Newsletter item template
+ */
 const newsletterItemTemplateDataDetails = zod_1.z
     .discriminatedUnion('type', [
-    exports.mediaItemDetails
-        .pick({ type: true, format: true })
-        .merge(exports.mediaItemDetails.omit({ type: true, format: true }).partial()),
-    exports.textItemDetails
-        .pick({ type: true })
-        .merge(exports.textItemDetails.omit({ type: true }).partial()),
-    exports.containerItemDetails
-        .pick({ type: true })
-        .merge(exports.containerItemDetails.omit({ type: true }).partial()),
+    exports.createNewsletterItemDetailsMedia,
+    exports.createNewsletterItemDetailsText,
+    exports.createNewsletterItemDetailsContainer,
 ])
     .optional();
-exports.postNewsletterItemTemplateInput = zod_1.z.object({
+exports.newsletterItemTemplateData = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
+    position: exports.nodePosition,
+    templateId: zod_1.z.coerce.number().optional(),
+    data: newsletterItemTemplateDataDetails,
+});
+exports.createNewsletterItemTemplateData = exports.newsletterItemTemplateData
+    .omit({ position: true, id: true })
+    .merge(zod_1.z.object({ temp: exports.tempNewsletterItemIds }));
+exports.newsletterItemTemplateBase = zod_1.z.object({
+    id: zod_1.z.coerce.number(),
+    meta: exports.meta,
     name: zod_1.z.string(),
-    data: zod_1.z.array(zod_1.z.object({
-        templateId: zod_1.z.number().optional(),
-        temp: exports.tempNewsletterItemIds,
-        data: newsletterItemTemplateDataDetails,
-    })),
 });
-exports.getNewsletterItemTemplateInput = zod_1.z.object({
-    id: zod_1.z.number(),
-});
-exports.deleteNewsletterItemTemplateInput = zod_1.z.object({
-    id: zod_1.z.number(),
-});
-function isMediaDetailsInput(details) {
-    return ((details === null || details === void 0 ? void 0 : details.type) === NewsletterItemTypeName.Media);
-}
-function isTextDetailsInput(details) {
-    return ((details === null || details === void 0 ? void 0 : details.type) === NewsletterItemTypeName.Text);
-}
-function isContainerDetailsInput(details) {
-    return ((details === null || details === void 0 ? void 0 : details.type) ===
-        NewsletterItemTypeName.Container);
-}
-function isMediaDetails(details) {
-    return (details.type === NewsletterItemTypeName.Media);
-}
-function isTextDetails(details) {
-    return details.type === NewsletterItemTypeName.Text;
-}
-function isContainerDetails(details) {
-    return (details.type ===
-        NewsletterItemTypeName.Container);
-}
+exports.newsletterItemTemplate = exports.newsletterItemTemplateBase.merge(zod_1.z.object({
+    items: zod_1.z.array(exports.newsletterItemTemplateData),
+    templates: zod_1.z.array(exports.newsletterItemTemplateBase),
+}));
+exports.createNewsletterItemTemplate = exports.newsletterItemTemplate
+    .omit({
+    id: true,
+    templates: true,
+    items: true,
+    meta: true,
+})
+    .merge(zod_1.z.object({ data: zod_1.z.array(exports.createNewsletterItemTemplateData) }));
+/**
+ * User
+ */
+exports.user = exports.userBase.merge(zod_1.z.object({
+    newsletters: zod_1.z.array(exports.newsletterBase),
+    newsletterItemTemplates: zod_1.z.array(exports.newsletterItemTemplateBase),
+}));
 //# sourceMappingURL=athena-common.js.map

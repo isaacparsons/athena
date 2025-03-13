@@ -4,12 +4,9 @@ import { useParams } from 'react-router-dom';
 import {
   NewsletterProperties,
   NewsletterMembers,
-  NewsletterItemsProvider
+  NewsletterPostsProvider,
 } from '@athena/components';
-import {
-  CircularProgress,
-  Skeleton,
-} from '@mui/material'
+import { CircularProgress, Skeleton } from '@mui/material';
 import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -44,11 +41,10 @@ export function Newsletter() {
   if (!newsletter) return null;
 
   return (
-    <NewsletterItemsProvider newsletterId={newsletter.id} parentId={null}>
+    <NewsletterPostsProvider newsletterId={newsletter.id} parentId={null}>
       <NewsletterProperties properties={newsletter.properties} />
       <NewsletterMembers members={newsletter.members} />
-    </NewsletterItemsProvider>
-
+    </NewsletterPostsProvider>
   );
 }
 {

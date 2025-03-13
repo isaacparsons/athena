@@ -1,28 +1,43 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useMemo, useState } from 'react';
 import { Fab } from '@mui/material';
-import { ToggleList, NewsletterItemCard, AddItemsDialog, AddItemTemplateDialog } from '@athena/components';
+import {
+  ToggleList,
+  NewsletterPostCard,
+  AddItemsDialog,
+  AddItemTemplateDialog,
+} from '@athena/components';
 import { DeleteIcon, TemplateIcon } from '@athena/icons';
-import { StoreNewsletterItem, useStore } from '@athena/store';
+import { StoreNewsletterPost, useStore } from '@athena/store';
 import { usePromiseWithNotification } from '@athena/hooks';
 
-
-interface NewsletterItemsListProps {
-  items: StoreNewsletterItem[];
+interface NewsletterPostsListProps {
+  items: StoreNewsletterPost[];
   newsletterId: number;
   parentId: number | null;
 }
 
-export function NewsletterItemsList({ items, newsletterId, parentId }: NewsletterItemsListProps) {
+export function NewsletterPostsList({
+  items,
+  newsletterId,
+  parentId,
+}: NewsletterPostsListProps) {
   const promiseWithNotifications = usePromiseWithNotification();
-  const { fetchNewsletter, deleteNewsletterItems, selectedItemIds, selectItemIds, editing, setEditing } = useStore(
+  const {
+    fetchNewsletter,
+    deleteNewsletterPosts,
+    selectedItemIds,
+    selectItemIds,
+    editing,
+    setEditing,
+  } = useStore(
     useShallow((state) => ({
       fetchNewsletter: state.newsletters.fetch,
-      deleteNewsletterItems: state.newsletterItems.deleteItems,
+      deleteNewsletterPosts: state.newsletterItems.deleteItems,
       selectedItemIds: state.newsletterItems.selectedItemIds,
       selectItemIds: state.newsletterItems.selectItemIds,
       editing: state.newsletterItems.editing,
-      setEditing: state.newsletterItems.setEditing
+      setEditing: state.newsletterItems.setEditing,
     }))
   );
 
@@ -32,26 +47,29 @@ export function NewsletterItemsList({ items, newsletterId, parentId }: Newslette
   const handleOpenAddTemplateDialog = () => setAddTemplateDialogOpen(true);
   const handleCloseAddTemplateDialog = () => {
     setAddTemplateDialogOpen(false);
-    handleFinishEditing()
+    handleFinishEditing();
   };
   const handleFinishEditing = () => {
-    selectItemIds([])
-    setEditing(false)
-  }
-  const handleDeleteItems = async (ids: number[]) => {
+    selectItemIds([]);
+    setEditing(false);
+  };
+  const handleDeleteItems = async () => {
     setDeletingItems(true);
-    promiseWithNotifications.execute(deleteNewsletterItems(ids), {
+    promiseWithNotifications.execute(deleteNewsletterPosts(newsletterId), {
       successMsg: 'Items deleted!',
       errorMsg: 'Unable to delete items :(',
       onSuccess: () => {
         fetchNewsletter(newsletterId);
         setDeletingItems(false);
-        handleFinishEditing()
+        handleFinishEditing();
       },
     });
   };
 
-  const filteredItems = useMemo(() => items.filter((i) => i.parentId === parentId), [items, parentId]);
+  const filteredItems = useMemo(
+    () => items.filter((i) => i.position.parentId === parentId),
+    [items, parentId]
+  );
 
   const selectedItems = useMemo(() => {
     return filteredItems.filter((i) => selectedItemIds.includes(i.id));
@@ -59,19 +77,34 @@ export function NewsletterItemsList({ items, newsletterId, parentId }: Newslette
 
   return (
     <>
-
-      {editing && <Fab
-        disabled={selectedItemIds.length === 0}
-        onClick={() => handleDeleteItems(Array.from(selectedItemIds))}
-        sx={{ position: 'fixed', bottom: 16, right: 16, bgcolor: 'red', color: 'white' }}>
-        <DeleteIcon />
-      </Fab>}
-      {selectedItems.length > 0 && <Fab variant="extended" onClick={handleOpenAddTemplateDialog} sx={{ position: 'fixed', bottom: 32 }}>
-        <TemplateIcon sx={{ mr: 1 }} />
-        Create Template
-      </Fab>}
+      {editing && (
+        <Fab
+          disabled={selectedItemIds.length === 0}
+          onClick={handleDeleteItems}
+          sx={{
+            position: 'fixed',
+            bottom: 16,
+            right: 16,
+            bgcolor: 'red',
+            color: 'white',
+          }}
+        >
+          <DeleteIcon />
+        </Fab>
+      )}
+      {selectedItems.length > 0 && (
+        <Fab
+          variant="extended"
+          onClick={handleOpenAddTemplateDialog}
+          sx={{ position: 'fixed', bottom: 32 }}
+        >
+          <TemplateIcon sx={{ mr: 1 }} />
+          Create Template
+        </Fab>
+      )}
 
       <AddItemTemplateDialog
+        newsletterId={newsletterId}
         open={addTemplateDialogOpen}
         handleClose={handleCloseAddTemplateDialog}
         items={selectedItems}
@@ -82,7 +115,7 @@ export function NewsletterItemsList({ items, newsletterId, parentId }: Newslette
         selectedItemIds={new Set(selectedItemIds)}
         setSelectedItemIds={(items) => selectItemIds(Array.from(items))}
         selectable={editing}
-        renderItem={(props) => (<NewsletterItemCard {...props} />)}
+        renderItem={(props) => <NewsletterPostCard {...props} />}
       />
     </>
   );

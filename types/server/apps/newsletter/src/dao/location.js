@@ -20,6 +20,17 @@ let LocationDAO = class LocationDAO {
             return res.id;
         });
     }
+    update(input) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const result = yield this.db
+                .updateTable('location')
+                .set(Object.assign(Object.assign(Object.assign({}, (input.name ? { name: input.name } : {})), (input.country ? { countryCode: input.country } : {})), (input.position ? { position: input.position } : {})))
+                .returning('id')
+                .where('id', '=', input.id)
+                .executeTakeFirstOrThrow();
+            return result.id;
+        });
+    }
 };
 exports.LocationDAO = LocationDAO;
 exports.LocationDAO = LocationDAO = tslib_1.__decorate([

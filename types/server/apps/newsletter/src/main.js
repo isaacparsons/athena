@@ -18,7 +18,7 @@ exports.app.use((0, cors_1.default)({
     //   'https://storage.googleapis.com/athena-newsletter',
     // ],
     origin: '*',
-    AccessControlAllowOrigin: '*',
+    // AccessControlAllowOrigin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
 }));
 exports.app.use(express_1.default.json());

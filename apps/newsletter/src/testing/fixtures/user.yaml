@@ -1,0 +1,4 @@
+user:
+  - firstName: test
+    lastName: user
+    email: email@email.com

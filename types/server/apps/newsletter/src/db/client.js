@@ -58,9 +58,13 @@ class DBManagerClient {
             console.log('user created!');
             console.log(user);
             const newsletterId = yield newsletterDAO.post(user.id, {
-                name: 'Monthly Newsletter',
-                startDate: new Date(2024, 1, 1).toISOString(),
-                endDate: new Date(2024, 1, 30).toISOString(),
+                properties: {
+                    name: 'Monthly Newsletter',
+                    dateRange: {
+                        start: new Date(2024, 1, 1).toISOString(),
+                        end: new Date(2024, 1, 30).toISOString(),
+                    },
+                },
             });
             console.log('newsletter created!');
             console.log(newsletterId);
@@ -111,9 +115,11 @@ class DBManagerClient {
             };
             const inputBatch = {
                 newsletterId,
-                parentId: null,
-                nextItemId: null,
-                previousItemId: null,
+                position: {
+                    parentId: null,
+                    nextId: null,
+                    prevId: null,
+                },
                 batch: [movieReview, movieReviewThoughts, movieReviewRating],
             };
             const ids = yield newsletterItemsDAO.postBatch(user.id, inputBatch);
@@ -121,14 +127,4 @@ class DBManagerClient {
     }
 }
 exports.DBManagerClient = DBManagerClient;
-// Monthly newsletter
-// kitty of the month
-//  - photo
-//  - winner
-//  - summary of why they won
-// movie review
-//  - link to the movie
-//  - rating
-//  - thoughts
-//
 //# sourceMappingURL=client.js.map

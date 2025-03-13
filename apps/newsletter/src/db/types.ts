@@ -3,46 +3,21 @@ import {
   Transaction as KyselyTransaction,
   ColumnType,
   Selectable,
+  CreateTableBuilder,
+  sql,
 } from 'kysely';
-import {
-  CountryTableColumns,
-  FederatedCredentialTableColumns,
-  LocationTableColumns,
-  NewsletterItemContainerTableColumns,
-  NewsletterItemMediaTableColumns,
-  NewsletterItemTableColumns,
-  NewsletterItemTemplateDataTableColumns,
-  NewsletterItemTemplateTableColumns,
-  NewsletterItemTextTableColumns,
-  NewsletterTableColumns,
-  UserNewsletterTableColumns,
-  UserTableColumns,
-  UserTemplateTableColumns,
-} from '.';
+import { DB } from '../types/db';
+
+export type Database = DB;
+
 export { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres';
 export { Pool } from 'pg';
 export { sql, Expression, PostgresDialect, Kysely as DB } from 'kysely';
 
-export type UniqueId = ColumnType<number, never, never>;
 export type Created = ColumnType<string, string, never>;
 export type Modified = ColumnType<string | null, never, string>;
 export type Creator = ColumnType<number, number, never>;
 export type Modifier = ColumnType<number | null, never, number>;
-export type MutableNullableDate = ColumnType<
-  string | null,
-  string | null,
-  string | null
->;
-export type MutableDate = ColumnType<string, string, string>;
-export type MutableForeignKey = ColumnType<number, number, number>;
-export type ForeignKey = ColumnType<number, number, never>;
-
-export type ImmutableString = ColumnType<string, string, never>;
-export type ImmutableNumber = ColumnType<number, number, never>;
-
-export type SelectMutableNullableDate = Selectable<MutableNullableDate>;
-export type InsertMutableNullableDate = Selectable<MutableNullableDate>;
-export type UpdateMutableNullableDate = Selectable<MutableNullableDate>;
 
 export const MetaColumns = [
   'created',
@@ -50,12 +25,15 @@ export const MetaColumns = [
   'creatorId',
   'modifierId',
 ] as const;
+
 export type Meta = {
   created: Created;
   modified: Modified;
   creatorId: Creator;
   modifierId: Modifier;
 };
+
+export type SelectMeta = Selectable<Meta>;
 
 export enum TABLE_NAMES {
   LOCATION = 'location',
@@ -65,55 +43,82 @@ export enum TABLE_NAMES {
   NEWSLETTER = 'newsletter',
   USER_NEWSLETTER = 'user_newsletter',
   USER_TEMPLATE = 'user_template',
-  NEWSLETTER_ITEM = 'newsletter_item',
-  NEWSLETTER_ITEM_MEDIA = 'newsletter_item_media',
-  NEWSLETTER_ITEM_TEXT = 'newsletter_item_text',
-  NEWSLETTER_ITEM_CONTAINER = 'newsletter_item_container',
-  NEWSLETTER_ITEM_TEMPLATE = 'newsletter_item_template',
-  NEWSLETTER_ITEM_TEMPLATE_DATA = 'newsletter_item_template_data',
-  NEWSLETTER_ITEM_TEMPLATE_MAPPING = 'newsletter_item_template_mapping',
+  NEWSLETTER_POST = 'newsletter_post',
+  NEWSLETTER_POST_MEDIA = 'newsletter_post_media',
+  NEWSLETTER_POST_TEXT = 'newsletter_post_text',
+  NEWSLETTER_POST_CONTAINER = 'newsletter_post_container',
+  // NEWSLETTER_POST_TEMPLATE = 'newsletter_post_template',
+  // NEWSLETTER_POST_TEMPLATE_DATA = 'newsletter_post_template_data',
+  // NEWSLETTER_POST_TEMPLATE_MAPPING = 'newsletter_post_template_mapping',
 }
 
 export type META_TABLES =
-  | TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE
-  | TABLE_NAMES.NEWSLETTER_ITEM
-  | TABLE_NAMES.NEWSLETTER;
+  // | TABLE_NAMES.NEWSLETTER_POST_TEMPLATE
+  TABLE_NAMES.NEWSLETTER_POST | TABLE_NAMES.NEWSLETTER;
 
-export interface Database {
-  user: UserTableColumns;
-  newsletter: NewsletterTableColumns;
-  user_newsletter: UserNewsletterTableColumns;
-  user_template: UserTemplateTableColumns;
-  newsletter_item: NewsletterItemTableColumns;
-  newsletter_item_media: NewsletterItemMediaTableColumns;
-  newsletter_item_text: NewsletterItemTextTableColumns;
-  newsletter_item_container: NewsletterItemContainerTableColumns;
-  country: CountryTableColumns;
-  federated_credential: FederatedCredentialTableColumns;
-  location: LocationTableColumns;
-  newsletter_item_template: NewsletterItemTemplateTableColumns;
-  newsletter_item_template_data: NewsletterItemTemplateDataTableColumns;
-}
+export type TableName = keyof Database;
+export type EntityTableName = Extract<
+  TableName,
+  'newsletter' | 'newsletter_post'
+  // | 'newsletter_post_template'
+>;
 
 export type DBConnection = Kysely<Database>;
 export type Transaction = KyselyTransaction<Database>;
 
-export interface ITable {
+export interface ITable<T extends TableName, C extends string = never> {
   db: DBConnection;
   name: string;
+  tableBuilder: CreateTableBuilder<T, C>;
   createTable: () => Promise<void>;
   deleteTable: () => Promise<void>;
+  truncateTable: () => Promise<void>;
 }
 
-export abstract class Table implements ITable {
-  db: DBConnection;
-  name: string;
-  constructor(db: DBConnection, name: string) {
-    this.name = name;
-    this.db = db;
-  }
+export abstract class Table<T extends TableName, C extends string = never>
+  implements ITable<T, C>
+{
+  constructor(readonly db: DBConnection, readonly name: string) {}
+
+  tableBuilder: CreateTableBuilder<T, C> = this.db.schema
+    .createTable(this.name)
+    .ifNotExists();
+
   async createTable() {
-    throw new Error('not implemented');
+    return this.tableBuilder.execute();
+  }
+  async deleteTable() {
+    this.db.schema.dropTable(this.name).ifExists().cascade().execute();
+    return;
+  }
+  async truncateTable() {
+    this.db.deleteFrom(this.name as any).execute();
+    return;
+  }
+}
+
+export class EntityTable<T extends EntityTableName, C extends string = never>
+  extends Table<T, C | 'id' | 'created' | 'creatorId' | 'modified' | 'modifierId'>
+  implements
+    ITable<T, C | 'id' | 'created' | 'creatorId' | 'modified' | 'modifierId'>
+{
+  constructor(readonly db: DBConnection, readonly name: string) {
+    super(db, name);
+  }
+
+  tableBuilder: CreateTableBuilder<T, C> = this.tableBuilder
+    .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
+    .addColumn('created', 'text', (cb) => cb.notNull().defaultTo(sql`now()`))
+    .addColumn('creatorId', 'integer', (col) =>
+      col.notNull().references('user.id').onDelete('cascade')
+    )
+    .addColumn('modified', 'text')
+    .addColumn('modifierId', 'integer', (col) =>
+      col.references('user.id').onDelete('cascade')
+    );
+
+  async createTable() {
+    return this.tableBuilder.execute();
   }
   async deleteTable() {
     this.db.schema.dropTable(this.name).ifExists().cascade().execute();

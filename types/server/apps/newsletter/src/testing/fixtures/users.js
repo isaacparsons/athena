@@ -1,3 +1,4 @@
+"use strict";
 // import { dbClient } from '../../db';
 // export async function createUser() {
 //   const testUserEmail = 'test@test.com';

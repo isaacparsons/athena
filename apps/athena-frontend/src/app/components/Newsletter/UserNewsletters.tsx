@@ -1,9 +1,9 @@
+import { NewsletterBase } from '@athena/common';
 import { UserNewsletterCard, CustomList, CustomListItem } from '@athena/components';
-import { StoreNewsletter } from '@athena/store';
 import { useNavigate } from 'react-router-dom';
 
 interface NewslettersProps {
-  newsletters: StoreNewsletter[];
+  newsletters: NewsletterBase[];
 }
 export function UserNewsletters(props: NewslettersProps) {
   const { newsletters } = props;

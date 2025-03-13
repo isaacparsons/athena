@@ -1,10 +1,7 @@
 export declare const trpc: {
     _config: import("@trpc/server").RootConfig<{
         ctx: {
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../services").IGCSManager;
             db: import("kysely").Kysely<import("../db").Database>;
@@ -23,10 +20,7 @@ export declare const trpc: {
     procedure: import("@trpc/server").ProcedureBuilder<{
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../services").IGCSManager;
                 db: import("kysely").Kysely<import("../db").Database>;
@@ -43,10 +37,7 @@ export declare const trpc: {
             transformer: import("@trpc/server").DefaultDataTransformer;
         }>;
         _ctx_out: {
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../services").IGCSManager;
             db: import("kysely").Kysely<import("../db").Database>;
@@ -67,10 +58,7 @@ export declare const trpc: {
     middleware: <TNewParams extends import("@trpc/server").ProcedureParams<import("@trpc/server").AnyRootConfig, unknown, unknown, unknown, unknown, unknown, unknown>>(fn: import("@trpc/server").MiddlewareFunction<{
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../services").IGCSManager;
                 db: import("kysely").Kysely<import("../db").Database>;
@@ -95,10 +83,7 @@ export declare const trpc: {
     }, TNewParams>) => import("@trpc/server").MiddlewareBuilder<{
         _config: import("@trpc/server").RootConfig<{
             ctx: {
-                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                    user?: import("@athena/common").UserSession;
-                    isAuthenticated(): () => boolean;
-                };
+                req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
                 res: import("express").Response<any, Record<string, any>>;
                 gcs: import("../services").IGCSManager;
                 db: import("kysely").Kysely<import("../db").Database>;
@@ -123,10 +108,7 @@ export declare const trpc: {
     }, TNewParams>;
     router: <TProcRouterRecord extends import("@trpc/server").ProcedureRouterRecord>(procedures: TProcRouterRecord) => import("@trpc/server").CreateRouterInner<import("@trpc/server").RootConfig<{
         ctx: {
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../services").IGCSManager;
             db: import("kysely").Kysely<import("../db").Database>;
@@ -145,10 +127,7 @@ export declare const trpc: {
     mergeRouters: typeof import("@trpc/server").mergeRouters;
     createCallerFactory: <TRouter extends import("@trpc/server").Router<import("@trpc/server").AnyRouterDef<import("@trpc/server").RootConfig<{
         ctx: {
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../services").IGCSManager;
             db: import("kysely").Kysely<import("../db").Database>;
@@ -168,10 +147,7 @@ export declare const trpc: {
 export declare const publicProcedure: import("@trpc/server").ProcedureBuilder<{
     _config: import("@trpc/server").RootConfig<{
         ctx: {
-            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-                user?: import("@athena/common").UserSession;
-                isAuthenticated(): () => boolean;
-            };
+            req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../services").IGCSManager;
             db: import("kysely").Kysely<import("../db").Database>;
@@ -188,10 +164,7 @@ export declare const publicProcedure: import("@trpc/server").ProcedureBuilder<{
         transformer: import("@trpc/server").DefaultDataTransformer;
     }>;
     _ctx_out: {
-        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>> & {
-            user?: import("@athena/common").UserSession;
-            isAuthenticated(): () => boolean;
-        };
+        req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
         res: import("express").Response<any, Record<string, any>>;
         gcs: import("../services").IGCSManager;
         db: import("kysely").Kysely<import("../db").Database>;

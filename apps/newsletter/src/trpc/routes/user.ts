@@ -7,9 +7,9 @@ export const userRouter = trpc.router({
   newsletters: loggedInProcedure.query(({ ctx }) => {
     return ctx.dao.user.newsletters(ctx.user.userId);
   }),
-  newsletterItemTemplates: loggedInProcedure.query(({ ctx }) => {
-    return ctx.dao.user.newsletterItemTemplates(ctx.user.userId);
-  }),
+  // newsletterItemTemplates: loggedInProcedure.query(({ ctx }) => {
+  //   return ctx.dao.user.newsletterItemTemplates(ctx.user.userId);
+  // }),
 });
 
 export type UserRouter = typeof userRouter;

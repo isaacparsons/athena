@@ -1,169 +1,165 @@
-// import { DateTime } from 'luxon';
-// import { appRouter as router } from '../../src/routes/index';
-// import { createContext } from '../../src/trpc/context';
-// import { createNewsletter } from '../fixtures/newsletters';
-// import { createUser } from '../fixtures/users';
+import _ from 'lodash';
+import { appRouter as router } from '../../trpc/routes';
+import { createContext } from '../../trpc/context';
+import { createFixture } from '../setup';
+import { getNewsletter } from '../test-util';
+import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
+import { CreateNewsletter } from '@athena/common';
 
 // const now = new Date(2024, 1, 1);
 // Date.now = jest.fn(() => now.getTime());
 
-// const getNewsletter = async (userId: number, id: number) => {
-//   return router.newsletters.get({
-//     ctx: createContext({
-//       req: {
-//         user: {
-//           id: userId,
-//         },
-//       } as any,
-//       res: {} as any,
-//     }),
-//     path: '',
-//     rawInput: {
-//       newsletterId: id,
-//     },
-//     type: router.newsletters.get._type,
-//   });
-// };
+const dbClient = new DBManagerClient();
 
-// describe('newsletter routes', () => {
-//   test('get', async () => {
-//     const newsletterInput = {
-//       name: 'test newsletter 1',
-//     };
-//     const user1 = await createUser();
-//     const existingNewsletter = await createNewsletter(
-//       user1.id,
-//       newsletterInput.name
-//     );
+describe('newsletter routes', () => {
+  afterAll(async () => {
+    await dbClient.truncateTables(['user']);
+  });
+  test('get', async () => {
+    const entities = await createFixture('newsletter.yaml');
+    const user = _.get(entities, ['user', 0]) as SelectUser;
+    const newsletter = _.get(entities, ['newsletter', 0]) as SelectNewsletter;
 
-//     const newsletter = await getNewsletter(user1.id, existingNewsletter.id);
-//     expect(newsletter).toEqual({
-//       meta: {
-//         creator: user1,
-//         created: expect.any(Date),
-//         modified: null,
-//         modifier: null,
-//       },
-//       properties: {
-//         name: newsletterInput.name,
-//         dateRange: {
-//           start: expect.any(Date),
-//           end: expect.any(Date),
-//         },
-//       },
-//       owner: user1,
-//       members: expect.arrayContaining([user1]),
-//       items: [],
-//     });
-//   });
-//   test('post', async () => {
-//     const user1 = await createUser();
-//     const newsletterInput = {
-//       name: 'test newsletter 1',
-//       startDate: new Date().toISOString(),
-//       endDate: new Date().toISOString(),
-//     };
-//     const newsletter = await router.newsletters.post({
-//       ctx: createContext({
-//         req: {
-//           user: {
-//             id: user1.id,
-//           },
-//         } as any,
-//         res: {} as any,
-//       }),
-//       path: '',
-//       rawInput: newsletterInput,
-//       type: router.newsletters.post._type,
-//     });
-//     expect(newsletter).toEqual({
-//       id: expect.any(Number),
-//       name: newsletterInput.name,
-//       ownerId: user1.id,
-//       startDate: expect.any(Date),
-//       endDate: expect.any(Date),
-//       created: expect.any(Date),
-//       modified: null,
-//       creatorId: user1.id,
-//       modifierId: null,
-//     });
-//   });
-//   describe('update', () => {
-//     test('update name and date', async () => {
-//       const newsletterInput = {
-//         name: 'updated test newsletter 1',
-//         startDate: DateTime.now().toISO(),
-//         endDate: DateTime.now().plus({ day: 1 }).toISO(),
-//       };
-//       const user1 = await createUser();
-//       const existingNewsletter = await createNewsletter(
-//         user1.id,
-//         newsletterInput.name
-//       );
+    const createdNewsletter = await getNewsletter(user.id, newsletter.id);
 
-//       await router.newsletters.update({
-//         ctx: createContext({
-//           req: {
-//             user: {
-//               id: user1.id,
-//             },
-//           } as any,
-//           res: {} as any,
-//         }),
-//         path: '',
-//         rawInput: { ...newsletterInput, id: existingNewsletter.id },
-//         type: router.newsletters.update._type,
-//       });
+    expect(createdNewsletter).toEqual({
+      id: expect.any(Number),
+      meta: {
+        creator: user,
+        created: expect.any(String),
+      },
+      properties: {
+        name: newsletter.name,
+        dateRange: {
+          start: expect.any(String),
+          end: expect.any(String),
+        },
+      },
+      owner: user,
+      members: expect.arrayContaining([user]),
+      items: [],
+    });
+  });
+  test('post', async () => {
+    const entities = await createFixture('user.yaml');
+    const user = _.get(entities, ['user', 0]) as SelectUser;
 
-//       const newsletter = await getNewsletter(user1.id, existingNewsletter.id);
-//       expect(newsletter).toEqual({
-//         meta: {
-//           creator: user1,
-//           created: expect.any(Date), // now, //TODO: fix this
-//           modified: expect.any(Date), //now, //TODO: fix this
-//           modifier: user1,
-//         },
-//         properties: {
-//           name: newsletterInput.name,
-//           dateRange: {
-//             start: new Date(newsletterInput.startDate),
-//             end: new Date(newsletterInput.endDate),
-//           },
-//         },
-//         owner: user1,
-//         members: expect.arrayContaining([user1]),
-//         items: [],
-//       });
-//     });
-//   });
-//   test('delete', async () => {
-//     const newsletterInput = {
-//       name: 'test newsletter 1',
-//     };
-//     const user1 = await createUser();
-//     const existingNewsletter = await createNewsletter(
-//       user1.id,
-//       newsletterInput.name
-//     );
+    const newsletterInput: CreateNewsletter = {
+      properties: {
+        name: 'test newsletter 1',
+        dateRange: {
+          start: new Date().toISOString(),
+          end: new Date().toISOString(),
+        },
+      },
+    };
+    const newsletterId = (await router.newsletters.post({
+      ctx: createContext({
+        req: {
+          user: {
+            userId: user.id,
+          },
+          isAuthenticated: () => true,
+        } as any,
+        res: {} as any,
+      }),
+      path: '',
+      rawInput: newsletterInput,
+      type: router.newsletters.post._type,
+    })) as number;
 
-//     await router.newsletters.delete({
-//       ctx: createContext({
-//         req: {
-//           user: {
-//             id: user1.id,
-//           },
-//         } as any,
-//         res: {} as any,
-//       }),
-//       path: '',
-//       rawInput: {
-//         id: existingNewsletter.id,
-//       },
-//       type: router.newsletters.delete._type,
-//     });
-//     const newsletter = getNewsletter(user1.id, existingNewsletter.id);
-//     expect(newsletter).rejects.toEqual(
-//       new Error(`newsletter with id: ${existingNewsletter.id} does not exist`)
-//     );
-//   });
-// });
+    const createdNewsletter = await getNewsletter(user.id, newsletterId);
+
+    expect(createdNewsletter).toEqual({
+      id: newsletterId,
+      meta: {
+        creator: user,
+        created: expect.any(String),
+      },
+      properties: newsletterInput.properties,
+      owner: user,
+      members: expect.arrayContaining([user]),
+      items: [],
+    });
+  });
+  describe('update', () => {
+    test('update name and date', async () => {
+      const entities = await createFixture('newsletter.yaml');
+      const user = _.get(entities, ['user', 0]) as SelectUser;
+      const existingNewsletter = _.get(entities, [
+        'newsletter',
+        0,
+      ]) as SelectNewsletter;
+
+      const newsletterInput: CreateNewsletter = {
+        properties: {
+          name: 'updated test newsletter 1',
+          dateRange: {
+            start: new Date().toISOString(),
+            end: new Date().toISOString(),
+          },
+        },
+      };
+
+      await router.newsletters.update({
+        ctx: createContext({
+          req: {
+            user: {
+              userId: user.id,
+            },
+            isAuthenticated: () => true,
+          } as any,
+          res: {} as any,
+        }),
+        path: '',
+        rawInput: { ...newsletterInput, id: existingNewsletter.id },
+        type: router.newsletters.update._type,
+      });
+
+      const newsletter = await getNewsletter(user.id, existingNewsletter.id);
+      console.log(JSON.stringify(newsletter, null, 4));
+      expect(newsletter).toEqual({
+        id: existingNewsletter.id,
+        meta: {
+          creator: user,
+          created: expect.any(String),
+          modified: expect.any(String),
+          modifier: user,
+        },
+        properties: newsletterInput.properties,
+        owner: user,
+        members: expect.arrayContaining([user]),
+        items: [],
+      });
+    });
+  });
+  test('delete', async () => {
+    const entities = await createFixture('newsletter.yaml');
+    const user = _.get(entities, ['user', 0]) as SelectUser;
+    const existingNewsletter = _.get(entities, [
+      'newsletter',
+      0,
+    ]) as SelectNewsletter;
+
+    await router.newsletters.delete({
+      ctx: createContext({
+        req: {
+          user: {
+            userId: user.id,
+          },
+          isAuthenticated: () => true,
+        } as any,
+        res: {} as any,
+      }),
+      path: '',
+      rawInput: {
+        id: existingNewsletter.id,
+      },
+      type: router.newsletters.delete._type,
+    });
+    const newsletter = getNewsletter(user.id, existingNewsletter.id);
+    expect(newsletter).rejects.toEqual(
+      new Error(`newsletter with id: ${existingNewsletter.id} does not exist`)
+    );
+  });
+});

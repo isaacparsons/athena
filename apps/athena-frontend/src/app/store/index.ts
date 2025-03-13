@@ -6,17 +6,17 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import type {} from '@redux-devtools/extension'; // required for devtools typing
 import { createUserSlice, UserSlice } from './user';
 import { createNewslettersSlice, NewslettersSlice } from './newsletters';
-import { NewsletterItemsSlice } from './newsletter-items';
-import { createNewsletterItemsSlice } from './newsletter-items';
+import { NewsletterPostsSlice } from './newsletter-items';
+import { createNewsletterPostsSlice } from './newsletter-items';
 import {
-  createNewsletterItemTemplatesSlice,
-  NewsletterItemTemplatesSlice,
+  createNewsletterPostTemplatesSlice,
+  NewsletterPostTemplatesSlice,
 } from './newsletter-item-templates';
 
 export type Slices = UserSlice &
   NewslettersSlice &
-  NewsletterItemsSlice &
-  NewsletterItemTemplatesSlice;
+  NewsletterPostsSlice &
+  NewsletterPostTemplatesSlice;
 
 export const useStore = create<Slices>()(
   devtools(
@@ -24,8 +24,8 @@ export const useStore = create<Slices>()(
       subscribeWithSelector((...a) => ({
         ...createUserSlice(...a),
         ...createNewslettersSlice(...a),
-        ...createNewsletterItemsSlice(...a),
-        ...createNewsletterItemTemplatesSlice(...a),
+        ...createNewsletterPostsSlice(...a),
+        ...createNewsletterPostTemplatesSlice(...a),
       }))
     )
   )

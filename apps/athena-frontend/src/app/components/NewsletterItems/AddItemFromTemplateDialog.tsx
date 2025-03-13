@@ -9,11 +9,10 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-import { mapToArray } from "@athena/common"
-import { convertFromTemplateItems, } from '../../../util';
+import { mapToArray } from '@athena/common';
+import { convertFromTemplateItems } from '../../../util';
 import { useAddItemsStore, useStore } from '@athena/store';
 import { CustomCard, CustomList, CustomListItem } from '@athena/components';
-
 
 interface AddItemFromTemplateDialogProps {
   parentId: string | null;
@@ -21,9 +20,7 @@ interface AddItemFromTemplateDialogProps {
   onClose: () => void;
 }
 
-export function AddItemFromTemplateDialog(
-  props: AddItemFromTemplateDialogProps
-) {
+export function AddItemFromTemplateDialog(props: AddItemFromTemplateDialogProps) {
   const { parentId, open, onClose } = props;
 
   const { loading, newsletterItemTemplates, fetchTemplate } = useStore(
@@ -34,16 +31,15 @@ export function AddItemFromTemplateDialog(
     }))
   );
 
-  const { addItems } = useAddItemsStore(
+  const { addItem, newsletterId } = useAddItemsStore(
     useShallow((state) => ({
       items: state.data,
-      addItems: state.addItems,
+      newsletterId: state.newsletterId,
+      addItem: state.addItem,
     }))
   );
 
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(
-    null
-  );
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
 
   const templates = useMemo(
     () => mapToArray(newsletterItemTemplates),
@@ -55,31 +51,48 @@ export function AddItemFromTemplateDialog(
   };
 
   const handleAddTemplate = async () => {
-    if (selectedTemplateId !== null) {
+    if (selectedTemplateId !== null && newsletterId) {
       const template = await fetchTemplate(selectedTemplateId);
-      const parentItem = template.items.find((i) => i.parentId === null);
-      const templateItems = template.items.map((i) => ({
-        ...i,
-        parentId: i.parentId === parentItem?.id ? null : i.parentId
-      })).filter((i) => i.data)
-      addItems(parentId, convertFromTemplateItems(templateItems))
-      onClose()
+      const parentItem = template.items.find((i) => i.position.parentId === null);
+      const templateItems = template.items
+        .map((i) => ({
+          ...i,
+          parentId:
+            i.position.parentId === parentItem?.id ? null : i.position.parentId,
+        }))
+        .filter((i) => i.data);
+      convertFromTemplateItems(newsletterId, templateItems).forEach((t) =>
+        addItem(parentId, t)
+      );
+      onClose();
     }
   };
 
   return (
-    <Dialog
-      fullWidth
-      open={open}
-      onClose={() => onClose()}
-    >
+    <Dialog fullWidth open={open} onClose={() => onClose()}>
       <DialogTitle>{'Create from template'}</DialogTitle>
       <DialogContent sx={{ width: '100%' }}>
         <CustomList>
           {templates.map((template) => (
             <CustomListItem id={template.id}>
-              <CustomCard onClick={() => handleTemplateSelected(template.id)} bgColor={selectedTemplateId === template.id ? 'primary.main' : 'secondary.light'}>
-                <Typography sx={{ color: selectedTemplateId === template.id ? 'secondary.light' : 'primary.main' }}>{template.name}</Typography>
+              <CustomCard
+                onClick={() => handleTemplateSelected(template.id)}
+                bgColor={
+                  selectedTemplateId === template.id
+                    ? 'primary.main'
+                    : 'secondary.light'
+                }
+              >
+                <Typography
+                  sx={{
+                    color:
+                      selectedTemplateId === template.id
+                        ? 'secondary.light'
+                        : 'primary.main',
+                  }}
+                >
+                  {template.name}
+                </Typography>
               </CustomCard>
             </CustomListItem>
           ))}
@@ -95,6 +108,6 @@ export function AddItemFromTemplateDialog(
           </Button>
         )}
       </DialogActions>
-    </Dialog >
+    </Dialog>
   );
 }

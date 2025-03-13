@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { container } from '../inversify.config';
-import { INewsletterDAO, INewsletterItemDAO } from '@athena/dao';
+import { INewsletterDAO, INewsletterPostDAO } from '@athena/dao';
 import {
   CountryTableClient,
   UserNewsletterTableClient,
@@ -8,62 +8,68 @@ import {
   UserTableClient,
   FederatedCredentialTableClient,
   LocationTableClient,
-  NewsletterItemTableClient,
-  NewsletterItemMediaTableClient,
-  NewsletterItemTextTableClient,
-  NewsletterItemTemplateTableClient,
-  NewsletterItemTemplateDataTableClient,
-  UserTemplateTableClient,
+  NewsletterPostTableClient,
+  NewsletterPostMediaTableClient,
+  NewsletterPostTextTableClient,
+  // NewsletterPostTemplateTableClient,
+  // NewsletterPostTemplateDataTableClient,
+  // UserTemplateTableClient,
   ITable,
   TABLE_NAMES,
   DBConnection,
-  NewsletterItemContainerTableClient,
+  NewsletterPostContainerTableClient,
 } from '@athena/db';
 import { TYPES } from '../types/types';
-import { nanoid } from 'nanoid';
-import {
-  CreateNewsletterItemBatchInputItem,
-  NewsletterItemTypeName,
-} from '@athena/common';
-
-const newsletterDAO = container.get<INewsletterDAO>(TYPES.INewsletterDAO);
-const newsletterItemsDAO = container.get<INewsletterItemDAO>(
-  TYPES.INewsletterItemDAO
-);
-const dbClient = container.get<DBConnection>(TYPES.DBClient);
+// import { nanoid } from 'nanoid';
+// import {
+//   NewsletterPostPostName,
+//   CreateNewsletterPostBatchItem,
+// } from '@athena/common';
 
 export class DBManagerClient {
-  tables: ITable[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tables: ITable<any, any>[];
+  client: DBConnection;
+  newsletterDAO: INewsletterDAO;
+  newsletterItemsDAO: INewsletterPostDAO;
   constructor() {
+    this.client = container.get<DBConnection>(TYPES.DBClient);
+    this.newsletterDAO = container.get<INewsletterDAO>(TYPES.INewsletterDAO);
+    this.newsletterItemsDAO = container.get<INewsletterPostDAO>(
+      TYPES.INewsletterPostDAO
+    );
     this.tables = [
-      new LocationTableClient(dbClient, TABLE_NAMES.LOCATION),
-      new CountryTableClient(dbClient, TABLE_NAMES.COUNTRY),
-      new UserTableClient(dbClient, TABLE_NAMES.USER),
+      new LocationTableClient(this.client, TABLE_NAMES.LOCATION),
+      new CountryTableClient(this.client, TABLE_NAMES.COUNTRY),
+      new UserTableClient(this.client, TABLE_NAMES.USER),
       new FederatedCredentialTableClient(
-        dbClient,
+        this.client,
         TABLE_NAMES.FEDEREATED_CREDENTIAL
       ),
-      new NewsletterTableClient(dbClient, TABLE_NAMES.NEWSLETTER),
-      new UserNewsletterTableClient(dbClient, TABLE_NAMES.USER_NEWSLETTER),
-      new NewsletterItemTableClient(dbClient, TABLE_NAMES.NEWSLETTER_ITEM),
-      new NewsletterItemMediaTableClient(
-        dbClient,
-        TABLE_NAMES.NEWSLETTER_ITEM_MEDIA
+      new NewsletterTableClient(this.client, TABLE_NAMES.NEWSLETTER),
+      new UserNewsletterTableClient(this.client, TABLE_NAMES.USER_NEWSLETTER),
+      new NewsletterPostTableClient(this.client, TABLE_NAMES.NEWSLETTER_POST),
+      new NewsletterPostMediaTableClient(
+        this.client,
+        TABLE_NAMES.NEWSLETTER_POST_MEDIA
       ),
-      new NewsletterItemTextTableClient(dbClient, TABLE_NAMES.NEWSLETTER_ITEM_TEXT),
-      new NewsletterItemContainerTableClient(
-        dbClient,
-        TABLE_NAMES.NEWSLETTER_ITEM_CONTAINER
+      new NewsletterPostTextTableClient(
+        this.client,
+        TABLE_NAMES.NEWSLETTER_POST_TEXT
       ),
-      new NewsletterItemTemplateTableClient(
-        dbClient,
-        TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE
+      new NewsletterPostContainerTableClient(
+        this.client,
+        TABLE_NAMES.NEWSLETTER_POST_CONTAINER
       ),
-      new NewsletterItemTemplateDataTableClient(
-        dbClient,
-        TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE_DATA
-      ),
-      new UserTemplateTableClient(dbClient, TABLE_NAMES.USER_TEMPLATE),
+      // new NewsletterPostTemplateTableClient(
+      //   this.client,
+      //   TABLE_NAMES.NEWSLETTER_POST_TEMPLATE
+      // ),
+      // new NewsletterPostTemplateDataTableClient(
+      //   this.client,
+      //   TABLE_NAMES.NEWSLETTER_POST_TEMPLATE_DATA
+      // ),
+      // new UserTemplateTableClient(this.client, TABLE_NAMES.USER_TEMPLATE),
     ];
   }
   async createTables() {
@@ -78,9 +84,16 @@ export class DBManagerClient {
     }
   }
 
+  async truncateTables(ignore?: string[]) {
+    for (let i = 0; i < this.tables.length; i++) {
+      if (!ignore || !ignore.includes(this.tables[i].name))
+        await this.tables[i].truncateTable();
+    }
+  }
+
   async seed() {
     console.log('seeding...');
-    const user = await dbClient
+    const user = await this.client
       .insertInto('user')
       .values({
         firstName: 'SUPER',
@@ -92,82 +105,78 @@ export class DBManagerClient {
 
     console.log('user created!');
     console.log(user);
-    const newsletterId = await newsletterDAO.post(user.id, {
-      name: 'Monthly Newsletter',
-      startDate: new Date(2024, 1, 1).toISOString(),
-      endDate: new Date(2024, 1, 30).toISOString(),
-    });
-    console.log('newsletter created!');
-    console.log(newsletterId);
+    // const newsletterId = await this.newsletterDAO.post(user.id, {
+    //   properties: {
+    //     name: 'Monthly Newsletter',
+    //     dateRange: {
+    //       start: new Date(2024, 1, 1).toISOString(),
+    //       end: new Date(2024, 1, 30).toISOString(),
+    //     },
+    //   },
+    // });
+    // console.log('newsletter created!');
+    // console.log(newsletterId);
 
-    const movieReviewId = nanoid();
-    const movieReviewRatingId = nanoid();
-    const movieReviewThoughtsId = nanoid();
+    // const movieReviewId = nanoid();
+    // const movieReviewRatingId = nanoid();
+    // const movieReviewThoughtsId = nanoid();
 
-    const movieReview: CreateNewsletterItemBatchInputItem = {
-      title: 'Movie Review',
-      newsletterId,
-      temp: {
-        id: movieReviewId,
-        parentId: null,
-        nextId: null,
-        prevId: null,
-      },
-      details: {
-        type: NewsletterItemTypeName.Container,
-        name: 'Movie Review',
-      },
-    };
+    // const movieReview: CreateNewsletterPostBatchItem<NewsletterPostPostName.Container> =
+    // {
+    //   title: 'Movie Review',
+    //   newsletterId,
+    //   temp: {
+    //     id: movieReviewId,
+    //     parentId: null,
+    //     nextId: null,
+    //     prevId: null,
+    //   },
+    //   details: {
+    //     type: NewsletterPostPostName.Container,
+    //     name: 'Movie Review',
+    //   },
+    // };
 
-    const movieReviewThoughts: CreateNewsletterItemBatchInputItem = {
-      title: 'Thoughts',
-      newsletterId,
-      temp: {
-        id: movieReviewThoughtsId,
-        parentId: movieReviewId,
-        nextId: movieReviewRatingId,
-        prevId: null,
-      },
-      details: {
-        type: NewsletterItemTypeName.Text,
-        name: 'It was pretty good',
-      },
-    };
-    const movieReviewRating: CreateNewsletterItemBatchInputItem = {
-      title: 'Rating',
-      newsletterId,
-      temp: {
-        id: movieReviewRatingId,
-        parentId: movieReviewId,
-        nextId: null,
-        prevId: movieReviewThoughtsId,
-      },
-      details: {
-        type: NewsletterItemTypeName.Text,
-        name: '7/10',
-      },
-    };
-    const inputBatch = {
-      newsletterId,
-      parentId: null,
-      nextItemId: null,
-      previousItemId: null,
-      batch: [movieReview, movieReviewThoughts, movieReviewRating],
-    };
+    // const movieReviewThoughts: CreateNewsletterPostBatchItem<NewsletterPostPostName.Text> =
+    // {
+    //   title: 'Thoughts',
+    //   newsletterId,
+    //   temp: {
+    //     id: movieReviewThoughtsId,
+    //     parentId: movieReviewId,
+    //     nextId: movieReviewRatingId,
+    //     prevId: null,
+    //   },
+    //   details: {
+    //     type: NewsletterPostPostName.Text,
+    //     name: 'It was pretty good',
+    //   },
+    // };
+    // const movieReviewRating: CreateNewsletterPostBatchItem<NewsletterPostPostName.Text> =
+    // {
+    //   title: 'Rating',
+    //   newsletterId,
+    //   temp: {
+    //     id: movieReviewRatingId,
+    //     parentId: movieReviewId,
+    //     nextId: null,
+    //     prevId: movieReviewThoughtsId,
+    //   },
+    //   details: {
+    //     type: NewsletterPostPostName.Text,
+    //     name: '7/10',
+    //   },
+    // };
+    // const inputBatch = {
+    //   newsletterId,
+    //   position: {
+    //     parentId: null,
+    //     nextId: null,
+    //     prevId: null,
+    //   },
+    //   batch: [movieReview, movieReviewThoughts, movieReviewRating],
+    // };
 
-    const ids = await newsletterItemsDAO.postBatch(user.id, inputBatch);
+    // const ids = await this.newsletterItemsDAO.postBatch(user.id, inputBatch);
   }
 }
-
-// Monthly newsletter
-// kitty of the month
-//  - photo
-//  - winner
-//  - summary of why they won
-
-// movie review
-//  - link to the movie
-//  - rating
-//  - thoughts
-
-//

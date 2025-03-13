@@ -1,5 +1,5 @@
-import { Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '@athena/db';
+import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
+import { DBConnection, Table, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '@athena/db';
 export interface UserTableColumns {
     id: UniqueId;
     firstName: string | null;
@@ -13,9 +13,9 @@ export interface UserTable {
 export type SelectUser = Selectable<UserTableColumns>;
 export type InsertUser = Insertable<UserTableColumns>;
 export type UpdateUser = Updateable<UserTableColumns>;
-export declare class UserTableClient extends Table implements ITable {
+export declare class UserTableClient extends Table<'user', 'id' | 'firstName' | 'lastName' | 'email'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'user', 'id' | 'firstName' | 'lastName' | 'email'>;
 }
 export interface UserNewsletterTableColumns {
     userId: ImmutableNumber;
@@ -28,9 +28,9 @@ export interface UserNewsletterTable {
 export type SelectUserNewsletter = Selectable<UserNewsletterTableColumns>;
 export type InsertUserNewsletter = Insertable<UserNewsletterTableColumns>;
 export type UpdateUserNewsletter = Updateable<UserNewsletterTableColumns>;
-export declare class UserNewsletterTableClient extends Table implements ITable {
+export declare class UserNewsletterTableClient extends Table<'user_newsletter', 'userId' | 'newsletterId'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'user_newsletter', 'userId' | 'newsletterId'>;
 }
 export interface UserTemplateTableColumns {
     userId: ImmutableNumber;
@@ -43,7 +43,7 @@ export interface UserTemplateTable {
 export type SelectUserTemplate = Selectable<UserTemplateTableColumns>;
 export type InsertUserTemplate = Insertable<UserTemplateTableColumns>;
 export type UpdateUserTemplate = Updateable<UserTemplateTableColumns>;
-export declare class UserTemplateTableClient extends Table implements ITable {
+export declare class UserTemplateTableClient extends Table<'user_template', 'userId' | 'newsletterItemTemplateId'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'user_template', 'userId' | 'newsletterItemTemplateId'>;
 }

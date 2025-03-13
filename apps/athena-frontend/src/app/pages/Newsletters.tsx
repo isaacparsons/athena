@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 import {
@@ -8,21 +8,17 @@ import {
   CustomContainer,
 } from '@athena/components';
 import { CircularProgress } from '@mui/material';
-import { mapToArray } from '@athena/common';
 
 export function Newsletters() {
   const { newsletters, loading } = useStore(
     useShallow((state) => ({
-      newsletters: state.newsletters.data,
-      loading: state.newsletters.loading,
+      newsletters: state.user.data?.newsletters ?? [],
+      loading: state.user.loading,
     }))
   );
   const [addNewsletterDialogOpen, setAddNewsletterDialogOpen] = useState(false);
   const handleOpenAddNewsletterDialog = () => setAddNewsletterDialogOpen(true);
-  const handleCloseAddNewsletterDialog = () =>
-    setAddNewsletterDialogOpen(false);
-
-  const newslettersArr = useMemo(() => mapToArray(newsletters), [newsletters]);
+  const handleCloseAddNewsletterDialog = () => setAddNewsletterDialogOpen(false);
 
   return (
     <CustomContainer>
@@ -34,7 +30,7 @@ export function Newsletters() {
             open={addNewsletterDialogOpen}
             onClose={handleCloseAddNewsletterDialog}
           />
-          <UserNewsletters newsletters={newslettersArr} />
+          <UserNewsletters newsletters={newsletters} />
           <CustomFab onClick={handleOpenAddNewsletterDialog} />
         </>
       )}

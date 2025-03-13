@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { DateRange, MediaFormat } from './athena-common';
 
 export const logObject = (item: any, label?: string) => {
@@ -35,3 +36,5 @@ export function mimeTypeToMediaFormat(mimeType: string): MediaFormat {
 
   throw new Error('Unsupported mime type');
 }
+
+export const nullToUndefined = (v: any) => (_.isNull(v) ? undefined : v);

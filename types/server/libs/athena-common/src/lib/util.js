@@ -1,11 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logObject = void 0;
+exports.nullToUndefined = exports.logObject = void 0;
 exports.range = range;
 exports.mapToArray = mapToArray;
 exports.formatDate = formatDate;
 exports.formatDateRange = formatDateRange;
 exports.mimeTypeToMediaFormat = mimeTypeToMediaFormat;
+const tslib_1 = require("tslib");
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
 const athena_common_1 = require("./athena-common");
 const logObject = (item, label) => {
     if (label) {
@@ -42,4 +44,6 @@ function mimeTypeToMediaFormat(mimeType) {
         return athena_common_1.MediaFormat.Audio;
     throw new Error('Unsupported mime type');
 }
+const nullToUndefined = (v) => (lodash_1.default.isNull(v) ? undefined : v);
+exports.nullToUndefined = nullToUndefined;
 //# sourceMappingURL=util.js.map

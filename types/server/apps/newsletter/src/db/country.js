@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CountryTableClient = exports.CountryTable = void 0;
-const tslib_1 = require("tslib");
 const db_1 = require("@athena/db");
 exports.CountryTable = {
     tableName: db_1.TABLE_NAMES.COUNTRY,
@@ -15,20 +14,12 @@ exports.CountryTable = {
 class CountryTableClient extends db_1.Table {
     constructor(db, name) {
         super(db, name);
-    }
-    createTable() {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            this.db.schema
-                .createTable(this.name)
-                .ifNotExists()
-                .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
-                .addColumn('code', 'varchar', (col) => col.notNull())
-                .addColumn('name', 'varchar', (col) => col.notNull())
-                .addColumn('longitude', 'double precision', (col) => col.notNull())
-                .addColumn('latitude', 'double precision', (col) => col.notNull())
-                .execute();
-            return;
-        });
+        this.tableBuilder = this.tableBuilder
+            .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
+            .addColumn('code', 'varchar', (col) => col.notNull())
+            .addColumn('name', 'varchar', (col) => col.notNull())
+            .addColumn('longitude', 'double precision', (col) => col.notNull())
+            .addColumn('latitude', 'double precision', (col) => col.notNull());
     }
 }
 exports.CountryTableClient = CountryTableClient;

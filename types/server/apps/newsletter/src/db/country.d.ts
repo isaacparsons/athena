@@ -1,5 +1,5 @@
-import { Insertable, Selectable } from 'kysely';
-import { DBConnection, Table, ITable, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '@athena/db';
+import { CreateTableBuilder, Insertable, Selectable } from 'kysely';
+import { DBConnection, Table, UniqueId, ImmutableString, ImmutableNumber, TABLE_NAMES } from '@athena/db';
 export interface CountryTableColumns {
     id: UniqueId;
     code: ImmutableString;
@@ -18,7 +18,7 @@ export declare const CountryTable: {
 };
 export type SelectCountry = Selectable<CountryTableColumns>;
 export type InsertCountry = Insertable<CountryTableColumns>;
-export declare class CountryTableClient extends Table implements ITable {
+export declare class CountryTableClient extends Table<'location', 'id' | 'code' | 'name' | 'longitude' | 'latitude'> {
     constructor(db: DBConnection, name: string);
-    createTable(): Promise<void>;
+    tableBuilder: CreateTableBuilder<'location', 'id' | 'code' | 'name' | 'longitude' | 'latitude'>;
 }

@@ -5,3 +5,4 @@ export declare function mapToArray<T = object>(obj: Record<string, T>): T[];
 export declare function formatDate(date: string): string;
 export declare function formatDateRange(dateRange: DateRange): string | null;
 export declare function mimeTypeToMediaFormat(mimeType: string): MediaFormat;
+export declare const nullToUndefined: (v: any) => any;

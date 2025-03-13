@@ -1,29 +1,26 @@
 import {
-  NewsletterItemTemplateBase,
-  CreateNewsletterItemTemplateInput,
-  NewsletterItemTemplate,
+  CreateNewsletterPostTemplate,
+  NewsletterPostTemplate,
 } from '@athena/common';
 import { Slices } from '@athena/store';
 import { StateCreator } from 'zustand';
 import { asyncTrpcClient } from '../../trpc';
 
-type StoreNewsletterItemTemplatesData = Record<number, NewsletterItemTemplateBase>;
-
-export interface NewsletterItemTemplatesSlice {
+export interface NewsletterPostTemplatesSlice {
   newsletterItemTemplates: {
     loading: boolean;
-    data: StoreNewsletterItemTemplatesData;
-    fetch: (id: number) => Promise<NewsletterItemTemplate>;
-    save: (input: CreateNewsletterItemTemplateInput) => Promise<number>;
-    addTemplates: (templates: Omit<NewsletterItemTemplateBase, 'items'>[]) => void;
+    data: Record<number, NewsletterPostTemplate>;
+    fetch: (id: number) => Promise<NewsletterPostTemplate>;
+    save: (input: CreateNewsletterPostTemplate) => Promise<number>;
+    // addTemplates: (templates: Omit<NewsletterPostTemplateBase, 'items'>[]) => void;
   };
 }
 
-export const createNewsletterItemTemplatesSlice: StateCreator<
+export const createNewsletterPostTemplatesSlice: StateCreator<
   Slices,
   [['zustand/devtools', never], ['zustand/immer', never]],
   [],
-  NewsletterItemTemplatesSlice
+  NewsletterPostTemplatesSlice
 > = (set, get) => ({
   newsletterItemTemplates: {
     loading: false,
@@ -38,15 +35,11 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
       });
       set((state) => {
         state.newsletterItemTemplates.loading = false;
-        const { templates, ...rest } = template;
-        state.newsletterItemTemplates.data[template.id] = rest;
-        templates.forEach((t) => {
-          state.newsletterItemTemplates.data[t.id] = t;
-        });
+        state.newsletterItemTemplates.data[id] = template;
       });
       return template;
     },
-    save: async (input: CreateNewsletterItemTemplateInput) => {
+    save: async (input: CreateNewsletterPostTemplate) => {
       set((state) => {
         state.newsletterItemTemplates.loading = true;
       });
@@ -57,15 +50,12 @@ export const createNewsletterItemTemplatesSlice: StateCreator<
       get().newsletterItemTemplates.fetch(id);
       return id;
     },
-    addTemplates: (templates: Omit<NewsletterItemTemplateBase, 'items'>[]) => {
-      set((state) => {
-        templates.forEach((t) => {
-          state.newsletterItemTemplates.data[t.id] = {
-            ...t,
-            items: [],
-          };
-        });
-      });
-    },
+    // addTemplates: (templates: NewsletterPostTemplateBase[]) => {
+    //   set((state) => {
+    //     templates.forEach((t) => {
+    //       state.newsletterItemTemplates.templates[t.id] = t;
+    //     });
+    //   });
+    // },
   },
 });

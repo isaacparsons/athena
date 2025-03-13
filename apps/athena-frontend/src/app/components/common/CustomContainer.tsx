@@ -12,7 +12,7 @@ export function CustomContainer({ children }: CustomContainerProps) {
       sx={{
         minHeight: '100vh',
         padding: 2,
-        bgcolor: 'secondary.light'
+        bgcolor: 'secondary.light',
       }}
       maxWidth="md"
     >

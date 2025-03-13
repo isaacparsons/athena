@@ -9,5 +9,5 @@
     "types": ["reflect-metadata"]
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.ts", "src/types/*.d.ts"]
+  "include": ["src/**/*.ts", "./src/types/express.d.ts"]
 }

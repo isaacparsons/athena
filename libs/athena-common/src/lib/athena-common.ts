@@ -1,16 +1,6 @@
 import { z } from 'zod';
-/**
- * Input validation
- */
 
-export const locationInput = z
-  .object({
-    name: z.string().optional(),
-    countryCode: z.string().optional(),
-    latitude: z.coerce.number().optional(),
-    longitude: z.coerce.number().optional(),
-  })
-  .optional();
+export type Nullable<T> = T | null;
 
 export enum MediaFormat {
   Image = 'image',
@@ -18,323 +8,400 @@ export enum MediaFormat {
   Audio = 'audio',
 }
 
-export enum NewsletterItemTypeName {
+export enum NewsletterPostTypeName {
   Media = 'media',
   Text = 'text',
   Container = 'container',
 }
 
-const mediaFormat = z.nativeEnum(MediaFormat);
-
-export const mediaItemDetails = z.object({
-  type: z.literal(NewsletterItemTypeName.Media),
-  name: z.string(),
-  fileName: z.string(),
-  format: mediaFormat,
-  caption: z.string().optional().nullable(),
-});
-
-export const textItemDetails = z.object({
-  type: z.literal(NewsletterItemTypeName.Text),
-  name: z.string(),
-  description: z.string().optional().nullable(),
-  link: z.string().optional().nullable(),
-});
-
-export const containerItemDetails = z.object({
-  type: z.literal(NewsletterItemTypeName.Container),
-  name: z.string(),
-});
-
-export const newsletterItemDetails = z.discriminatedUnion('type', [
-  mediaItemDetails,
-  textItemDetails,
-  containerItemDetails,
-]);
-
-export const getNewsletterItemInput = z.object({
-  newsletterItemId: z.coerce.number(),
-});
-
-export const getNewsletterItemTreeInput = z.object({
-  parentId: z.coerce.number().nullable(),
-});
-
-export const postNewsletterItemInputBase = z.object({
-  newsletterId: z.coerce.number(),
-  parentId: z.coerce.number().nullable(),
-  nextItemId: z.coerce.number().nullable(),
-  previousItemId: z.coerce.number().nullable(),
-  title: z.string(),
-  date: z.string().optional(),
-  location: locationInput,
-});
-
-export const postNewsletterItemInput = postNewsletterItemInputBase.merge(
-  z.object({
-    details: newsletterItemDetails,
-  })
-);
-
-export const tempNewsletterItemIds = z.object({
-  id: z.string(),
-  parentId: z.string().nullable(),
-  nextId: z.string().nullable(),
-  prevId: z.string().nullable(),
-});
-
-export const postNewsletterItemBatchInputItem = postNewsletterItemInput
-  .omit({
-    nextItemId: true,
-    previousItemId: true,
-    parentId: true,
-  })
-  .merge(z.object({ temp: tempNewsletterItemIds }));
-
-export const postNewsletterItemBatchInput = z.object({
-  newsletterId: z.coerce.number(),
-  parentId: z.coerce.number().nullable(),
-  nextItemId: z.coerce.number().nullable(),
-  previousItemId: z.coerce.number().nullable(),
-  batch: z.array(postNewsletterItemBatchInputItem),
-});
-
-// TODO: we can remove below, it should be derived from newsletter item input
-export const updateNewsletterItemInput = z
-  .object({
-    newsletterItemId: z.coerce.number(),
-    title: z.string().optional(),
-    date: z.string().optional().nullable(),
-    // parentId: z.coerce.number().optional(),
-    nextItemId: z.coerce.number().optional(),
-    location: locationInput,
-    details: newsletterItemDetails,
-  })
-  .refine((obj) => obj.date || obj.nextItemId || obj.title || obj.location);
-
-export const getNewsletterInput = z.object({
-  newsletterId: z.coerce.number(),
-});
-
-export const postNewsletterInput = z.object({
-  name: z
-    .string()
-    .min(1, { message: 'Name must be at least 1 characters long' })
-    .max(100, { message: 'Name must be at less than 100 characters long' }),
-  startDate: z.string().min(8).optional(),
-  endDate: z.string().min(8).optional(),
-});
-
-export const updateNewsletterInput = z.object({
+export const getInput = z.object({
   id: z.coerce.number(),
-  name: z.string().optional(),
-  startDate: z.string().optional().nullable(),
-  endDate: z.string().optional().nullable(),
 });
+export type GetInput = z.infer<typeof getInput>;
 
-export const deleteNewsletterInput = z.object({ id: z.coerce.number() });
-
-export const deleteManyNewsletterItemsInput = z.object({
-  newsletterItemIds: z.array(z.coerce.number()),
+export const deleteInput = z.object({
+  id: z.coerce.number(),
 });
+export type DeleteInput = z.infer<typeof deleteInput>;
 
-export const getItemUploadLinksInput = z.object({
-  items: z.array(z.object({ id: z.string() })),
+export const deleteBatchInput = z.object({
+  ids: z.array(z.coerce.number()),
 });
-
-const newsletterItemTemplateDataDetails = z
-  .discriminatedUnion('type', [
-    mediaItemDetails
-      .pick({ type: true, format: true })
-      .merge(mediaItemDetails.omit({ type: true, format: true }).partial()),
-    textItemDetails
-      .pick({ type: true })
-      .merge(textItemDetails.omit({ type: true }).partial()),
-    containerItemDetails
-      .pick({ type: true })
-      .merge(containerItemDetails.omit({ type: true }).partial()),
-  ])
-  .optional();
-export const postNewsletterItemTemplateInput = z.object({
-  name: z.string(),
-  data: z.array(
-    z.object({
-      templateId: z.number().optional(),
-      temp: tempNewsletterItemIds,
-      data: newsletterItemTemplateDataDetails,
-    })
-  ),
-});
-export const getNewsletterItemTemplateInput = z.object({
-  id: z.number(),
-});
-export const deleteNewsletterItemTemplateInput = z.object({
-  id: z.number(),
-});
-
-/**
- * Base Types
- */
-
-type NullableString = string | null;
+export type DeleteBatchInput = z.infer<typeof deleteBatchInput>;
 
 /**
  * User
  */
-export interface UserSession {
-  email: string;
-  userId: number;
-  accessToken: string;
-  refreshToken: string;
-}
 
-export interface UserBase {
-  id: number;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-}
+export const userBase = z.object({
+  id: z.coerce.number(),
+  email: z.string(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+});
 
-export type UserNewsletters = NewsletterBase[];
-export type UserNewsletterItemTemplates = Omit<
-  NewsletterItemTemplateBase,
-  'items'
->[];
-
-export interface User extends UserBase {
-  newsletters: UserNewsletters;
-  newsletterItemTemplates: UserNewsletterItemTemplates;
-}
+export type UserBase = z.infer<typeof userBase>;
 
 /**
- * Common
+ * Meta data
  */
-export type Position = {
-  latitude: number;
-  longitude: number;
-};
 
-interface MetaBase {
-  creator: UserBase;
-  modifier: UserBase | null;
-  created: string;
-  modified: string | null;
-}
+export const meta = z.object({
+  creator: userBase,
+  modifier: userBase.optional(),
+  created: z.string(),
+  modified: z.string().optional(),
+});
 
-interface Meta {
-  meta: MetaBase;
-}
+export type Meta = z.infer<typeof meta>;
 
-export interface DateRange {
-  start: NullableString;
-  end: NullableString;
-}
+export const positionInput = z.object({
+  latitude: z.coerce.number(),
+  longitude: z.coerce.number(),
+});
 
 /**
  * Country
  */
-export interface Country {
-  name: string;
-  position: Position;
-}
+
+export const country = z.object({
+  name: z.string(),
+  position: positionInput,
+});
+
+export type Position = z.infer<typeof positionInput>;
+
+/**
+ * Date
+ */
+
+export const dateInput = z.string().min(8);
+
+export const dateRangeInput = z.object({
+  start: dateInput.optional(),
+  end: dateInput.optional(),
+});
+
+export type DateRange = z.infer<typeof dateRangeInput>;
 
 /**
  * Location
  */
-export interface Location {
-  id: number;
-  country: string | null;
-  name: string | null;
-  position: Position | null;
-}
+
+export const locationInput = z.object({
+  id: z.coerce.number(),
+  name: z.string().optional(),
+  country: z.string().optional(),
+  position: z
+    .object({
+      latitude: z.coerce.number(),
+      longitude: z.coerce.number(),
+    })
+    .optional(),
+});
+
 export type LocationInput = z.infer<typeof locationInput>;
-export type TempNewsletterItemIds = z.infer<typeof tempNewsletterItemIds>;
+export type Location = LocationInput;
 
-/**
- * Newsletter
- */
+export const createLocation = locationInput.omit({ id: true });
 
-export interface NewsletterProperties {
-  name: string;
-  dateRange: DateRange | null;
-}
+export type CreateLocation = z.infer<typeof createLocation>;
 
-export interface NewsletterBase extends Meta {
-  id: number;
-  properties: NewsletterProperties;
-  owner: UserBase;
-}
+export const updateLocation = locationInput;
 
-export interface Newsletter extends NewsletterBase {
-  members: UserBase[];
-  items: NewsletterItemBase[];
-}
-
-export type CreateNewsletterInput = z.infer<typeof postNewsletterInput>;
-export type ReadNewsletterInput = z.infer<typeof getNewsletterInput>;
-export type UpdateNewsletterInput = z.infer<typeof updateNewsletterInput>;
-export type DeleteNewsletterInput = z.infer<typeof deleteNewsletterInput>;
+export type UpdateLocation = z.infer<typeof updateLocation>;
 
 /**
  * Newsletter Item
  */
 
-type CreateItemDetailsInputMedia = z.infer<typeof mediaItemDetails>;
-type CreateItemDetailsInputText = z.infer<typeof textItemDetails>;
-type CreateItemDetailsInputContainer = z.infer<typeof containerItemDetails>;
+// details
+const mediaFormat = z.nativeEnum(MediaFormat);
 
-export type CreateItemDetailsInputMap = {
-  media: CreateItemDetailsInputMedia;
-  text: CreateItemDetailsInputText;
-  container: CreateItemDetailsInputContainer;
+export const postDetailType = z.union([
+  z.literal(NewsletterPostTypeName.Media),
+  z.literal(NewsletterPostTypeName.Text),
+  z.literal(NewsletterPostTypeName.Container),
+]);
+
+export const basePostDetails = z.object({
+  id: z.coerce.number(),
+  newsletterPostId: z.coerce.number(),
+  name: z.string(),
+});
+
+export type BaseItemDetails = z.infer<typeof basePostDetails>;
+
+export const mediaPostDetails = z
+  .object({
+    type: z.literal(NewsletterPostTypeName.Media),
+    fileName: z.string(),
+    format: mediaFormat,
+    caption: z.string().optional().nullable(),
+  })
+  .merge(basePostDetails);
+
+export type MediaPostDetails = z.infer<typeof mediaPostDetails>;
+
+export const textPostDetails = z
+  .object({
+    type: z.literal(NewsletterPostTypeName.Text),
+    description: z.string().optional().nullable(),
+    link: z.string().optional().nullable(),
+  })
+  .merge(basePostDetails);
+
+export type TextPostDetails = z.infer<typeof textPostDetails>;
+
+export const containerPostDetails = z
+  .object({
+    type: z.literal(NewsletterPostTypeName.Container),
+  })
+  .merge(basePostDetails);
+
+export type ContainerPostDetails = z.infer<typeof containerPostDetails>;
+
+export const newsletterPostDetails = z.discriminatedUnion('type', [
+  mediaPostDetails,
+  textPostDetails,
+  containerPostDetails,
+]);
+
+export type NewsletterPostDetails<
+  T extends NewsletterPostTypeName | undefined = undefined
+> = T extends NewsletterPostTypeName.Text
+  ? TextPostDetails
+  : T extends NewsletterPostTypeName.Media
+  ? MediaPostDetails
+  : T extends NewsletterPostTypeName.Container
+  ? ContainerPostDetails
+  : z.infer<typeof newsletterPostDetails>;
+
+export const createNewsletterPostDetailsMedia = mediaPostDetails.omit({
+  id: true,
+  newsletterPostId: true,
+});
+export const createNewsletterPostDetailsText = textPostDetails.omit({
+  id: true,
+  newsletterPostId: true,
+});
+export const createNewsletterPostDetailsContainer = containerPostDetails.omit({
+  id: true,
+  newsletterPostId: true,
+});
+
+export type CreateNewsletterPostDetailsMedia = z.infer<
+  typeof createNewsletterPostDetailsMedia
+>;
+export type CreateNewsletterPostDetailsText = z.infer<
+  typeof createNewsletterPostDetailsText
+>;
+export type CreateNewsletterPostDetailsContainer = z.infer<
+  typeof createNewsletterPostDetailsContainer
+>;
+
+export const createNewsletterPostDetails = z.discriminatedUnion('type', [
+  createNewsletterPostDetailsMedia,
+  createNewsletterPostDetailsText,
+  createNewsletterPostDetailsContainer,
+]);
+
+export type CreateNewsletterPostDetails<
+  T extends NewsletterPostTypeName | undefined = undefined
+> = T extends NewsletterPostTypeName.Text
+  ? CreateNewsletterPostDetailsText
+  : T extends NewsletterPostTypeName.Media
+  ? CreateNewsletterPostDetailsMedia
+  : T extends NewsletterPostTypeName.Container
+  ? CreateNewsletterPostDetailsContainer
+  : z.infer<typeof createNewsletterPostDetails>;
+
+export const updateNewsletterPostDetailsMedia = mediaPostDetails
+  .pick({ type: true })
+  .merge(mediaPostDetails.omit({ type: true }).partial())
+  .merge(basePostDetails.omit({ id: true }).partial())
+  .merge(basePostDetails.pick({ id: true }));
+
+export const updateNewsletterPostDetailsText = textPostDetails
+  .pick({ type: true })
+  .merge(textPostDetails.omit({ type: true }).partial())
+  .merge(basePostDetails.omit({ id: true }).partial())
+  .merge(basePostDetails.pick({ id: true }));
+
+export const updateNewsletterPostDetailsContainer = containerPostDetails
+  .pick({ type: true })
+  .merge(containerPostDetails.omit({ type: true }).partial())
+  .merge(basePostDetails.omit({ id: true }).partial())
+  .merge(basePostDetails.pick({ id: true }));
+
+export type UpdateNewsletterPostDetailsMedia = z.infer<
+  typeof updateNewsletterPostDetailsMedia
+>;
+export type UpdateNewsletterPostDetailsText = z.infer<
+  typeof updateNewsletterPostDetailsText
+>;
+export type UpdateNewsletterPostDetailsContainer = z.infer<
+  typeof updateNewsletterPostDetailsContainer
+>;
+
+export const updateNewsletterPostDetails = z.discriminatedUnion('type', [
+  updateNewsletterPostDetailsMedia,
+  updateNewsletterPostDetailsText,
+  updateNewsletterPostDetailsContainer,
+]);
+
+export type UpdateNewsletterPostDetails<
+  T extends NewsletterPostTypeName | undefined = undefined
+> = T extends NewsletterPostTypeName.Text
+  ? UpdateNewsletterPostDetailsText
+  : T extends NewsletterPostTypeName.Media
+  ? UpdateNewsletterPostDetailsMedia
+  : T extends NewsletterPostTypeName.Container
+  ? UpdateNewsletterPostDetailsContainer
+  : z.infer<typeof updateNewsletterPostDetails>;
+
+export const nodePosition = z.object({
+  parentId: z.coerce.number().nullable(),
+  nextId: z.coerce.number().nullable(),
+  prevId: z.coerce.number().nullable(),
+});
+
+export type NodePosition = z.infer<typeof nodePosition>;
+
+export const newsletterPostBase = z.object({
+  id: z.coerce.number(),
+  newsletterId: z.coerce.number(),
+  position: nodePosition,
+  title: z.string(),
+  date: z.string().nullable().optional(),
+  location: locationInput.optional(),
+  details: newsletterPostDetails,
+});
+
+export type NewsletterPostBase = z.infer<typeof newsletterPostBase>;
+
+export const newsletterPost = newsletterPostBase.merge(
+  z.object({
+    children: z.array(newsletterPostBase),
+    meta: meta,
+  })
+);
+
+export type NewsletterPost<
+  T extends NewsletterPostTypeName | undefined = undefined
+> = z.infer<typeof newsletterPost> & {
+  details: NewsletterPostDetails<T>;
 };
-export type CreateNewsletterItemDetailsTypeFromName<
-  T extends NewsletterItemTypeName
-> = CreateItemDetailsInputMap[T];
 
-export type CreateItemDetailsInput<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> = CreateNewsletterItemDetailsTypeFromName<T>;
-
-export function isMediaDetailsInput(
-  details: CreateItemDetailsInput | undefined
-): details is CreateItemDetailsInputMedia {
+export const isMediaPost = (
+  item: NewsletterPostBase
+): item is NewsletterPost<NewsletterPostTypeName.Media> => {
   return (
-    (details as CreateItemDetailsInputMedia)?.type === NewsletterItemTypeName.Media
+    (item as NewsletterPost<NewsletterPostTypeName.Media>).details.type ===
+    NewsletterPostTypeName.Media
   );
-}
+};
 
-export function isTextDetailsInput(
-  details: CreateItemDetailsInput | undefined
-): details is CreateItemDetailsInputText {
+export const isTextPost = (
+  item: NewsletterPostBase
+): item is NewsletterPost<NewsletterPostTypeName.Text> => {
   return (
-    (details as CreateItemDetailsInputText)?.type === NewsletterItemTypeName.Text
+    (item as NewsletterPost<NewsletterPostTypeName.Text>).details.type ===
+    NewsletterPostTypeName.Text
   );
-}
+};
 
-export function isContainerDetailsInput(
-  details: CreateItemDetailsInput | undefined
-): details is CreateItemDetailsInputContainer {
+export const isContainerItem = (
+  item: NewsletterPostBase
+): item is NewsletterPost<NewsletterPostTypeName.Container> => {
   return (
-    (details as CreateItemDetailsInputContainer)?.type ===
-    NewsletterItemTypeName.Container
+    (item as NewsletterPost<NewsletterPostTypeName.Container>).details.type ===
+    NewsletterPostTypeName.Container
   );
-}
+};
 
-export type CreateNewsletterItemInput = z.infer<typeof postNewsletterItemInput>;
-export type CreateNewsletterItemBatchInputItem = z.infer<
-  typeof postNewsletterItemBatchInputItem
->;
-export type CreateNewsletterItemBatchInput = z.infer<
-  typeof postNewsletterItemBatchInput
->;
-export type ReadNewsletterItemInput = z.infer<typeof getNewsletterItemInput>;
-export type ReadNewsletterItemTreeInput = z.infer<typeof getNewsletterItemTreeInput>;
-export type UpdateNewsletterItemInput = z.infer<typeof updateNewsletterItemInput>;
-export type DeleteManyNewsletterItemsInput = z.infer<
-  typeof deleteManyNewsletterItemsInput
->;
-export type CreateNewsletterItemDetailsInput = z.infer<typeof newsletterItemDetails>;
+export const createNewsletterPost = newsletterPost
+  .omit({
+    id: true,
+    children: true,
+    details: true,
+    location: true,
+    meta: true,
+  })
+  .merge(
+    z.object({
+      details: createNewsletterPostDetails,
+      location: createLocation.optional(),
+    })
+  );
+
+export type CreateNewsletterPost<
+  T extends NewsletterPostTypeName | undefined = undefined
+> = T extends NewsletterPostTypeName
+  ? Omit<z.infer<typeof createNewsletterPost>, 'details'> & {
+      details: CreateNewsletterPostDetails<T>;
+    }
+  : z.infer<typeof createNewsletterPost>;
+
+export const updateNewsletterPost = newsletterPost
+  .pick({ id: true, newsletterId: true })
+  .merge(
+    newsletterPost
+      .omit({
+        id: true,
+        newsletterId: true,
+        details: true,
+        position: true,
+        children: true,
+      })
+      .partial()
+  )
+  .merge(z.object({ details: updateNewsletterPostDetails.optional() }))
+  .merge(
+    z.object({
+      childPositions: z
+        .array(nodePosition.merge(z.object({ id: z.coerce.number() })))
+        .optional(),
+    })
+  );
+
+export type UpdateNewsletterPost = z.infer<typeof updateNewsletterPost>;
+
+export const tempNewsletterPostIds = z.object({
+  id: z.string(),
+  parentId: z.coerce.string().nullable(),
+  nextId: z.coerce.string().nullable(),
+  prevId: z.coerce.string().nullable(),
+});
+
+export type TempNewsletterPostIds = z.infer<typeof tempNewsletterPostIds>;
+
+export const createNewsletterPostsBatchItem = createNewsletterPost
+  .omit({ position: true })
+  .merge(z.object({ temp: tempNewsletterPostIds }));
+
+export type CreateNewsletterPostBatchItem<
+  T extends NewsletterPostTypeName | undefined = undefined
+> = T extends NewsletterPostTypeName
+  ? Omit<z.infer<typeof createNewsletterPostsBatchItem>, 'details'> & {
+      details: CreateNewsletterPostDetails<T>;
+    }
+  : z.infer<typeof createNewsletterPostsBatchItem>;
+
+export const createNewsletterPostsBatch = z.object({
+  newsletterId: z.coerce.number(),
+  position: nodePosition,
+  batch: z.array(createNewsletterPostsBatchItem),
+});
+
+export type CreateNewsletterPostsBatch = z.infer<typeof createNewsletterPostsBatch>;
+
+export const getItemUploadLinks = z.object({
+  items: z.array(z.object({ id: z.string() })),
+});
+
+export type GetItemUploadLinks = z.infer<typeof getItemUploadLinks>;
+
 export type GetItemUploadLinksResponse = ItemUploadLink[];
 
 export type ItemUploadLink = {
@@ -343,149 +410,152 @@ export type ItemUploadLink = {
   fileName: string;
 };
 
-export type NewsletterItemDetailsBase = {
-  id: number;
-  name: string;
-};
+/**
+ * Newsletter
+ */
 
-export type NewsletterItemDetailsMedia = NewsletterItemDetailsBase & {
-  type: NewsletterItemTypeName.Media;
-  fileName: string;
-  format: MediaFormat;
-  caption: string | null;
-};
+export const newsletterProperties = z.object({
+  name: z
+    .string()
+    .min(1, { message: 'Name must be at least 1 characters long' })
+    .max(100, { message: 'Name must be at less than 100 characters long' }),
+  dateRange: dateRangeInput,
+});
 
-export type NewsletterItemDetailsText = NewsletterItemDetailsBase & {
-  type: NewsletterItemTypeName.Text;
-  description: string | null;
-  link: string | null;
-};
+export type NewsletterProperties = z.infer<typeof newsletterProperties>;
 
-export type NewsletterItemDetailsContainer = NewsletterItemDetailsBase & {
-  type: NewsletterItemTypeName.Container;
-};
-
-export type NewsletterItemDetailsMap = {
-  [NewsletterItemTypeName.Media]: NewsletterItemDetailsMedia;
-  [NewsletterItemTypeName.Text]: NewsletterItemDetailsText;
-  [NewsletterItemTypeName.Container]: NewsletterItemDetailsContainer;
-};
-
-type NewsletterItemDetails<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> = NewsletterItemDetailsTypeFromName<T>;
-
-export type NewsletterItemDetailsTypeFromName<T extends NewsletterItemTypeName> =
-  NewsletterItemDetailsMap[T];
-
-export function isMediaDetails(
-  details: NewsletterItemDetails
-): details is NewsletterItemDetailsMedia {
-  return (
-    (details as NewsletterItemDetailsMedia).type === NewsletterItemTypeName.Media
+export const newsletterBase = z
+  .object({
+    id: z.coerce.number(),
+  })
+  .merge(
+    z.object({
+      properties: newsletterProperties,
+      owner: userBase,
+      meta: meta,
+    })
   );
-}
 
-export function isTextDetails(
-  details: NewsletterItemDetails
-): details is NewsletterItemDetailsText {
-  return (details as NewsletterItemDetailsText).type === NewsletterItemTypeName.Text;
-}
+export type NewsletterBase = z.infer<typeof newsletterBase>;
 
-export function isContainerDetails(
-  details: NewsletterItemDetails
-): details is NewsletterItemDetailsContainer {
-  return (
-    (details as NewsletterItemDetailsContainer).type ===
-    NewsletterItemTypeName.Container
-  );
-}
+export const newsletter = newsletterBase.merge(
+  z.object({
+    members: z.array(userBase),
+    items: z.array(newsletterPostBase),
+  })
+);
 
-export interface NewsletterItemBase<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> extends Meta {
-  newsletterId: number;
-  id: number;
-  location: Location | null;
-  date: string | null;
-  title: string;
-  parentId: number | null;
-  nextItemId: number | null;
-  previousItemId: number | null;
-  details: NewsletterItemDetailsTypeFromName<T>;
-}
+export type Newsletter = z.infer<typeof newsletter>;
 
-export interface NewsletterItem<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> extends NewsletterItemBase<T> {
-  children: NewsletterItemBase<T>[];
-}
+export const createNewsletter = newsletter.omit({
+  id: true,
+  owner: true,
+  meta: true,
+  members: true,
+  items: true,
+});
+
+export type CreateNewsletter = z.infer<typeof createNewsletter>;
+
+export const updateNewsletter = newsletter.pick({ id: true }).merge(
+  z.object({
+    properties: newsletterProperties.partial(),
+  })
+);
+
+export type UpdateNewsletter = z.infer<typeof updateNewsletter>;
 
 /**
  * Newsletter item template
  */
 
-export interface NewsletterItemTemplateBase<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> extends Meta {
-  id: number;
-  name: string;
-  items: NewsletterItemTemplateData<T>[];
-}
-
-export type NewsletterItemTemplate<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> = NewsletterItemTemplateBase<T> & {
-  templates: NewsletterItemTemplateBase<T>[];
-};
-
 // const newsletterItemTemplateDataDetails = z
 //   .discriminatedUnion('type', [
-//     mediaItemDetails
-//       .pick({ type: true })
-//       .merge(mediaItemDetails.omit({ type: true }).partial()),
-//     textItemDetails
-//       .pick({ type: true })
-//       .merge(textItemDetails.omit({ type: true }).partial()),
+//     createNewsletterPostDetailsMedia,
+//     createNewsletterPostDetailsText,
+//     createNewsletterPostDetailsContainer,
 //   ])
 //   .optional();
-// const baseNewsletterItemTemplateData = z.object({
-//   id: z.number(),
-//   nextId: z.number().nullable(),
-//   prevId: z.number().nullable(),
-//   parentId: z.number().nullable(),
-//   templateId: z.number().nullable(),
+
+// export type NewsletterPostTemplateDataDetails<
+//   T extends NewsletterPostTypeName | undefined = undefined
+// > = T extends NewsletterPostTypeName.Text
+//   ? CreateNewsletterPostDetailsText
+//   : T extends NewsletterPostTypeName.Media
+//   ? CreateNewsletterPostDetailsMedia
+//   : T extends NewsletterPostTypeName.Container
+//   ? CreateNewsletterPostDetailsContainer
+//   : z.infer<typeof newsletterItemTemplateDataDetails>;
+
+// export const newsletterItemTemplateData = z.object({
+//   id: z.coerce.number(),
+//   position: nodePosition,
+//   templateId: z.coerce.number().optional(),
 //   data: newsletterItemTemplateDataDetails,
 // });
 
-export type NewsletterItemTemplateDataDetails<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> = NewsletterItemDetailsTypeFromName<T> & { type: T };
+// export type NewsletterPostTemplateData = z.infer<typeof newsletterItemTemplateData>;
 
-export interface NewsletterItemTemplateData<
-  T extends NewsletterItemTypeName = NewsletterItemTypeName
-> {
-  id: number;
-  nextId: number | null;
-  prevId: number | null;
-  parentId: number | null;
-  templateId: number | null;
-  data: NewsletterItemTemplateDataDetails<T>;
+// export const createNewsletterPostTemplateData = newsletterItemTemplateData
+//   .omit({ position: true, id: true })
+//   .merge(z.object({ temp: tempNewsletterPostIds }));
+
+// export const newsletterItemTemplateBase = z.object({
+//   id: z.coerce.number(),
+//   meta: meta,
+//   name: z.string(),
+// });
+
+// export type NewsletterPostTemplateBase = z.infer<typeof newsletterItemTemplateBase>;
+
+// export const newsletterItemTemplate = newsletterItemTemplateBase.merge(
+//   z.object({
+//     items: z.array(newsletterItemTemplateData),
+//     templates: z.array(newsletterItemTemplateBase),
+//   })
+// );
+
+// export type NewsletterPostTemplate = z.infer<typeof newsletterItemTemplate>;
+
+// export const createNewsletterPostTemplate = newsletterItemTemplate
+//   .omit({
+//     id: true,
+//     templates: true,
+//     items: true,
+//     meta: true,
+//   })
+//   .merge(z.object({ data: z.array(createNewsletterPostTemplateData) }));
+
+// export type CreateNewsletterPostTemplate = z.infer<
+//   typeof createNewsletterPostTemplate
+// >;
+
+/**
+ * User
+ */
+
+export const user = userBase.merge(
+  z.object({
+    newsletters: z.array(newsletterBase),
+    // newsletterItemTemplates: z.array(newsletterItemTemplateBase),
+  })
+);
+
+export type User = z.infer<typeof user>;
+
+export interface UserSession {
+  email: string;
+  userId: number;
+  accessToken: string;
+  refreshToken: string;
 }
 
-// export type NewsletterItemTemplateDataDetails = z.infer<
-//   typeof newsletterItemTemplateDataDetails
-// >;
-// export type NewsletterItemTemplateData = z.infer<typeof baseNewsletterItemTemplateData>;
-export type CreateNewsletterItemTemplateInput = z.infer<
-  typeof postNewsletterItemTemplateInput
->;
-export type ReadNewsletterItemTemplateInput = z.infer<
-  typeof getNewsletterItemTemplateInput
->;
-export type DeleteNewsletterItemTemplateInput = z.infer<
-  typeof deleteNewsletterItemTemplateInput
->;
+export type Entity =
+  | Location
+  | User
+  // | NewsletterPostTemplate
+  | Newsletter
+  | NewsletterPost;
 
 /**
  * Helpers

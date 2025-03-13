@@ -1,56 +1,72 @@
-import {
-  Box,
-  Typography,
-} from '@mui/material';
-import { StoreNewsletterItem } from '@athena/store';
+import { Box, Typography } from '@mui/material';
+import { StoreNewsletterPost } from '@athena/store';
 import { useNavigate } from 'react-router-dom';
-import { CustomCard, CustomCardFooter, CustomCardHeader, CustomCheckbox, CustomIconButton } from '@athena/components';
+import {
+  CustomCard,
+  CustomCardFooter,
+  CustomCardHeader,
+  CustomCheckbox,
+  CustomIconButton,
+} from '@athena/components';
 import { ArrowForwardIcon } from '@athena/icons';
-import { MediaFormat, NewsletterItemTypeName } from '@athena/common';
+import { MediaFormat, NewsletterPostPostName } from '@athena/common';
 import ReactPlayer from 'react-player';
 
-interface NewsletterItemCardProps {
-  item: StoreNewsletterItem;
+interface NewsletterPostCardProps {
+  item: StoreNewsletterPost;
   selectable: boolean;
   selected: boolean;
   onToggleSelect: (id: number) => void;
 }
 
-export function NewsletterItemCard({ item, selectable, selected, onToggleSelect }: NewsletterItemCardProps) {
+export function NewsletterPostCard({
+  item,
+  selectable,
+  selected,
+  onToggleSelect,
+}: NewsletterPostCardProps) {
   const navigate = useNavigate();
 
   const hasChildren = item.childrenIds.length > 0;
 
-  const handleCardClick = () => navigate(`/newsletters/${item.newsletterId}/items/${item.id}`)
+  const handleCardClick = () =>
+    navigate(`/newsletters/${item.newsletterId}/items/${item.id}`);
   return (
     <CustomCard
       onClick={selectable ? undefined : handleCardClick}
-      src={item.details?.type === NewsletterItemTypeName.Media && item.details.format === MediaFormat.Image ? item.details.fileName : undefined}
+      src={
+        item.details?.type === NewsletterPostPostName.Media &&
+        item.details.format === MediaFormat.Image
+          ? item.details.fileName
+          : undefined
+      }
     >
       <CustomCardHeader
-        left={selectable ?
-          <CustomCheckbox
-            id={item.id}
-            value={selected}
-            onClick={() => onToggleSelect(item.id)} /> : null
+        left={
+          selectable ? (
+            <CustomCheckbox
+              id={item.id}
+              value={selected}
+              onClick={() => onToggleSelect(item.id)}
+            />
+          ) : null
         }
       >
-        <Typography sx={{ color: 'text.secondary' }}>
-          {item.title}
-        </Typography>
+        <Typography sx={{ color: 'text.secondary' }}>{item.title}</Typography>
       </CustomCardHeader>
-      {item.details?.type === NewsletterItemTypeName.Media && item.details.format === MediaFormat.Image && (
-        <Box sx={{ height: 400 }} />
-      )}
-      {item.details?.type === NewsletterItemTypeName.Media
-        && item.details.format === MediaFormat.Video
-        && <ReactPlayer
-          url={item.details.fileName}
-          controls={true}
-          width={"100%"}
-          height={"100%"} />}
-      {item.details?.type === NewsletterItemTypeName.Text && (
-        <Box sx={{ direction: "column" }}>
+      {item.details?.type === NewsletterPostPostName.Media &&
+        item.details.format === MediaFormat.Image && <Box sx={{ height: 400 }} />}
+      {item.details?.type === NewsletterPostPostName.Media &&
+        item.details.format === MediaFormat.Video && (
+          <ReactPlayer
+            url={item.details.fileName}
+            controls={true}
+            width={'100%'}
+            height={'100%'}
+          />
+        )}
+      {item.details?.type === NewsletterPostPostName.Text && (
+        <Box sx={{ direction: 'column' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             {item.details.name}
           </Typography>
@@ -64,14 +80,18 @@ export function NewsletterItemCard({ item, selectable, selected, onToggleSelect 
               {item.details.link}
             </Typography>
           )}
-        </Box>)}
-      <CustomCardFooter right={
-        hasChildren &&
-        <CustomIconButton
-          onClick={handleCardClick}
-          icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />} />}>
-
-      </CustomCardFooter>
+        </Box>
+      )}
+      <CustomCardFooter
+        right={
+          hasChildren && (
+            <CustomIconButton
+              onClick={handleCardClick}
+              icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />}
+            />
+          )
+        }
+      ></CustomCardFooter>
     </CustomCard>
   );
 }

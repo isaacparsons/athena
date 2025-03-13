@@ -1,8 +1,9 @@
+import _ from 'lodash'
 import { TRPCError } from '@trpc/server';
-import { parseEnv } from '../../util';
+import { getConfig } from '../../util';
 import { publicProcedure } from '..';
 
-const env = parseEnv();
+const config = getConfig();
 
 export const loggedInProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
@@ -15,8 +16,8 @@ export const loggedInProcedure = publicProcedure.use(async (opts) => {
   //   },
   // });
 
-  const adminSecret = ctx.req.headers['admin-secret'];
-  if (adminSecret === env.app.adminSecret) {
+  const adminSecret = _.get(ctx, ['req', 'headers', 'admin-secret'])
+  if (adminSecret === config.app.adminSecret) {
     const admin = await ctx.db
       .selectFrom('user')
       .where('firstName', '=', 'SUPER')
@@ -42,6 +43,6 @@ export const loggedInProcedure = publicProcedure.use(async (opts) => {
       },
     });
   }
-  ctx.res.clearCookie(env.app.sessionCookieName);
+  ctx.res.clearCookie(config.app.sessionCookieName);
   throw new TRPCError({ code: 'UNAUTHORIZED' });
 });

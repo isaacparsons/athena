@@ -1,50 +1,28 @@
-import { Insertable, Selectable } from 'kysely';
+import { CreateTableBuilder, Insertable, Selectable } from 'kysely';
 import {
   DBConnection,
   Table,
-  ITable,
-  UniqueId,
-  ImmutableString,
-  ImmutableNumber,
-  TABLE_NAMES,
 } from '@athena/db';
+import { Country } from '../types/db';
 
-export interface CountryTableColumns {
-  id: UniqueId;
-  code: ImmutableString;
-  name: ImmutableString;
-  longitude: ImmutableNumber;
-  latitude: ImmutableNumber;
-}
+export type SelectCountry = Selectable<Country>;
+export type InsertCountry = Insertable<Country>;
 
-export const CountryTable = {
-  tableName: TABLE_NAMES.COUNTRY,
-  columns: ['id', 'code', 'name', 'longitude', 'latitude'],
-  id: `${TABLE_NAMES.COUNTRY}.id`,
-  code: `${TABLE_NAMES.COUNTRY}.code`,
-  name: `${TABLE_NAMES.COUNTRY}.name`,
-  longtitude: `${TABLE_NAMES.COUNTRY}.longtitude`,
-  latitude: `${TABLE_NAMES.COUNTRY}.latitude`,
-};
-
-export type SelectCountry = Selectable<CountryTableColumns>;
-export type InsertCountry = Insertable<CountryTableColumns>;
-
-export class CountryTableClient extends Table implements ITable {
+export class CountryTableClient extends Table<
+  'location',
+  'id' | 'code' | 'name' | 'longitude' | 'latitude'
+> {
   constructor(db: DBConnection, name: string) {
     super(db, name);
   }
 
-  async createTable() {
-    this.db.schema
-      .createTable(this.name)
-      .ifNotExists()
-      .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
-      .addColumn('code', 'varchar', (col) => col.notNull())
-      .addColumn('name', 'varchar', (col) => col.notNull())
-      .addColumn('longitude', 'double precision', (col) => col.notNull())
-      .addColumn('latitude', 'double precision', (col) => col.notNull())
-      .execute();
-    return;
-  }
+  tableBuilder: CreateTableBuilder<
+    'location',
+    'id' | 'code' | 'name' | 'longitude' | 'latitude'
+  > = this.tableBuilder
+    .addColumn('id', 'serial', (cb) => cb.primaryKey().notNull())
+    .addColumn('code', 'varchar', (col) => col.notNull())
+    .addColumn('name', 'varchar', (col) => col.notNull())
+    .addColumn('longitude', 'double precision', (col) => col.notNull())
+    .addColumn('latitude', 'double precision', (col) => col.notNull());
 }
