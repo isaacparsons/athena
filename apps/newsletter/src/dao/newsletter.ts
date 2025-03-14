@@ -23,14 +23,14 @@ import { EntityDAO, EntityMetaRow } from './entity';
 
 type NewsletterRow = EntityMetaRow &
   Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
-    items: Omit<NewsletterPostEntity, 'children'>[];
+    posts: Omit<NewsletterPostEntity, 'children'>[];
     owner: SelectUser;
     members: SelectUser[];
   };
 
 export type INewsletterDAO = EntityDAO<NewsletterRow, NewsletterEntity> & {
   get(id: number): Promise<NewsletterEntity>;
-  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'items' | 'members'>[]>;
+  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'posts' | 'members'>[]>;
   post(userId: number, input: CreateNewsletter): Promise<number>;
   update(userId: number, input: UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
@@ -54,7 +54,7 @@ export class NewsletterDAO implements INewsletterDAO {
       },
       owner: mapUser(row.owner),
       members: mapUsers(row.members),
-      items: row.items,
+      posts: row.posts,
     };
   }
 
@@ -79,16 +79,16 @@ export class NewsletterDAO implements INewsletterDAO {
           () => new Error(`newsletter with id: ${id} does not exist`)
         );
 
-      const items = await this.newsletterItemDAO.getByNewsletterId(id);
+      const posts = await this.newsletterItemDAO.getByNewsletterId(id);
 
       return this.toEntity({
         ...newsletter,
-        items,
+        posts,
       });
     });
   }
 
-  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'items' | 'members'>[]> {
+  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'posts' | 'members'>[]> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletters = await trx
         .selectFrom('user_newsletter as un')
@@ -108,9 +108,9 @@ export class NewsletterDAO implements INewsletterDAO {
         .execute();
 
       return newsletters.map((n) => {
-        const { items, members, ...rest } = this.toEntity({
+        const { posts, members, ...rest } = this.toEntity({
           ...n,
-          items: [],
+          posts: [],
           members: [],
         });
         return rest;

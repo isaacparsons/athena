@@ -5,7 +5,7 @@ import {
   createNewsletterPostsBatch,
   deleteBatchInput,
   getInput,
-  getItemUploadLinks,
+  getPostUploadLinks,
   updateNewsletterPost,
 } from '@athena/common';
 
@@ -14,15 +14,15 @@ const router = trpc.router({
     return ctx.dao.newsletterPost.get(input.id);
   }),
   getPostUploadLinks: loggedInProcedure
-    .input(getItemUploadLinks)
+    .input(getPostUploadLinks)
     .query(async ({ input, ctx }) => {
       return Promise.all(
-        input.items.map(async (item) => {
+        input.posts.map(async (post) => {
           const fileName = `${ctx.user.userId}-${nanoid.nanoid()}`;
           const url = await ctx.gcs.getSignedUrl(fileName, 'write');
           return {
             url,
-            id: item.id,
+            id: post.id,
             fileName,
           };
         })

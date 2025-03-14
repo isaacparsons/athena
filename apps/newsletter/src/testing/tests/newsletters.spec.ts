@@ -37,7 +37,7 @@ describe('newsletter routes', () => {
       },
       owner: user,
       members: expect.arrayContaining([user]),
-      items: [],
+      posts: [],
     });
   });
   test('post', async () => {
@@ -79,7 +79,7 @@ describe('newsletter routes', () => {
       properties: newsletterInput.properties,
       owner: user,
       members: expect.arrayContaining([user]),
-      items: [],
+      posts: [],
     });
   });
   describe('update', () => {
@@ -117,7 +117,6 @@ describe('newsletter routes', () => {
       });
 
       const newsletter = await getNewsletter(user.id, existingNewsletter.id);
-      console.log(JSON.stringify(newsletter, null, 4));
       expect(newsletter).toEqual({
         id: existingNewsletter.id,
         meta: {
@@ -129,7 +128,7 @@ describe('newsletter routes', () => {
         properties: newsletterInput.properties,
         owner: user,
         members: expect.arrayContaining([user]),
-        items: [],
+        posts: [],
       });
     });
   });

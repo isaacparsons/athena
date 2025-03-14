@@ -59,7 +59,7 @@ export class NewsletterPostMediaTableClient extends Table<
 }
 
 export class NewsletterPostTextTableClient extends Table<
-  'newsletter_item_text',
+  'newsletter_post_text',
   'id' | 'name' | 'link' | 'type' | 'description' | 'newsletterPostId'
 > {
   constructor(db: DBConnection, name: string) {
@@ -67,7 +67,7 @@ export class NewsletterPostTextTableClient extends Table<
   }
 
   tableBuilder: CreateTableBuilder<
-    'newsletter_item_text',
+    'newsletter_post_text',
     'id' | 'name' | 'link' | 'type' | 'description' | 'newsletterPostId'
   > = this.tableBuilder
     .addColumn('id', 'serial', (cb) => cb.primaryKey())
@@ -84,7 +84,7 @@ export class NewsletterPostTextTableClient extends Table<
 }
 
 export class NewsletterPostContainerTableClient extends Table<
-  'newsletter_item_container',
+  'newsletter_post_container',
   'id' | 'name' | 'type' | 'newsletterPostId'
 > {
   constructor(db: DBConnection, name: string) {
@@ -92,7 +92,7 @@ export class NewsletterPostContainerTableClient extends Table<
   }
 
   tableBuilder: CreateTableBuilder<
-    'newsletter_item_container',
+    'newsletter_post_container',
     'id' | 'name' | 'type' | 'newsletterPostId'
   > = this.tableBuilder
     .addColumn('id', 'serial', (cb) => cb.primaryKey())

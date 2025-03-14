@@ -294,28 +294,28 @@ export type NewsletterPost<
 };
 
 export const isMediaPost = (
-  item: NewsletterPostBase
-): item is NewsletterPost<NewsletterPostTypeName.Media> => {
+  post: NewsletterPostBase
+): post is NewsletterPost<NewsletterPostTypeName.Media> => {
   return (
-    (item as NewsletterPost<NewsletterPostTypeName.Media>).details.type ===
+    (post as NewsletterPost<NewsletterPostTypeName.Media>).details.type ===
     NewsletterPostTypeName.Media
   );
 };
 
 export const isTextPost = (
-  item: NewsletterPostBase
-): item is NewsletterPost<NewsletterPostTypeName.Text> => {
+  post: NewsletterPostBase
+): post is NewsletterPost<NewsletterPostTypeName.Text> => {
   return (
-    (item as NewsletterPost<NewsletterPostTypeName.Text>).details.type ===
+    (post as NewsletterPost<NewsletterPostTypeName.Text>).details.type ===
     NewsletterPostTypeName.Text
   );
 };
 
 export const isContainerItem = (
-  item: NewsletterPostBase
-): item is NewsletterPost<NewsletterPostTypeName.Container> => {
+  post: NewsletterPostBase
+): post is NewsletterPost<NewsletterPostTypeName.Container> => {
   return (
-    (item as NewsletterPost<NewsletterPostTypeName.Container>).details.type ===
+    (post as NewsletterPost<NewsletterPostTypeName.Container>).details.type ===
     NewsletterPostTypeName.Container
   );
 };
@@ -343,6 +343,27 @@ export type CreateNewsletterPost<
     }
   : z.infer<typeof createNewsletterPost>;
 
+// export const updateNewsletterPost = newsletterPost
+//   .pick({ id: true, newsletterId: true })
+//   .merge(
+//     newsletterPost
+//       .omit({
+//         id: true,
+//         newsletterId: true,
+//         details: true,
+//         position: true,
+//         children: true,
+//       })
+//       .partial()
+//   )
+//   .merge(z.object({ details: updateNewsletterPostDetails.optional() }))
+//   .merge(
+//     z.object({
+//       childPositions: z
+//         .array(nodePosition.merge(z.object({ id: z.coerce.number() })))
+//         .optional(),
+//     })
+//   );
 export const updateNewsletterPost = newsletterPost
   .pick({ id: true, newsletterId: true })
   .merge(
@@ -351,19 +372,11 @@ export const updateNewsletterPost = newsletterPost
         id: true,
         newsletterId: true,
         details: true,
-        position: true,
         children: true,
       })
       .partial()
   )
-  .merge(z.object({ details: updateNewsletterPostDetails.optional() }))
-  .merge(
-    z.object({
-      childPositions: z
-        .array(nodePosition.merge(z.object({ id: z.coerce.number() })))
-        .optional(),
-    })
-  );
+  .merge(z.object({ details: updateNewsletterPostDetails.optional() }));
 
 export type UpdateNewsletterPost = z.infer<typeof updateNewsletterPost>;
 
@@ -396,15 +409,15 @@ export const createNewsletterPostsBatch = z.object({
 
 export type CreateNewsletterPostsBatch = z.infer<typeof createNewsletterPostsBatch>;
 
-export const getItemUploadLinks = z.object({
-  items: z.array(z.object({ id: z.string() })),
+export const getPostUploadLinks = z.object({
+  posts: z.array(z.object({ id: z.string() })),
 });
 
-export type GetItemUploadLinks = z.infer<typeof getItemUploadLinks>;
+export type GetPostUploadLinks = z.infer<typeof getPostUploadLinks>;
 
-export type GetItemUploadLinksResponse = ItemUploadLink[];
+export type GetPostUploadLinksResponse = PostUploadLink[];
 
-export type ItemUploadLink = {
+export type PostUploadLink = {
   id: string;
   url: string;
   fileName: string;
@@ -441,7 +454,7 @@ export type NewsletterBase = z.infer<typeof newsletterBase>;
 export const newsletter = newsletterBase.merge(
   z.object({
     members: z.array(userBase),
-    items: z.array(newsletterPostBase),
+    posts: z.array(newsletterPostBase),
   })
 );
 
@@ -452,7 +465,7 @@ export const createNewsletter = newsletter.omit({
   owner: true,
   meta: true,
   members: true,
-  items: true,
+  posts: true,
 });
 
 export type CreateNewsletter = z.infer<typeof createNewsletter>;

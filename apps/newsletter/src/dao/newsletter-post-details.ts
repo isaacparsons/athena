@@ -25,16 +25,16 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
   async get(newsletterItemId: number): Promise<NewsletterPostDetails> {
     const details = await this.db
       .selectFrom([
-        'newsletter_item_media as nim',
-        'newsletter_item_text as nit',
-        'newsletter_item_container as nic',
+        'newsletter_post_media as nim',
+        'newsletter_post_text as nit',
+        'newsletter_post_container as nic',
       ])
       .selectAll()
       .where(({ or, eb }) =>
         or([
-          eb('nim.newsletterItemId', '=', newsletterItemId),
-          eb('nit.newsletterItemId', '=', newsletterItemId),
-          eb('nic.newsletterItemId', '=', newsletterItemId),
+          eb('nim.newsletterPostId', '=', newsletterItemId),
+          eb('nit.newsletterPostId', '=', newsletterItemId),
+          eb('nic.newsletterPostId', '=', newsletterItemId),
         ])
       )
       .executeTakeFirst();
@@ -67,28 +67,28 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
     throw new Error('unrecognized type');
   }
   async post(
-    newsletterItemId: number,
+    newsletterPostId: number,
     input: CreateNewsletterPostDetails
   ): Promise<void | undefined> {
     if (!input) return;
     if (input.type === NewsletterPostTypeName.Text) {
       await this.db
-        .insertInto('newsletter_item_text')
-        .values({ ...input, newsletterItemId })
+        .insertInto('newsletter_post_text')
+        .values({ ...input, newsletterPostId })
         .executeTakeFirstOrThrow();
       return;
     }
     if (input.type === NewsletterPostTypeName.Media) {
       await this.db
-        .insertInto('newsletter_item_media')
-        .values({ ...input, newsletterItemId })
+        .insertInto('newsletter_post_media')
+        .values({ ...input, newsletterPostId })
         .executeTakeFirstOrThrow();
       return;
     }
     if (input.type === NewsletterPostTypeName.Container) {
       await this.db
-        .insertInto('newsletter_item_container')
-        .values({ ...input, newsletterItemId })
+        .insertInto('newsletter_post_container')
+        .values({ ...input, newsletterPostId })
         .executeTakeFirstOrThrow();
       return;
     }
@@ -97,14 +97,14 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
   async update(input: UpdateNewsletterPostDetails): Promise<number> {
     const table =
       input.type === NewsletterPostTypeName.Text
-        ? 'newsletter_item_text'
+        ? 'newsletter_post_text'
         : input.type === NewsletterPostTypeName.Container
-        ? 'newsletter_item_container'
+        ? 'newsletter_post_container'
         : input.type === NewsletterPostTypeName.Media
-        ? 'newsletter_item_media'
+        ? 'newsletter_post_media'
         : null;
 
-    if (!table) throw new Error('unrecognized item type');
+    if (!table) throw new Error('unrecognized post type');
     const result = await this.db
       .updateTable(table)
       .set(input)

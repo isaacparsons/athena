@@ -9,18 +9,6 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
-export type Json = JsonValue;
-
-export type JsonArray = JsonValue[];
-
-export type JsonObject = {
-  [x: string]: JsonValue | undefined;
-};
-
-export type JsonPrimitive = boolean | number | string | null;
-
-export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
-
 export interface Country {
   code: string;
   id: Generated<number>;
@@ -54,65 +42,6 @@ export interface Newsletter {
   name: string;
   ownerId: number;
   startDate: string | null;
-}
-
-export interface NewsletterItem {
-  created: Generated<string>;
-  creatorId: number;
-  date: string | null;
-  id: Generated<number>;
-  locationId: number | null;
-  modified: string | null;
-  modifierId: number | null;
-  newsletterId: number;
-  nextId: number | null;
-  parentId: number | null;
-  prevId: number | null;
-  title: string;
-}
-
-export interface NewsletterItemContainer {
-  id: Generated<number>;
-  name: string;
-  newsletterItemId: number;
-  type: string;
-}
-
-export interface NewsletterItemMedia {
-  caption: string | null;
-  fileName: string;
-  format: string;
-  id: Generated<number>;
-  name: string;
-  newsletterItemId: number;
-  type: string;
-}
-
-export interface NewsletterItemTemplate {
-  created: Generated<string>;
-  creatorId: number;
-  id: Generated<number>;
-  modified: string | null;
-  modifierId: number | null;
-  name: string;
-}
-
-export interface NewsletterItemTemplateData {
-  data: Json | null;
-  id: Generated<number>;
-  nextId: number | null;
-  parentId: number | null;
-  prevId: number | null;
-  templateId: number | null;
-}
-
-export interface NewsletterItemText {
-  description: string | null;
-  id: Generated<number>;
-  link: string | null;
-  name: string;
-  newsletterItemId: number;
-  type: string;
 }
 
 export interface NewsletterPost {
@@ -168,27 +97,15 @@ export interface UserNewsletter {
   userId: number;
 }
 
-export interface UserTemplate {
-  newsletterItemTemplateId: number;
-  userId: number;
-}
-
 export interface DB {
   country: Country;
   federated_credential: FederatedCredential;
   location: Location;
   newsletter: Newsletter;
-  newsletter_item: NewsletterItem;
-  newsletter_item_container: NewsletterItemContainer;
-  newsletter_item_media: NewsletterItemMedia;
-  newsletter_item_template: NewsletterItemTemplate;
-  newsletter_item_template_data: NewsletterItemTemplateData;
-  newsletter_item_text: NewsletterItemText;
   newsletter_post: NewsletterPost;
   newsletter_post_container: NewsletterPostContainer;
   newsletter_post_media: NewsletterPostMedia;
   newsletter_post_text: NewsletterPostText;
   user: User;
   user_newsletter: UserNewsletter;
-  user_template: UserTemplate;
 }

@@ -25,3 +25,11 @@ nx run newsletter:test
 ```sh
 nx run newsletter:serve:development
 ```
+
+### codegen
+
+#### db
+
+```sh
+nx run newsletter:codegen:db
+```

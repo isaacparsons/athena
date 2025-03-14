@@ -1,0 +1,68 @@
+generate:
+  email1: email
+
+user:
+  - __ref: 1
+    firstName: test
+    lastName: user
+    email: __generate.email1
+
+newsletter:
+  - __ref: 2
+    name: newsletter 1
+    created: 2025-02-22T18:18:00.539Z
+    creatorId: __ref.1
+    ownerId: __ref.1
+    startDate: 2025-02-22T18:18:00.539Z
+    endDate: 2025-02-22T18:18:00.539Z
+
+user_newsletter:
+  - userId: __ref.1
+    newsletterId: __ref.2
+
+newsletter_post:
+  - __ref: 3
+    title: text item 1
+    newsletterId: __ref.2
+    creatorId: __ref.1
+    parentId: null
+    nextId: null
+    prevId: null
+  - __ref: 4
+    title: text item 2
+    newsletterId: __ref.2
+    creatorId: __ref.1
+    parentId: __ref.3
+    nextId: null
+    prevId: null
+  - __ref: 5
+    title: text item 3
+    newsletterId: __ref.2
+    creatorId: __ref.1
+    parentId: __ref.3
+    nextId: null
+    prevId: __ref.4
+  - __ref: 6
+    title: text item 4
+    newsletterId: __ref.2
+    creatorId: __ref.1
+    parentId: __ref.3
+    nextId: null
+    prevId: __ref.5
+
+newsletter_post_text:
+  - name: text item 1
+    type: text
+    newsletterPostId: __ref.3
+
+  - name: text item 2
+    type: text
+    newsletterPostId: __ref.4
+
+  - name: text item 3
+    type: text
+    newsletterPostId: __ref.5
+
+  - name: text item 4
+    type: text
+    newsletterPostId: __ref.6

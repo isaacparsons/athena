@@ -1,6 +1,6 @@
 import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
 import { DBConnection, Table, TABLE_NAMES } from '@athena/db';
-import { User, UserNewsletter, UserTemplate } from '../types/db';
+import { User, UserNewsletter } from '../types/db';
 
 export interface UserTable {
   name: TABLE_NAMES.USER;
