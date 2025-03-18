@@ -19,6 +19,7 @@ newsletter:
 user_newsletter:
   - userId: __ref.1
     newsletterId: __ref.2
+    role: owner
 
 newsletter_post:
   - __ref: 3

@@ -3,6 +3,8 @@ import {
   NewsletterPost,
   UpdateNewsletterPost,
   UpdateNewsletter,
+  InviteNewsletterUser,
+  Newsletter,
 } from '@athena/common';
 import { createContext } from '../trpc';
 import {
@@ -38,7 +40,7 @@ const userMockRequest = createMockRequest('users');
 export async function getNewsletter(userId: number, newsletterId: number) {
   return router.newsletters.get(
     newsletterMockRequest('get')(userId, { id: newsletterId })
-  );
+  ) as Promise<Newsletter>;
 }
 
 export async function createNewsletter(userId: number, input: CreateNewsletter) {
@@ -57,6 +59,15 @@ export async function deleteNewsletter(userId: number, id: number) {
   return router.newsletters.delete(
     newsletterMockRequest('delete')(userId, { id })
   ) as Promise<number>;
+}
+
+export async function inviteNewsletterUser(
+  userId: number,
+  input: InviteNewsletterUser
+) {
+  return router.newsletters.inviteUser(
+    newsletterMockRequest('inviteUser')(userId, input)
+  );
 }
 
 export async function getNewsletterPost(userId: number, newsletterPostId: number) {

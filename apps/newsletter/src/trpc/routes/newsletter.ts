@@ -3,6 +3,7 @@ import {
   createNewsletter,
   deleteInput,
   getInput,
+  inviteNewsletterUser,
   updateNewsletter,
 } from '@athena/common';
 
@@ -23,6 +24,11 @@ const router = trpc.router({
   delete: loggedInProcedure.input(deleteInput).mutation(async ({ ctx, input }) => {
     return await ctx.dao.newsletter.delete(ctx.user.userId, input.id);
   }),
+  inviteUser: loggedInProcedure
+    .input(inviteNewsletterUser)
+    .mutation(async ({ ctx, input }) => {
+      return ctx.dao.newsletter.inviteUser(ctx.user.userId, input);
+    }),
 });
 
 export default router;

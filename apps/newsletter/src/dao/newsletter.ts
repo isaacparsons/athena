@@ -15,6 +15,9 @@ import {
   CreateNewsletter,
   UpdateNewsletter,
   NewsletterPost as NewsletterPostEntity,
+  InviteNewsletterUser,
+  NewsletterRole,
+  NewsletterPermissions,
 } from '@athena/common';
 import { creator, modifier, owner } from '../util';
 import { IGCSManager } from '@athena/services';
@@ -22,6 +25,35 @@ import { TYPES } from '../types/types';
 import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
 import { EntityDAO, IEntityDAO, EntityMetaRow } from './entity';
 import { Expression, expressionBuilder } from 'kysely';
+
+export const newsletterRolePermissionsMap: Record<
+  NewsletterRole,
+  NewsletterPermissions[]
+> = {
+  [NewsletterRole.READ_ONLY]: [NewsletterPermissions.READ],
+  [NewsletterRole.OWNER]: [
+    NewsletterPermissions.READ,
+    NewsletterPermissions.WRITE,
+    NewsletterPermissions.UPDATE,
+    NewsletterPermissions.DELETE,
+    NewsletterPermissions.COMMENT,
+    NewsletterPermissions.EDIT_MEMBER,
+    NewsletterPermissions.SHARE,
+    NewsletterPermissions.INVITE,
+  ],
+  [NewsletterRole.EDITOR]: [
+    NewsletterPermissions.READ,
+    NewsletterPermissions.WRITE,
+    NewsletterPermissions.UPDATE,
+    NewsletterPermissions.DELETE,
+    NewsletterPermissions.COMMENT,
+    NewsletterPermissions.SHARE,
+  ],
+  [NewsletterRole.COMMENTOR]: [
+    NewsletterPermissions.READ,
+    NewsletterPermissions.COMMENT,
+  ],
+};
 
 type NewsletterRow = EntityMetaRow &
   Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
@@ -36,6 +68,7 @@ export type INewsletterDAO = IEntityDAO<NewsletterRow, NewsletterEntity> & {
   create(userId: number, input: CreateNewsletter): Promise<number>;
   update(userId: number, input: UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
+  inviteUser(userId: number, input: InviteNewsletterUser): Promise<void>;
 };
 
 @injectable()
@@ -142,6 +175,7 @@ export class NewsletterDAO
         .insertInto('user_newsletter')
         .values({
           userId: userId,
+          role: NewsletterRole.OWNER,
           newsletterId: newsletter.id,
         })
         .executeTakeFirstOrThrow();
@@ -168,7 +202,41 @@ export class NewsletterDAO
       .where('ownerId', '=', userId)
       .returning('id')
       .executeTakeFirstOrThrow();
-
     return res.id;
   }
+
+  async inviteUser(userId: number, input: InviteNewsletterUser) {
+    const { newsletterId, email } = input;
+    const { role } = await this.db
+      .selectFrom('user_newsletter')
+      .select('role')
+      .where(({ and, eb }) =>
+        and([eb('userId', '=', userId), eb('newsletterId', '=', newsletterId)])
+      )
+      .executeTakeFirstOrThrow();
+    console.log({
+      role,
+      permissions: _.get(newsletterRolePermissionsMap, [role ?? '']),
+    });
+    if (
+      role === null ||
+      !_.get(newsletterRolePermissionsMap, [role]).includes(
+        NewsletterPermissions.INVITE
+      )
+    )
+      throw new Error(`Do not have permissions`);
+
+    await this.db
+      .insertInto('user_newsletter')
+      .values({
+        userId: this.db.selectFrom('user').select('id').where('email', '=', email),
+        newsletterId,
+        role: input.role,
+      })
+      .executeTakeFirstOrThrow();
+  }
+
+  // async removeMember() {}
+
+  // async editPermissions(){}
 }

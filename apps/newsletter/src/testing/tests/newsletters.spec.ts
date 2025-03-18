@@ -4,10 +4,11 @@ import {
   createNewsletter,
   deleteNewsletter,
   getNewsletter,
+  inviteNewsletterUser,
   updateNewsletter,
 } from '../test-util';
 import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
-import { CreateNewsletter } from '@athena/common';
+import { CreateNewsletter, NewsletterRole } from '@athena/common';
 
 const dbClient = new DBManagerClient();
 
@@ -124,5 +125,43 @@ describe('newsletter routes', () => {
     await expect(newsletter).rejects.toEqual(
       new Error(`newsletter with id: ${existingNewsletter.id} does not exist`)
     );
+  });
+  describe('invite user', () => {
+    test('invite user', async () => {
+      const entities1 = await createFixture('newsletter.yaml');
+      const entities2 = await createFixture('user.yaml');
+      const user1 = _.get(entities1, ['user', 0]) as SelectUser;
+      const user2 = _.get(entities2, ['user', 0]) as SelectUser;
+
+      const existingNewsletter = _.get(entities1, [
+        'newsletter',
+        0,
+      ]) as SelectNewsletter;
+
+      await inviteNewsletterUser(user1.id, {
+        newsletterId: existingNewsletter.id,
+        email: user2.email,
+        role: NewsletterRole.READ_ONLY,
+      });
+      const newsletter = await getNewsletter(user1.id, existingNewsletter.id);
+      expect(newsletter.members).toEqual(expect.arrayContaining([user1, user2]));
+    });
+    test('throw error if a user with invalid permissions tries to invite a user', async () => {
+      const entities = await createFixture('newsletter-with-read-only-member.yaml');
+      const entities2 = await createFixture('user.yaml');
+      // const entities3 = await createFixture('user.yaml');
+      const user1 = _.get(entities, ['user', 0]) as SelectUser;
+      const user2 = _.get(entities, ['user', 1]) as SelectUser;
+      const user3 = _.get(entities2, ['user', 0]) as SelectUser;
+
+      const newsletter = _.get(entities, ['newsletter', 0]) as SelectNewsletter;
+
+      const invite = inviteNewsletterUser(user2.id, {
+        newsletterId: newsletter.id,
+        email: user3.email,
+        role: NewsletterRole.READ_ONLY,
+      });
+      await expect(invite).rejects.toEqual(new Error('Do not have permissions'));
+    });
   });
 });

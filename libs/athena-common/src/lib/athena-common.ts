@@ -478,6 +478,34 @@ export const updateNewsletter = newsletter.pick({ id: true }).merge(
 
 export type UpdateNewsletter = z.infer<typeof updateNewsletter>;
 
+export enum NewsletterRole {
+  READ_ONLY = 'read-only',
+  OWNER = 'owner',
+  EDITOR = 'editor',
+  COMMENTOR = 'commentor',
+}
+
+export enum NewsletterPermissions {
+  READ = 'read',
+  WRITE = 'write',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  COMMENT = 'comment',
+  SHARE = 'share',
+  INVITE = 'invite',
+  EDIT_MEMBER = 'edit-member',
+}
+
+const newsletterRole = z.nativeEnum(NewsletterRole);
+const newsletterPermissions = z.nativeEnum(NewsletterPermissions);
+
+export const inviteNewsletterUser = z.object({
+  newsletterId: z.coerce.number(),
+  email: z.coerce.string(),
+  role: newsletterRole,
+});
+
+export type InviteNewsletterUser = z.infer<typeof inviteNewsletterUser>;
 /**
  * Newsletter item template
  */

@@ -7,7 +7,6 @@ import {
   sql,
 } from 'kysely';
 import { DB } from '../types/db';
-
 export type Database = DB;
 
 export { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres';
