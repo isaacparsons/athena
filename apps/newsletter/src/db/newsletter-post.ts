@@ -36,12 +36,19 @@ export class NewsletterPostTableClient extends EntityTable<
       col.references(`${TABLE_NAMES.NEWSLETTER_POST}.id`).onDelete('cascade')
     )
     .addColumn('nextId', 'integer', (col) =>
-      col.references(`${TABLE_NAMES.NEWSLETTER_POST}.id`).onDelete('set null')
+      col
+        .references(`${TABLE_NAMES.NEWSLETTER_POST}.id`)
+        .unique()
+        .onDelete('set null')
     )
     .addColumn('prevId', 'integer', (col) =>
-      col.references(`${TABLE_NAMES.NEWSLETTER_POST}.id`).onDelete('set null')
+      col
+        .references(`${TABLE_NAMES.NEWSLETTER_POST}.id`)
+        .unique()
+        .onDelete('set null')
     );
 }
+// CONSTRAINT fk_prev FOREIGN KEY (prev_id) REFERENCES linked_list (id) ON DELETE SET NULL,
 //TODO: add below check to item type
 // (col) =>
 //   col.check(

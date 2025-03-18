@@ -1,40 +1,84 @@
-import { NewsletterPost, UpdateNewsletterPost } from '@athena/common';
+import {
+  CreateNewsletter,
+  NewsletterPost,
+  UpdateNewsletterPost,
+  UpdateNewsletter,
+} from '@athena/common';
 import { createContext } from '../trpc';
-import { appRouter as router } from '../trpc/routes';
+import {
+  AppRouter,
+  appRouter as router,
+  RouterEndpoint,
+  RouterEndpointType,
+} from '../trpc/routes';
 
-export function createMockRequest(userId: number, input: object) {
-  return {
-    ctx: createContext({
-      req: {
-        user: {
-          userId,
-        },
-        isAuthenticated: () => true,
-      } as any,
-      res: {} as any,
-    }),
-    path: '',
-    rawInput: input,
-    type: router.newsletters.get._type,
+export const createMockRequest =
+  <R extends RouterEndpoint>(entityType: R) =>
+  (endpointType: RouterEndpointType<R>) =>
+  (userId: number, input: object) => {
+    const type = (router[entityType][endpointType] as any)._type;
+    return {
+      ctx: createContext({
+        req: {
+          user: { userId },
+          isAuthenticated: () => true,
+        } as any,
+        res: {} as any,
+      }),
+      path: '',
+      rawInput: input,
+      type,
+    };
   };
-}
 
-export function getNewsletter(userId: number, newsletterId: number) {
-  return router.newsletters.get(createMockRequest(userId, { id: newsletterId }));
-}
+const newsletterMockRequest = createMockRequest('newsletters');
+const newsletterPostMockRequest = createMockRequest('newsletterPosts');
+const userMockRequest = createMockRequest('users');
 
-export function getNewsletterPost(userId: number, newsletterPostId: number) {
-  return router.newsletterPosts.get(
-    createMockRequest(userId, { id: newsletterPostId })
-  ) as Promise<NewsletterPost>;
-}
-
-export function deleteNewsletterPost(userId: number, newsletterPostIds: number[]) {
-  return router.newsletterPosts.deleteMany(
-    createMockRequest(userId, { ids: newsletterPostIds })
+export async function getNewsletter(userId: number, newsletterId: number) {
+  return router.newsletters.get(
+    newsletterMockRequest('get')(userId, { id: newsletterId })
   );
 }
 
-export function updateNewsletterPost(userId: number, input: UpdateNewsletterPost) {
-  return router.newsletterPosts.update(createMockRequest(userId, input));
+export async function createNewsletter(userId: number, input: CreateNewsletter) {
+  return router.newsletters.post(
+    newsletterMockRequest('post')(userId, input)
+  ) as Promise<number>;
+}
+
+export async function updateNewsletter(userId: number, input: UpdateNewsletter) {
+  return router.newsletters.update(
+    newsletterMockRequest('update')(userId, input)
+  ) as Promise<number>;
+}
+
+export async function deleteNewsletter(userId: number, id: number) {
+  return router.newsletters.delete(
+    newsletterMockRequest('delete')(userId, { id })
+  ) as Promise<number>;
+}
+
+export async function getNewsletterPost(userId: number, newsletterPostId: number) {
+  return router.newsletterPosts.get(
+    newsletterPostMockRequest('get')(userId, { id: newsletterPostId })
+  ) as Promise<NewsletterPost>;
+}
+
+export async function deleteNewsletterPost(
+  userId: number,
+  newsletterPostIds: number[]
+) {
+  return router.newsletterPosts.deleteMany(
+    newsletterPostMockRequest('deleteMany')(userId, { ids: newsletterPostIds })
+  );
+}
+
+export async function updateNewsletterPost(
+  userId: number,
+  input: UpdateNewsletterPost
+) {
+  return router.newsletterPosts.update(
+    newsletterPostMockRequest('update')(userId, input)
+  );
 }

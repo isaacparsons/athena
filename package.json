@@ -35,7 +35,7 @@
     "googleapis": "^144.0.0",
     "immer": "^10.1.1",
     "install": "^0.13.0",
-    "inversify": "^6.0.3",
+    "inversify": "^7.1.0",
     "js-cookie": "^3.0.5",
     "kysely": "^0.27.4",
     "luxon": "^3.5.0",

@@ -31,18 +31,25 @@ container.bind(TYPES.DBClient).toConstantValue(
         user: config.db.username,
         password: config.db.password,
         port: config.db.port,
-        max: 10,
+        max: 10, //10
       }),
     }),
   })
 );
-container.bind<ILocationDAO>(TYPES.ILocationDAO).to(LocationDAO);
-container.bind<INewsletterDAO>(TYPES.INewsletterDAO).to(NewsletterDAO);
+container.bind<ILocationDAO>(TYPES.ILocationDAO).to(LocationDAO).inSingletonScope();
+container
+  .bind<INewsletterDAO>(TYPES.INewsletterDAO)
+  .to(NewsletterDAO)
+  .inSingletonScope();
 container
   .bind<INewsletterPostDetailsDAO>(TYPES.INewsletterPostDetailsDAO)
-  .to(NewsletterPostDetailsDAO);
-container.bind<INewsletterPostDAO>(TYPES.INewsletterPostDAO).to(NewsletterPostDAO);
-container.bind<IUserDAO>(TYPES.IUserDAO).to(UserDAO);
+  .to(NewsletterPostDetailsDAO)
+  .inSingletonScope();
+container
+  .bind<INewsletterPostDAO>(TYPES.INewsletterPostDAO)
+  .to(NewsletterPostDAO)
+  .inSingletonScope();
+container.bind<IUserDAO>(TYPES.IUserDAO).to(UserDAO).inSingletonScope();
 // container
 //   .bind<INewsletterPostTemplateDAO>(TYPES.INewsletterPostTemplateDAO)
 //   .to(NewsletterPostTemplateDAO);

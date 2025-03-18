@@ -12,3 +12,15 @@ export const appRouter = trpc.router({
 });
 
 export type AppRouter = typeof appRouter;
+
+export type RouterEndpoint = keyof Omit<
+  AppRouter,
+  'createCaller' | 'getErrorShape' | '_def'
+>;
+
+export type RouterEndpointType<T extends RouterEndpoint = RouterEndpoint> =
+  keyof Omit<AppRouter[T], 'createCaller' | 'getErrorShape' | '_def'>;
+
+export type NewsletterRoute = RouterEndpointType<'newsletters'>;
+export type NewsletterPostRoute = RouterEndpointType<'newsletterPosts'>;
+export type UserRoute = RouterEndpointType<'newsletters'>;

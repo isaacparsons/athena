@@ -1,4 +1,7 @@
+generate:
+  email1: email
+
 user:
   - firstName: test
     lastName: user
-    email: email@email.com
+    email: __generate.email1

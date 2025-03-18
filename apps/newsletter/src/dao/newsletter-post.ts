@@ -41,7 +41,7 @@ import {
   mapPosition,
 } from './mapping';
 import { IGCSManager } from '@athena/services';
-import { EntityDAO, EntityMetaRow } from './entity';
+import { EntityDAO, EntityMetaRow, IEntityDAO } from './entity';
 import { Expression, expressionBuilder, Selectable } from 'kysely';
 
 export type NewsletterPostRow = EntityMetaRow &
@@ -53,7 +53,7 @@ export type NewsletterPostRow = EntityMetaRow &
     children: Omit<NewsletterPostRow, 'children'>[];
   };
 
-export type INewsletterPostDAO = EntityDAO<
+export type INewsletterPostDAO = IEntityDAO<
   NewsletterPostRow,
   NewsletterPostEntity
 > & {

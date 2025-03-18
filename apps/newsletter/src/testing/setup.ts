@@ -8,6 +8,7 @@ import { faker } from '@faker-js/faker';
 import { Database, DB, DBConnection, Pool, PostgresDialect } from '@athena/db';
 import { Container } from 'inversify';
 import { TYPES } from '../types/types';
+import { container } from '../inversify.config';
 
 const generateTypeMap = {
   email: faker.internet.email,
@@ -17,21 +18,21 @@ type GenerateType = keyof typeof generateTypeMap;
 
 const fixturesDir = path.join(__dirname, 'fixtures');
 
-const container = new Container();
-container.bind(TYPES.DBClient).toConstantValue(
-  new DB<Database>({
-    dialect: new PostgresDialect({
-      pool: new Pool({
-        database: 'newsletter',
-        host: 'localhost',
-        user: 'postgres',
-        password: 'postgres',
-        port: 5432,
-        max: 10,
-      }),
-    }),
-  })
-);
+// const container = new Container();
+// container.bind(TYPES.DBClient).toConstantValue(
+//   new DB<Database>({
+//     dialect: new PostgresDialect({
+//       pool: new Pool({
+//         database: 'newsletter',
+//         host: 'localhost',
+//         user: 'postgres',
+//         password: 'postgres',
+//         port: 5432,
+//         max: 10,
+//       }),
+//     }),
+//   })
+// );
 const db = container.get<DBConnection>(TYPES.DBClient);
 
 export const parseFixture = async (fileName: string) => {

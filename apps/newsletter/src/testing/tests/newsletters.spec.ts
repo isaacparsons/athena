@@ -1,19 +1,21 @@
 import _ from 'lodash';
-import { appRouter as router } from '../../trpc/routes';
-import { createContext } from '../../trpc/context';
 import { createFixture } from '../setup';
-import { getNewsletter } from '../test-util';
+import {
+  createNewsletter,
+  deleteNewsletter,
+  getNewsletter,
+  updateNewsletter,
+} from '../test-util';
 import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
 import { CreateNewsletter } from '@athena/common';
-
-// const now = new Date(2024, 1, 1);
-// Date.now = jest.fn(() => now.getTime());
 
 const dbClient = new DBManagerClient();
 
 describe('newsletter routes', () => {
   afterAll(async () => {
     await dbClient.truncateTables(['user']);
+    await dbClient.truncateTables(['newsletter']);
+    await dbClient.truncateTables(['user_newsletter']);
   });
   test('get', async () => {
     const entities = await createFixture('newsletter.yaml');
@@ -46,27 +48,14 @@ describe('newsletter routes', () => {
 
     const newsletterInput: CreateNewsletter = {
       properties: {
-        name: 'test newsletter 1',
+        name: 'test newsletter 2',
         dateRange: {
           start: new Date().toISOString(),
           end: new Date().toISOString(),
         },
       },
     };
-    const newsletterId = (await router.newsletters.post({
-      ctx: createContext({
-        req: {
-          user: {
-            userId: user.id,
-          },
-          isAuthenticated: () => true,
-        } as any,
-        res: {} as any,
-      }),
-      path: '',
-      rawInput: newsletterInput,
-      type: router.newsletters.post._type,
-    })) as number;
+    const newsletterId = await createNewsletter(user.id, newsletterInput);
 
     const createdNewsletter = await getNewsletter(user.id, newsletterId);
 
@@ -101,19 +90,9 @@ describe('newsletter routes', () => {
         },
       };
 
-      await router.newsletters.update({
-        ctx: createContext({
-          req: {
-            user: {
-              userId: user.id,
-            },
-            isAuthenticated: () => true,
-          } as any,
-          res: {} as any,
-        }),
-        path: '',
-        rawInput: { ...newsletterInput, id: existingNewsletter.id },
-        type: router.newsletters.update._type,
+      await updateNewsletter(user.id, {
+        ...newsletterInput,
+        id: existingNewsletter.id,
       });
 
       const newsletter = await getNewsletter(user.id, existingNewsletter.id);
@@ -140,24 +119,9 @@ describe('newsletter routes', () => {
       0,
     ]) as SelectNewsletter;
 
-    await router.newsletters.delete({
-      ctx: createContext({
-        req: {
-          user: {
-            userId: user.id,
-          },
-          isAuthenticated: () => true,
-        } as any,
-        res: {} as any,
-      }),
-      path: '',
-      rawInput: {
-        id: existingNewsletter.id,
-      },
-      type: router.newsletters.delete._type,
-    });
+    await deleteNewsletter(user.id, existingNewsletter.id);
     const newsletter = getNewsletter(user.id, existingNewsletter.id);
-    expect(newsletter).rejects.toEqual(
+    await expect(newsletter).rejects.toEqual(
       new Error(`newsletter with id: ${existingNewsletter.id} does not exist`)
     );
   });

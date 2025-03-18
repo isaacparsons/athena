@@ -1,9 +1,10 @@
-import { inject, injectable } from 'inversify';
+import { inject, injectable, injectFromBase } from 'inversify';
 import 'reflect-metadata';
 import _ from 'lodash';
 import { INewsletterPostDAO } from '@athena/dao';
 import {
   DBConnection,
+  Database,
   SelectNewsletter,
   SelectUser,
   Transaction,
@@ -15,11 +16,12 @@ import {
   UpdateNewsletter,
   NewsletterPost as NewsletterPostEntity,
 } from '@athena/common';
-import { creator, modifier, owner, selectEntityColumns } from '../util';
+import { creator, modifier, owner } from '../util';
 import { IGCSManager } from '@athena/services';
 import { TYPES } from '../types/types';
 import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
-import { EntityDAO, EntityMetaRow } from './entity';
+import { EntityDAO, IEntityDAO, EntityMetaRow } from './entity';
+import { Expression, expressionBuilder } from 'kysely';
 
 type NewsletterRow = EntityMetaRow &
   Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
@@ -28,21 +30,29 @@ type NewsletterRow = EntityMetaRow &
     members: SelectUser[];
   };
 
-export type INewsletterDAO = EntityDAO<NewsletterRow, NewsletterEntity> & {
+export type INewsletterDAO = IEntityDAO<NewsletterRow, NewsletterEntity> & {
   get(id: number): Promise<NewsletterEntity>;
   getByUserId(id: number): Promise<Omit<NewsletterEntity, 'posts' | 'members'>[]>;
-  post(userId: number, input: CreateNewsletter): Promise<number>;
+  create(userId: number, input: CreateNewsletter): Promise<number>;
   update(userId: number, input: UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
 };
 
 @injectable()
-export class NewsletterDAO implements INewsletterDAO {
+@injectFromBase()
+export class NewsletterDAO
+  extends EntityDAO<'newsletter', NewsletterRow, NewsletterEntity>
+  implements INewsletterDAO
+{
+  tableName = 'newsletter' as any;
+
   constructor(
     @inject(TYPES.DBClient) readonly db: DBConnection,
     @inject(TYPES.IGCSManager) readonly gcs: IGCSManager,
     @inject(TYPES.INewsletterPostDAO) readonly newsletterItemDAO: INewsletterPostDAO
-  ) {}
+  ) {
+    super();
+  }
 
   toEntity(row: NewsletterRow) {
     return {
@@ -58,33 +68,33 @@ export class NewsletterDAO implements INewsletterDAO {
     };
   }
 
+  private members(newsletterId: Expression<number>) {
+    const eb = expressionBuilder<Database, 'user_newsletter' | 'user'>();
+    return jsonArrayFrom(
+      eb
+        .selectFrom('user_newsletter as un')
+        .where('un.newsletterId', '=', newsletterId)
+        .innerJoin('user', 'user.id', 'un.userId')
+        .selectAll('user')
+    ).as('members');
+  }
+
   async get(id: number): Promise<NewsletterEntity> {
     return this.db.transaction().execute(async (trx: Transaction) => {
-      const newsletter = await selectEntityColumns(trx, 'newsletter')
-        .where('newsletter.id', '=', id)
+      const newsletter = await this.selectEntity(trx)
         .select((eb) => [
-          'newsletter.name',
-          'newsletter.startDate',
-          'newsletter.endDate',
-          owner(trx, eb.ref('newsletter.ownerId')).as('owner'),
-          jsonArrayFrom(
-            eb
-              .selectFrom('user_newsletter as un')
-              .where('un.newsletterId', '=', id)
-              .innerJoin('user', 'user.id', 'un.userId')
-              .selectAll('user')
-          ).as('members'),
+          'name',
+          'startDate',
+          'endDate',
+          owner(trx, eb.ref('ownerId')).as('owner'),
+          this.members(eb.ref('newsletter.id')),
         ])
+        .where('id', '=', id)
         .executeTakeFirstOrThrow(
           () => new Error(`newsletter with id: ${id} does not exist`)
         );
-
       const posts = await this.newsletterItemDAO.getByNewsletterId(id);
-
-      return this.toEntity({
-        ...newsletter,
-        posts,
-      });
+      return this.toEntity({ ...newsletter, posts });
     });
   }
 
@@ -118,18 +128,14 @@ export class NewsletterDAO implements INewsletterDAO {
     });
   }
 
-  async post(userId: number, input: CreateNewsletter): Promise<number> {
+  async create(userId: number, input: CreateNewsletter): Promise<number> {
     return this.db.transaction().execute(async (trx: Transaction) => {
-      const newsletter = await trx
-        .insertInto('newsletter')
-        .values({
-          name: input.properties.name,
-          startDate: input.properties.dateRange?.start,
-          endDate: input.properties.dateRange?.end,
-          ownerId: userId,
-          created: new Date().toISOString(),
-          creatorId: userId,
-        })
+      const newsletter = await this.postEntity(trx, userId, {
+        name: input.properties.name,
+        startDate: input.properties.dateRange?.start,
+        endDate: input.properties.dateRange?.end,
+        ownerId: userId,
+      })
         .returningAll()
         .executeTakeFirstOrThrow();
       await trx
@@ -145,15 +151,11 @@ export class NewsletterDAO implements INewsletterDAO {
   }
 
   async update(userId: number, input: UpdateNewsletter): Promise<number> {
-    const res = await this.db
-      .updateTable('newsletter')
-      .set({
-        name: input.properties.name,
-        startDate: input.properties.dateRange?.start,
-        endDate: input.properties.dateRange?.end,
-        modifierId: userId,
-        modified: new Date().toISOString(),
-      })
+    const res = await this.updateEntity(this.db, userId, input.id, {
+      name: input.properties.name,
+      startDate: input.properties.dateRange?.start,
+      endDate: input.properties.dateRange?.end,
+    })
       .returning('id')
       .where('id', '=', input.id)
       .executeTakeFirstOrThrow();
@@ -161,8 +163,7 @@ export class NewsletterDAO implements INewsletterDAO {
   }
 
   async delete(userId: number, id: number): Promise<number> {
-    const res = await this.db
-      .deleteFrom('newsletter')
+    const res = await this.deleteEntity(this.db)
       .where('id', '=', id)
       .where('ownerId', '=', userId)
       .returning('id')

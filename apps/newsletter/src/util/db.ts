@@ -1,9 +1,11 @@
 import {
+  Database,
   DBConnection,
   EntityTableName,
   Expression,
   jsonObjectFrom,
 } from '@athena/db';
+import { expressionBuilder } from 'kysely';
 
 export const newsletterPostDetailsMedia = (
   db: DBConnection,
@@ -79,3 +81,29 @@ export const selectEntityColumns = <T extends EntityTableName>(
         .whereRef('user.id', '=', db.dynamic.ref(`${tableName}.modifierId`))
     ).as('modifier'),
   ]);
+
+// export const withEntityColumns = <T extends TableN>(
+//   ExpressionBuilder
+// ) => {
+//   const eb = expressionBuilder<Database, T>();
+
+//   db.selectFrom(tableName).select([
+//     `id`,
+//     `created`,
+//     `modified`,
+//     jsonObjectFrom(
+//       db
+//         .selectFrom('user')
+//         .selectAll()
+//         .whereRef('user.id', '=', db.dynamic.ref(`${tableName}.creatorId`))
+//     )
+//       .$notNull()
+//       .as('creator'),
+//     jsonObjectFrom(
+//       db
+//         .selectFrom('user')
+//         .selectAll()
+//         .whereRef('user.id', '=', db.dynamic.ref(`${tableName}.modifierId`))
+//     ).as('modifier'),
+//   ]);
+// }
