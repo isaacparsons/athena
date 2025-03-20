@@ -1,5 +1,11 @@
 import _ from 'lodash';
-import { DateRange, MediaFormat } from './athena-common';
+import {
+  MediaFormat,
+  NewsletterPostBase,
+  NewsletterPostTypeName,
+  DateRange,
+} from './lib';
+import { NewsletterPost } from './entity';
 
 export const logObject = (item: any, label?: string) => {
   if (label) {
@@ -38,3 +44,38 @@ export function mimeTypeToMediaFormat(mimeType: string): MediaFormat {
 }
 
 export const nullToUndefined = (v: any) => (_.isNull(v) ? undefined : v);
+
+export const isMediaPost = (
+  post: NewsletterPostBase
+): post is NewsletterPost<NewsletterPostTypeName.Media> => {
+  return (
+    (post as NewsletterPost<NewsletterPostTypeName.Media>).details.type ===
+    NewsletterPostTypeName.Media
+  );
+};
+
+export const isTextPost = (
+  post: NewsletterPostBase
+): post is NewsletterPost<NewsletterPostTypeName.Text> => {
+  return (
+    (post as NewsletterPost<NewsletterPostTypeName.Text>).details.type ===
+    NewsletterPostTypeName.Text
+  );
+};
+
+export const isContainerItem = (
+  post: NewsletterPostBase
+): post is NewsletterPost<NewsletterPostTypeName.Container> => {
+  return (
+    (post as NewsletterPost<NewsletterPostTypeName.Container>).details.type ===
+    NewsletterPostTypeName.Container
+  );
+};
+
+export const isNumberOrNull = _.overSome([_.isNumber, _.isNull]);
+
+type NonUndefined<T> = T extends undefined ? never : T;
+
+export function areDefinedOrNull<T>(values: T[]): values is NonUndefined<T>[] {
+  return values.every(_.negate(_.isUndefined));
+}

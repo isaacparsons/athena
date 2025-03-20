@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Entity } from '@athena/common';
 import {
   Database,
@@ -39,9 +40,6 @@ export interface IEntityDAO<R, E extends Entity> {
 @injectable()
 export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> {
   abstract tableName: T;
-  // query =  expressionBuilder<Database, T>().selectFrom(this.tableName)
-  //   SelectQueryBuilder<Database, T, any>
-  //q: SelectQueryBuilder<Database, T, any>
   selectEntity(db: DBConnection) {
     const eb = expressionBuilder<Database, EntityTableName>();
     return db.selectFrom(this.tableName).select([
@@ -64,19 +62,22 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
       ).as('modifier'),
     ]);
   }
-  postEntity(
+  postEntities(
     db: DBConnection,
     userId: number,
     values: Omit<
       InsertObject<Database, T>,
       'created' | 'creatorId' | 'modifier' | 'modified'
-    >
+    >[]
   ) {
-    return db.insertInto(this.tableName).values({
-      ...values,
-      created: new Date().toISOString(),
-      creatorId: userId,
-    } as InsertExpression<Database, T>);
+    const created = new Date().toISOString();
+    return db.insertInto(this.tableName).values(
+      values.map((v) => ({
+        ...v,
+        created,
+        creatorId: userId,
+      })) as InsertExpression<Database, T>
+    );
   }
 
   updateEntity(
@@ -90,11 +91,14 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
       >
     >
   ) {
-    return db.updateTable(this.tableName).set({
-      ...values,
-      modified: new Date().toISOString(),
-      modifierId: userId,
-    } as UpdateObjectExpression<Database, ExtractTableAlias<Database, T>, ExtractTableAlias<Database, T>>);
+    return db
+      .updateTable(this.tableName)
+      .set({
+        ...values,
+        modified: new Date().toISOString(),
+        modifierId: userId,
+      } as UpdateObjectExpression<Database, ExtractTableAlias<Database, T>, ExtractTableAlias<Database, T>>)
+      .where('id', '=', id as any);
   }
 
   deleteEntity(db: DBConnection) {

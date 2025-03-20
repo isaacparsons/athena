@@ -18,6 +18,7 @@ import {
   TABLE_NAMES,
   DBConnection,
   NewsletterPostContainerTableClient,
+  sql,
 } from '@athena/db';
 import { TYPES } from '../types/types';
 // import { nanoid } from 'nanoid';
@@ -76,6 +77,7 @@ export class DBManagerClient {
     for (let i = 0; i < this.tables.length; i++) {
       await this.tables[i].createTable();
     }
+    await this.addCustom();
   }
 
   async dropTables() {
@@ -89,6 +91,24 @@ export class DBManagerClient {
       if (!ignore || !ignore.includes(this.tables[i].name))
         await this.tables[i].truncateTable();
     }
+  }
+
+  async addCustom() {
+    await sql`
+      ALTER TABLE newsletter_post
+      ADD CONSTRAINT newsletter_post_nextId_fkey
+      FOREIGN KEY (${sql.ref('nextId')}) 
+      REFERENCES newsletter_post(id)
+      DEFERRABLE INITIALLY DEFERRED
+    `.execute(this.client);
+
+    await sql`
+      ALTER TABLE newsletter_post
+      ADD CONSTRAINT newsletter_post_prevId_fkey
+      FOREIGN KEY (${sql.ref('prevId')}) 
+      REFERENCES newsletter_post(id)
+      DEFERRABLE INITIALLY DEFERRED
+      `.execute(this.client);
   }
 
   async seed() {

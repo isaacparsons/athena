@@ -1,4 +1,4 @@
-import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
+import { CreateTableBuilder, Insertable, Selectable, sql, Updateable } from 'kysely';
 import { DBConnection, TABLE_NAMES, EntityTable } from '@athena/db';
 import { NewsletterPost } from '../types/db';
 
@@ -35,18 +35,41 @@ export class NewsletterPostTableClient extends EntityTable<
     .addColumn('parentId', 'integer', (col) =>
       col.references(`${TABLE_NAMES.NEWSLETTER_POST}.id`).onDelete('cascade')
     )
-    .addColumn('nextId', 'integer', (col) =>
-      col
-        .references(`${TABLE_NAMES.NEWSLETTER_POST}.id`)
-        .unique()
-        .onDelete('set null')
+    .addColumn(
+      'nextId',
+      'integer'
+      // .references(`${TABLE_NAMES.NEWSLETTER_POST}.id`)
+      // .unique()
+      // .onDelete('set null')
+      // .check(sql.raw(`UNIQUE (nextId) DEFERRABLE INITIALLY DEFERRED`))
+
+      // .modifyEnd( )
     )
-    .addColumn('prevId', 'integer', (col) =>
-      col
-        .references(`${TABLE_NAMES.NEWSLETTER_POST}.id`)
-        .unique()
-        .onDelete('set null')
+    .addColumn(
+      'prevId',
+      'integer'
+      // (col) => col
+      // .references(`${TABLE_NAMES.NEWSLETTER_POST}.id`)
+      // .unique()
+      // .onDelete('set null')
+      // .modifyEnd(
+      //   sql.raw(`
+      //   , CONSTRAINT unique_prev_id
+      //     UNIQUE DEFERRABLE INITIALLY DEFERRED
+      // `)
+      // )
+      // .check(sql.raw(`UNIQUE (prevId) DEFERRABLE INITIALLY DEFERRED`))
+      // .check(sql`UNIQUE (prevId) DEFERRABLE INITIALLY DEFERRED`)
     );
+
+  // .modifyEnd(
+  //   sql`
+  //   ADD CONSTRAINT fk_prev_id
+  //     FOREIGN KEY (prevId)
+  //     REFERENCES ${this.name}(id)
+  //     DEFERRABLE INITIALLY DEFERRED
+  // `
+  // );
 }
 // CONSTRAINT fk_prev FOREIGN KEY (prev_id) REFERENCES linked_list (id) ON DELETE SET NULL,
 //TODO: add below check to item type

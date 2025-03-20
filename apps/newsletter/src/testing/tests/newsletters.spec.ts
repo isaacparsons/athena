@@ -8,8 +8,7 @@ import {
   updateNewsletter,
 } from '../test-util';
 import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
-import { CreateNewsletter, NewsletterRole } from '@athena/common';
-
+import { NewsletterRole, CreateNewsletter } from '@athena/common';
 const dbClient = new DBManagerClient();
 
 describe('newsletter routes', () => {
@@ -149,7 +148,6 @@ describe('newsletter routes', () => {
     test('throw error if a user with invalid permissions tries to invite a user', async () => {
       const entities = await createFixture('newsletter-with-read-only-member.yaml');
       const entities2 = await createFixture('user.yaml');
-      // const entities3 = await createFixture('user.yaml');
       const user1 = _.get(entities, ['user', 0]) as SelectUser;
       const user2 = _.get(entities, ['user', 1]) as SelectUser;
       const user3 = _.get(entities2, ['user', 0]) as SelectUser;

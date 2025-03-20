@@ -5,6 +5,8 @@ import {
   UpdateNewsletter,
   InviteNewsletterUser,
   Newsletter,
+  CreateNewsletterPost,
+  // CreateNewsletterPostsBatch,
 } from '@athena/common';
 import { createContext } from '../trpc';
 import {
@@ -93,3 +95,21 @@ export async function updateNewsletterPost(
     newsletterPostMockRequest('update')(userId, input)
   );
 }
+
+export async function createNewsletterPost(
+  userId: number,
+  input: CreateNewsletterPost
+) {
+  return router.newsletterPosts.create(
+    newsletterPostMockRequest('create')(userId, input)
+  ) as Promise<number>;
+}
+
+// export async function createNewsletterPostsBatch(
+//   userId: number,
+//   input: CreateNewsletterPostsBatch
+// ) {
+//   return router.newsletterPosts.createBatch(
+//     newsletterPostMockRequest('createBatch')(userId, input)
+//   ) as Promise<number[]>;
+// }

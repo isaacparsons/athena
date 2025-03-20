@@ -163,12 +163,14 @@ export class NewsletterDAO
 
   async create(userId: number, input: CreateNewsletter): Promise<number> {
     return this.db.transaction().execute(async (trx: Transaction) => {
-      const newsletter = await this.postEntity(trx, userId, {
-        name: input.properties.name,
-        startDate: input.properties.dateRange?.start,
-        endDate: input.properties.dateRange?.end,
-        ownerId: userId,
-      })
+      const newsletter = await this.postEntities(trx, userId, [
+        {
+          name: input.properties.name,
+          startDate: input.properties.dateRange?.start,
+          endDate: input.properties.dateRange?.end,
+          ownerId: userId,
+        },
+      ])
         .returningAll()
         .executeTakeFirstOrThrow();
       await trx
@@ -205,6 +207,14 @@ export class NewsletterDAO
     return res.id;
   }
 
+  private validPermissions(
+    role: NewsletterRole,
+    permissions: NewsletterPermissions[]
+  ) {
+    const rolePermissions = newsletterRolePermissionsMap[role];
+    return permissions.every((permission) => rolePermissions.includes(permission));
+  }
+
   async inviteUser(userId: number, input: InviteNewsletterUser) {
     const { newsletterId, email } = input;
     const { role } = await this.db
@@ -214,15 +224,8 @@ export class NewsletterDAO
         and([eb('userId', '=', userId), eb('newsletterId', '=', newsletterId)])
       )
       .executeTakeFirstOrThrow();
-    console.log({
-      role,
-      permissions: _.get(newsletterRolePermissionsMap, [role ?? '']),
-    });
     if (
-      role === null ||
-      !_.get(newsletterRolePermissionsMap, [role]).includes(
-        NewsletterPermissions.INVITE
-      )
+      !this.validPermissions(role as NewsletterRole, [NewsletterPermissions.INVITE])
     )
       throw new Error(`Do not have permissions`);
 

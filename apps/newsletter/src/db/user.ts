@@ -54,7 +54,7 @@ export class UserNewsletterTableClient extends Table<
       .addColumn('newsletterId', 'integer', (col) =>
         col.references('newsletter.id').onDelete('cascade').notNull()
       )
-      .addColumn('role', 'text');
+      .addColumn('role', 'text', (cb) => cb.notNull());
 }
 
 // export interface UserTemplateTable {

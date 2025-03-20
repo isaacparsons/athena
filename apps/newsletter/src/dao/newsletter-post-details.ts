@@ -4,18 +4,21 @@ import { DBConnection } from '@athena/db';
 import {
   NewsletterPostTypeName,
   NewsletterPostDetails,
-  CreateNewsletterPostDetails,
   ContainerPostDetails,
   TextPostDetails,
   MediaPostDetails,
-  UpdateNewsletterPostDetails,
+  UpdateNewsletterPost,
+  CreateNewsletterPost,
 } from '@athena/common';
 import { TYPES } from '../types/types';
 
 export interface INewsletterPostDetailsDAO {
   get(newsletterItemId: number): Promise<NewsletterPostDetails>;
-  post(newsletterItemId: number, input: CreateNewsletterPostDetails): Promise<void>;
-  update(input: UpdateNewsletterPostDetails): Promise<number>;
+  post(
+    newsletterItemId: number,
+    input: CreateNewsletterPost['details']
+  ): Promise<void>;
+  update(input: UpdateNewsletterPost['details']): Promise<number>;
 }
 
 @injectable()
@@ -68,7 +71,7 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
   }
   async post(
     newsletterPostId: number,
-    input: CreateNewsletterPostDetails
+    input: CreateNewsletterPost['details']
   ): Promise<void | undefined> {
     if (!input) return;
     if (input.type === NewsletterPostTypeName.Text) {
@@ -94,7 +97,7 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
     }
     throw new Error('unrecognized item type');
   }
-  async update(input: UpdateNewsletterPostDetails): Promise<number> {
+  async update(input: UpdateNewsletterPost['details']): Promise<number> {
     const table =
       input.type === NewsletterPostTypeName.Text
         ? 'newsletter_post_text'

@@ -94,7 +94,7 @@ export interface User {
 
 export interface UserNewsletter {
   newsletterId: number;
-  role: string | null;
+  role: string;
   userId: number;
 }
 
