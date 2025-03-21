@@ -102,6 +102,10 @@ export const updateNewsletterPostDetails = z.discriminatedUnion('type', [
   ),
 ]);
 
+export type UpdateNewsletterPostDetails = z.infer<
+  typeof updateNewsletterPostDetails
+>;
+
 export const newsletterPostBase = z.object({
   id: z.coerce.number(),
   newsletterId: z.coerce.number(),

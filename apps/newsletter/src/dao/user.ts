@@ -2,10 +2,9 @@ import _ from 'lodash';
 import { NewsletterBase, User } from '@athena/common';
 import 'reflect-metadata';
 import { DBConnection } from '@athena/db';
-import { creator, modifier, owner } from '../util';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types/types';
-import { mapMeta, mapUser } from './mapping';
+import { mapUser } from './mapping';
 import { INewsletterDAO } from './newsletter';
 
 export interface IUserDAO {

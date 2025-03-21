@@ -19,7 +19,7 @@ import {
   NewsletterRole,
   NewsletterPermissions,
 } from '@athena/common';
-import { creator, modifier, owner } from '../util';
+import { creator, modifier, owner } from '../db/helpers';
 import { IGCSManager } from '@athena/services';
 import { TYPES } from '../types/types';
 import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
@@ -187,7 +187,8 @@ export class NewsletterDAO
   }
 
   async update(userId: number, input: UpdateNewsletter): Promise<number> {
-    const res = await this.updateEntity(this.db, userId, input.id, {
+    const res = await this.updateEntity(this.db, userId, {
+      id: input.id,
       name: input.properties.name,
       startDate: input.properties.dateRange?.start,
       endDate: input.properties.dateRange?.end,

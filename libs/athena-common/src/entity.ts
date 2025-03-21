@@ -111,8 +111,8 @@ export const updateNewsletterPosts = z.array(
   withUpdateInputSchema(
     newsletterPostBase.partial().merge(
       z.object({
-        position: nodePositionInput,
-        details: updateNewsletterPostDetails,
+        position: nodePosition.optional(),
+        details: updateNewsletterPostDetails.optional(),
         location: updateLocation.optional(),
       })
     )

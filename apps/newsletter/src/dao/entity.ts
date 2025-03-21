@@ -83,14 +83,14 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
   updateEntity(
     db: DBConnection,
     userId: number,
-    id: number,
-    values: Partial<
+    input: { id: number } & Partial<
       Omit<
         UpdateObject<Database, T>,
         'created' | 'creatorId' | 'modifier' | 'modified'
       >
     >
   ) {
+    const { id, ...values } = input;
     return db
       .updateTable(this.tableName)
       .set({

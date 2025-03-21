@@ -7,8 +7,8 @@ import {
   ContainerPostDetails,
   TextPostDetails,
   MediaPostDetails,
-  UpdateNewsletterPost,
   CreateNewsletterPost,
+  UpdateNewsletterPostDetails,
 } from '@athena/common';
 import { TYPES } from '../types/types';
 
@@ -18,7 +18,7 @@ export interface INewsletterPostDetailsDAO {
     newsletterItemId: number,
     input: CreateNewsletterPost['details']
   ): Promise<void>;
-  update(input: UpdateNewsletterPost['details']): Promise<number>;
+  update(input: UpdateNewsletterPostDetails): Promise<number>;
 }
 
 @injectable()
@@ -97,7 +97,7 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
     }
     throw new Error('unrecognized item type');
   }
-  async update(input: UpdateNewsletterPost['details']): Promise<number> {
+  async update(input: UpdateNewsletterPostDetails): Promise<number> {
     const table =
       input.type === NewsletterPostTypeName.Text
         ? 'newsletter_post_text'

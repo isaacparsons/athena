@@ -1,9 +1,7 @@
 import _ from 'lodash';
 import 'reflect-metadata';
 import {
-  Database,
   DBConnection,
-  jsonObjectFrom,
   SelectLocation,
   SelectNewsletterPostContainer,
   SelectNewsletterPostMedia,
@@ -21,13 +19,9 @@ import {
   NewsletterPost as NewsletterPostEntity,
   DeleteBatchInput,
   CreateNewsletterPost,
-  // CreateNewsletterPostsBatch,
-  UpdateNewsletterPost,
+  UpdateNewsletterPosts,
   NodePosition,
-  NodePositionInput,
-  isNumberOrNull,
   TempNodePosition,
-  areDefinedOrNull,
 } from '@athena/common';
 import {
   location,
@@ -35,7 +29,7 @@ import {
   newsletterPostDetailsText,
   newsletterPostDetailsContainer,
   selectEntityColumns,
-} from '../util';
+} from '../db/helpers';
 import { inject, injectable, injectFromBase } from 'inversify';
 import { TYPES } from '../types/types';
 import { NewsletterPost } from '../types/db';
@@ -47,7 +41,13 @@ import {
 } from './mapping';
 import { IGCSManager } from '@athena/services';
 import { EntityDAO, EntityMetaRow, IEntityDAO } from './entity';
-import { Expression, expressionBuilder, Selectable } from 'kysely';
+import { Selectable } from 'kysely';
+
+import * as O from 'fp-ts/Option';
+import { pipe } from 'fp-ts/function';
+import * as T from 'fp-ts/Task';
+import * as A from 'fp-ts/Array';
+import * as TE from 'fp-ts/TaskEither';
 
 export type NewsletterPostRow = EntityMetaRow &
   Omit<Selectable<NewsletterPost>, 'modifierId' | 'creatorId' | 'locationId'> & {
@@ -62,12 +62,12 @@ export type INewsletterPostDAO = IEntityDAO<
   NewsletterPostRow,
   NewsletterPostEntity
 > & {
-  deleteMany(input: DeleteBatchInput): Promise<void>;
+  deleteMany(userId: number, input: DeleteBatchInput): Promise<void>;
   create(userId: number, input: CreateNewsletterPost): Promise<number>;
   // createBatch(userId: number, input: CreateNewsletterPostsBatch): Promise<number[]>;
   get(id: number): Promise<NewsletterPostEntity>;
   getByNewsletterId(id: number): Promise<Omit<NewsletterPostEntity, 'children'>[]>;
-  update(userId: number, input: UpdateNewsletterPost): Promise<number>;
+  update(userId: number, input: UpdateNewsletterPosts): Promise<number[]>;
 };
 
 @injectable()
@@ -111,75 +111,11 @@ export class NewsletterPostDAO
     };
   }
 
-  async deleteMany(input: DeleteBatchInput) {
-    const { ids } = input;
-    await this.db.transaction().execute(async (trx: Transaction) => {
-      await Promise.all(
-        ids.map(async (id) => {
-          const post = await trx
-            .selectFrom('newsletter_post')
-            .where('id', '=', id)
-            .select(['id', 'nextId', 'prevId'])
-            .executeTakeFirstOrThrow();
+  // toRow<E extends NewsletterPostEntity>(entity: E){
+  //   return {
 
-          // update item that has nextId = id to have nextId = item's nextId
-          await trx
-            .updateTable('newsletter_post')
-            .set({ nextId: post.nextId })
-            .where('nextId', '=', id)
-            .execute();
-
-          // update item that has previousId = id to have previousId = item's previousId
-          await trx
-            .updateTable('newsletter_post')
-            .set({ prevId: post.prevId })
-            .where('prevId', '=', id)
-            .execute();
-
-          await trx
-            .deleteFrom('newsletter_post')
-            .where('id', '=', id)
-            .executeTakeFirstOrThrow();
-        })
-      );
-    });
-  }
-
-  private async updateNodePositions(
-    db: DBConnection,
-    id: number,
-    position: NodePosition
-  ) {
-    const { parentId } = position;
-    const nextId = _.get(position, ['nextId']);
-    if (nextId !== undefined) {
-      await db
-        .updateTable('newsletter_post')
-        .set({ nextId: id })
-        .where(({ and, eb }) =>
-          and([
-            eb('nextId', nextId === null ? 'is' : '=', nextId),
-            eb('parentId', parentId === null ? 'is' : '=', parentId),
-            eb('id', '!=', id),
-          ])
-        )
-        .executeTakeFirst();
-    }
-    const prevId = _.get(position, ['prevId']);
-    if (prevId !== undefined) {
-      await db
-        .updateTable('newsletter_post')
-        .set({ prevId: id })
-        .where(({ and, eb }) =>
-          and([
-            eb('prevId', prevId === null ? 'is' : '=', prevId),
-            eb('parentId', parentId === null ? 'is' : '=', parentId),
-            eb('id', '!=', id),
-          ])
-        )
-        .executeTakeFirst();
-    }
-  }
+  //   }
+  // }
 
   private async getNeighbours(
     db: DBConnection,
@@ -261,12 +197,7 @@ export class NewsletterPostDAO
     await Promise.all(
       nodes.map(async (n) => {
         const realPos = getRealPosition(n.tempPosition);
-        await this.updateEntity(
-          db,
-          userId,
-          realPos.id,
-          _.omit(realPos, ['id'])
-        ).executeTakeFirstOrThrow();
+        await this.updateEntity(db, userId, realPos).executeTakeFirstOrThrow();
       })
     );
   }
@@ -300,11 +231,13 @@ export class NewsletterPostDAO
         .executeTakeFirstOrThrow();
 
       if (nextId !== null)
-        await this.updateEntity(trx, userId, nextId, {
+        await this.updateEntity(trx, userId, {
+          id: nextId,
           prevId: id,
         }).executeTakeFirstOrThrow();
       if (prevId !== null)
-        await this.updateEntity(trx, userId, prevId, {
+        await this.updateEntity(trx, userId, {
+          id: prevId,
           nextId: id,
         }).executeTakeFirstOrThrow();
 
@@ -430,70 +363,99 @@ export class NewsletterPostDAO
     });
   }
 
-  async update(userId: number, input: UpdateNewsletterPost) {
-    const { id, date, location, position, details, newsletterId } = input;
-    if (!date && !location && !position && !details)
-      throw new Error('no update specified');
-
+  async update(userId: number, input: UpdateNewsletterPosts) {
     return this.db.transaction().execute(async (trx: Transaction) => {
-      return 1;
-      // if (details) await new NewsletterPostDetailsDAO(trx).update(details);
-      // if (location) await new LocationDAO(trx).update(location);
+      // TODO: should probably verify theyre structure is correct
 
-      // const result = await trx
-      //   .updateTable('newsletter_post')
-      //   .set({
-      //     modified: new Date().toISOString(),
-      //     modifierId: userId,
-      //     ...(date ? { date } : {}),
-      //   })
-      //   .where('id', '=', id)
-      //   .returningAll()
-      //   .executeTakeFirstOrThrow();
+      const updatePostLocation = (
+        post: UpdateNewsletterPosts[number]
+      ): O.Option<T.Task<number>> =>
+        pipe(
+          O.fromNullable(post.location),
+          O.map((loc) => () => new LocationDAO(trx).update(loc))
+        );
 
-      // if (position) {
-      //   await trx
-      //     .updateTable('newsletter_post')
-      //     .set({ nextId: result.nextId })
-      //     .where('nextId', '=', id)
-      //     .returningAll()
-      //     .executeTakeFirstOrThrow();
+      const updatePostDetail = (
+        post: UpdateNewsletterPosts[number]
+      ): O.Option<T.Task<number>> =>
+        pipe(
+          O.fromNullable(post.details),
+          O.map((details) => () => new NewsletterPostDetailsDAO(trx).update(details))
+        );
 
-      //   await trx
-      //     .updateTable('newsletter_post')
-      //     .set({ prevId: result.prevId })
-      //     .where('prevId', '=', id)
-      //     .returningAll()
-      //     .executeTakeFirstOrThrow();
+      const updatePost = (
+        post: UpdateNewsletterPosts[number]
+      ): TE.TaskEither<Error, number> =>
+        pipe(
+          TE.tryCatch(
+            () =>
+              this.updateEntity(trx, userId, {
+                id: post.id,
+                title: post.title,
+                parentId: post.position?.parentId ?? null,
+                nextId: post.position?.nextId ?? null,
+                prevId: post.position?.prevId ?? null,
+              })
+                .returning('id')
+                .executeTakeFirstOrThrow(),
+            (reason) => new Error(String(reason))
+          ),
+          TE.map((p) => p.id)
+        );
 
-      //   const { left, right } = await this.getAndVerifyNodes(
-      //     trx,
-      //     newsletterId,
-      //     position
-      //   );
-      //   await trx
-      //     .updateTable('newsletter_post as ni')
-      //     .set({ prevId: position.prevId, nextId: position.nextId })
-      //     .where('ni.id', '=', id)
-      //     .executeTakeFirstOrThrow();
+      // update locations
+      await pipe(input, A.map(updatePostLocation), A.compact, A.sequence(T.task))();
 
-      //   if (right !== null) {
-      //     await trx
-      //       .updateTable('newsletter_post as ni')
-      //       .set({ prevId: id })
-      //       .where('ni.id', '=', right.id)
-      //       .executeTakeFirstOrThrow();
-      //   }
+      // update details
+      await pipe(input, A.map(updatePostDetail), A.compact, A.sequence(T.task))();
 
-      //   if (left !== null) {
-      //     await trx
-      //       .updateTable('newsletter_post as ni')
-      //       .set({ nextId: id })
-      //       .where('ni.id', '=', left.id)
-      //       .executeTakeFirstOrThrow();
-      //   }
-      // }
-      // return result.id;
+      const result = await pipe(input, A.traverse(TE.ApplicativePar)(updatePost))();
+      if (result._tag === 'Left') {
+        throw new Error(`Failed to update some posts: ${result.left.message}`);
+      } else {
+        return result.right;
+      }
+    });
+  }
+
+  async deleteMany(userId: number, input: DeleteBatchInput) {
+    const { ids } = input;
+    await this.db.transaction().execute(async (trx: Transaction) => {
+      const deletedPosts = await trx
+        .deleteFrom('newsletter_post')
+        .where('id', 'in', ids)
+        .returning(['id', 'nextId', 'prevId', 'parentId', 'newsletterId'])
+        .execute();
+
+      // update post with nextId = post.id to have nextId = post.nextId
+      // update post with prevId = post.id to have prevId = post.prevId
+      await Promise.all(
+        deletedPosts.map(async (p) => {
+          await trx
+            .updateTable('newsletter_post')
+            .set({ nextId: p.nextId })
+            .where(({ and, eb }) =>
+              and([
+                eb('nextId', '=', p.id),
+                eb('parentId', '=', p.parentId),
+                eb('newsletterId', '=', p.newsletterId),
+              ])
+            )
+            .execute();
+
+          await trx
+            .updateTable('newsletter_post')
+            .set({ prevId: p.prevId })
+            .where(({ and, eb }) =>
+              and([
+                eb('prevId', '=', p.id),
+                eb('parentId', '=', p.parentId),
+                eb('newsletterId', '=', p.newsletterId),
+              ])
+            )
+            .execute();
+        })
+      );
     });
   }
 }

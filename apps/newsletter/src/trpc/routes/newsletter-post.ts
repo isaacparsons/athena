@@ -6,7 +6,7 @@ import {
   deleteBatchInput,
   getInput,
   getPostUploadLinks,
-  updateNewsletterPost,
+  updateNewsletterPosts,
 } from '@athena/common';
 
 const router = trpc.router({
@@ -40,14 +40,14 @@ const router = trpc.router({
   //     return ctx.dao.newsletterPost.createBatch(ctx.user.userId, input);
   //   }),
   update: loggedInProcedure
-    .input(updateNewsletterPost)
+    .input(updateNewsletterPosts)
     .mutation(({ input, ctx }) => {
       return ctx.dao.newsletterPost.update(ctx.user.userId, input);
     }),
   deleteMany: loggedInProcedure
     .input(deleteBatchInput)
     .mutation(async ({ input, ctx }) => {
-      return ctx.dao.newsletterPost.deleteMany(input);
+      return ctx.dao.newsletterPost.deleteMany(ctx.user.userId, input);
     }),
 });
 export default router;

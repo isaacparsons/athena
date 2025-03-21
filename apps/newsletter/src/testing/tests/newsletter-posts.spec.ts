@@ -1,154 +1,29 @@
 import { createFixture } from '../setup';
 import _ from 'lodash';
-import { appRouter as router } from '../../trpc/routes';
 import {
   CreateNewsletterPost,
   CreateNewsletterPostChild,
-  NewsletterPost,
   NewsletterPostTypeName,
+  TempNodePosition,
 } from '@athena/common';
+import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
 import {
-  DBManagerClient,
-  SelectNewsletter,
-  SelectNewsletterPost,
-  SelectUser,
-} from '@athena/db';
-import {
-  createMockRequest,
   createNewsletterPost,
-  deleteNewsletterPost,
-  getNewsletter,
+  deleteNewsletterPosts,
   getNewsletterPost,
-  updateNewsletterPost,
+  updateNewsletterPosts,
 } from '../test-util';
 
-// const createPostsBatch1 = (
-//   newsletterId: number
-// ): CreateNewsletterPostBatchItem[] => [
-//   {
-//     newsletterId,
-//     title: 'node item 1',
-//     temp: {
-//       id: '1',
-//       parentId: null,
-//       nextId: null,
-//       prevId: null,
-//     },
-//     details: {
-//       type: NewsletterPostTypeName.Container,
-//       name: 'container',
-//     },
-//   },
-//   {
-//     newsletterId,
-//     title: 'text item 1',
-//     temp: {
-//       id: '2',
-//       parentId: '1',
-//       nextId: '3',
-//       prevId: null,
-//     },
-//     details: {
-//       type: NewsletterPostTypeName.Text,
-//       name: 'text item 1',
-//     } as CreateNewsletterPostDetailsText,
-//   },
-//   {
-//     newsletterId,
-//     title: 'text item 2',
-//     temp: {
-//       id: '3',
-//       parentId: '1',
-//       nextId: null,
-//       prevId: '2',
-//     },
-//     details: {
-//       type: NewsletterPostTypeName.Text,
-//       name: 'text item 2',
-//     } as CreateNewsletterPostDetailsText,
-//   },
-// ];
-
-// const createPostsBatch2 = (
-//   newsletterId: number
-// ): CreateNewsletterPostBatchItem[] => [
-//   {
-//     newsletterId,
-//     title: 'node item 1',
-//     temp: {
-//       id: '1',
-//       parentId: null,
-//       nextId: null,
-//       prevId: null,
-//     },
-//     details: {
-//       type: NewsletterPostTypeName.Container,
-//       name: 'container',
-//     },
-//   },
-//   {
-//     newsletterId,
-//     title: 'text item 1',
-//     temp: {
-//       id: '2',
-//       parentId: '1',
-//       nextId: '3',
-//       prevId: null,
-//     },
-//     details: {
-//       type: NewsletterPostTypeName.Text,
-//       name: 'text item 1',
-//     } as CreateNewsletterPostDetailsText,
-//   },
-//   {
-//     newsletterId,
-//     title: 'text item 2',
-//     temp: {
-//       id: '3',
-//       parentId: '1',
-//       nextId: '4',
-//       prevId: '2',
-//     },
-//     details: {
-//       type: NewsletterPostTypeName.Text,
-//       name: 'text item 2',
-//     } as CreateNewsletterPostDetailsText,
-//   },
-//   {
-//     newsletterId,
-//     title: 'text item 3',
-//     temp: {
-//       id: '4',
-//       parentId: '1',
-//       nextId: null,
-//       prevId: '3',
-//     },
-//     details: {
-//       type: NewsletterPostTypeName.Text,
-//       name: 'text item 3',
-//     } as CreateNewsletterPostDetailsText,
-//   },
-// ];
-
-// async function addPosts(
-//   posts: CreateNewsletterPostBatchItem[],
-//   userId: number,
-//   newsletterId: number
-// ) {
-//   const inputBatch: CreateNewsletterPostsBatch = {
-//     newsletterId,
-//     position: {
-//       parentId: null,
-//       nextId: null,
-//       prevId: null,
-//     },
-//     batch: posts,
-//   };
-//   const ids = (await router.newsletterPosts.createBatch(
-//     createMockRequest(userId, inputBatch)
-//   )) as number[];
-//   return Promise.all(ids.map((id) => getNewsletterPost(userId, id)));
-// }
+const createMockTextPostChild = (
+  newsletterId: number,
+  name: string,
+  tempPosition: TempNodePosition
+): CreateNewsletterPostChild => ({
+  newsletterId,
+  title: name,
+  tempPosition,
+  details: { type: NewsletterPostTypeName.Text, name },
+});
 
 const dbClient = new DBManagerClient();
 
@@ -169,7 +44,7 @@ describe('newsletter post routes', () => {
   // });
 
   describe('create newsletter item', () => {
-    test.only('add item with children', async () => {
+    test('add item with children', async () => {
       const child1Input: CreateNewsletterPostChild = {
         newsletterId: newsletter.id,
         title: 'text item 2',
@@ -406,5 +281,181 @@ describe('newsletter post routes', () => {
     //   const postsAfter = await getNewsletterPost(user.id, post1!.id);
     //   console.log(JSON.stringify(postsAfter, null, 4));
     // });
+  });
+  describe('update newsletter item', () => {
+    test('swap children', async () => {
+      const id = await createNewsletterPost(user.id, {
+        newsletterId: newsletter.id,
+        position: { parentId: null, nextId: null },
+        title: 'test text item 1',
+        details: {
+          type: NewsletterPostTypeName.Container,
+          name: 'test text item 1',
+        },
+        children: [
+          createMockTextPostChild(newsletter.id, 'text item 2', {
+            id: '1',
+            parentId: null,
+            nextId: '2',
+            prevId: null,
+          }),
+          createMockTextPostChild(newsletter.id, 'text item 3', {
+            id: '2',
+            parentId: null,
+            nextId: null,
+            prevId: '1',
+          }),
+        ],
+      });
+
+      const posts = await getNewsletterPost(user.id, id);
+
+      const next = posts.children.find(
+        (c) => _.get(c, ['position', 'nextId']) === null
+      );
+      const prev = posts.children.find(
+        (c) => _.get(c, ['position', 'prevId']) === null
+      );
+
+      const updatedPosts = [
+        {
+          id: next!.id,
+          position: {
+            parentId: id,
+            nextId: prev!.id,
+            prevId: null,
+          },
+        },
+        {
+          id: prev!.id,
+          position: {
+            parentId: id,
+            nextId: null,
+            prevId: next!.id,
+          },
+        },
+      ];
+
+      await updateNewsletterPosts(user.id, updatedPosts);
+
+      const postsAfter = await getNewsletterPost(user.id, id);
+
+      const child1 = postsAfter.children.find((c) => c.id === next!.id);
+
+      expect(_.get(child1, ['position'])).toMatchObject({
+        parentId: id,
+        nextId: prev!.id,
+        prevId: null,
+      });
+
+      const child2 = postsAfter.children.find((c) => c.id === prev!.id);
+
+      expect(_.get(child2, ['position'])).toMatchObject({
+        parentId: id,
+        nextId: null,
+        prevId: next!.id,
+      });
+    });
+
+    // test.only('update post details / location', async () => {
+    //   const id = await createNewsletterPost(user.id, {
+    //     newsletterId: newsletter.id,
+    //     position: { parentId: null, nextId: null },
+    //     title: 'test text item 1',
+    //     details: {
+    //       type: NewsletterPostTypeName.Container,
+    //       name: 'test text item 1',
+    //     },
+    //     children: [],
+    //   });
+
+    //   const posts = await getNewsletterPost(user.id, id);
+
+    //   const next = posts.children.find(
+    //     (c) => _.get(c, ['position', 'nextId']) === null
+    //   );
+    //   const prev = posts.children.find(
+    //     (c) => _.get(c, ['position', 'prevId']) === null
+    //   );
+
+    //   const updatedPosts = [
+    //     {
+    //       id: next!.id,
+    //       position: {
+    //         parentId: id,
+    //         nextId: prev!.id,
+    //         prevId: null,
+    //       },
+    //     },
+    //     {
+    //       id: prev!.id,
+    //       position: {
+    //         parentId: id,
+    //         nextId: null,
+    //         prevId: next!.id,
+    //       },
+    //     },
+    //   ];
+
+    //   await updateNewsletterPosts(user.id, updatedPosts);
+
+    //   const postsAfter = await getNewsletterPost(user.id, id);
+
+    //   const child1 = postsAfter.children.find((c) => c.id === next!.id);
+
+    //   expect(_.get(child1, ['position'])).toMatchObject({
+    //     parentId: id,
+    //     nextId: prev!.id,
+    //     prevId: null,
+    //   });
+
+    //   const child2 = postsAfter.children.find((c) => c.id === prev!.id);
+
+    //   expect(_.get(child2, ['position'])).toMatchObject({
+    //     parentId: id,
+    //     nextId: null,
+    //     prevId: next!.id,
+    //   });
+    // });
+  });
+  test.only('delete posts', async () => {
+    const id = await createNewsletterPost(user.id, {
+      newsletterId: newsletter.id,
+      position: { parentId: null, nextId: null },
+      title: 'test text item 1',
+      details: {
+        type: NewsletterPostTypeName.Container,
+        name: 'test text item 1',
+      },
+      children: [
+        createMockTextPostChild(newsletter.id, 'text item 2', {
+          id: '1',
+          parentId: null,
+          nextId: '2',
+          prevId: null,
+        }),
+        createMockTextPostChild(newsletter.id, 'text item 3', {
+          id: '2',
+          parentId: null,
+          nextId: '3',
+          prevId: '1',
+        }),
+        createMockTextPostChild(newsletter.id, 'text item 4', {
+          id: '3',
+          parentId: null,
+          nextId: null,
+          prevId: '2',
+        }),
+      ],
+    });
+
+    const posts = await getNewsletterPost(user.id, id);
+
+    const post = posts.children.find((c) => c.title === 'text item 3');
+
+    await deleteNewsletterPosts(user.id, [post!.id]);
+
+    const postsAfter = await getNewsletterPost(user.id, id);
+    console.log(JSON.stringify(postsAfter, null, 4));
   });
 });

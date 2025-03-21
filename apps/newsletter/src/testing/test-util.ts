@@ -1,7 +1,7 @@
 import {
   CreateNewsletter,
   NewsletterPost,
-  UpdateNewsletterPost,
+  UpdateNewsletterPosts,
   UpdateNewsletter,
   InviteNewsletterUser,
   Newsletter,
@@ -78,18 +78,15 @@ export async function getNewsletterPost(userId: number, newsletterPostId: number
   ) as Promise<NewsletterPost>;
 }
 
-export async function deleteNewsletterPost(
-  userId: number,
-  newsletterPostIds: number[]
-) {
+export async function deleteNewsletterPosts(userId: number, ids: number[]) {
   return router.newsletterPosts.deleteMany(
-    newsletterPostMockRequest('deleteMany')(userId, { ids: newsletterPostIds })
+    newsletterPostMockRequest('deleteMany')(userId, { ids })
   );
 }
 
-export async function updateNewsletterPost(
+export async function updateNewsletterPosts(
   userId: number,
-  input: UpdateNewsletterPost
+  input: UpdateNewsletterPosts
 ) {
   return router.newsletterPosts.update(
     newsletterPostMockRequest('update')(userId, input)
