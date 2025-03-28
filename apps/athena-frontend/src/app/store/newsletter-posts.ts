@@ -3,31 +3,15 @@ import axios from 'axios';
 import {
   CreateManyNewsletterPosts,
   DeleteBatchInput,
-  //   CreateNewsletterPostBatchItem,
   NewsletterPost,
   NewsletterPostTypeName,
-  //   NewsletterPostPostName,
-  NodePosition,
-  //   UpdateNewsletterPost,
 } from '@athena/common';
-import {
-  // FileMap,
-  Slices,
-} from '@athena/store';
+import { Slices } from '@athena/store';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { asyncTrpcClient } from '../../trpc';
-// import { mapToStoreItem, traverseItemIds } from '../../util';
 
 export type FileMap = Record<string, File>;
-
-// export type StoreNewsletterPost<
-//   T extends NewsletterPostPostName = NewsletterPostPostName
-// > = Omit<NewsletterPost<T>, 'children'> & {
-//   childrenIds: number[];
-// };
-
-// export type StoreNewsletterPost = Omit<NewsletterPost, 'children'>;
 
 export interface NewsletterPostsSlice {
   newsletterPosts: {
@@ -36,22 +20,6 @@ export interface NewsletterPostsSlice {
     saving: boolean;
     create: (input: CreateManyNewsletterPosts, files?: FileMap) => Promise<void>;
     delete: (newsletterId: number, input: DeleteBatchInput) => Promise<void>;
-
-    // editing: boolean;
-    // selectedItemIds: number[];
-    // uploading: boolean;
-    // setEditing: (editing: boolean) => void;
-    // updatedItem: UpdateNewsletterPost | null;
-    // setUpdatedItem: (item: UpdateNewsletterPost | null) => void;
-    // update: () => Promise<void>;
-    // selectItemIds: (itemsIds: number[]) => void;
-    // fetch: (id: number) => Promise<void>;
-    // upload: (
-    //   newsletterId: number,
-    //   position: NodePosition,
-    //   batch: CreateNewsletterPostBatchItem[],
-    //   files: FileMap
-    // ) => Promise<void>;
   };
 }
 
@@ -59,10 +27,6 @@ const DEFAULT_DATA = {
   loading: false,
   data: {},
   saving: false,
-  //   editing: false,
-  //   selectedItemIds: [],
-  //   uploading: false,
-  //   updatedItem: null,
 };
 
 export const createNewsletterPostsSlice: StateCreator<
@@ -89,43 +53,6 @@ export const createNewsletterPostsSlice: StateCreator<
         });
       });
     },
-    // setEditing: (editing: boolean) => {
-    //   set((state) => {
-    //     state.newsletterPosts.editing = editing;
-    //   });
-    // },
-    // selectItemIds: (itemsIds: number[]) => {
-    //   set((state) => {
-    //     state.newsletterItems.selectedItemIds = traverseItemIds(
-    //       _.cloneDeep(state.newsletterItems.data),
-    //       [],
-    //       _.cloneDeep(itemsIds)
-    //     );
-    //   });
-    // },
-    // setUpdatedItem: (item: UpdateNewsletterPost | null) => {
-    //   set((state) => {
-    //     state.newsletterItems.updatedItem = item
-    //       ? {
-    //           ...(state.newsletterItems.updatedItem ?? {}),
-    //           ...item,
-    //         }
-    //       : null;
-    //   });
-    // },
-    // update: async () => {
-    //   const item = get().newsletterItems.updatedItem;
-    //   if (!item) return;
-
-    //   await asyncTrpcClient.newsletterItems.update.mutate(item);
-    //   await get().newsletters.fetch(item.newsletterId);
-
-    //   set((state) => {
-    //     state.newsletterItems.editing = false;
-    //     state.newsletterItems.updatedItem = null;
-    //   });
-    // },
-
     create: async (input: CreateManyNewsletterPosts, files?: FileMap) => {
       set((state) => {
         state.newsletterPosts.saving = true;
@@ -170,7 +97,7 @@ export const createNewsletterPostsSlice: StateCreator<
         state.newsletterPosts.saving = true;
       });
       await asyncTrpcClient.newsletterPosts.deleteMany.mutate(input);
-      // await get().newsletters.fetch(newsletterId);
+      await get().newsletters.fetch(newsletterId);
       set((state) => {
         state.newsletterPosts.saving = false;
       });

@@ -4,19 +4,20 @@ import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import cors from 'cors';
 import { getConfig } from './util';
 import { createContext, appRouter, initPassport } from './trpc';
+import path from 'path';
 
 const config = getConfig();
 
 export let app = express();
 app.use(
   cors({
-    credentials: true,
-    origin: [
-      `http://${config.client.host}:${config.client.port}`,
-      'https://storage.googleapis.com/athena-newsletter',
-    ],
-    // credentials: false,
-    // origin: '*',
+    // credentials: true,
+    // origin: [
+    //   `http://${config.client.host}:${config.client.port}`,
+    //   'https://storage.googleapis.com/athena-newsletter',
+    // ],
+    credentials: false,
+    origin: '*',
     // AccessControlAllowOrigin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   })
@@ -45,4 +46,17 @@ app.use(
 
 app.listen(config.app.port, config.app.host, () => {
   console.log(`[ ready ] http://${config.app.host}:${config.app.port}`);
+});
+
+// web app
+export const webApp = express();
+const webAppPath = path.join(__dirname, '..', '..', '..', '..', 'athena-frontend');
+webApp.use(express.static(webAppPath));
+
+webApp.get('*', (req, res) => {
+  res.sendFile(path.join(webAppPath, 'index.html'));
+});
+
+webApp.listen(config.client.port, config.client.host, () => {
+  console.log(`[ ready ] http://${config.client.host}:${config.client.port}`);
 });

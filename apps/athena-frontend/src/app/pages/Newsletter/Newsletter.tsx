@@ -10,7 +10,6 @@ import {
   BackButton,
   CustomContainer,
   NewsletterPostChanges,
-  NewsletterPostsList,
 } from '@athena/components';
 import { CloseIcon, EditIcon } from '@athena/icons';
 import { useNewsletter, useParamId, usePosts } from '@athena/hooks';
@@ -54,7 +53,6 @@ export function Newsletter() {
       newsletterId !== undefined
     ) {
       await deletePosts(newsletterId, changes.delete);
-      await fetchNewsletter(newsletterId);
     }
   };
 

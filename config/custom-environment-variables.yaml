@@ -1,0 +1,25 @@
+app:
+  host: APP_HOST
+  port: APP_PORT
+  sessionSecret: APP_SESSION_SECRET
+  sessionCookieName: APP_SESSION_COOKIE_NAME
+  adminSecret: APP_ADMIN_SECRET
+
+client:
+  host: CLIENT_HOST
+  port: CLIENT_PORT
+
+db:
+  host: DB_HOST
+  port: DB_PORT
+  name: DB_NAME
+  username: DB_USERNAME
+  password: DB_PASSWORD
+
+google:
+  clientId: GOOGLE_CLIENT_ID
+  clientSecret: GOOGLE_CLIENT_SECRET
+  callbackUrl: GOOGLE_CALLBACK_URL
+
+gcs:
+  bucketName: GCS_BUCKET_NAME

@@ -1,0 +1,1 @@
+docker-compose --env-file ./.env.local build && docker-compose --env-file ./.env.local up -d db && npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/create-tables.ts && npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/seed.ts && docker-compose --env-file ./.env.local up api

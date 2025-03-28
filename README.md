@@ -43,3 +43,9 @@ To generate a new library, use:
 ```sh
 npx nx g @nx/node:lib mylib
 ```
+
+run api
+
+```sh
+nx run newsletter:build && docker-compose --env-file ./.env.local build && docker-compose --env-file ./.env.local up api
+```

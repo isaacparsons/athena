@@ -1,1 +1,25 @@
-# development
+app:
+  host: localhost
+  port: 3000
+  sessionSecret: '123456789'
+  sessionCookieName: newsletter_session
+  adminSecret: '123456'
+
+db:
+  host: localhost
+  port: 5432
+  name: newsletter
+  username: postgres
+  password: postgres
+
+google:
+  clientId: 123
+  clientSecret: 123
+  callbackUrl: localhost
+
+gcs:
+  bucketName: athena-newsletter
+
+client:
+  host: localhost
+  port: 4200

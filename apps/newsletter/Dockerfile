@@ -1,7 +1,9 @@
 FROM node:18
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install --only=production
-COPY ../../dist/apps/newsletter ./dist
+RUN npm install
+COPY dist/apps ./dist
+COPY config ./config
 EXPOSE 3000
-CMD ["node", "./dist/index.js"]
+EXPOSE 4200
+CMD ["node", "./dist/newsletter/main.js"]
