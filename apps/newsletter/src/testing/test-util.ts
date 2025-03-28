@@ -6,6 +6,7 @@ import {
   InviteNewsletterUser,
   Newsletter,
   CreateNewsletterPost,
+  CreateManyNewsletterPosts,
   // CreateNewsletterPostsBatch,
 } from '@athena/common';
 import { createContext } from '../trpc';
@@ -46,8 +47,8 @@ export async function getNewsletter(userId: number, newsletterId: number) {
 }
 
 export async function createNewsletter(userId: number, input: CreateNewsletter) {
-  return router.newsletters.post(
-    newsletterMockRequest('post')(userId, input)
+  return router.newsletters.create(
+    newsletterMockRequest('create')(userId, input)
   ) as Promise<number>;
 }
 
@@ -93,12 +94,12 @@ export async function updateNewsletterPosts(
   );
 }
 
-export async function createNewsletterPost(
+export async function createNewsletterPosts(
   userId: number,
-  input: CreateNewsletterPost
+  input: CreateManyNewsletterPosts
 ) {
-  return router.newsletterPosts.create(
-    newsletterPostMockRequest('create')(userId, input)
+  return router.newsletterPosts.createMany(
+    newsletterPostMockRequest('createMany')(userId, input)
   ) as Promise<number>;
 }
 

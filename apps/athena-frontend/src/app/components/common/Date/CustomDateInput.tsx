@@ -8,7 +8,7 @@ import { StyledDialog } from '@athena/components';
 
 interface CustomDateInputProps {
   open: boolean;
-  date?: string;
+  date?: string | null;
   onClose: () => void;
   onSave: (date: string | null) => void;
 }

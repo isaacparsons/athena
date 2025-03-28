@@ -10,31 +10,31 @@ import {
   TextField,
 } from '@mui/material';
 import { LocationIcon } from '@athena/icons';
-import { CreateLocation, Position } from '@athena/common';
+import { CreateLocation, GeoPosition } from '@athena/common';
 import { StyledDialog } from '@athena/components';
 
 const MAP_ZOOM = 12;
 const GOOGLE_API_KEY = 'AIzaSyCQJxFCjWTq0wD0rZgKNWva92xJ2oDiuCU';
 
-interface CustomLocationDialogProps {
+interface CustomLocationDialogProps<T> {
   open: boolean;
   onClose: () => void;
-  onSave: (location: CreateLocation) => void;
+  onSave: (location: T) => void;
 }
 
-const formatLatLng = (pos: Position) => ({
+const formatLatLng = (pos: GeoPosition) => ({
   lat: pos.latitude,
   lng: pos.longitude,
 });
 
-export function CustomLocationDialog({
+export function CreateLocationDialog<T extends CreateLocation>({
   open,
   onClose,
   onSave,
-}: CustomLocationDialogProps) {
+}: CustomLocationDialogProps<T>) {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
-  const [currentLocation, setCurrentLocation] = useState<Position | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<GeoPosition | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -58,11 +58,12 @@ export function CustomLocationDialog({
             latitude: currentLocation.latitude,
             longitude: currentLocation.longitude,
           }
-        : undefined;
+        : null;
     onSave({
-      name: name.length > 0 ? name : undefined,
-      position: pos,
-    });
+      name: name.length > 0 ? name : null,
+      country: null, // TODO: fix this
+      geoPosition: pos,
+    } as T);
   };
 
   return (

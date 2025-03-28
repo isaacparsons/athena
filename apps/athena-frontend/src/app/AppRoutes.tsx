@@ -1,23 +1,28 @@
 import { ReactNode } from 'react';
-import { createHashRouter, Navigate, Outlet, RouteObject } from 'react-router-dom';
+import {
+  createHashRouter,
+  Navigate,
+  Outlet,
+  RouteObject,
+  useRouteError,
+} from 'react-router-dom';
 import {
   Login,
   Newsletter,
   Home,
   NotFound,
-  NewsletterPost,
-  Templates,
-  NewsletterPostTemplate,
+  // Templates,
   Newsletters,
 } from './pages';
 import { UserBase } from '@athena/common';
 import { Appbar } from '@athena/components';
+import { NewsletterPost } from './pages/NewsletterPost';
 
 export enum RoutePaths {
   home = '/',
   newsletters = '/newsletters',
   newsletter = '/newsletters/:newsletterId',
-  newsletterItems = '/newsletters/:newsletterId/items/:newsletterItemId',
+  newsletterPost = '/newsletters/:newsletterId/posts/:newsletterPostId',
   login = '/login',
   templates = '/templates',
   newsletterItemTemplate = '/templates/item/:newsletterItemTemplateId',
@@ -46,13 +51,30 @@ function WithAppbar(props: WithAppbarProps) {
   const { children } = props;
   return (
     <>
-      <Appbar title="newsletter" />
+      <Appbar title="Reeliv" />
       {children}
     </>
   );
 }
-
+function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+  return (
+    <div>
+      <h1>Oops, something went wrong!</h1>
+      <p>{(error as Error).toString()}</p>
+    </div>
+  );
+}
 const routerConfig: RouteObject[] = [
+  // {
+  //   path: '/not-found',
+  //   errorElement: <ErrorBoundary />,
+  // },
+  {
+    path: 'not-found',
+    element: <NotFound />,
+  },
   {
     path: RoutePaths.home,
     element: <Home />,
@@ -80,23 +102,23 @@ const routerConfig: RouteObject[] = [
     ),
   },
   {
-    path: RoutePaths.newsletterItems,
+    path: RoutePaths.newsletterPost,
     element: <NewsletterPost />,
   },
-  {
-    path: RoutePaths.templates,
-    element: (
-      <WithAppbar>
-        <WithOutlet>
-          <Templates />
-        </WithOutlet>
-      </WithAppbar>
-    ),
-  },
-  {
-    path: RoutePaths.newsletterItemTemplate,
-    element: <NewsletterPostTemplate />,
-  },
+  // {
+  //   path: RoutePaths.templates,
+  //   element: (
+  //     <WithAppbar>
+  //       <WithOutlet>
+  //         <Templates />
+  //       </WithOutlet>
+  //     </WithAppbar>
+  //   ),
+  // },
+  // {
+  //   path: RoutePaths.newsletterItemTemplate,
+  //   element: <NewsletterPostTemplate />,
+  // },
 ];
 
 export const appBarVisiblePaths = ['/', '/login', '/templates'];

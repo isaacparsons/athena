@@ -22,6 +22,7 @@ import {
   UpdateNewsletterPosts,
   NodePosition,
   TempNodePosition,
+  CreateManyNewsletterPosts,
 } from '@athena/common';
 import {
   location,
@@ -63,7 +64,7 @@ export type INewsletterPostDAO = IEntityDAO<
   NewsletterPostEntity
 > & {
   deleteMany(userId: number, input: DeleteBatchInput): Promise<void>;
-  create(userId: number, input: CreateNewsletterPost): Promise<number>;
+  createMany(userId: number, input: CreateManyNewsletterPosts): Promise<number>;
   // createBatch(userId: number, input: CreateNewsletterPostsBatch): Promise<number[]>;
   get(id: number): Promise<NewsletterPostEntity>;
   getByNewsletterId(id: number): Promise<Omit<NewsletterPostEntity, 'children'>[]>;
@@ -94,7 +95,7 @@ export class NewsletterPostDAO
       meta: mapMeta(row),
       position: mapPosition(row),
       location: mapLocation(row),
-      date: _.isNull(row.date) ? undefined : row.date,
+      date: _.isNull(row.date) ? null : row.date,
       title: row.title,
       details: mapNewsletterPostDetails(
         row.mediaDetails,
@@ -110,12 +111,6 @@ export class NewsletterPostDAO
       children: row.children.map(this.mapItem),
     };
   }
-
-  // toRow<E extends NewsletterPostEntity>(entity: E){
-  //   return {
-
-  //   }
-  // }
 
   private async getNeighbours(
     db: DBConnection,
@@ -142,7 +137,7 @@ export class NewsletterPostDAO
     db: DBConnection,
     userId: number,
     parentNodeId: number,
-    nodes: Pick<CreateNewsletterPost, 'children'>['children']
+    nodes: CreateNewsletterPost[]
   ) {
     const n1 = await Promise.all(
       nodes.map(async (n) => {
@@ -177,12 +172,17 @@ export class NewsletterPostDAO
       pos: TempNodePosition
     ): NodePosition & { id: number } => {
       const id = idMap.get(pos.id);
-      const parentId = _.isNull(pos.parentId)
-        ? parentNodeId
-        : idMap.get(pos.parentId);
+      const parent = pos.parentId !== null ? idMap.get(pos.parentId) : null;
+      const parentId = parent === undefined ? parentNodeId : parent;
       const nextId = _.isNull(pos.nextId) ? null : idMap.get(pos.nextId);
       const prevId = _.isNull(pos.prevId) ? null : idMap.get(pos.prevId);
 
+      console.log({
+        id,
+        parentId,
+        nextId,
+        prevId,
+      });
       if (
         !_.isUndefined(id) &&
         !_.isUndefined(parentId) &&
@@ -202,13 +202,17 @@ export class NewsletterPostDAO
     );
   }
 
-  async create(userId: number, input: CreateNewsletterPost) {
+  async createMany(userId: number, input: CreateManyNewsletterPosts) {
     return this.db.transaction().execute(async (trx: Transaction) => {
-      const locationId = input.location
-        ? await new LocationDAO(trx).post(input.location)
-        : null;
-      const { details, position, newsletterId, title, date, children } = input;
-      const { parentId } = position;
+      const { position, posts, newsletterId } = input;
+
+      const [parents, children] = _.partition(
+        posts,
+        (p) => p.tempPosition.parentId === null
+      );
+      console.log(JSON.stringify(children, null, 4));
+      const parent = _.get(parents, [0]);
+      if (parent === undefined) throw new Error('a parent node must be specified');
 
       const { prevId, nextId } = await this.getNeighbours(
         trx,
@@ -216,15 +220,19 @@ export class NewsletterPostDAO
         position
       );
 
+      const locationId = parent.location
+        ? await new LocationDAO(trx).post(parent.location)
+        : null;
+
       const { id } = await this.postEntities(trx, userId, [
         {
-          title,
-          date,
+          title: parent.title,
+          date: parent.date,
           locationId,
           newsletterId,
           nextId,
           prevId,
-          parentId,
+          parentId: position.parentId,
         },
       ])
         .returning('id')
@@ -241,7 +249,7 @@ export class NewsletterPostDAO
           nextId: id,
         }).executeTakeFirstOrThrow();
 
-      await new NewsletterPostDetailsDAO(trx).post(id, details);
+      await new NewsletterPostDetailsDAO(trx).post(id, parent.details);
       await this.createChildNodes(trx, userId, id, children);
 
       return id;
@@ -427,8 +435,6 @@ export class NewsletterPostDAO
         .returning(['id', 'nextId', 'prevId', 'parentId', 'newsletterId'])
         .execute();
 
-      // update post with nextId = post.id to have nextId = post.nextId
-      // update post with prevId = post.id to have prevId = post.prevId
       await Promise.all(
         deletedPosts.map(async (p) => {
           await trx
@@ -437,7 +443,7 @@ export class NewsletterPostDAO
             .where(({ and, eb }) =>
               and([
                 eb('nextId', '=', p.id),
-                eb('parentId', '=', p.parentId),
+                eb('parentId', p.parentId === null ? 'is' : '=', p.parentId),
                 eb('newsletterId', '=', p.newsletterId),
               ])
             )
@@ -449,7 +455,7 @@ export class NewsletterPostDAO
             .where(({ and, eb }) =>
               and([
                 eb('prevId', '=', p.id),
-                eb('parentId', '=', p.parentId),
+                eb('parentId', p.parentId === null ? 'is' : '=', p.parentId),
                 eb('newsletterId', '=', p.newsletterId),
               ])
             )

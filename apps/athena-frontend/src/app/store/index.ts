@@ -6,17 +6,17 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import type {} from '@redux-devtools/extension'; // required for devtools typing
 import { createUserSlice, UserSlice } from './user';
 import { createNewslettersSlice, NewslettersSlice } from './newsletters';
-import { NewsletterPostsSlice } from './newsletter-items';
-import { createNewsletterPostsSlice } from './newsletter-items';
 import {
-  createNewsletterPostTemplatesSlice,
-  NewsletterPostTemplatesSlice,
-} from './newsletter-item-templates';
+  createNewsletterPostsSlice,
+  NewsletterPostsSlice,
+} from './newsletter-posts';
+// import {
+//   createNewsletterPostTemplatesSlice,
+//   NewsletterPostTemplatesSlice,
+// } from './newsletter-item-templates';
 
-export type Slices = UserSlice &
-  NewslettersSlice &
-  NewsletterPostsSlice &
-  NewsletterPostTemplatesSlice;
+export type Slices = UserSlice & NewslettersSlice & NewsletterPostsSlice;
+//   NewsletterPostTemplatesSlice;
 
 export const useStore = create<Slices>()(
   devtools(
@@ -25,14 +25,14 @@ export const useStore = create<Slices>()(
         ...createUserSlice(...a),
         ...createNewslettersSlice(...a),
         ...createNewsletterPostsSlice(...a),
-        ...createNewsletterPostTemplatesSlice(...a),
+        // ...createNewsletterPostTemplatesSlice(...a),
       }))
     )
   )
 );
 
 export * from './user';
-export * from './newsletters';
-export * from './newsletter-items';
-export * from './add-newsletter-items';
-export * from './newsletter-item-templates';
+// export * from './newsletters';
+// export * from './newsletter-items';
+// export * from './add-newsletter-items';
+// export * from './newsletter-item-templates';

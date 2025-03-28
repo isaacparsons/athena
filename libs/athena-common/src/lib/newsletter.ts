@@ -1,9 +1,5 @@
 import { z } from 'zod';
-import { dateRangeInput, updateInput } from './common';
-
-/**
- * Newsletter
- */
+import { createRequestSchema, dateRangeInput, updateRequestSchema } from './common';
 
 export const newsletterProperties = z.object({
   name: z
@@ -15,19 +11,10 @@ export const newsletterProperties = z.object({
 
 export type NewsletterProperties = z.infer<typeof newsletterProperties>;
 
-export const createNewsletter = z.object({
+export const newsletterBase = z.object({
+  id: z.coerce.number(),
   properties: newsletterProperties,
 });
-
-export type CreateNewsletter = z.infer<typeof createNewsletter>;
-
-export const updateNewsletter = updateInput.merge(
-  z.object({
-    properties: newsletterProperties.partial(),
-  })
-);
-
-export type UpdateNewsletter = z.infer<typeof updateNewsletter>;
 
 export enum NewsletterRole {
   READ_ONLY = 'read-only',
@@ -47,8 +34,14 @@ export enum NewsletterPermissions {
   EDIT_MEMBER = 'edit-member',
 }
 
-const newsletterRole = z.nativeEnum(NewsletterRole);
-const newsletterPermissions = z.nativeEnum(NewsletterPermissions);
+export const newsletterRole = z.nativeEnum(NewsletterRole);
+export const newsletterPermissions = z.nativeEnum(NewsletterPermissions);
+
+export const createNewsletter = createRequestSchema(newsletterBase);
+export type CreateNewsletter = z.infer<typeof createNewsletter>;
+
+export const updateNewsletter = updateRequestSchema(newsletterBase);
+export type UpdateNewsletter = z.infer<typeof updateNewsletter>;
 
 export const inviteNewsletterUser = z.object({
   newsletterId: z.coerce.number(),

@@ -1,5 +1,5 @@
 import { Database, DB } from '@athena/db';
-import { UserDAO, NewsletterDAO, LocationDAO, NewsletterItemDAO, NewsletterItemTemplateDAO, INewsletterDAO, IUserDAO, ILocationDAO, INewsletterItemDAO, INewsletterItemTemplateDAO } from '@athena/dao';
+import { UserDAO, NewsletterDAO, LocationDAO, NewsletterPostDAO, INewsletterDAO, IUserDAO, ILocationDAO, INewsletterPostDAO } from '@athena/dao';
 import { GCSManager, IGCSManager } from '@athena/services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/common';
@@ -16,20 +16,18 @@ export type Context = {
         user: UserDAO;
         newsletter: NewsletterDAO;
         location: LocationDAO;
-        newsletterItem: NewsletterItemDAO;
-        newsletterItemTemplate: NewsletterItemTemplateDAO;
+        newsletterPost: NewsletterPostDAO;
     };
 };
 export declare function createContext({ req, res }: CreateExpressContextOptions): {
     req: Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
     res: Response<any, Record<string, any>>;
     gcs: IGCSManager;
-    db: DB<Database>;
+    db: DB<import("../types/db").DB>;
     dao: {
         user: IUserDAO;
         newsletter: INewsletterDAO;
         location: ILocationDAO;
-        newsletterItem: INewsletterItemDAO;
-        newsletterItemTemplate: INewsletterItemTemplateDAO;
+        newsletterPost: INewsletterPostDAO;
     };
 };

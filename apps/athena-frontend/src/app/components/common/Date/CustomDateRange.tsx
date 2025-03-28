@@ -14,7 +14,7 @@ export function CustomDateRange(props: CustomDateRangeProps) {
     <Stack direction="row" spacing={2} sx={{ pb: 1 }}>
       <CalendarTodayIcon />
       <Typography>{`${formatDate(value.start)} ${
-        value.end && ' - ' + formatDate(value.end)
+        value.end ? ' - ' + formatDate(value.end) : ''
       }`}</Typography>
     </Stack>
   );

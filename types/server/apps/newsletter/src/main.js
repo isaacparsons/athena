@@ -8,7 +8,7 @@ const express_2 = require("@trpc/server/adapters/express");
 const cors_1 = tslib_1.__importDefault(require("cors"));
 const util_1 = require("./util");
 const trpc_1 = require("./trpc");
-const env = (0, util_1.parseEnv)();
+const config = (0, util_1.getConfig)();
 exports.app = (0, express_1.default)();
 exports.app.use((0, cors_1.default)({
     // credentials: true,
@@ -37,7 +37,7 @@ exports.app.use('/api/v1/trpc', (0, express_2.createExpressMiddleware)({
         // }
     },
 }));
-exports.app.listen(env.app.port, env.app.host, () => {
-    console.log(`[ ready ] http://${env.app.host}:${env.app.port}`);
+exports.app.listen(config.app.port, config.app.host, () => {
+    console.log(`[ ready ] http://${config.app.host}:${config.app.port}`);
 });
 //# sourceMappingURL=main.js.map

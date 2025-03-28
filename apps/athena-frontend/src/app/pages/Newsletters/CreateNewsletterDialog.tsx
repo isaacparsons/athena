@@ -23,17 +23,17 @@ import { usePromiseWithNotification } from '@athena/hooks';
 import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '@athena/store';
 
-interface AddNewsletterDialogProps {
+interface CreateNewsletterDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
+export function CreateNewsletterDialog(props: CreateNewsletterDialogProps) {
   const { onClose, open } = props;
   const promiseWithNotifications = usePromiseWithNotification();
   const navigate = useNavigate();
   const { createNewsletter } = useStore(
-    useShallow((state) => ({ createNewsletter: state.newsletters.upload }))
+    useShallow((state) => ({ createNewsletter: state.newsletters.create }))
   );
   const {
     control,
@@ -49,7 +49,7 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
         name: '',
         dateRange: {
           start: new Date().toISOString(),
-          end: undefined,
+          end: null,
         },
       },
     },
@@ -61,15 +61,19 @@ export function AddNewsletterDialog(props: AddNewsletterDialogProps) {
       errorMsg: 'Unable to create newsletter :(',
       onSuccess: (newsletterId) => {
         navigate(`/newsletters/${newsletterId}`);
-        onClose();
-        reset();
+        handleClose();
       },
     });
   };
 
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
   return (
-    <StyledDialog fullScreen open={open}>
-      <DialogTitle>Add Newsletter</DialogTitle>
+    <StyledDialog open={open} onClose={handleClose}>
+      <DialogTitle>Create Newsletter</DialogTitle>
       <DialogContent>
         <TextField
           {...register('properties.name')}

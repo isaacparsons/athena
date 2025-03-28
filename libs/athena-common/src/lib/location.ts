@@ -1,28 +1,21 @@
 import { z } from 'zod';
+import {
+  createRequestSchema,
+  geoPositionInput,
+  updateRequestSchema,
+} from './common';
 
-/**
- * Location
- */
-
-export const locationInput = z.object({
+export const location = z.object({
   id: z.coerce.number(),
-  name: z.string().optional(),
-  country: z.string().optional(),
-  position: z
-    .object({
-      latitude: z.coerce.number(),
-      longitude: z.coerce.number(),
-    })
-    .optional(),
+  name: z.string().nullable(),
+  country: z.string().nullable(),
+  geoPosition: geoPositionInput.nullable(),
 });
 
-export type LocationInput = z.infer<typeof locationInput>;
-export type Location = LocationInput;
+export type Location = z.infer<typeof location>;
 
-export const createLocation = locationInput.omit({ id: true });
-
+export const createLocation = createRequestSchema(location);
 export type CreateLocation = z.infer<typeof createLocation>;
 
-export const updateLocation = locationInput;
-
+export const updateLocation = updateRequestSchema(location);
 export type UpdateLocation = z.infer<typeof updateLocation>;

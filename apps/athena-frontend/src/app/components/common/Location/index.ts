@@ -1,2 +1,2 @@
-export * from './CustomLocationDialog';
-export * from './CustomLocationInput';
+export * from './CreateLocationDialog';
+export * from './Location';

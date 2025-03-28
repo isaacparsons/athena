@@ -61,6 +61,11 @@
           "commands": [
             "tsc -p apps/newsletter/tsconfig.app.json --declaration --outDir types/server"
           ]
+        },
+        "db": {
+          "commands": [
+            "kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"
+          ]
         }
       }
     },

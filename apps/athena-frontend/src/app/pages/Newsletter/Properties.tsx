@@ -3,15 +3,15 @@ import { CustomDateRange } from '@athena/components';
 import { NewsletterProperties as INewsletterProperties } from '@athena/common';
 
 interface NewsletterPropertiesProps {
-  properties: INewsletterProperties;
+  data: INewsletterProperties;
 }
 
-export function NewsletterProperties(props: NewsletterPropertiesProps) {
-  const { properties } = props;
+export function Properties(props: NewsletterPropertiesProps) {
+  const { data } = props;
   return (
     <Stack spacing={1}>
-      <Typography variant="h4">{properties.name}</Typography>
-      <CustomDateRange value={properties.dateRange} />
+      <Typography variant="h4">{data.name}</Typography>
+      <CustomDateRange value={data.dateRange} />
     </Stack>
   );
 }

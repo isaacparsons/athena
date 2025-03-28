@@ -1,6 +1,7 @@
 import { trpc, loggedInProcedure } from '..';
-import * as nanoid from 'nanoid';
+import { nanoid } from 'nanoid';
 import {
+  createManyNewsletterPosts,
   createNewsletterPost,
   // createNewsletterPostsBatch,
   deleteBatchInput,
@@ -18,7 +19,7 @@ const router = trpc.router({
     .query(async ({ input, ctx }) => {
       return Promise.all(
         input.posts.map(async (post) => {
-          const fileName = `${ctx.user.userId}-${nanoid.nanoid()}`;
+          const fileName = `${ctx.user.userId}-${nanoid()}`;
           const url = await ctx.gcs.getSignedUrl(fileName, 'write');
           return {
             url,
@@ -29,10 +30,10 @@ const router = trpc.router({
       );
     }),
 
-  create: loggedInProcedure
-    .input(createNewsletterPost)
+  createMany: loggedInProcedure
+    .input(createManyNewsletterPosts)
     .mutation(async ({ input, ctx }) => {
-      return ctx.dao.newsletterPost.create(ctx.user.userId, input);
+      return ctx.dao.newsletterPost.createMany(ctx.user.userId, input);
     }),
   // createBatch: loggedInProcedure
   //   .input(createNewsletterPostsBatch)

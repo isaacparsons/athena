@@ -4,13 +4,12 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
             req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
             res: import("express").Response<any, Record<string, any>>;
             gcs: import("../../services").IGCSManager;
-            db: import("kysely").Kysely<import("../../db").Database>;
+            db: import("kysely").Kysely<import("../../types/db").DB>;
             dao: {
                 user: import("../../dao").IUserDAO;
                 newsletter: import("../../dao").INewsletterDAO;
                 location: import("../../dao").ILocationDAO;
-                newsletterItem: import("../../dao").INewsletterItemDAO;
-                newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
+                newsletterPost: import("../../dao").INewsletterPostDAO;
             };
         };
         meta: object;
@@ -19,6 +18,8 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
     }>;
     _meta: object;
     _ctx_out: {
+        db: import("kysely").Kysely<import("../../types/db").DB>;
+        gcs: import("../../services").IGCSManager;
         user: {
             email: string;
             userId: number;
@@ -27,14 +28,11 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
         };
         req: import("express").Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
         res: import("express").Response<any, Record<string, any>>;
-        gcs: import("../../services").IGCSManager;
-        db: import("kysely").Kysely<import("../../db").Database>;
         dao: {
             user: import("../../dao").IUserDAO;
             newsletter: import("../../dao").INewsletterDAO;
             location: import("../../dao").ILocationDAO;
-            newsletterItem: import("../../dao").INewsletterItemDAO;
-            newsletterItemTemplate: import("../../dao").INewsletterItemTemplateDAO;
+            newsletterPost: import("../../dao").INewsletterPostDAO;
         };
     };
     _input_in: typeof import("@trpc/server").unsetMarker;

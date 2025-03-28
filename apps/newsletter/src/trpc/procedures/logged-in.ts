@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _ from 'lodash';
 import { TRPCError } from '@trpc/server';
 import { getConfig } from '../../util';
 import { publicProcedure } from '..';
@@ -16,7 +16,7 @@ export const loggedInProcedure = publicProcedure.use(async (opts) => {
   //   },
   // });
 
-  const adminSecret = _.get(ctx, ['req', 'headers', 'admin-secret'])
+  const adminSecret = _.get(ctx, ['req', 'headers', 'admin-secret']);
   if (adminSecret === config.app.adminSecret) {
     const admin = await ctx.db
       .selectFrom('user')

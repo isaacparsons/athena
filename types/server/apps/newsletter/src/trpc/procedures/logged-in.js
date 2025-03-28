@@ -2,10 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loggedInProcedure = void 0;
 const tslib_1 = require("tslib");
+const lodash_1 = tslib_1.__importDefault(require("lodash"));
 const server_1 = require("@trpc/server");
 const util_1 = require("../../util");
 const __1 = require("..");
-const env = (0, util_1.parseEnv)();
+const config = (0, util_1.getConfig)();
 exports.loggedInProcedure = __1.publicProcedure.use((opts) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const { ctx } = opts;
     // TODO:  fix all this
@@ -15,8 +16,8 @@ exports.loggedInProcedure = __1.publicProcedure.use((opts) => tslib_1.__awaiter(
     //     user: ctx.req.user,
     //   },
     // });
-    const adminSecret = ctx.req.headers['admin-secret'];
-    if (adminSecret === env.app.adminSecret) {
+    const adminSecret = lodash_1.default.get(ctx, ['req', 'headers', 'admin-secret']);
+    if (adminSecret === config.app.adminSecret) {
         const admin = yield ctx.db
             .selectFrom('user')
             .where('firstName', '=', 'SUPER')
@@ -41,7 +42,7 @@ exports.loggedInProcedure = __1.publicProcedure.use((opts) => tslib_1.__awaiter(
             },
         });
     }
-    ctx.res.clearCookie(env.app.sessionCookieName);
+    ctx.res.clearCookie(config.app.sessionCookieName);
     throw new server_1.TRPCError({ code: 'UNAUTHORIZED' });
 }));
 //# sourceMappingURL=logged-in.js.map

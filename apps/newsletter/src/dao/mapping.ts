@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { MediaFormat, NewsletterPostTypeName } from '@athena/common';
+import { MediaFormat, Meta, NewsletterPostTypeName } from '@athena/common';
 import {
   SelectLocation,
   SelectNewsletterPostContainer,
@@ -10,28 +10,17 @@ import {
 
 export const mapUser = (user: SelectUser) => ({
   ...user,
-  firstName: _.isNull(user.firstName) ? undefined : user.firstName,
-  lastName: _.isNull(user.lastName) ? undefined : user.lastName,
+  firstName: _.isNull(user.firstName) ? null : user.firstName,
+  lastName: _.isNull(user.lastName) ? null : user.lastName,
 });
 
 export const mapUsers = (users: SelectUser[]) => users.map(mapUser);
 
-export const mapMeta = <
-  T extends {
-    created: string;
-    modified: string | null;
-    creator: SelectUser;
-    modifier: SelectUser | null;
-  }
->(
-  meta: T
-) => ({
+export const mapMeta = <T extends Meta>(meta: T) => ({
   created: new Date(meta.created).toISOString(),
-  modified: _.isNull(meta.modified)
-    ? undefined
-    : new Date(meta.modified).toISOString(),
+  modified: _.isNull(meta.modified) ? null : new Date(meta.modified).toISOString(),
   creator: mapUser(meta.creator),
-  modifier: _.isNull(meta.modifier) ? undefined : mapUser(meta.modifier),
+  modifier: _.isNull(meta.modifier) ? null : mapUser(meta.modifier),
 });
 
 export const mapPosition = <
@@ -55,17 +44,17 @@ export const mapLocation = <T extends { location: SelectLocation | null }>(
   return location
     ? {
         id: location.id,
-        name: _.isNull(location.name) ? undefined : location.name,
-        country: _.isNull(location.countryCode) ? undefined : location.countryCode,
-        position:
+        name: _.isNull(location.name) ? null : location.name,
+        country: _.isNull(location.countryCode) ? null : location.countryCode,
+        geoPosition:
           location.latitude && location.longitude
             ? {
                 latitude: location.latitude,
                 longitude: location.longitude,
               }
-            : undefined,
+            : null,
       }
-    : undefined;
+    : null;
 };
 
 export const mapNewsletterPostDetails = (
@@ -112,6 +101,6 @@ export const mapDateRange = <
   startDate,
   endDate,
 }: T) => ({
-  start: _.isNull(startDate) ? undefined : new Date(startDate).toISOString(),
-  end: _.isNull(endDate) ? undefined : new Date(endDate).toISOString(),
+  start: _.isNull(startDate) ? null : new Date(startDate).toISOString(),
+  end: _.isNull(endDate) ? null : new Date(endDate).toISOString(),
 });

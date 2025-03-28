@@ -8,12 +8,12 @@ const passport_google_oauth20_1 = require("passport-google-oauth20");
 const remeda_1 = require("remeda");
 const express_session_1 = tslib_1.__importDefault(require("express-session"));
 const util_1 = require("../../util");
-const env = (0, util_1.parseEnv)();
+const config = (0, util_1.getConfig)();
 const SCOPES = ['profile', 'email', 'https://www.googleapis.com/auth/drive'];
 const GOOGLE_AUTH = {
-    clientID: env.google.clientId,
-    clientSecret: env.google.clientSecret,
-    callbackURL: env.google.callbackUrl,
+    clientID: config.google.clientId,
+    clientSecret: config.google.clientSecret,
+    callbackURL: config.google.callbackUrl,
     scope: SCOPES,
     state: true,
     passReqToCallback: true,
@@ -35,8 +35,8 @@ router.get('/logout', (req, res) => {
 });
 function initPassport(app) {
     app.use((0, express_session_1.default)({
-        name: env.app.sessionCookieName,
-        secret: env.app.sessionSecret,
+        name: config.app.sessionCookieName,
+        secret: config.app.sessionSecret,
         resave: false,
         saveUninitialized: true,
         cookie: {

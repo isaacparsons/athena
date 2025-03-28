@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
-import {
-  CustomFab,
-  AddNewsletterDialog,
-  UserNewsletters,
-  CustomContainer,
-} from '@athena/components';
+import { CustomContainer, createCustomFab } from '@athena/components';
 import { CircularProgress } from '@mui/material';
+import { CreateNewsletterDialog, UserNewsletters } from './';
+import { AddIcon } from '@athena/icons';
+
+const AddFab = createCustomFab(AddIcon);
 
 export function Newsletters() {
   const { newsletters, loading } = useStore(
@@ -26,12 +25,12 @@ export function Newsletters() {
         <CircularProgress />
       ) : (
         <>
-          <AddNewsletterDialog
+          <CreateNewsletterDialog
             open={addNewsletterDialogOpen}
             onClose={handleCloseAddNewsletterDialog}
           />
-          <UserNewsletters newsletters={newsletters} />
-          <CustomFab onClick={handleOpenAddNewsletterDialog} />
+          <UserNewsletters data={newsletters} />
+          <AddFab onClick={handleOpenAddNewsletterDialog} />
         </>
       )}
     </CustomContainer>

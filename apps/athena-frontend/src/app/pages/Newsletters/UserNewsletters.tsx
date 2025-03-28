@@ -1,21 +1,21 @@
 import { NewsletterBase } from '@athena/common';
-import { UserNewsletterCard, CustomList, CustomListItem } from '@athena/components';
+import { CustomList, CustomListItem, NewsletterCard } from '@athena/components';
 import { useNavigate } from 'react-router-dom';
 
 interface NewslettersProps {
-  newsletters: NewsletterBase[];
+  data: NewsletterBase[];
 }
 export function UserNewsletters(props: NewslettersProps) {
-  const { newsletters } = props;
+  const { data } = props;
   const navigate = useNavigate();
 
   return (
     <CustomList>
-      {newsletters.map((newsletter) => {
+      {data.map((newsletter) => {
         return (
           <CustomListItem id={newsletter.id} key={newsletter.id}>
-            <UserNewsletterCard
-              newsletter={newsletter}
+            <NewsletterCard
+              data={newsletter}
               onClick={() => navigate(`/newsletters/${newsletter.id}`)}
             />
           </CustomListItem>

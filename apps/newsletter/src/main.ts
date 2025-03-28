@@ -10,13 +10,13 @@ const config = getConfig();
 export let app = express();
 app.use(
   cors({
-    // credentials: true,
-    credentials: false,
-    // origin: [
-    //   `http://${env.client.host}:${env.client.port}`,
-    //   'https://storage.googleapis.com/athena-newsletter',
-    // ],
-    origin: '*',
+    credentials: true,
+    origin: [
+      `http://${config.client.host}:${config.client.port}`,
+      'https://storage.googleapis.com/athena-newsletter',
+    ],
+    // credentials: false,
+    // origin: '*',
     // AccessControlAllowOrigin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   })

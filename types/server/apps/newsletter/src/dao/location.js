@@ -24,7 +24,7 @@ let LocationDAO = class LocationDAO {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const result = yield this.db
                 .updateTable('location')
-                .set(Object.assign(Object.assign(Object.assign({}, (input.name ? { name: input.name } : {})), (input.country ? { countryCode: input.country } : {})), (input.position ? { position: input.position } : {})))
+                .set(Object.assign(Object.assign(Object.assign({}, (input.name ? { name: input.name } : {})), (input.country ? { countryCode: input.country } : {})), (input.geoPosition ? { position: input.geoPosition } : {})))
                 .returning('id')
                 .where('id', '=', input.id)
                 .executeTakeFirstOrThrow();

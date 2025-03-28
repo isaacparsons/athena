@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserTemplateTableClient = exports.UserNewsletterTableClient = exports.UserTableClient = void 0;
+exports.UserNewsletterTableClient = exports.UserTableClient = void 0;
 const db_1 = require("@athena/db");
 class UserTableClient extends db_1.Table {
     constructor(db, name) {
@@ -18,20 +18,37 @@ class UserNewsletterTableClient extends db_1.Table {
         super(db, name);
         this.tableBuilder = this.tableBuilder
             .addColumn('userId', 'integer', (col) => col.references('user.id').onDelete('cascade').notNull())
-            .addColumn('newsletterId', 'integer', (col) => col.references('newsletter.id').onDelete('cascade').notNull());
+            .addColumn('newsletterId', 'integer', (col) => col.references('newsletter.id').onDelete('cascade').notNull())
+            .addColumn('role', 'text', (cb) => cb.notNull());
     }
 }
 exports.UserNewsletterTableClient = UserNewsletterTableClient;
-class UserTemplateTableClient extends db_1.Table {
-    constructor(db, name) {
-        super(db, name);
-        this.tableBuilder = this.tableBuilder
-            .addColumn('userId', 'integer', (col) => col.references(`${db_1.TABLE_NAMES.USER}.id`).onDelete('cascade').notNull())
-            .addColumn('newsletterItemTemplateId', 'integer', (col) => col
-            .references(`${db_1.TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE}.id`)
-            .onDelete('cascade')
-            .notNull());
-    }
-}
-exports.UserTemplateTableClient = UserTemplateTableClient;
+// export interface UserTemplateTable {
+//   name: TABLE_NAMES.USER_TEMPLATE;
+//   columns: UserTemplate;
+// }
+// export type SelectUserTemplate = Selectable<UserTemplate>;
+// export type InsertUserTemplate = Insertable<UserTemplate>;
+// export type UpdateUserTemplate = Updateable<UserTemplate>;
+// export class UserTemplateTableClient extends Table<
+//   'user_template',
+//   'userId' | 'newsletterItemTemplateId'
+// > {
+//   constructor(db: DBConnection, name: string) {
+//     super(db, name);
+//   }
+//   tableBuilder: CreateTableBuilder<
+//     'user_template',
+//     'userId' | 'newsletterItemTemplateId'
+//   > = this.tableBuilder
+//     .addColumn('userId', 'integer', (col) =>
+//       col.references(`${TABLE_NAMES.USER}.id`).onDelete('cascade').notNull()
+//     )
+//     .addColumn('newsletterItemTemplateId', 'integer', (col) =>
+//       col
+//         .references(`${TABLE_NAMES.NEWSLETTER_ITEM_TEMPLATE}.id`)
+//         .onDelete('cascade')
+//         .notNull()
+//     );
+// }
 //# sourceMappingURL=user.js.map

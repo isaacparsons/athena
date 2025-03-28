@@ -1,11 +1,11 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { DBConnection } from '@athena/db';
-import { CreateLocation, LocationInput, UpdateLocation } from '@athena/common';
+import { CreateLocation, UpdateLocation } from '@athena/common';
 import { TYPES } from '../types/types';
 
 export interface ILocationDAO {
-  post(input: LocationInput): Promise<number>;
+  post(input: CreateLocation): Promise<number>;
   update(input: UpdateLocation): Promise<number>;
 }
 
@@ -32,7 +32,7 @@ export class LocationDAO implements ILocationDAO {
       .set({
         ...(input.name ? { name: input.name } : {}),
         ...(input.country ? { countryCode: input.country } : {}),
-        ...(input.position ? { position: input.position } : {}),
+        ...(input.geoPosition ? { position: input.geoPosition } : {}),
       })
       .returning('id')
       .where('id', '=', input.id)

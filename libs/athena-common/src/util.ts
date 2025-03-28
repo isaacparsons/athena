@@ -5,7 +5,13 @@ import {
   NewsletterPostTypeName,
   DateRange,
 } from './lib';
-import { NewsletterPost } from './entity';
+import {
+  NewsletterPost,
+  MediaPostDetails,
+  TextPostDetails,
+  ContainerPostDetails,
+  NewsletterPostDetails,
+} from './entity';
 
 export const logObject = (item: any, label?: string) => {
   if (label) {
@@ -46,28 +52,28 @@ export function mimeTypeToMediaFormat(mimeType: string): MediaFormat {
 export const nullToUndefined = (v: any) => (_.isNull(v) ? undefined : v);
 
 export const isMediaPost = (
-  post: NewsletterPostBase
-): post is NewsletterPost<NewsletterPostTypeName.Media> => {
+  post: NewsletterPost
+): post is NewsletterPost<MediaPostDetails> => {
   return (
-    (post as NewsletterPost<NewsletterPostTypeName.Media>).details.type ===
+    (post as NewsletterPost<MediaPostDetails>).details.type ===
     NewsletterPostTypeName.Media
   );
 };
 
 export const isTextPost = (
-  post: NewsletterPostBase
-): post is NewsletterPost<NewsletterPostTypeName.Text> => {
+  post: NewsletterPost
+): post is NewsletterPost<TextPostDetails> => {
   return (
-    (post as NewsletterPost<NewsletterPostTypeName.Text>).details.type ===
+    (post as NewsletterPost<TextPostDetails>).details.type ===
     NewsletterPostTypeName.Text
   );
 };
 
 export const isContainerItem = (
   post: NewsletterPostBase
-): post is NewsletterPost<NewsletterPostTypeName.Container> => {
+): post is NewsletterPost<ContainerPostDetails> => {
   return (
-    (post as NewsletterPost<NewsletterPostTypeName.Container>).details.type ===
+    (post as NewsletterPost<ContainerPostDetails>).details.type ===
     NewsletterPostTypeName.Container
   );
 };

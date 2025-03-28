@@ -1,13 +1,9 @@
 import { z } from 'zod';
-import { positionInput } from './common';
-
-/**
- * Country
- */
+import { geoPositionInput } from './common';
 
 export const country = z.object({
   name: z.string(),
-  position: positionInput,
+  geoPosition: geoPositionInput,
 });
 
 export type Country = z.infer<typeof country>;

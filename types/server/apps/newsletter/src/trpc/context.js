@@ -13,8 +13,10 @@ function createContext({ req, res }) {
             user: inversify_config_1.container.get(types_1.TYPES.IUserDAO),
             newsletter: inversify_config_1.container.get(types_1.TYPES.INewsletterDAO),
             location: inversify_config_1.container.get(types_1.TYPES.ILocationDAO),
-            newsletterItem: inversify_config_1.container.get(types_1.TYPES.INewsletterItemDAO),
-            newsletterItemTemplate: inversify_config_1.container.get(types_1.TYPES.INewsletterItemTemplateDAO),
+            newsletterPost: inversify_config_1.container.get(types_1.TYPES.INewsletterPostDAO),
+            // newsletterItemTemplate: container.get<INewsletterPostTemplateDAO>(
+            //   TYPES.INewsletterPostTemplateDAO
+            // ),
         },
     };
 }

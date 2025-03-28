@@ -8,8 +8,8 @@ class NewsletterTableClient extends db_1.EntityTable {
         this.tableBuilder = this.tableBuilder
             .addColumn('name', 'varchar', (cb) => cb.notNull())
             .addColumn('ownerId', 'integer', (col) => col.notNull().references('user.id').notNull().onDelete('restrict'))
-            .addColumn('startDate', 'date')
-            .addColumn('endDate', 'date');
+            .addColumn('startDate', 'text')
+            .addColumn('endDate', 'text');
     }
 }
 exports.NewsletterTableClient = NewsletterTableClient;

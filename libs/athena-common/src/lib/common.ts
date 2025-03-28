@@ -2,6 +2,16 @@ import { z } from 'zod';
 
 export type Nullable<T> = T | null;
 
+export const id = z.coerce.number();
+export type Id = z.infer<typeof id>;
+
+export const geoPositionInput = z.object({
+  latitude: z.coerce.number(),
+  longitude: z.coerce.number(),
+});
+
+export type GeoPosition = z.infer<typeof geoPositionInput>;
+
 export const getInput = z.object({
   id: z.coerce.number(),
 });
@@ -17,36 +27,33 @@ export const deleteBatchInput = z.object({
 });
 export type DeleteBatchInput = z.infer<typeof deleteBatchInput>;
 
-export const updateInput = z.object({
-  id: z.coerce.number(),
-});
-
-export function withUpdateInputSchema<T extends z.AnyZodObject>(schema: T) {
-  return z.object({ id: z.coerce.number() }).and(schema);
+export function updateRequestSchema<T extends z.ZodRawShape>(
+  schema: z.ZodObject<T>
+) {
+  return schema.merge(z.object({ id: z.coerce.number() })) as z.ZodObject<
+    T & { id: z.ZodNumber }
+  >;
 }
 
-export function withCreateInputSchema<T extends z.AnyZodObject>(schema: T) {
+export function createRequestSchema<T extends z.AnyZodObject>(schema: T) {
   return schema.omit({ id: true, meta: true }) as z.ZodObject<
     Omit<T['shape'], 'id' | 'meta'>
   >;
 }
 
-export const positionInput = z.object({
-  latitude: z.coerce.number(),
-  longitude: z.coerce.number(),
-});
+export const readRequestSchema = z.object({ id: z.coerce.number() });
+export const deleteRequestSchema = z.object({ id: z.coerce.number() });
+export const deleteManyRequestSchema = z.array(z.coerce.number());
 
-export type Position = z.infer<typeof positionInput>;
-
-/**
- * Date
- */
+// /**
+//  * Date
+//  */
 
 export const dateInput = z.string().min(8);
 
 export const dateRangeInput = z.object({
-  start: dateInput.optional(),
-  end: dateInput.optional(),
+  start: dateInput.nullable(),
+  end: dateInput.nullable(),
 });
 
 export type DateRange = z.infer<typeof dateRangeInput>;

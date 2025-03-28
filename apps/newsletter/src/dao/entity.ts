@@ -6,16 +6,9 @@ import {
   EntityTableName,
   jsonObjectFrom,
   SelectUser,
-  TableName,
 } from '@athena/db';
 import { injectable } from 'inversify';
-import {
-  Expression,
-  ExpressionBuilder,
-  expressionBuilder,
-  SelectQueryBuilder,
-  UpdateObject,
-} from 'kysely';
+import { expressionBuilder, UpdateObject } from 'kysely';
 import {
   InsertExpression,
   InsertObject,

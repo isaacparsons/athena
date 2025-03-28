@@ -11,7 +11,7 @@ const router = trpc.router({
   get: loggedInProcedure.input(getInput).query(async ({ input, ctx }) => {
     return await ctx.dao.newsletter.get(input.id);
   }),
-  post: loggedInProcedure
+  create: loggedInProcedure
     .input(createNewsletter)
     .mutation(async ({ ctx, input }) => {
       return await ctx.dao.newsletter.create(ctx.user.userId, input);

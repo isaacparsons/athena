@@ -5,16 +5,16 @@ import { useState } from 'react';
 import { formatDate } from '@athena/common';
 
 interface CustomDateProps {
-  value?: string;
+  value?: string | null;
   onChange?: (date: string | null) => void;
-  readonly: boolean;
+  editing: boolean;
 }
 
 const defaultProps = {
-  readonly: false,
+  editing: false,
 };
 
-export function CustomDate({ value, onChange, readonly }: CustomDateProps) {
+export function CustomDate({ value, onChange, editing }: CustomDateProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   const handleDatePickerClose = () => setDatePickerOpen(false);
@@ -25,10 +25,11 @@ export function CustomDate({ value, onChange, readonly }: CustomDateProps) {
     handleDatePickerClose();
   };
 
+  if (!editing && value?.length === 0) return null;
   return (
     <>
       <CustomDateInput
-        open={!readonly && datePickerOpen}
+        open={editing && datePickerOpen}
         date={value}
         onSave={handleSave}
         onClose={handleDatePickerClose}
@@ -48,10 +49,10 @@ export function CustomDate({ value, onChange, readonly }: CustomDateProps) {
           <Typography sx={{ color: 'white' }}>
             {formatDate(value ?? new Date().toISOString())}
           </Typography>
-          {readonly ? (
-            <CalendarTodayIcon sx={{ color: 'white' }} />
-          ) : (
+          {editing ? (
             <EditIcon sx={{ color: 'white' }} />
+          ) : (
+            <CalendarTodayIcon sx={{ color: 'white' }} />
           )}
         </Stack>
       </ButtonBase>

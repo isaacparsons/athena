@@ -15,12 +15,16 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { AccountCircleIcon, MenuIcon, TemplateIcon, SettingsIcon, HomeIcon } from '@athena/icons'
+import {
+  AccountCircleIcon,
+  MenuIcon,
+  TemplateIcon,
+  SettingsIcon,
+  HomeIcon,
+} from '@athena/icons';
 import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
-
-
 
 interface AppbarProps {
   title: string;
@@ -44,11 +48,7 @@ export function Appbar(props: AppbarProps) {
   return (
     <AppBar position="static">
       <Drawer open={drawerOpen} onClose={handleCloseDrawer}>
-        <Box
-          sx={{ width: 250 }}
-          role="presentation"
-          onClick={handleCloseDrawer}
-        >
+        <Box sx={{ width: 250 }} role="presentation" onClick={handleCloseDrawer}>
           <List>
             <DrawerListItem
               text={'Home'}

@@ -11,13 +11,14 @@ import {
   jsonArrayFrom,
 } from '@athena/db';
 import {
-  Newsletter as NewsletterEntity,
+  Newsletter,
   CreateNewsletter,
   UpdateNewsletter,
-  NewsletterPost as NewsletterPostEntity,
+  NewsletterPost,
   InviteNewsletterUser,
   NewsletterRole,
   NewsletterPermissions,
+  NewsletterBase,
 } from '@athena/common';
 import { creator, modifier, owner } from '../db/helpers';
 import { IGCSManager } from '@athena/services';
@@ -57,14 +58,14 @@ export const newsletterRolePermissionsMap: Record<
 
 type NewsletterRow = EntityMetaRow &
   Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
-    posts: Omit<NewsletterPostEntity, 'children'>[];
+    posts: Omit<NewsletterPost, 'children'>[];
     owner: SelectUser;
     members: SelectUser[];
   };
 
-export type INewsletterDAO = IEntityDAO<NewsletterRow, NewsletterEntity> & {
-  get(id: number): Promise<NewsletterEntity>;
-  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'posts' | 'members'>[]>;
+export type INewsletterDAO = IEntityDAO<NewsletterRow, Newsletter> & {
+  get(id: number): Promise<Newsletter>;
+  getByUserId(id: number): Promise<NewsletterBase[]>;
   create(userId: number, input: CreateNewsletter): Promise<number>;
   update(userId: number, input: UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
@@ -74,7 +75,7 @@ export type INewsletterDAO = IEntityDAO<NewsletterRow, NewsletterEntity> & {
 @injectable()
 @injectFromBase()
 export class NewsletterDAO
-  extends EntityDAO<'newsletter', NewsletterRow, NewsletterEntity>
+  extends EntityDAO<'newsletter', NewsletterRow, Newsletter>
   implements INewsletterDAO
 {
   tableName = 'newsletter' as any;
@@ -112,7 +113,7 @@ export class NewsletterDAO
     ).as('members');
   }
 
-  async get(id: number): Promise<NewsletterEntity> {
+  async get(id: number): Promise<Newsletter> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletter = await this.selectEntity(trx)
         .select((eb) => [
@@ -131,7 +132,7 @@ export class NewsletterDAO
     });
   }
 
-  getByUserId(id: number): Promise<Omit<NewsletterEntity, 'posts' | 'members'>[]> {
+  getByUserId(id: number): Promise<NewsletterBase[]> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletters = await trx
         .selectFrom('user_newsletter as un')

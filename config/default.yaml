@@ -1,9 +1,9 @@
 app:
   host: localhost
   port: 3000
-  sessionSecret: 123456789
+  sessionSecret: '123456789'
   sessionCookieName: newsletter_session
-  adminSecret: 123456
+  adminSecret: '123456'
 
 db:
   host: localhost
@@ -22,4 +22,4 @@ gcs:
 
 client:
   host: localhost
-  port: 3000
+  port: 4200
