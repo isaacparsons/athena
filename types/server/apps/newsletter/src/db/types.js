@@ -27,6 +27,7 @@ var TABLE_NAMES;
     TABLE_NAMES["NEWSLETTER"] = "newsletter";
     TABLE_NAMES["USER_NEWSLETTER"] = "user_newsletter";
     TABLE_NAMES["USER_TEMPLATE"] = "user_template";
+    TABLE_NAMES["TEMPLATE"] = "template";
     TABLE_NAMES["NEWSLETTER_POST"] = "newsletter_post";
     TABLE_NAMES["NEWSLETTER_POST_MEDIA"] = "newsletter_post_media";
     TABLE_NAMES["NEWSLETTER_POST_TEXT"] = "newsletter_post_text";

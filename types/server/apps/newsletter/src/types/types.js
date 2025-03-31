@@ -7,7 +7,7 @@ exports.TYPES = {
     INewsletterDAO: Symbol.for('INewsletterDAO'),
     INewsletterPostDAO: Symbol.for('INewsletterPostDAO'),
     INewsletterPostDetailsDAO: Symbol.for('INewsletterPostDetailsDAO'),
-    INewsletterPostTemplateDAO: Symbol.for('INewsletterPostTemplateDAO'),
+    ITemplateDAO: Symbol.for('ITemplateDAO'),
     IGCSManager: Symbol.for('IGCSManager'),
     DBClient: Symbol.for('DBClient'),
     gcsConfig: Symbol.for('gcsConfig'),

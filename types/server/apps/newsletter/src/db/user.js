@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserNewsletterTableClient = exports.UserTableClient = void 0;
+exports.UserTableClient = void 0;
 const db_1 = require("@athena/db");
 class UserTableClient extends db_1.Table {
     constructor(db, name) {
@@ -13,16 +13,6 @@ class UserTableClient extends db_1.Table {
     }
 }
 exports.UserTableClient = UserTableClient;
-class UserNewsletterTableClient extends db_1.Table {
-    constructor(db, name) {
-        super(db, name);
-        this.tableBuilder = this.tableBuilder
-            .addColumn('userId', 'integer', (col) => col.references('user.id').onDelete('cascade').notNull())
-            .addColumn('newsletterId', 'integer', (col) => col.references('newsletter.id').onDelete('cascade').notNull())
-            .addColumn('role', 'text', (cb) => cb.notNull());
-    }
-}
-exports.UserNewsletterTableClient = UserNewsletterTableClient;
 // export interface UserTemplateTable {
 //   name: TABLE_NAMES.USER_TEMPLATE;
 //   columns: UserTemplate;

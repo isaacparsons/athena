@@ -1,14 +1,14 @@
 import { userRouter } from './user';
 import newsletterRoutes from './newsletter';
 import newsletterItemRoutes from './newsletter-post';
-// import newsletterItemTemplateRoutes from './newsletter-item-template';
+import templateRoutes from './template';
 import { trpc } from '..';
 
 export const appRouter = trpc.router({
   users: userRouter,
   newsletters: newsletterRoutes,
   newsletterPosts: newsletterItemRoutes,
-  // newsletterItemTemplates: newsletterItemTemplateRoutes,
+  templates: templateRoutes,
 });
 
 export type AppRouter = typeof appRouter;
@@ -21,6 +21,6 @@ export type RouterEndpoint = keyof Omit<
 export type RouterEndpointType<T extends RouterEndpoint = RouterEndpoint> =
   keyof Omit<AppRouter[T], 'createCaller' | 'getErrorShape' | '_def'>;
 
-export type NewsletterRoute = RouterEndpointType<'newsletters'>;
-export type NewsletterPostRoute = RouterEndpointType<'newsletterPosts'>;
-export type UserRoute = RouterEndpointType<'newsletters'>;
+// export type NewsletterRoute = RouterEndpointType<'newsletters'>;
+// export type NewsletterPostRoute = RouterEndpointType<'newsletterPosts'>;
+// export type UserRoute = RouterEndpointType<'newsletters'>;

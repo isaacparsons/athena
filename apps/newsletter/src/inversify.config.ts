@@ -13,6 +13,10 @@ import {
   // NewsletterPostTemplateDAO,
   ILocationDAO,
   LocationDAO,
+  TemplateDAO,
+  ITemplateDAO,
+  ITemplateNodeDAO,
+  TemplateNodeDAO,
 } from './dao';
 import { GCSManager, IGCSManager } from './services';
 import { Database, DB, Pool, PostgresDialect } from './db';
@@ -50,6 +54,11 @@ container
   .to(NewsletterPostDAO)
   .inSingletonScope();
 container.bind<IUserDAO>(TYPES.IUserDAO).to(UserDAO).inSingletonScope();
+container.bind<ITemplateDAO>(TYPES.ITemplateDAO).to(TemplateDAO).inSingletonScope();
+container
+  .bind<ITemplateNodeDAO>(TYPES.ITemplateNodeDAO)
+  .to(TemplateNodeDAO)
+  .inSingletonScope();
 // container
 //   .bind<INewsletterPostTemplateDAO>(TYPES.INewsletterPostTemplateDAO)
 //   .to(NewsletterPostTemplateDAO);

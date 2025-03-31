@@ -24,6 +24,8 @@ import {
   NewsletterProperties,
   NewsletterPostBase,
   NodePosition,
+  TemplateNodeBase,
+  templateBase,
 } from './lib';
 
 export type Meta = {
@@ -106,19 +108,6 @@ export const createManyNewsletterPosts = z.object({
 
 export type CreateManyNewsletterPosts = z.infer<typeof createManyNewsletterPosts>;
 
-// export const createNewsletterPostChild = createNewsletterPostBase.merge(
-//   z.object({ tempPosition: tempNodePosition })
-// );
-// export type CreateNewsletterPostChild = z.infer<typeof createNewsletterPostChild>;
-
-// export const createNewsletterPost = createNewsletterPostBase.merge(
-//   z.object({
-//     position: nodePositionInput,
-//     children: z.array(createNewsletterPostChild),
-//   })
-// );
-// export type CreateNewsletterPost = z.infer<typeof createNewsletterPost>;
-
 export const updateNewsletterPosts = z.array(
   updateRequestSchema(
     newsletterPostBase.partial().merge(
@@ -132,13 +121,12 @@ export const updateNewsletterPosts = z.array(
 );
 export type UpdateNewsletterPosts = z.infer<typeof updateNewsletterPosts>;
 
-// export const createNewsletterPostsBatchItem = createNewsletterPost
-//   .omit({ position: true })
-//   .merge(z.object({ tempPosition: tempNodePosition }));
+export type TemplateNode = Entity & TemplateNodeBase;
 
-// export const createNewsletterPostsBatch = z.object({
-//   newsletterId: z.coerce.number(),
-//   position: nodePositionInput,
-//   batch: z.array(createNewsletterPostsBatchItem),
-// });
-// export type CreateNewsletterPostsBatch = z.infer<typeof createNewsletterPostsBatch>;
+export type TemplateBase = z.infer<typeof templateBase> & Entity;
+
+export type Template = Entity &
+  TemplateBase & {
+    members: UserBase[];
+    nodes: TemplateNode[];
+  };

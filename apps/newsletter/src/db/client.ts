@@ -11,21 +11,17 @@ import {
   NewsletterPostTableClient,
   NewsletterPostMediaTableClient,
   NewsletterPostTextTableClient,
-  // NewsletterPostTemplateTableClient,
-  // NewsletterPostTemplateDataTableClient,
-  // UserTemplateTableClient,
   ITable,
   TABLE_NAMES,
   DBConnection,
   NewsletterPostContainerTableClient,
   sql,
+  TemplateTableClient,
+  TemplateNodeTableClient,
 } from '@athena/db';
 import { TYPES } from '../types/types';
+import { UserTemplateTableClient } from './user-template';
 // import { nanoid } from 'nanoid';
-// import {
-//   NewsletterPostPostName,
-//   CreateNewsletterPostBatchItem,
-// } from '@athena/common';
 
 export class DBManagerClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -62,18 +58,13 @@ export class DBManagerClient {
         this.client,
         TABLE_NAMES.NEWSLETTER_POST_CONTAINER
       ),
-      // new NewsletterPostTemplateTableClient(
-      //   this.client,
-      //   TABLE_NAMES.NEWSLETTER_POST_TEMPLATE
-      // ),
-      // new NewsletterPostTemplateDataTableClient(
-      //   this.client,
-      //   TABLE_NAMES.NEWSLETTER_POST_TEMPLATE_DATA
-      // ),
-      // new UserTemplateTableClient(this.client, TABLE_NAMES.USER_TEMPLATE),
+      new TemplateTableClient(this.client, TABLE_NAMES.TEMPLATE),
+      new UserTemplateTableClient(this.client, TABLE_NAMES.USER_TEMPLATE),
+      new TemplateNodeTableClient(this.client, TABLE_NAMES.TEMPLATE_NODE),
     ];
   }
   async createTables() {
+    await this.addEnumTypes();
     for (let i = 0; i < this.tables.length; i++) {
       await this.tables[i].createTable();
     }
@@ -93,6 +84,13 @@ export class DBManagerClient {
     }
   }
 
+  async addEnumTypes() {
+    await this.client.schema
+      .createType('template_type')
+      .asEnum(['newsletter', 'newsletter-post'])
+      .execute();
+  }
+
   async addCustom() {
     await sql`
       ALTER TABLE newsletter_post
@@ -107,6 +105,22 @@ export class DBManagerClient {
       ADD CONSTRAINT newsletter_post_prevId_fkey
       FOREIGN KEY (${sql.ref('prevId')}) 
       REFERENCES newsletter_post(id)
+      DEFERRABLE INITIALLY DEFERRED
+      `.execute(this.client);
+
+    await sql`
+      ALTER TABLE template_node
+      ADD CONSTRAINT template_node_nextId_fkey
+      FOREIGN KEY (${sql.ref('nextId')}) 
+      REFERENCES template_node(id)
+      DEFERRABLE INITIALLY DEFERRED
+      `.execute(this.client);
+
+    await sql`
+      ALTER TABLE template_node
+      ADD CONSTRAINT template_node_prevId_fkey
+      FOREIGN KEY (${sql.ref('prevId')}) 
+      REFERENCES template_node(id)
       DEFERRABLE INITIALLY DEFERRED
       `.execute(this.client);
   }

@@ -24,6 +24,7 @@ export declare enum TABLE_NAMES {
     NEWSLETTER = "newsletter",
     USER_NEWSLETTER = "user_newsletter",
     USER_TEMPLATE = "user_template",
+    TEMPLATE = "template",
     NEWSLETTER_POST = "newsletter_post",
     NEWSLETTER_POST_MEDIA = "newsletter_post_media",
     NEWSLETTER_POST_TEXT = "newsletter_post_text",
@@ -31,7 +32,7 @@ export declare enum TABLE_NAMES {
 }
 export type META_TABLES = TABLE_NAMES.NEWSLETTER_POST | TABLE_NAMES.NEWSLETTER;
 export type TableName = keyof Database;
-export type EntityTableName = Extract<TableName, 'newsletter' | 'newsletter_post'>;
+export type EntityTableName = Extract<TableName, 'newsletter' | 'newsletter_post' | 'template'>;
 export type DBConnection = Kysely<Database>;
 export type Transaction = KyselyTransaction<Database>;
 export interface ITable<T extends TableName, C extends string = never> {

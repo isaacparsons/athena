@@ -1,5 +1,5 @@
 import { Database, DB } from '@athena/db';
-import { UserDAO, NewsletterDAO, LocationDAO, NewsletterPostDAO, INewsletterDAO, IUserDAO, ILocationDAO, INewsletterPostDAO } from '@athena/dao';
+import { UserDAO, NewsletterDAO, LocationDAO, NewsletterPostDAO, INewsletterDAO, IUserDAO, ILocationDAO, INewsletterPostDAO, TemplateDAO, ITemplateDAO } from '@athena/dao';
 import { GCSManager, IGCSManager } from '@athena/services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/common';
@@ -17,6 +17,7 @@ export type Context = {
         newsletter: NewsletterDAO;
         location: LocationDAO;
         newsletterPost: NewsletterPostDAO;
+        template: TemplateDAO;
     };
 };
 export declare function createContext({ req, res }: CreateExpressContextOptions): {
@@ -29,5 +30,6 @@ export declare function createContext({ req, res }: CreateExpressContextOptions)
         newsletter: INewsletterDAO;
         location: ILocationDAO;
         newsletterPost: INewsletterPostDAO;
+        template: ITemplateDAO;
     };
 };

@@ -10,5 +10,7 @@ tslib_1.__exportStar(require("./newsletter-post-details"), exports);
 tslib_1.__exportStar(require("./newsletter-post"), exports);
 tslib_1.__exportStar(require("./newsletter"), exports);
 tslib_1.__exportStar(require("./user"), exports);
+tslib_1.__exportStar(require("./template"), exports);
+tslib_1.__exportStar(require("./user-newsletter"), exports);
 tslib_1.__exportStar(require("./client"), exports);
 //# sourceMappingURL=index.js.map

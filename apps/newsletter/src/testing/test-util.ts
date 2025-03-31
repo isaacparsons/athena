@@ -7,6 +7,12 @@ import {
   Newsletter,
   CreateNewsletterPost,
   CreateManyNewsletterPosts,
+  CreateTemplate,
+  GetInput,
+  Template,
+  TemplateBase,
+  UpdateTemplate,
+  DeleteInput,
   // CreateNewsletterPostsBatch,
 } from '@athena/common';
 import { createContext } from '../trpc';
@@ -39,6 +45,7 @@ export const createMockRequest =
 const newsletterMockRequest = createMockRequest('newsletters');
 const newsletterPostMockRequest = createMockRequest('newsletterPosts');
 const userMockRequest = createMockRequest('users');
+const templateMockRequest = createMockRequest('templates');
 
 export async function getNewsletter(userId: number, newsletterId: number) {
   return router.newsletters.get(
@@ -111,3 +118,33 @@ export async function createNewsletterPosts(
 //     newsletterPostMockRequest('createBatch')(userId, input)
 //   ) as Promise<number[]>;
 // }
+
+export async function createTemplate(userId: number, input: CreateTemplate) {
+  return router.templates.create(
+    templateMockRequest('create')(userId, input)
+  ) as Promise<number>;
+}
+
+export async function getTemplate(userId: number, input: GetInput) {
+  return router.templates.get(
+    templateMockRequest('get')(userId, input)
+  ) as Promise<Template>;
+}
+
+export async function getTemplatesByUserId(userId: number) {
+  return router.users.templates(userMockRequest('templates')(userId, {})) as Promise<
+    TemplateBase[]
+  >;
+}
+
+export async function updateTemplate(userId: number, input: UpdateTemplate) {
+  return router.templates.update(
+    templateMockRequest('update')(userId, input)
+  ) as Promise<number[]>;
+}
+
+export async function deleteTemplate(userId: number, input: DeleteInput) {
+  return router.templates.delete(
+    templateMockRequest('delete')(userId, input)
+  ) as Promise<number>;
+}

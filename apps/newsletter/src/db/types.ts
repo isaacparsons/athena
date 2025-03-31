@@ -18,13 +18,6 @@ export type Modified = ColumnType<string | null, never, string>;
 export type Creator = ColumnType<number, number, never>;
 export type Modifier = ColumnType<number | null, never, number>;
 
-export const MetaColumns = [
-  'created',
-  'modified',
-  'creatorId',
-  'modifierId',
-] as const;
-
 export type Meta = {
   created: Created;
   modified: Modified;
@@ -42,24 +35,18 @@ export enum TABLE_NAMES {
   NEWSLETTER = 'newsletter',
   USER_NEWSLETTER = 'user_newsletter',
   USER_TEMPLATE = 'user_template',
+  TEMPLATE = 'template',
+  TEMPLATE_NODE = 'template_node',
   NEWSLETTER_POST = 'newsletter_post',
   NEWSLETTER_POST_MEDIA = 'newsletter_post_media',
   NEWSLETTER_POST_TEXT = 'newsletter_post_text',
   NEWSLETTER_POST_CONTAINER = 'newsletter_post_container',
-  // NEWSLETTER_POST_TEMPLATE = 'newsletter_post_template',
-  // NEWSLETTER_POST_TEMPLATE_DATA = 'newsletter_post_template_data',
-  // NEWSLETTER_POST_TEMPLATE_MAPPING = 'newsletter_post_template_mapping',
 }
-
-export type META_TABLES =
-  // | TABLE_NAMES.NEWSLETTER_POST_TEMPLATE
-  TABLE_NAMES.NEWSLETTER_POST | TABLE_NAMES.NEWSLETTER;
 
 export type TableName = keyof Database;
 export type EntityTableName = Extract<
   TableName,
-  'newsletter' | 'newsletter_post'
-  // | 'newsletter_post_template'
+  'newsletter' | 'newsletter_post' | 'template' | 'template_node'
 >;
 
 export type DBConnection = Kysely<Database>;

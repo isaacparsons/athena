@@ -6,6 +6,7 @@ require("reflect-metadata");
 const inversify_config_1 = require("../inversify.config");
 const db_1 = require("@athena/db");
 const types_1 = require("../types/types");
+const user_template_1 = require("./user-template");
 // import { nanoid } from 'nanoid';
 // import {
 //   NewsletterPostPostName,
@@ -27,6 +28,8 @@ class DBManagerClient {
             new db_1.NewsletterPostMediaTableClient(this.client, db_1.TABLE_NAMES.NEWSLETTER_POST_MEDIA),
             new db_1.NewsletterPostTextTableClient(this.client, db_1.TABLE_NAMES.NEWSLETTER_POST_TEXT),
             new db_1.NewsletterPostContainerTableClient(this.client, db_1.TABLE_NAMES.NEWSLETTER_POST_CONTAINER),
+            new db_1.TemplateTableClient(this.client, db_1.TABLE_NAMES.TEMPLATE),
+            new user_template_1.UserTemplateTableClient(this.client, db_1.TABLE_NAMES.USER_TEMPLATE),
             // new NewsletterPostTemplateTableClient(
             //   this.client,
             //   TABLE_NAMES.NEWSLETTER_POST_TEMPLATE

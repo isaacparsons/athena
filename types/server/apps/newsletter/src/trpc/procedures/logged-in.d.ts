@@ -10,6 +10,7 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
                 newsletter: import("../../dao").INewsletterDAO;
                 location: import("../../dao").ILocationDAO;
                 newsletterPost: import("../../dao").INewsletterPostDAO;
+                template: import("../../dao").ITemplateDAO;
             };
         };
         meta: object;
@@ -33,6 +34,7 @@ export declare const loggedInProcedure: import("@trpc/server").ProcedureBuilder<
             newsletter: import("../../dao").INewsletterDAO;
             location: import("../../dao").ILocationDAO;
             newsletterPost: import("../../dao").INewsletterPostDAO;
+            template: import("../../dao").ITemplateDAO;
         };
     };
     _input_in: typeof import("@trpc/server").unsetMarker;

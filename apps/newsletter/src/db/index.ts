@@ -7,4 +7,6 @@ export * from './newsletter-post-details';
 export * from './newsletter-post';
 export * from './newsletter';
 export * from './user';
+export * from './template';
+export * from './user-newsletter';
 export * from './client';

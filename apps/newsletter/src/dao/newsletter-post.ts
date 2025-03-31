@@ -210,7 +210,6 @@ export class NewsletterPostDAO
         posts,
         (p) => p.tempPosition.parentId === null
       );
-      console.log(JSON.stringify(children, null, 4));
       const parent = _.get(parents, [0]);
       if (parent === undefined) throw new Error('a parent node must be specified');
 

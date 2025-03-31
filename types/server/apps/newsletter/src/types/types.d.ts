@@ -4,7 +4,7 @@ export declare const TYPES: {
     INewsletterDAO: symbol;
     INewsletterPostDAO: symbol;
     INewsletterPostDetailsDAO: symbol;
-    INewsletterPostTemplateDAO: symbol;
+    ITemplateDAO: symbol;
     IGCSManager: symbol;
     DBClient: symbol;
     gcsConfig: symbol;

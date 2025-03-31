@@ -14,9 +14,7 @@ function createContext({ req, res }) {
             newsletter: inversify_config_1.container.get(types_1.TYPES.INewsletterDAO),
             location: inversify_config_1.container.get(types_1.TYPES.ILocationDAO),
             newsletterPost: inversify_config_1.container.get(types_1.TYPES.INewsletterPostDAO),
-            // newsletterItemTemplate: container.get<INewsletterPostTemplateDAO>(
-            //   TYPES.INewsletterPostTemplateDAO
-            // ),
+            template: inversify_config_1.container.get(types_1.TYPES.ITemplateDAO),
         },
     };
 }

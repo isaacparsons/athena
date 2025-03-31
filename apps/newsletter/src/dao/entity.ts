@@ -6,6 +6,7 @@ import {
   EntityTableName,
   jsonObjectFrom,
   SelectUser,
+  Transaction,
 } from '@athena/db';
 import { injectable } from 'inversify';
 import { expressionBuilder, UpdateObject } from 'kysely';
@@ -99,4 +100,11 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
   }
 
   //   toEntity: (row: R) => E;
+
+  withTransaction<T>(db: DBConnection, execute: (db: DBConnection) => Promise<T>) {
+    if (db.isTransaction) return execute(db);
+    return db.transaction().execute(async (trx: Transaction) => {
+      return execute(trx);
+    });
+  }
 }

@@ -9,6 +9,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
             newsletter: import("../../dao").INewsletterDAO;
             location: import("../../dao").ILocationDAO;
             newsletterPost: import("../../dao").INewsletterPostDAO;
+            template: import("../../dao").ITemplateDAO;
         };
     };
     meta: object;
@@ -27,6 +28,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     newsletter: import("../../dao").INewsletterDAO;
                     location: import("../../dao").ILocationDAO;
                     newsletterPost: import("../../dao").INewsletterPostDAO;
+                    template: import("../../dao").ITemplateDAO;
                 };
             };
             meta: object;
@@ -50,6 +52,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 newsletter: import("../../dao").INewsletterDAO;
                 location: import("../../dao").ILocationDAO;
                 newsletterPost: import("../../dao").INewsletterPostDAO;
+                template: import("../../dao").ITemplateDAO;
             };
         };
         _input_in: {
@@ -73,6 +76,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     newsletter: import("../../dao").INewsletterDAO;
                     location: import("../../dao").ILocationDAO;
                     newsletterPost: import("../../dao").INewsletterPostDAO;
+                    template: import("../../dao").ITemplateDAO;
                 };
             };
             meta: object;
@@ -96,6 +100,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 newsletter: import("../../dao").INewsletterDAO;
                 location: import("../../dao").ILocationDAO;
                 newsletterPost: import("../../dao").INewsletterPostDAO;
+                template: import("../../dao").ITemplateDAO;
             };
         };
         _input_in: {
@@ -131,6 +136,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     newsletter: import("../../dao").INewsletterDAO;
                     location: import("../../dao").ILocationDAO;
                     newsletterPost: import("../../dao").INewsletterPostDAO;
+                    template: import("../../dao").ITemplateDAO;
                 };
             };
             meta: object;
@@ -154,6 +160,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 newsletter: import("../../dao").INewsletterDAO;
                 location: import("../../dao").ILocationDAO;
                 newsletterPost: import("../../dao").INewsletterPostDAO;
+                template: import("../../dao").ITemplateDAO;
             };
         };
         _input_in: {
@@ -191,6 +198,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     newsletter: import("../../dao").INewsletterDAO;
                     location: import("../../dao").ILocationDAO;
                     newsletterPost: import("../../dao").INewsletterPostDAO;
+                    template: import("../../dao").ITemplateDAO;
                 };
             };
             meta: object;
@@ -214,6 +222,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 newsletter: import("../../dao").INewsletterDAO;
                 location: import("../../dao").ILocationDAO;
                 newsletterPost: import("../../dao").INewsletterPostDAO;
+                template: import("../../dao").ITemplateDAO;
             };
         };
         _input_in: {
@@ -237,6 +246,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                     newsletter: import("../../dao").INewsletterDAO;
                     location: import("../../dao").ILocationDAO;
                     newsletterPost: import("../../dao").INewsletterPostDAO;
+                    template: import("../../dao").ITemplateDAO;
                 };
             };
             meta: object;
@@ -260,6 +270,7 @@ declare const router: import("@trpc/server").CreateRouterInner<import("@trpc/ser
                 newsletter: import("../../dao").INewsletterDAO;
                 location: import("../../dao").ILocationDAO;
                 newsletterPost: import("../../dao").INewsletterPostDAO;
+                template: import("../../dao").ITemplateDAO;
             };
         };
         _input_in: {

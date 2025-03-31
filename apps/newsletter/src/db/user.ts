@@ -1,6 +1,6 @@
 import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
 import { DBConnection, Table, TABLE_NAMES } from '@athena/db';
-import { User, UserNewsletter } from '../types/db';
+import { User } from '../types/db';
 
 export interface UserTable {
   name: TABLE_NAMES.USER;
@@ -27,34 +27,6 @@ export class UserTableClient extends Table<
     .addColumn('firstName', 'varchar')
     .addColumn('lastName', 'varchar')
     .addColumn('email', 'varchar', (cb) => cb.notNull().unique());
-}
-
-export interface UserNewsletterTable {
-  name: TABLE_NAMES.USER_NEWSLETTER;
-  columns: UserNewsletter;
-}
-
-export type SelectUserNewsletter = Selectable<UserNewsletter>;
-export type InsertUserNewsletter = Insertable<UserNewsletter>;
-export type UpdateUserNewsletter = Updateable<UserNewsletter>;
-
-export class UserNewsletterTableClient extends Table<
-  'user_newsletter',
-  'userId' | 'newsletterId'
-> {
-  constructor(db: DBConnection, name: string) {
-    super(db, name);
-  }
-
-  tableBuilder: CreateTableBuilder<'user_newsletter', 'userId' | 'newsletterId'> =
-    this.tableBuilder
-      .addColumn('userId', 'integer', (col) =>
-        col.references('user.id').onDelete('cascade').notNull()
-      )
-      .addColumn('newsletterId', 'integer', (col) =>
-        col.references('newsletter.id').onDelete('cascade').notNull()
-      )
-      .addColumn('role', 'text', (cb) => cb.notNull());
 }
 
 // export interface UserTemplateTable {

@@ -9,6 +9,8 @@ import {
   IUserDAO,
   ILocationDAO,
   INewsletterPostDAO,
+  TemplateDAO,
+  ITemplateDAO,
   // INewsletterPostTemplateDAO,
 } from '@athena/dao';
 import { GCSManager, IGCSManager } from '@athena/services';
@@ -39,7 +41,7 @@ export type Context = {
     newsletter: NewsletterDAO;
     location: LocationDAO;
     newsletterPost: NewsletterPostDAO;
-    // newsletterItemTemplate: NewsletterPostTemplateDAO;
+    template: TemplateDAO;
   };
 };
 
@@ -54,9 +56,7 @@ export function createContext({ req, res }: CreateExpressContextOptions) {
       newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),
       location: container.get<ILocationDAO>(TYPES.ILocationDAO),
       newsletterPost: container.get<INewsletterPostDAO>(TYPES.INewsletterPostDAO),
-      // newsletterItemTemplate: container.get<INewsletterPostTemplateDAO>(
-      //   TYPES.INewsletterPostTemplateDAO
-      // ),
+      template: container.get<ITemplateDAO>(TYPES.ITemplateDAO),
     },
   };
 }

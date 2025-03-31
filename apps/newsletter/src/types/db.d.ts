@@ -9,6 +9,20 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
+export type TemplateType = "newsletter" | "newsletter-post";
+
 export interface Country {
   code: string;
   id: Generated<number>;
@@ -85,6 +99,30 @@ export interface NewsletterPostText {
   type: string;
 }
 
+export interface Template {
+  config: Json | null;
+  created: Generated<string>;
+  creatorId: number;
+  id: Generated<number>;
+  modified: string | null;
+  modifierId: number | null;
+  name: string;
+  type: TemplateType;
+}
+
+export interface TemplateNode {
+  created: Generated<string>;
+  creatorId: number;
+  data: Json | null;
+  id: Generated<number>;
+  modified: string | null;
+  modifierId: number | null;
+  nextId: number | null;
+  parentId: number | null;
+  prevId: number | null;
+  templateId: number;
+}
+
 export interface User {
   email: string;
   firstName: string | null;
@@ -98,6 +136,12 @@ export interface UserNewsletter {
   userId: number;
 }
 
+export interface UserTemplate {
+  role: string;
+  templateId: number;
+  userId: number;
+}
+
 export interface DB {
   country: Country;
   federated_credential: FederatedCredential;
@@ -107,6 +151,9 @@ export interface DB {
   newsletter_post_container: NewsletterPostContainer;
   newsletter_post_media: NewsletterPostMedia;
   newsletter_post_text: NewsletterPostText;
+  template: Template;
+  template_node: TemplateNode;
   user: User;
   user_newsletter: UserNewsletter;
+  user_template: UserTemplate;
 }

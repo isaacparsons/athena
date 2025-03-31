@@ -49,14 +49,14 @@ app.listen(config.app.port, config.app.host, () => {
 });
 
 // web app
-export const webApp = express();
-const webAppPath = path.join(__dirname, '..', '..', '..', '..', 'athena-frontend');
-webApp.use(express.static(webAppPath));
+// export const webApp = express();
+// const webAppPath = path.join(__dirname, '..', '..', '..', '..', 'athena-frontend');
+// webApp.use(express.static(webAppPath));
 
-webApp.get('*', (req, res) => {
-  res.sendFile(path.join(webAppPath, 'index.html'));
-});
+// webApp.get('*', (req, res) => {
+//   res.sendFile(path.join(webAppPath, 'index.html'));
+// });
 
-webApp.listen(config.client.port, config.client.host, () => {
-  console.log(`[ ready ] http://${config.client.host}:${config.client.port}`);
-});
+// webApp.listen(config.client.port, config.client.host, () => {
+//   console.log(`[ ready ] http://${config.client.host}:${config.client.port}`);
+// });

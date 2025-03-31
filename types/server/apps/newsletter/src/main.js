@@ -12,11 +12,11 @@ const config = (0, util_1.getConfig)();
 exports.app = (0, express_1.default)();
 exports.app.use((0, cors_1.default)({
     // credentials: true,
-    credentials: false,
     // origin: [
-    //   `http://${env.client.host}:${env.client.port}`,
+    //   `http://${config.client.host}:${config.client.port}`,
     //   'https://storage.googleapis.com/athena-newsletter',
     // ],
+    credentials: false,
     origin: '*',
     // AccessControlAllowOrigin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -40,4 +40,14 @@ exports.app.use('/api/v1/trpc', (0, express_2.createExpressMiddleware)({
 exports.app.listen(config.app.port, config.app.host, () => {
     console.log(`[ ready ] http://${config.app.host}:${config.app.port}`);
 });
+// web app
+// export const webApp = express();
+// const webAppPath = path.join(__dirname, '..', '..', '..', '..', 'athena-frontend');
+// webApp.use(express.static(webAppPath));
+// webApp.get('*', (req, res) => {
+//   res.sendFile(path.join(webAppPath, 'index.html'));
+// });
+// webApp.listen(config.client.port, config.client.host, () => {
+//   console.log(`[ ready ] http://${config.client.host}:${config.client.port}`);
+// });
 //# sourceMappingURL=main.js.map
