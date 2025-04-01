@@ -38,8 +38,19 @@ export const useParamId = (key: string) => {
   }, [params, key]);
 };
 
-export const useSelectItems = () => {
+export const useSelectItems = <T>(data: T[], key: string) => {
   const [selected, setSelected] = useState(new Set<string>());
+
+  const allSelected = useMemo(
+    () => _.every(data, (i) => selected.has(_.get(i, key))),
+    [data, selected, key]
+  );
+
+  const handleSelectAll = () => {
+    const newSelected = allSelected ? [] : data.map((i) => _.get(i, key));
+    console.log(newSelected);
+    setSelected(new Set(newSelected));
+  };
 
   const handleSelect = (id: string) => {
     setSelected((selected) => {
@@ -51,5 +62,5 @@ export const useSelectItems = () => {
     });
   };
 
-  return { selected, handleSelect };
+  return { selected, handleSelect, allSelected, handleSelectAll };
 };

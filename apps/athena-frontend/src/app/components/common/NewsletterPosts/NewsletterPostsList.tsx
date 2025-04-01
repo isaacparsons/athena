@@ -1,25 +1,14 @@
 import _ from 'lodash';
 import {
-  CreateManyNewsletterPosts,
   CreateNewsletterPost,
-  DeleteBatchInput,
   NewsletterPost,
   NewsletterPostDetails,
-  UpdateNewsletterPosts,
 } from '@athena/common';
 import { StyledCard } from '@athena/components';
 
 import { List, ListItem } from '@mui/material';
 import React from 'react';
-import { FileMap } from '../../../store/newsletter-posts';
 import { useFilterArray } from '@athena/hooks';
-
-export type NewsletterPostChanges = {
-  create?: CreateManyNewsletterPosts;
-  update?: UpdateNewsletterPosts;
-  delete?: DeleteBatchInput;
-  files?: FileMap;
-};
 
 interface NewsletterPostsListProps {
   posts: Post[];

@@ -12,13 +12,21 @@ import {
   NewsletterPostChanges,
 } from '@athena/components';
 import { CloseIcon, EditIcon } from '@athena/icons';
-import { useNewsletter, useParamId, usePosts } from '@athena/hooks';
+import {
+  useNewsletter,
+  useParamId,
+  usePosts,
+  usePromiseWithNotification,
+} from '@athena/hooks';
 import { NewsletterPostsController } from '../../components/common/NewsletterPosts/NewsletterPostsController';
 
 export function Newsletter() {
   const [editing, setEditing] = useState(true);
 
+  const toggleEditing = () => setEditing((editing) => !editing);
+
   const newsletterId = useParamId('newsletterId');
+  const promiseWithNotifications = usePromiseWithNotification();
 
   const {
     loading,
@@ -46,14 +54,23 @@ export function Newsletter() {
   const posts = usePosts(newsletterId, newsletterPosts);
 
   const onSave = async (changes: NewsletterPostChanges) => {
-    if (changes.create) await createPosts(changes.create, changes.files);
+    if (changes.create) {
+      promiseWithNotifications.execute(createPosts(changes.create, changes.files), {
+        successMsg: 'Items created!',
+        errorMsg: 'Unable to create items :(',
+      });
+    }
     if (
       changes.delete &&
       changes.delete.ids.length > 0 &&
       newsletterId !== undefined
     ) {
-      await deletePosts(newsletterId, changes.delete);
+      promiseWithNotifications.execute(deletePosts(newsletterId, changes.delete), {
+        successMsg: 'Items deleted!',
+        errorMsg: 'Unable to delete items :(',
+      });
     }
+    toggleEditing();
   };
 
   if (loading) return <CircularProgress />;

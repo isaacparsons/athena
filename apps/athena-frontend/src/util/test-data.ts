@@ -4,6 +4,8 @@ import {
   NewsletterPost,
   NewsletterPostDetails,
   NewsletterPostTypeName,
+  TemplateBase,
+  TemplateType,
   TextPostDetails,
 } from '@athena/common';
 
@@ -63,3 +65,19 @@ export const textPost = createMockPost({
 export const mediaPost = createMockPost({
   details: mediaDetails,
 });
+
+export const createMockTemplateBase = (template: Partial<TemplateBase>) => {
+  const id = template.id ?? 1;
+  return {
+    id,
+    type: template.type ?? TemplateType.NewsletterPost,
+    name: template.name ?? `template ${id}`,
+    config: template.config ?? {},
+    meta: template.meta ?? {
+      creator: user,
+      modifier: null,
+      created: '2025-03-24T16:42:32.271Z',
+      modified: null,
+    },
+  };
+};

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {
   CreateManyNewsletterPosts,
   CreateNewsletterPost,
@@ -11,23 +10,35 @@ import {
 } from '@athena/common';
 import { useMemo, useRef, useState } from 'react';
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
-import { FileMap } from '../../../store/newsletter-posts';
+import { FileMap } from '@athena/store';
 import { useSelectItems } from '@athena/hooks';
-import { FileSelection } from './FileSelection';
-import { CustomCardFooter, CustomCardHeader } from '../CustomCard';
-import { Checkbox } from '@mui/material';
-import { createStyledIcon, StyledDialog } from '../Styled';
-import { createCustomFab } from '../Fab';
 import {
+  CustomCardFooter,
+  CustomCardHeader,
+  createStyledIcon,
+  StyledDialog,
+  StyledFab,
+  FileSelection,
+  AddNewsletterPostButton,
+  NewsletterPostDetailsContent,
+  NewsletterPostsList,
+} from '@athena/components';
+import { Checkbox, Stack } from '@mui/material';
+import {
+  TemplateIcon,
   ArrowBackIcon,
   ArrowForwardIcon,
   CheckIcon,
   CloseIcon,
+  DeleteIcon,
 } from '@athena/icons';
-import { AddNewsletterPostButton } from './AddNewsletterPostButton';
-import { NewsletterPostDetailsContent } from './NewsletterPostCard';
-import { nanoid } from 'nanoid';
-import { NewsletterPostsList } from './NewsletterPostsList';
+import {
+  createNewPost,
+  formatCreatedPosts,
+  formatDeletedPosts,
+  formatUpdatedPosts,
+  postsToTempPosts,
+} from './util';
 
 interface NewsletterPostsControllerProps {
   newsletterId: number;
@@ -43,22 +54,23 @@ export type NewsletterPostChanges = {
   files?: FileMap;
 };
 
-type Post = Partial<Omit<NewsletterPost, 'details'>> & {
+export type Post = Partial<Omit<NewsletterPost, 'details'>> & {
   details: Omit<NewsletterPostDetails, 'id' | 'newsletterPostId'>;
   tempPosition: CreateNewsletterPost['tempPosition'];
   file?: File;
 };
 
-const Save = createCustomFab(CheckIcon);
 const Close = createStyledIcon(CloseIcon);
 const DetailsCard = createStyledIcon(ArrowForwardIcon);
 const BackButton = createStyledIcon(ArrowBackIcon);
+const Delete = createStyledIcon(DeleteIcon);
+const CreateTemplate = createStyledIcon(TemplateIcon);
 
 export function NewsletterPostsController(props: NewsletterPostsControllerProps) {
   const { existingPosts, newsletterId, editing, onSave } = props;
 
   const { posts } = useMemo(() => postsToTempPosts(existingPosts), [existingPosts]);
-  const { selected, handleSelect } = useSelectItems();
+
   const [parent, setParent] = useState<null | Post>(null);
   const inputFile = useRef<HTMLInputElement | null>(null);
 
@@ -77,6 +89,11 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     name: 'posts',
     control,
   });
+
+  const { selected, handleSelect, allSelected, handleSelectAll } = useSelectItems(
+    fields,
+    'tempPosition.id'
+  );
 
   const handleFileAdded = (file: File) => {
     insert(fields.length, {
@@ -100,9 +117,10 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     });
   };
 
-  // const hasChanged = useMemo(() => {
-  //   // check for created / updated posts
-  // }, [fields])
+  const hasChanged = useMemo(
+    () => existingPosts.length !== fields.length,
+    [fields, existingPosts]
+  );
 
   const handleAddTextItem = () => {
     insert(
@@ -200,6 +218,13 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
         <CustomCardHeader
           left={parent === null ? null : <BackButton onClick={handleBack} />}
         />
+        <EditingHeader
+          enabled={fields.length > 0}
+          editing={Boolean(editing)}
+          selected={selected}
+          allSelected={allSelected}
+          handleSelectAll={handleSelectAll}
+        />
         <NewsletterPostsList
           posts={fields}
           parent={parent}
@@ -242,12 +267,15 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
             handleAddMediaItem={handleAddMediaItem}
           />
         )}
-        {editing && <Save onClick={handleSubmit(handleSave)} />}
+        {editing && (
+          <StyledFab disabled={!hasChanged} onClick={handleSubmit(handleSave)}>
+            <CheckIcon sx={{ color: 'white' }} />
+          </StyledFab>
+        )}
       </>
     </WithDialog>
   );
 }
-
 function WithDialog<T>({
   parent,
   children,
@@ -264,136 +292,32 @@ function WithDialog<T>({
   } else return children;
 }
 
-const postsToTempPosts = <T extends Omit<NewsletterPost, 'children'>>(
-  posts: T[]
-) => {
-  const existingPostsWithTempId = posts.map((p) => [nanoid(), p]) as [string, T][];
+interface EditingHeaderProps {
+  enabled: boolean;
+  editing: boolean;
+  allSelected: boolean;
+  selected: Set<string>;
+  handleSelectAll: () => void;
+}
 
-  const existingPostIdTempIdMap = new Map(
-    [...existingPostsWithTempId].map(([p1, p2]) => [p2.id, p1]) as [number, string][]
+function EditingHeader(props: EditingHeaderProps) {
+  const { editing, allSelected, enabled, handleSelectAll, selected } = props;
+  if (!editing || !enabled) return null;
+
+  return (
+    <Stack direction="row" alignItems="center" justifyContent="space-between" p={1}>
+      <Checkbox
+        sx={{ paddingRight: 2, width: 25 }}
+        edge="end"
+        onChange={() => handleSelectAll()}
+        checked={allSelected}
+      />
+      {selected.size > 0 && (
+        <Stack direction="row">
+          <Delete sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
+          <CreateTemplate sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
+        </Stack>
+      )}
+    </Stack>
   );
-
-  const tempPosts = existingPostsWithTempId.map(([tempId, p]) => {
-    return [
-      tempId,
-      {
-        ...p,
-        tempPosition: {
-          id: tempId,
-          parentId:
-            p.position.parentId === null
-              ? null
-              : existingPostIdTempIdMap.get(p.position.parentId) ?? null,
-          nextId:
-            p.position.nextId === null
-              ? null
-              : existingPostIdTempIdMap.get(p.position.nextId) ?? null,
-          prevId:
-            p.position.prevId === null
-              ? null
-              : existingPostIdTempIdMap.get(p.position.prevId) ?? null,
-        },
-      },
-    ];
-  }) as [string, Post][];
-
-  return {
-    posts: tempPosts.map(([, p]) => p),
-  };
-};
-
-const createNewPost = (
-  existing: Post[],
-  content: Pick<CreateNewsletterPost, 'details' | 'newsletterId'>,
-  id: string,
-  parentId: string | null
-) => {
-  const prev = existing.find(
-    (p) => p.tempPosition.nextId === null && p.tempPosition.parentId === parentId
-  );
-  return {
-    newsletterId: content.newsletterId,
-    title: 'test 1',
-    date: null,
-    details: content.details,
-    tempPosition: {
-      parentId: parentId ?? null,
-      id: id,
-      nextId: null,
-      prevId: prev?.tempPosition.id ?? null,
-    },
-  };
-};
-
-const formatCreatedPosts = (
-  newsletterId: number,
-  existingPosts: Post[],
-  posts: Post[]
-) => {
-  const created = posts.filter((p) => p.position === undefined);
-  const [parents, children] = _.partition(
-    created,
-    (p) => p.tempPosition.parentId === null
-  );
-
-  if (parents.length === 1) {
-    const parent = parents[0];
-    const existingParent = existingPosts.find(
-      (p) => parent.tempPosition.parentId === p.tempPosition.id
-    );
-
-    return {
-      newsletterId,
-      position: {
-        parentId:
-          existingParent === undefined
-            ? null
-            : existingParent.position?.parentId ?? null,
-        nextId: null,
-      },
-      posts: created.map((p) => ({
-        newsletterId,
-        title: p.title ?? '',
-        date: p.date ?? null,
-        details: p.details as NewsletterPostDetails,
-        tempPosition: p.tempPosition,
-        // location: p.location,
-      })),
-    };
-  }
-};
-
-const formatUpdatedPosts = (
-  newsletterId: number,
-  existingPosts: Post[],
-  posts: Post[]
-) => {
-  const notCreated = posts.filter((p) => p.position !== undefined);
-
-  return notCreated
-    .filter((p) => {
-      const postBefore = existingPosts.find(
-        (ep) => ep.tempPosition.id === p.tempPosition.id
-      );
-      return (
-        postBefore !== undefined && !_.isEqual(postBefore, p) && p.id !== undefined
-      );
-    })
-    .map((p) => ({
-      id: p.id as number,
-      newsletterId,
-      title: p.title ?? '',
-      date: p.date ?? null,
-      details: p.details as NewsletterPostDetails,
-      tempPosition: p.tempPosition,
-      // location: p.location,
-    }));
-};
-
-const formatDeletedPosts = (existingPosts: Post[], posts: Post[]) => {
-  return {
-    ids: _.differenceBy(existingPosts, posts, (p) => p.tempPosition.id)
-      .filter((p) => p.id !== undefined)
-      .map((p) => p.id as number),
-  };
-};
+}

@@ -10,12 +10,16 @@ import {
   createNewsletterPostsSlice,
   NewsletterPostsSlice,
 } from './newsletter-posts';
+import { createTemplatesSlice, TemplatesSlice } from './templates';
 // import {
 //   createNewsletterPostTemplatesSlice,
 //   NewsletterPostTemplatesSlice,
 // } from './newsletter-item-templates';
 
-export type Slices = UserSlice & NewslettersSlice & NewsletterPostsSlice;
+export type Slices = UserSlice &
+  NewslettersSlice &
+  NewsletterPostsSlice &
+  TemplatesSlice;
 //   NewsletterPostTemplatesSlice;
 
 export const useStore = create<Slices>()(
@@ -25,6 +29,7 @@ export const useStore = create<Slices>()(
         ...createUserSlice(...a),
         ...createNewslettersSlice(...a),
         ...createNewsletterPostsSlice(...a),
+        ...createTemplatesSlice(...a),
         // ...createNewsletterPostTemplatesSlice(...a),
       }))
     )
@@ -32,7 +37,8 @@ export const useStore = create<Slices>()(
 );
 
 export * from './user';
-// export * from './newsletters';
+export * from './newsletters';
+export * from './newsletter-posts';
 // export * from './newsletter-items';
 // export * from './add-newsletter-items';
 // export * from './newsletter-item-templates';

@@ -5,9 +5,10 @@ export type SvgIconComponent = typeof SvgIcon;
 
 export const createStyledIcon = (icon: SvgIconComponent) =>
   styled(icon)(({ theme }) => ({
-    // height: 25,
-    // width: 25,
+    height: 25,
+    width: 25,
     padding: theme.spacing(0.5),
+    // margin: theme.spacing(0.3),
     backgroundColor: 'grey',
     borderRadius: theme.spacing(5),
     color: 'white',

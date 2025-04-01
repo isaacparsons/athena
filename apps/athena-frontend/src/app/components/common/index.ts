@@ -14,3 +14,4 @@ export * from './CustomCheckbox';
 export * from './Styled';
 export * from './Location';
 export * from './SelectableList';
+export * from './FileSelection';

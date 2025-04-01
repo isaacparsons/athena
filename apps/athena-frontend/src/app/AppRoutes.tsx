@@ -13,6 +13,8 @@ import {
   NotFound,
   // Templates,
   Newsletters,
+  Templates,
+  Template,
 } from './pages';
 import { UserBase } from '@athena/common';
 import { Appbar } from '@athena/components';
@@ -25,6 +27,7 @@ export enum RoutePaths {
   newsletterPost = '/newsletters/:newsletterId/posts/:newsletterPostId',
   login = '/login',
   templates = '/templates',
+  template = '/templates/:templateId',
   newsletterItemTemplate = '/templates/item/:newsletterItemTemplateId',
   // account="/account"
   // settings="/settings"
@@ -105,20 +108,24 @@ const routerConfig: RouteObject[] = [
     path: RoutePaths.newsletterPost,
     element: <NewsletterPost />,
   },
-  // {
-  //   path: RoutePaths.templates,
-  //   element: (
-  //     <WithAppbar>
-  //       <WithOutlet>
-  //         <Templates />
-  //       </WithOutlet>
-  //     </WithAppbar>
-  //   ),
-  // },
-  // {
-  //   path: RoutePaths.newsletterItemTemplate,
-  //   element: <NewsletterPostTemplate />,
-  // },
+  {
+    path: RoutePaths.templates,
+    element: (
+      <WithAppbar>
+        <WithOutlet>
+          <Templates />
+        </WithOutlet>
+      </WithAppbar>
+    ),
+  },
+  {
+    path: RoutePaths.templates,
+    element: (
+      <WithAppbar>
+        <Template />
+      </WithAppbar>
+    ),
+  },
 ];
 
 export const appBarVisiblePaths = ['/', '/login', '/templates'];

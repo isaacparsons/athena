@@ -1,6 +1,5 @@
 import { inject, injectable, injectFromBase } from 'inversify';
 import 'reflect-metadata';
-import _ from 'lodash';
 import {
   Database,
   DBConnection,
@@ -95,7 +94,7 @@ export class TemplateDAO
     });
   }
 
-  getByUserId(id: number): Promise<TemplateBase[]> {
+  async getByUserId(id: number): Promise<TemplateBase[]> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const templates = await trx
         .selectFrom('user_template as ut')
