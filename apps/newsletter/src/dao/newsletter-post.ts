@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import {
   DBConnection,
   SelectLocation,
-  SelectNewsletterPostContainer,
   SelectNewsletterPostMedia,
   SelectNewsletterPostText,
   Transaction,
@@ -54,7 +53,6 @@ export type NewsletterPostRow = EntityMetaRow &
   Omit<Selectable<NewsletterPost>, 'modifierId' | 'creatorId' | 'locationId'> & {
     mediaDetails: SelectNewsletterPostMedia | null;
     textDetails: SelectNewsletterPostText | null;
-    containerDetails: SelectNewsletterPostContainer | null;
     location: SelectLocation | null;
     children: Omit<NewsletterPostRow, 'children'>[];
   };
@@ -97,11 +95,7 @@ export class NewsletterPostDAO
       location: mapLocation(row),
       date: _.isNull(row.date) ? null : row.date,
       title: row.title,
-      details: mapNewsletterPostDetails(
-        row.mediaDetails,
-        row.textDetails,
-        row.containerDetails
-      ),
+      details: mapNewsletterPostDetails(row.mediaDetails, row.textDetails),
     };
   }
 

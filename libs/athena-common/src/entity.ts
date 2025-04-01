@@ -2,7 +2,6 @@ import { z } from 'zod';
 import {
   mediaPostDetails,
   textPostDetails,
-  containerPostDetails,
   createTextDetails,
   createMediaDetails,
   updateTextDetails,
@@ -62,7 +61,6 @@ export type User = {
 
 export type TextPostDetails = z.infer<typeof textPostDetails>;
 export type MediaPostDetails = z.infer<typeof mediaPostDetails>;
-export type ContainerPostDetails = z.infer<typeof containerPostDetails>;
 
 export type CreateTextPostDetails = z.infer<typeof createTextDetails>;
 export type CreateMediaPostDetails = z.infer<typeof createMediaDetails>;
@@ -70,10 +68,7 @@ export type CreateMediaPostDetails = z.infer<typeof createMediaDetails>;
 export type UpdateTextPostDetails = z.infer<typeof updateTextDetails>;
 export type UpdateMediaPostDetails = z.infer<typeof updateMediaDetails>;
 
-export type NewsletterPostDetails =
-  | TextPostDetails
-  | MediaPostDetails
-  | ContainerPostDetails;
+export type NewsletterPostDetails = TextPostDetails | MediaPostDetails;
 
 export type NewsletterPost<
   T extends NewsletterPostDetails | undefined = NewsletterPostDetails

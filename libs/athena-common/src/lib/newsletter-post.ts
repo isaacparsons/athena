@@ -21,13 +21,11 @@ const mediaFormat = z.nativeEnum(MediaFormat);
 export enum NewsletterPostTypeName {
   Media = 'media',
   Text = 'text',
-  Container = 'container',
 }
 
 export const postDetailType = z.union([
   z.literal(NewsletterPostTypeName.Media),
   z.literal(NewsletterPostTypeName.Text),
-  z.literal(NewsletterPostTypeName.Container),
 ]);
 
 const postDetailBase = z.object({
@@ -37,12 +35,14 @@ const postDetailBase = z.object({
   name: z.string(),
 });
 
-export const mediaPostDetails = postDetailBase.extend({
+export const mediaPostInput = z.object({
   type: z.literal(NewsletterPostTypeName.Media),
   fileName: z.string(),
   format: mediaFormat,
   caption: z.string().nullable(),
 });
+
+export const mediaPostDetails = postDetailBase.merge(mediaPostInput);
 
 export const createMediaDetails = mediaPostDetails
   .omit({ id: true, newsletterPostId: true })
@@ -52,11 +52,13 @@ export const updateMediaDetails = mediaPostDetails
   .partial()
   .required({ id: true, newsletterPostId: true, type: true });
 
-export const textPostDetails = postDetailBase.extend({
+export const textPostInput = z.object({
   type: z.literal(NewsletterPostTypeName.Text),
   description: z.string().nullable(),
   link: z.string().nullable(),
 });
+
+export const textPostDetails = postDetailBase.merge(textPostInput);
 
 export const createTextDetails = textPostDetails
   .omit({ id: true, newsletterPostId: true })
@@ -67,29 +69,14 @@ export const updateTextDetails = textPostDetails
   .partial()
   .required({ id: true, newsletterPostId: true, type: true });
 
-export const containerPostDetails = postDetailBase.extend({
-  type: z.literal(NewsletterPostTypeName.Container),
-});
-
-export const createContainerDetails = containerPostDetails.omit({
-  id: true,
-  newsletterPostId: true,
-});
-
-export const updateContainerDetails = containerPostDetails
-  .partial()
-  .required({ id: true, newsletterPostId: true, type: true });
-
 export const createNewsletterPostDetails = z.discriminatedUnion('type', [
   createMediaDetails,
   createTextDetails,
-  createContainerDetails,
 ]);
 
 export const updateNewsletterPostDetails = z.discriminatedUnion('type', [
   updateMediaDetails,
   updateTextDetails,
-  updateContainerDetails,
 ]);
 
 export type UpdateNewsletterPostDetails = z.infer<

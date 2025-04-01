@@ -14,7 +14,6 @@ import {
   ITable,
   TABLE_NAMES,
   DBConnection,
-  NewsletterPostContainerTableClient,
   sql,
   TemplateTableClient,
   TemplateNodeTableClient,
@@ -53,10 +52,6 @@ export class DBManagerClient {
       new NewsletterPostTextTableClient(
         this.client,
         TABLE_NAMES.NEWSLETTER_POST_TEXT
-      ),
-      new NewsletterPostContainerTableClient(
-        this.client,
-        TABLE_NAMES.NEWSLETTER_POST_CONTAINER
       ),
       new TemplateTableClient(this.client, TABLE_NAMES.TEMPLATE),
       new UserTemplateTableClient(this.client, TABLE_NAMES.USER_TEMPLATE),

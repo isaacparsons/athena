@@ -5,13 +5,7 @@ import {
   NewsletterPostTypeName,
   DateRange,
 } from './lib';
-import {
-  NewsletterPost,
-  MediaPostDetails,
-  TextPostDetails,
-  ContainerPostDetails,
-  NewsletterPostDetails,
-} from './entity';
+import { NewsletterPost, MediaPostDetails, TextPostDetails } from './entity';
 
 export const logObject = (item: any, label?: string) => {
   if (label) {
@@ -66,15 +60,6 @@ export const isTextPost = (
   return (
     (post as NewsletterPost<TextPostDetails>).details.type ===
     NewsletterPostTypeName.Text
-  );
-};
-
-export const isContainerItem = (
-  post: NewsletterPostBase
-): post is NewsletterPost<ContainerPostDetails> => {
-  return (
-    (post as NewsletterPost<ContainerPostDetails>).details.type ===
-    NewsletterPostTypeName.Container
   );
 };
 

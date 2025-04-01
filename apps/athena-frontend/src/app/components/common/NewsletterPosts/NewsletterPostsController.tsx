@@ -7,6 +7,7 @@ import {
   NewsletterPostDetails,
   NewsletterPostTypeName,
   UpdateNewsletterPosts,
+  TempNodePosition,
 } from '@athena/common';
 import { useMemo, useRef, useState } from 'react';
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
@@ -56,7 +57,7 @@ export type NewsletterPostChanges = {
 
 export type Post = Partial<Omit<NewsletterPost, 'details'>> & {
   details: Omit<NewsletterPostDetails, 'id' | 'newsletterPostId'>;
-  tempPosition: CreateNewsletterPost['tempPosition'];
+  tempPosition: TempNodePosition;
   file?: File;
 };
 
@@ -229,36 +230,15 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           posts={fields}
           parent={parent}
           render={(value) => (
-            <>
-              <CustomCardHeader
-                left={
-                  editing ? (
-                    <Checkbox
-                      edge="end"
-                      onChange={() => handleSelect(value.tempPosition.id)}
-                      checked={selected.has(value.tempPosition.id)}
-                    />
-                  ) : null
-                }
-                right={
-                  editing ? (
-                    <Close onClick={() => handleRemove(value.tempPosition.id)} />
-                  ) : null
-                }
-              />
-              {value.details && (
-                <NewsletterPostDetailsContent
-                  editing={editing}
-                  data={value.details}
-                  onChange={(details) => {
-                    handleUpdate(value.tempPosition.id, { details });
-                  }}
-                />
-              )}
-              <CustomCardFooter
-                right={<DetailsCard onClick={() => handleOpenPostDetails(value)} />}
-              />
-            </>
+            <NewsletterPostsListItem
+              value={value}
+              editing={Boolean(editing)}
+              handleSelect={handleSelect}
+              selected={selected}
+              handleRemove={handleRemove}
+              handleUpdate={handleUpdate}
+              handleOpenPostDetails={handleOpenPostDetails}
+            />
           )}
         />
         {editing && (
@@ -319,5 +299,60 @@ function EditingHeader(props: EditingHeaderProps) {
         </Stack>
       )}
     </Stack>
+  );
+}
+
+interface NewsletterPostsListItemProps {
+  editing: boolean;
+  selected: Set<string>;
+  value: Post;
+  handleSelect: (id: string) => void;
+  handleRemove: (id: string) => void;
+  handleUpdate: (id: string, change: Partial<Post>) => void;
+  handleOpenPostDetails: (post: Post) => void;
+}
+
+function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
+  const {
+    editing,
+    selected,
+    value,
+    handleSelect,
+    handleRemove,
+    handleUpdate,
+    handleOpenPostDetails,
+  } = props;
+
+  return (
+    <>
+      <CustomCardHeader
+        left={
+          editing ? (
+            <Checkbox
+              edge="end"
+              onChange={() => handleSelect(value.tempPosition.id)}
+              checked={selected.has(value.tempPosition.id)}
+            />
+          ) : null
+        }
+        right={
+          editing ? (
+            <Close onClick={() => handleRemove(value.tempPosition.id)} />
+          ) : null
+        }
+      />
+      {value.details && (
+        <NewsletterPostDetailsContent
+          editing={editing}
+          data={value.details}
+          onChange={(details) => {
+            handleUpdate(value.tempPosition.id, { details });
+          }}
+        />
+      )}
+      <CustomCardFooter
+        right={<DetailsCard onClick={() => handleOpenPostDetails(value)} />}
+      />
+    </>
   );
 }

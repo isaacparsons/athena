@@ -4,7 +4,6 @@ import { DBConnection } from '@athena/db';
 import {
   NewsletterPostTypeName,
   NewsletterPostDetails,
-  ContainerPostDetails,
   TextPostDetails,
   MediaPostDetails,
   CreateNewsletterPost,
@@ -27,28 +26,16 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
 
   async get(newsletterItemId: number): Promise<NewsletterPostDetails> {
     const details = await this.db
-      .selectFrom([
-        'newsletter_post_media as nim',
-        'newsletter_post_text as nit',
-        'newsletter_post_container as nic',
-      ])
+      .selectFrom(['newsletter_post_media as nim', 'newsletter_post_text as nit'])
       .selectAll()
       .where(({ or, eb }) =>
         or([
           eb('nim.newsletterPostId', '=', newsletterItemId),
           eb('nit.newsletterPostId', '=', newsletterItemId),
-          eb('nic.newsletterPostId', '=', newsletterItemId),
         ])
       )
       .executeTakeFirst();
     if (!details) throw new Error('no details specified');
-    if (details.type === NewsletterPostTypeName.Container) {
-      return {
-        id: details.id,
-        type: NewsletterPostTypeName.Container,
-        name: details.name,
-      } as ContainerPostDetails;
-    }
     if (details.type === NewsletterPostTypeName.Text) {
       return {
         id: details.id,
@@ -88,21 +75,13 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
         .executeTakeFirstOrThrow();
       return;
     }
-    if (input.type === NewsletterPostTypeName.Container) {
-      await this.db
-        .insertInto('newsletter_post_container')
-        .values({ ...input, newsletterPostId })
-        .executeTakeFirstOrThrow();
-      return;
-    }
+
     throw new Error('unrecognized item type');
   }
   async update(input: UpdateNewsletterPostDetails): Promise<number> {
     const table =
       input.type === NewsletterPostTypeName.Text
         ? 'newsletter_post_text'
-        : input.type === NewsletterPostTypeName.Container
-        ? 'newsletter_post_container'
         : input.type === NewsletterPostTypeName.Media
         ? 'newsletter_post_media'
         : null;

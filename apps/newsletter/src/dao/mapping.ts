@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { MediaFormat, Meta, NewsletterPostTypeName } from '@athena/common';
 import {
   SelectLocation,
-  SelectNewsletterPostContainer,
   SelectNewsletterPostMedia,
   SelectNewsletterPostText,
   SelectUser,
@@ -59,8 +58,7 @@ export const mapLocation = <T extends { location: SelectLocation | null }>(
 
 export const mapNewsletterPostDetails = (
   media: SelectNewsletterPostMedia | null,
-  text: SelectNewsletterPostText | null,
-  container: SelectNewsletterPostContainer | null
+  text: SelectNewsletterPostText | null
 ) => {
   if (media)
     return {
@@ -80,13 +78,6 @@ export const mapNewsletterPostDetails = (
       type: text.type as NewsletterPostTypeName.Text,
       description: text.description,
       link: text.link,
-    };
-  if (container)
-    return {
-      newsletterPostId: container.newsletterPostId,
-      id: container.id,
-      name: container.name,
-      type: container.type as NewsletterPostTypeName.Container,
     };
 
   throw new Error('no valid details');
