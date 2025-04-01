@@ -1,16 +1,5 @@
 import { z } from 'zod';
 
-// function inferSchema<T>(schema: z.ZodType<T>) {
-//   return schema;
-// }
-// function createSchema<T extends z.ZodTypeAny, R extends keyof T, W extends keyof T>(
-//   schema: T,
-//   readonlyFields: R[],
-//   writeOnlyFields: W[]
-// ) {
-//   return schema.omit(keysToTruthyObject<T['_getType']>(readonlyFields));
-// }
-
 export enum MediaFormat {
   Image = 'image',
   Video = 'video',
@@ -32,7 +21,6 @@ const postDetailBase = z.object({
   id: z.coerce.number(),
   type: postDetailType,
   newsletterPostId: z.coerce.number(),
-  name: z.string(),
 });
 
 export const mediaPostInput = z.object({
@@ -40,7 +28,10 @@ export const mediaPostInput = z.object({
   fileName: z.string(),
   format: mediaFormat,
   caption: z.string().nullable(),
+  name: z.string(),
 });
+
+export type MediaPostInput = z.infer<typeof mediaPostInput>;
 
 export const mediaPostDetails = postDetailBase.merge(mediaPostInput);
 
@@ -56,7 +47,10 @@ export const textPostInput = z.object({
   type: z.literal(NewsletterPostTypeName.Text),
   description: z.string().nullable(),
   link: z.string().nullable(),
+  name: z.string(),
 });
+export type TextPostInput = z.infer<typeof textPostInput>;
+export type PostDetailsInput = MediaPostInput | TextPostInput;
 
 export const textPostDetails = postDetailBase.merge(textPostInput);
 

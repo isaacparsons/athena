@@ -10,8 +10,7 @@ import { Slices } from '@athena/store';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { asyncTrpcClient } from '../../trpc';
-
-export type FileMap = Record<string, File>;
+import { FileMap } from '../types';
 
 export interface NewsletterPostsSlice {
   newsletterPosts: {

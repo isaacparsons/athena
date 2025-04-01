@@ -1,11 +1,9 @@
 import {
-  Database,
   DBConnection,
   EntityTableName,
   Expression,
   jsonObjectFrom,
 } from '@athena/db';
-import { expressionBuilder } from 'kysely';
 
 export const newsletterPostDetailsMedia = (
   db: DBConnection,
@@ -17,17 +15,6 @@ export const newsletterPostDetailsMedia = (
       .selectAll()
       .whereRef(`newsletter_post_media.newsletterPostId`, '=', id)
   ).as('mediaDetails');
-
-export const newsletterPostDetailsContainer = (
-  db: DBConnection,
-  id: Expression<number>
-) =>
-  jsonObjectFrom(
-    db
-      .selectFrom('newsletter_post_container')
-      .selectAll()
-      .whereRef(`newsletter_post_container.newsletterPostId`, '=', id)
-  ).as('containerDetails');
 
 export const newsletterPostDetailsText = (
   db: DBConnection,

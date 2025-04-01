@@ -27,7 +27,6 @@ import {
   location,
   newsletterPostDetailsMedia,
   newsletterPostDetailsText,
-  newsletterPostDetailsContainer,
   selectEntityColumns,
 } from '../db/helpers';
 import { inject, injectable, injectFromBase } from 'inversify';
@@ -171,12 +170,6 @@ export class NewsletterPostDAO
       const nextId = _.isNull(pos.nextId) ? null : idMap.get(pos.nextId);
       const prevId = _.isNull(pos.prevId) ? null : idMap.get(pos.prevId);
 
-      console.log({
-        id,
-        parentId,
-        nextId,
-        prevId,
-      });
       if (
         !_.isUndefined(id) &&
         !_.isUndefined(parentId) &&
@@ -262,7 +255,6 @@ export class NewsletterPostDAO
           'prevId',
           newsletterPostDetailsMedia(trx, eb.ref('newsletter_post.id')),
           newsletterPostDetailsText(trx, eb.ref('newsletter_post.id')),
-          newsletterPostDetailsContainer(trx, eb.ref('newsletter_post.id')),
           location(trx, eb.ref('locationId')),
         ])
         .where('id', '=', id)
@@ -286,7 +278,6 @@ export class NewsletterPostDAO
           'prevId',
           newsletterPostDetailsMedia(trx, eb.ref('newsletter_post.id')),
           newsletterPostDetailsText(trx, eb.ref('newsletter_post.id')),
-          newsletterPostDetailsContainer(trx, eb.ref('newsletter_post.id')),
           location(trx, eb.ref('locationId')),
         ])
         .where('parentId', '=', parentItem.id)
@@ -333,7 +324,6 @@ export class NewsletterPostDAO
           'prevId',
           newsletterPostDetailsMedia(trx, eb.ref('newsletter_post.id')),
           newsletterPostDetailsText(trx, eb.ref('newsletter_post.id')),
-          newsletterPostDetailsContainer(trx, eb.ref('newsletter_post.id')),
           location(trx, eb.ref('newsletter_post.locationId')),
         ])
         .execute();

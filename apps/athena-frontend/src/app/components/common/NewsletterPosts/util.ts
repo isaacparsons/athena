@@ -1,11 +1,7 @@
 import _ from 'lodash';
-import {
-  CreateNewsletterPost,
-  NewsletterPost,
-  NewsletterPostDetails,
-} from '@athena/common';
+import { NewsletterPost, NewsletterPostDetails } from '@athena/common';
 import { nanoid } from 'nanoid';
-import { Post } from './NewsletterPostsController';
+import { Post } from '../../../types';
 
 export const postsToTempPosts = <T extends Omit<NewsletterPost, 'children'>>(
   posts: T[]
@@ -45,27 +41,11 @@ export const postsToTempPosts = <T extends Omit<NewsletterPost, 'children'>>(
   };
 };
 
-export const createNewPost = (
-  existing: Post[],
-  content: Pick<CreateNewsletterPost, 'details' | 'newsletterId'>,
-  id: string,
-  parentId: string | null
-) => {
-  const prev = existing.find(
-    (p) => p.tempPosition.nextId === null && p.tempPosition.parentId === parentId
+const isParentNode = (post: Post, posts: Post[]) => {
+  return (
+    post.tempPosition.parentId === null ||
+    !posts.find((p) => post.tempPosition.parentId === p.tempPosition.id)
   );
-  return {
-    newsletterId: content.newsletterId,
-    title: 'test 1',
-    date: null,
-    details: content.details,
-    tempPosition: {
-      parentId: parentId ?? null,
-      id: id,
-      nextId: null,
-      prevId: prev?.tempPosition.id ?? null,
-    },
-  };
 };
 
 export const formatCreatedPosts = (
@@ -74,35 +54,35 @@ export const formatCreatedPosts = (
   posts: Post[]
 ) => {
   const created = posts.filter((p) => p.position === undefined);
-  const [parents, children] = _.partition(
-    created,
-    (p) => p.tempPosition.parentId === null
-  );
 
-  if (parents.length === 1) {
+  // TODO: currently we only create 1 parent item, but we should be able to create
+  // multiple
+  const [parents, children] = _.partition(created, (p) => isParentNode(p, created));
+  if (parents.length !== 0) {
     const parent = parents[0];
     const existingParent = existingPosts.find(
       (p) => parent.tempPosition.parentId === p.tempPosition.id
     );
 
-    return {
+    const a = {
       newsletterId,
       position: {
-        parentId:
-          existingParent === undefined
-            ? null
-            : existingParent.position?.parentId ?? null,
+        parentId: existingParent === undefined ? null : existingParent.id ?? null,
         nextId: null,
       },
-      posts: created.map((p) => ({
+      posts: [
+        { ...parent, tempPosition: { ...parent.tempPosition, parentId: null } },
+        ...children,
+      ].map((p) => ({
         newsletterId,
         title: p.title ?? '',
         date: p.date ?? null,
         details: p.details as NewsletterPostDetails,
         tempPosition: p.tempPosition,
-        // location: p.location,
+        location: p.location === null ? undefined : p.location,
       })),
     };
+    return a;
   }
 };
 
@@ -129,7 +109,7 @@ export const formatUpdatedPosts = (
       date: p.date ?? null,
       details: p.details as NewsletterPostDetails,
       tempPosition: p.tempPosition,
-      // location: p.location,
+      location: p.location === null ? undefined : p.location,
     }));
 };
 
@@ -139,4 +119,17 @@ export const formatDeletedPosts = (existingPosts: Post[], posts: Post[]) => {
       .filter((p) => p.id !== undefined)
       .map((p) => p.id as number),
   };
+};
+
+export const getChildPosts = (id: string, posts: Post[]) => {
+  const filtered = posts.filter((p) => p.tempPosition.parentId === id);
+
+  if (filtered.length === 0) return [];
+
+  const arr = [...filtered];
+  for (let i = 0; i < filtered.length; i++) {
+    arr.push(...getChildPosts(filtered[i].tempPosition.id, posts));
+  }
+
+  return arr;
 };

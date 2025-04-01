@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import _ from 'lodash';
+import { useEffect, useMemo, useState } from 'react';
 import { CircularProgress, IconButton, Skeleton } from '@mui/material';
 import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
@@ -9,7 +8,12 @@ import {
   ActionBar,
   BackButton,
   CustomContainer,
-  NewsletterPostChanges,
+  formatCreatedPosts,
+  formatDeletedPosts,
+  formatUpdatedPosts,
+  NewsletterPostsController,
+  Post,
+  postsToTempPosts,
 } from '@athena/components';
 import { CloseIcon, EditIcon } from '@athena/icons';
 import {
@@ -18,10 +22,12 @@ import {
   usePosts,
   usePromiseWithNotification,
 } from '@athena/hooks';
-import { NewsletterPostsController } from '../../components/common/NewsletterPosts/NewsletterPostsController';
+import { CreateTemplateDialog } from './CreateTemplateDialog';
+import { FileMap } from '../../types';
 
 export function Newsletter() {
   const [editing, setEditing] = useState(true);
+  const [createTemplatePosts, setCreateTemplatePosts] = useState<Post[]>([]);
 
   const toggleEditing = () => setEditing((editing) => !editing);
 
@@ -52,20 +58,28 @@ export function Newsletter() {
 
   const newsletter = useNewsletter(newsletterId, newsletters);
   const posts = usePosts(newsletterId, newsletterPosts);
+  const { posts: existingPosts } = useMemo(() => postsToTempPosts(posts), [posts]);
 
-  const onSave = async (changes: NewsletterPostChanges) => {
-    if (changes.create) {
-      promiseWithNotifications.execute(createPosts(changes.create, changes.files), {
+  if (!newsletter) return null;
+
+  const handleSavePosts = async (data: { posts: Post[] }) => {
+    const files = data.posts.reduce((prev, curr) => {
+      if (curr.file !== undefined) prev[curr.tempPosition.id] = curr.file;
+      return prev;
+    }, {} as FileMap);
+
+    const created = formatCreatedPosts(newsletter.id, existingPosts, data.posts);
+    const updated = formatUpdatedPosts(newsletter.id, existingPosts, data.posts);
+    const deleted = formatDeletedPosts(existingPosts, data.posts);
+
+    if (created) {
+      promiseWithNotifications.execute(createPosts(created, files), {
         successMsg: 'Items created!',
         errorMsg: 'Unable to create items :(',
       });
     }
-    if (
-      changes.delete &&
-      changes.delete.ids.length > 0 &&
-      newsletterId !== undefined
-    ) {
-      promiseWithNotifications.execute(deletePosts(newsletterId, changes.delete), {
+    if (deleted && deleted.ids.length > 0 && newsletterId !== undefined) {
+      promiseWithNotifications.execute(deletePosts(newsletterId, deleted), {
         successMsg: 'Items deleted!',
         errorMsg: 'Unable to delete items :(',
       });
@@ -73,11 +87,16 @@ export function Newsletter() {
     toggleEditing();
   };
 
+  // const handleSaveTemplate = () => {};
+
   if (loading) return <CircularProgress />;
-  if (!newsletter) return null;
 
   return (
     <>
+      <CreateTemplateDialog
+        newsletterId={newsletter.id}
+        posts={createTemplatePosts}
+      />
       <ActionBar backBtn={<BackButton />}>
         <IconButton size="large" onClick={() => setEditing(!editing)}>
           {editing ? (
@@ -93,8 +112,9 @@ export function Newsletter() {
         <NewsletterPostsController
           editing={editing}
           newsletterId={newsletter.id}
-          existingPosts={posts}
-          onSave={onSave}
+          posts={existingPosts}
+          onSave={handleSavePosts}
+          setCreateTemplatePosts={(p) => setCreateTemplatePosts(p)}
         />
       </CustomContainer>
     </>

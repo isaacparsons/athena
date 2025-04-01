@@ -48,6 +48,14 @@
     },
     {
       "plugin": "@nx/jest/plugin",
+      "include": ["apps/athena-frontend/**/*"],
+      "options": {
+        "jestConfig": "apps/athena-frontend/jest.config.ts",
+        "targetName": "test"
+      }
+    },
+    {
+      "plugin": "@nx/jest/plugin",
       "include": ["apps/newsletter/**/*"],
       "options": {
         "jestConfig": "apps/newsletter/jest.config.ts",

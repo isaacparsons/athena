@@ -1,14 +1,11 @@
 import _ from 'lodash';
-import {
-  CreateTemplateNode,
-  NewsletterPost,
-  NewsletterPostTypeName,
-} from '@athena/common';
+import { CreateTemplateNode, NewsletterPostTypeName } from '@athena/common';
+import { Post } from '../app/types';
 
-export const toTemplateNodes = (posts: NewsletterPost[]): CreateTemplateNode[] =>
+export const toTemplateNodes = (posts: Post[]): CreateTemplateNode[] =>
   posts.map((p) => {
     const data: Record<string, string> = {
-      title: p.title,
+      title: p.title ?? p.details.name,
     };
     if (p.date !== null) _.set(data, ['date'], p.date);
 
@@ -29,12 +26,7 @@ export const toTemplateNodes = (posts: NewsletterPost[]): CreateTemplateNode[] =
     }
 
     return {
-      tempPosition: {
-        id: p.id.toString(),
-        parentId: p.position.parentId?.toString() ?? null,
-        nextId: p.position.nextId?.toString() ?? null,
-        prevId: p.position.prevId?.toString() ?? null,
-      },
+      tempPosition: p.tempPosition,
       data,
     };
   });
