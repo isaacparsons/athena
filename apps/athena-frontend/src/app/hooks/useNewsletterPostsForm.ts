@@ -1,22 +1,19 @@
-import { useFieldArray, useForm } from 'react-hook-form';
+import { Control, useFieldArray } from 'react-hook-form';
 import { PostDetailsInput } from '@athena/common';
 import { Post } from '../types';
 
-export const useNewsletterPosts = (parent: Post | null, posts: Post[]) => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    // formState: { errors, isValid, isSubmitting },
-  } = useForm<{ posts: Post[] }>({
-    // resolver: zodResolver(z.array(createNewsletterPostChild)),
-    defaultValues: { posts },
-    // mode: 'onChange',
-  });
-
-  const { fields, remove, insert, update } = useFieldArray({
+export const useNewsletterPostsForm = <T extends { posts: Post[] }>(
+  control: Control<T>,
+  parent: Post | null,
+  posts: Post[]
+) => {
+  const { fields, remove, insert, update } = useFieldArray<
+    { posts: Post[] },
+    'posts',
+    'postId'
+  >({
     name: 'posts',
-    control,
+    control: control as unknown as Control<{ posts: Post[] }>,
     keyName: 'postId',
   });
 
@@ -60,8 +57,6 @@ export const useNewsletterPosts = (parent: Post | null, posts: Post[]) => {
 
   return {
     fields,
-    handleSubmit,
-    reset,
     remove: handleRemove,
     update: handleUpdate,
     insert: handleInsert,

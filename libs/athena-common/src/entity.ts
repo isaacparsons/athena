@@ -52,7 +52,7 @@ export type Newsletter = NewsletterBase & {
 
 export type User = {
   newsletters: NewsletterBase[];
-  // newsletterItemTemplates: z.array(newsletterItemTemplateBase),
+  templates: TemplateBase[];
 };
 
 /**

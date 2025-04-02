@@ -25,8 +25,19 @@ export const toTemplateNodes = (posts: Post[]): CreateTemplateNode[] =>
         _.set(data, ['details.caption'], p.details.caption);
     }
 
+    const parentId = posts.find(
+      (p2) => p2.tempPosition.id === p.tempPosition.parentId
+    );
+    const nextId = posts.find((p2) => p2.tempPosition.id === p.tempPosition.nextId);
+    const prevId = posts.find((p2) => p2.tempPosition.id === p.tempPosition.prevId);
+
     return {
-      tempPosition: p.tempPosition,
+      tempPosition: {
+        id: p.tempPosition.id,
+        parentId: parentId === undefined ? null : p.tempPosition.parentId,
+        nextId: nextId === undefined ? null : p.tempPosition.nextId,
+        prevId: prevId === undefined ? null : p.tempPosition.prevId,
+      },
       data,
     };
   });

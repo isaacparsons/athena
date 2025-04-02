@@ -4,24 +4,22 @@ import {
   CustomList,
   CustomListItem,
 } from '@athena/components';
+import { useParamId, useTemplate } from '@athena/hooks';
 import { AddIcon } from '@athena/icons';
 import { useStore } from '@athena/store';
+import { CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { NewsletterPostsController } from '../../components/common/NewsletterPosts/NewsletterPostsController';
 
 export function Template() {
-  //   const { loading, itemTemplates } = useStore(
-  //     useShallow((state) => ({
-  //       itemTemplates: state.user.data?.newsletterItemTemplates ?? [],
-  //       loading: state.newsletterItemTemplates.loading,
-  //     }))
-  //   );
+  const templateId = useParamId('templateId');
+
+  const { template, loading } = useTemplate(templateId);
 
   const [editing, setEditing] = useState(false);
-  const [createTemplateDialogOpen, setCreateTemplateDialogOpen] = useState(false);
-  const handleOpenCreateTemplateDialog = () => setCreateTemplateDialogOpen(true);
-  const handleCloseCreateTemplateDialog = () => setCreateTemplateDialogOpen(false);
+  console.log(template);
+
+  if (loading) return <CircularProgress />;
 
   return (
     <CustomContainer>

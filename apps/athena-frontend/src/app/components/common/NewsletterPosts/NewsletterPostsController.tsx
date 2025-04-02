@@ -1,6 +1,5 @@
-import { NewsletterPost, TempNodePosition, PostDetailsInput } from '@athena/common';
 import { useMemo, useState } from 'react';
-import { SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useSelectItems } from '@athena/hooks';
 import {
   CustomCardHeader,
@@ -12,9 +11,10 @@ import {
   NewsletterPostsListItem,
   EditingHeader,
 } from '@athena/components';
-import { ArrowBackIcon, CheckIcon } from '@athena/icons';
+import { ArrowBackIcon, CheckIcon, DeleteIcon, TemplateIcon } from '@athena/icons';
 import { getChildPosts } from './util';
-import { useNewsletterPosts } from '@athena/hooks';
+import { useNewsletterPostsForm } from '@athena/hooks';
+import { Post } from '../../../types';
 
 interface NewsletterPostsControllerProps {
   newsletterId: number;
@@ -24,11 +24,8 @@ interface NewsletterPostsControllerProps {
   setCreateTemplatePosts: (posts: Post[]) => void;
 }
 
-export type Post = Partial<Omit<NewsletterPost, 'details'>> & {
-  details: PostDetailsInput;
-  tempPosition: TempNodePosition;
-  file?: File;
-};
+const Delete = createStyledIcon(DeleteIcon);
+const CreateTemplate = createStyledIcon(TemplateIcon);
 
 const BackButton = createStyledIcon(ArrowBackIcon);
 
@@ -37,7 +34,20 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
 
   const [parent, setParent] = useState<null | Post>(null);
 
-  const { fields, handleSubmit, reset, insert, update, remove } = useNewsletterPosts(
+  const {
+    control,
+    handleSubmit,
+    reset,
+    // formState: { errors, isValid, isSubmitting },
+  } = useForm<{ posts: Post[] }>({
+    // resolver: zodResolver(z.array(createNewsletterPostChild)),
+    defaultValues: { posts: posts },
+    values: { posts },
+    // mode: 'onChange',
+  });
+
+  const { fields, insert, update, remove } = useNewsletterPostsForm(
+    control,
     parent,
     posts
   );
@@ -82,7 +92,6 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
         date: p.date === undefined ? null : p.date,
         location: p.location === null ? undefined : p.location,
       }));
-    console.log(posts);
 
     setCreateTemplatePosts(posts);
   };
@@ -101,8 +110,15 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           selected={selected}
           allSelected={allSelected}
           handleSelectAll={handleSelectAll}
-          handleCreateTemplate={handleCreateTemplate}
-        />
+        >
+          <>
+            <Delete sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
+            <CreateTemplate
+              onClick={handleCreateTemplate}
+              sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }}
+            />
+          </>
+        </EditingHeader>
         <NewsletterPostsList
           posts={fields}
           parent={parent}

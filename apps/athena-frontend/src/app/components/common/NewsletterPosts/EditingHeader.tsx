@@ -1,9 +1,4 @@
-import { createStyledIcon } from '@athena/components';
 import { Checkbox, Stack } from '@mui/material';
-import { TemplateIcon, DeleteIcon } from '@athena/icons';
-
-const Delete = createStyledIcon(DeleteIcon);
-const CreateTemplate = createStyledIcon(TemplateIcon);
 
 interface EditingHeaderProps {
   enabled: boolean;
@@ -11,18 +6,12 @@ interface EditingHeaderProps {
   allSelected: boolean;
   selected: Set<string>;
   handleSelectAll: () => void;
-  handleCreateTemplate: () => void;
+  children: React.ReactNode;
 }
 
 export function EditingHeader(props: EditingHeaderProps) {
-  const {
-    editing,
-    allSelected,
-    enabled,
-    handleSelectAll,
-    selected,
-    handleCreateTemplate,
-  } = props;
+  const { editing, allSelected, enabled, handleSelectAll, selected, children } =
+    props;
   if (!editing || !enabled) return null;
 
   return (
@@ -33,15 +22,7 @@ export function EditingHeader(props: EditingHeaderProps) {
         onChange={() => handleSelectAll()}
         checked={allSelected}
       />
-      {selected.size > 0 && (
-        <Stack direction="row">
-          <Delete sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
-          <CreateTemplate
-            onClick={handleCreateTemplate}
-            sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }}
-          />
-        </Stack>
-      )}
+      {selected.size > 0 && <Stack direction="row">{children}</Stack>}
     </Stack>
   );
 }

@@ -1,7 +1,9 @@
 import _ from 'lodash';
 import { Newsletter, NewsletterPost } from '@athena/common';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useStore } from '@athena/store';
+import { useShallow } from 'zustand/react/shallow';
 
 export const usePosts = (
   newsletterId: number | undefined,
@@ -63,4 +65,28 @@ export const useSelectItems = <T>(data: T[], key: string) => {
   };
 
   return { selected, handleSelect, allSelected, handleSelectAll };
+};
+
+export const useEntries = <T extends object>(object: T) => {
+  return useMemo(() => _.values(object), [object]);
+};
+
+export const useTemplate = (id: number | undefined) => {
+  const { loading, templates, fetchTemplate } = useStore(
+    useShallow((state) => ({
+      templates: state.templates.data,
+      fetchTemplate: state.templates.fetch,
+      loading: state.templates.loading,
+    }))
+  );
+
+  useEffect(() => {
+    if (id) fetchTemplate(id);
+  }, [id, fetchTemplate]);
+
+  const template = useMemo(() => {
+    return id === undefined ? undefined : templates[id];
+  }, [id, templates]);
+
+  return { template, loading };
 };

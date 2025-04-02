@@ -20,7 +20,6 @@ export type Slices = UserSlice &
   NewslettersSlice &
   NewsletterPostsSlice &
   TemplatesSlice;
-//   NewsletterPostTemplatesSlice;
 
 export const useStore = create<Slices>()(
   devtools(
@@ -40,5 +39,4 @@ export * from './user';
 export * from './newsletters';
 export * from './newsletter-posts';
 // export * from './newsletter-items';
-// export * from './add-newsletter-items';
 // export * from './newsletter-item-templates';

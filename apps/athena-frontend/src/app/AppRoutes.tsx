@@ -28,7 +28,7 @@ export enum RoutePaths {
   login = '/login',
   templates = '/templates',
   template = '/templates/:templateId',
-  newsletterItemTemplate = '/templates/item/:newsletterItemTemplateId',
+  // newsletterItemTemplate = '/templates/item/:newsletterItemTemplateId',
   // account="/account"
   // settings="/settings"
 }
@@ -119,7 +119,7 @@ const routerConfig: RouteObject[] = [
     ),
   },
   {
-    path: RoutePaths.templates,
+    path: RoutePaths.template,
     element: (
       <WithAppbar>
         <Template />

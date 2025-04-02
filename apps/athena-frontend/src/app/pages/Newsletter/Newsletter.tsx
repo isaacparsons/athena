@@ -12,7 +12,6 @@ import {
   formatDeletedPosts,
   formatUpdatedPosts,
   NewsletterPostsController,
-  Post,
   postsToTempPosts,
 } from '@athena/components';
 import { CloseIcon, EditIcon } from '@athena/icons';
@@ -23,7 +22,8 @@ import {
   usePromiseWithNotification,
 } from '@athena/hooks';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
-import { FileMap } from '../../types';
+import { FileMap, Post } from '../../types';
+import { CreateTemplate } from '@athena/common';
 
 export function Newsletter() {
   const [editing, setEditing] = useState(true);
@@ -41,6 +41,7 @@ export function Newsletter() {
     fetchNewsletter,
     createPosts,
     deletePosts,
+    createTemplate,
   } = useStore(
     useShallow((state) => ({
       newsletters: state.newsletters.data,
@@ -49,6 +50,7 @@ export function Newsletter() {
       deletePosts: state.newsletterPosts.delete,
       loading: state.newsletters.loading,
       fetchNewsletter: state.newsletters.fetch,
+      createTemplate: state.templates.create,
     }))
   );
 
@@ -87,7 +89,17 @@ export function Newsletter() {
     toggleEditing();
   };
 
-  // const handleSaveTemplate = () => {};
+  const handleCloseTemplateDialog = () => {
+    setCreateTemplatePosts([]);
+  };
+
+  const handleSaveTemplate = (input: CreateTemplate) => {
+    promiseWithNotifications.execute(createTemplate(input), {
+      successMsg: 'Template created!',
+      errorMsg: 'Unable to create template :(',
+    });
+    setCreateTemplatePosts([]);
+  };
 
   if (loading) return <CircularProgress />;
 
@@ -96,6 +108,8 @@ export function Newsletter() {
       <CreateTemplateDialog
         newsletterId={newsletter.id}
         posts={createTemplatePosts}
+        onClose={handleCloseTemplateDialog}
+        onSave={handleSaveTemplate}
       />
       <ActionBar backBtn={<BackButton />}>
         <IconButton size="large" onClick={() => setEditing(!editing)}>
