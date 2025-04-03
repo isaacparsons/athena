@@ -15,3 +15,4 @@ export * from './Styled';
 export * from './Location';
 export * from './SelectableList';
 export * from './FileSelection';
+export * from './Template';

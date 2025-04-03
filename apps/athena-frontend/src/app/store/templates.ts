@@ -9,7 +9,7 @@ export interface TemplatesSlice {
   templates: {
     loading: boolean;
     data: Record<number, Template>;
-    fetch: (id: number) => Promise<void>;
+    fetch: (id: number) => Promise<Template>;
     create: (template: CreateTemplate) => Promise<number>;
   };
 }
@@ -34,10 +34,12 @@ export const createTemplatesSlice: StateCreator<
         state.templates.loading = false;
         state.templates.data[template.id] = template;
       });
+      return template;
     },
     create: async (template: CreateTemplate) => {
       const id = await asyncTrpcClient.templates.create.mutate(template);
       await get().templates.fetch(id);
+      await get().user.fetch();
       return id;
     },
   },

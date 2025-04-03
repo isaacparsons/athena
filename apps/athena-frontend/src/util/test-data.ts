@@ -16,6 +16,13 @@ export const user = {
   lastName: 'one',
 };
 
+export const meta = {
+  creator: user,
+  modifier: null,
+  created: '2025-03-24T16:42:32.271Z',
+  modified: null,
+};
+
 export const textDetails: TextPostDetails = {
   id: 1,
   type: NewsletterPostTypeName.Text,

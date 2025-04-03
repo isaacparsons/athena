@@ -1,3 +1,3 @@
 export * from './Templates';
-export * from './TemplateCard';
+export * from '../../components/common/Template/TemplateCard';
 export * from './UserTemplates';

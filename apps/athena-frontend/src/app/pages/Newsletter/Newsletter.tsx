@@ -107,6 +107,7 @@ export function Newsletter() {
       errorMsg: 'Unable to create template :(',
     });
     setCreateTemplatePosts([]);
+    toggleEditing();
   };
 
   if (loading) return <CircularProgress />;

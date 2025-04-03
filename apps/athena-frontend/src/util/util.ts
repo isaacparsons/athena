@@ -1,6 +1,11 @@
 import _ from 'lodash';
-import { CreateTemplateNode, NewsletterPostTypeName } from '@athena/common';
-import { Post } from '../app/types';
+import {
+  CreateTemplateNode,
+  NewsletterPostTypeName,
+  Template,
+} from '@athena/common';
+import { Post, PostInput } from '../app/types';
+import { nanoid } from 'nanoid';
 
 export const toTemplateNodes = (posts: Post[]): CreateTemplateNode[] =>
   posts.map((p) => {
@@ -41,3 +46,37 @@ export const toTemplateNodes = (posts: Post[]): CreateTemplateNode[] =>
       data,
     };
   });
+
+export const templateToPosts = (
+  newsletterId: number,
+  template: Template
+): PostInput[] => {
+  const { nodes } = template;
+
+  const base = {
+    newsletterId,
+    title: '',
+    date: null,
+  };
+
+  const idMap = new Map(nodes.map((n) => [n.id, nanoid()]));
+
+  return nodes.map((node) =>
+    _.toPairs(node.data).reduce((prev, curr) => {
+      _.set(prev, curr[0], curr[1]);
+      const tempPosition = {
+        id: idMap.get(node.id),
+        parentId:
+          node.position.parentId === null
+            ? undefined
+            : idMap.get(node.position.parentId),
+        nextId:
+          node.position.nextId === null ? null : idMap.get(node.position.nextId),
+        prevId:
+          node.position.prevId === null ? null : idMap.get(node.position.prevId),
+      };
+
+      return { ...prev, tempPosition };
+    }, base)
+  ) as PostInput[];
+};

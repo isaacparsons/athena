@@ -1,64 +1,76 @@
-import { ReactNode, useRef, useState } from 'react';
-import {
-  Button,
-  ButtonGroup,
-  Popover,
-  SpeedDial,
-  SpeedDialAction,
-} from '@mui/material';
-import { MediaIcon, MenuIcon, TextIcon } from '@athena/icons';
-import { FileSelection } from '../FileSelection';
-import {
-  mimeTypeToMediaFormat,
-  NewsletterPostTypeName,
-  PostDetailsInput,
-} from '@athena/common';
+import { useRef, useState } from 'react';
+import { Button, ButtonGroup } from '@mui/material';
+import { MediaIcon, TemplateIcon, TextIcon } from '@athena/icons';
+import { mimeTypeToMediaFormat, NewsletterPostTypeName } from '@athena/common';
+import { useTemplates } from '@athena/hooks';
+import { CreatePostsFromTemplateDialog, FileSelection } from '@athena/components';
+import { PostInput } from '../../../types';
 
 interface AddNewsletterPostButtonProps {
   newsletterId: number;
-  insert: (newsletterId: number, details: PostDetailsInput, file?: File) => void;
+  insert: (newsletterId: number, post: PostInput) => void;
 }
 
 export function AddNewsletterPostButton(props: AddNewsletterPostButtonProps) {
   const { newsletterId, insert } = props;
 
+  const templates = useTemplates();
+
   const inputFile = useRef<HTMLInputElement | null>(null);
+  const [createPostFromTemplateDialogOpen, setCreatePostFromTemplateDialogOpen] =
+    useState(false);
+
+  const handleOpenCreatePostFromTemplateDialog = () =>
+    setCreatePostFromTemplateDialogOpen(true);
+
+  const handleCloseCreatePostFromTemplateDialog = () =>
+    setCreatePostFromTemplateDialogOpen(false);
 
   const handleAddMediaItem = () => {
-    console.log(inputFile);
     if (inputFile.current) inputFile.current.click();
   };
 
   const handleAddTextItem = () => {
     insert(newsletterId, {
-      type: NewsletterPostTypeName.Text,
-      name: '',
-      link: null,
-      description: null,
+      details: {
+        type: NewsletterPostTypeName.Text,
+        name: '',
+        link: null,
+        description: null,
+      },
     });
   };
 
   const handleFileAdded = (file: File) => {
     insert(newsletterId, {
-      // date: new Date(file.lastModified).toISOString(),
-      type: NewsletterPostTypeName.Media,
-      caption: '',
-      name: '',
-      format: mimeTypeToMediaFormat(file.type),
-      fileName: URL.createObjectURL(file),
+      details: {
+        // date: new Date(file.lastModified).toISOString(),
+        type: NewsletterPostTypeName.Media,
+        caption: '',
+        name: '',
+        format: mimeTypeToMediaFormat(file.type),
+        fileName: URL.createObjectURL(file),
+      },
     });
   };
 
   return (
     <>
+      <CreatePostsFromTemplateDialog
+        newsletterId={newsletterId}
+        data={templates}
+        open={createPostFromTemplateDialogOpen}
+        onClose={handleCloseCreatePostFromTemplateDialog}
+        onInsert={insert}
+      />
       <FileSelection ref={inputFile} onFileAdded={handleFileAdded} />
       <ButtonGroup sx={{ width: '100%', justifyContent: 'center' }}>
-        {/* <Button
-               startIcon={<TemplateIcon />}
-               onClick={handleOpenCreateItemFromTemplateDialog}
-             >
-               {'From Template'}
-             </Button> */}
+        <Button
+          startIcon={<TemplateIcon />}
+          onClick={handleOpenCreatePostFromTemplateDialog}
+        >
+          {'From Template'}
+        </Button>
         <Button startIcon={<TextIcon />} onClick={handleAddTextItem}>
           {'Text'}
         </Button>

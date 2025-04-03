@@ -58,6 +58,13 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     'tempPosition.id'
   );
 
+  const hasChanged = useMemo(
+    () =>
+      JSON.stringify(posts) !==
+      JSON.stringify(fields.map((f) => _.omit(f, 'postId'))),
+    [fields, posts]
+  );
+
   const handleOpenPostDetails = (post: Post) => {
     if ((!editing && post.id !== undefined) || editing) {
       setParent(post);
@@ -96,13 +103,6 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
 
     setCreateTemplatePosts(posts);
   };
-
-  const hasChanged = useMemo(
-    () =>
-      JSON.stringify(posts) !==
-      JSON.stringify(fields.map((f) => _.omit(f, 'postId'))),
-    [fields, posts]
-  );
 
   return (
     <WithDialog parent={parent}>

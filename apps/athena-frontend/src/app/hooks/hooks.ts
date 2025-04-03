@@ -50,7 +50,6 @@ export const useSelectItems = <T>(data: T[], key: string) => {
 
   const handleSelectAll = () => {
     const newSelected = allSelected ? [] : data.map((i) => _.get(i, key));
-    console.log(newSelected);
     setSelected(new Set(newSelected));
   };
 
@@ -89,4 +88,13 @@ export const useTemplate = (id: number | undefined) => {
   }, [id, templates]);
 
   return { template, loading };
+};
+
+export const useTemplates = () => {
+  const { templates } = useStore(
+    useShallow((state) => ({
+      templates: state.user.data?.templates ?? [],
+    }))
+  );
+  return templates;
 };

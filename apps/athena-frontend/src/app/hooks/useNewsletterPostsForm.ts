@@ -1,6 +1,6 @@
+import _ from 'lodash';
 import { Control, useFieldArray } from 'react-hook-form';
-import { PostDetailsInput } from '@athena/common';
-import { Post } from '../types';
+import { Post, PostInput } from '../types';
 
 export const useNewsletterPostsForm = <T extends { posts: Post[] }>(
   control: Control<T>,
@@ -31,27 +31,29 @@ export const useNewsletterPostsForm = <T extends { posts: Post[] }>(
       });
   };
 
-  const handleInsert = (
-    newsletterId: number,
-    details: PostDetailsInput,
-    file?: File
-  ) => {
+  const handleInsert = (newsletterId: number, post: PostInput) => {
     const parentId = parent?.tempPosition.id ?? null;
     const prev = fields.find(
       (p) => p.tempPosition.nextId === null && p.tempPosition.parentId === parentId
     );
+    const inputParentId = _.get(post, ['tempPosition', 'parentId']);
+    const inputId = _.get(post, ['tempPosition', 'id']);
+    const inputNextId = _.get(post, ['tempPosition', 'nextId']);
+    const inputPrevId = _.get(post, ['tempPosition', 'prevId']);
+
     insert(fields.length, {
       newsletterId,
-      title: details.name,
+      title: post.details.name,
       date: null,
-      details,
+      details: post.details,
       tempPosition: {
-        parentId,
-        id: fields.length.toString(),
-        nextId: null,
-        prevId: prev?.tempPosition.id ?? null,
+        parentId: inputParentId === undefined ? parentId : inputParentId,
+        id: inputId === undefined ? fields.length.toString() : inputId,
+        nextId: inputNextId === undefined ? null : inputNextId,
+        prevId:
+          inputPrevId === undefined ? prev?.tempPosition.id ?? null : inputPrevId,
       },
-      file,
+      file: post.file,
     });
   };
 

@@ -6,4 +6,9 @@ export type Post = Partial<Omit<NewsletterPost, 'details'>> & {
   file?: File;
 };
 
+export type PostInput = Omit<Post, 'tempPosition'> &
+  Partial<{
+    tempPosition: { id: string } | Pick<Post, 'tempPosition'>;
+  }>;
+
 export type FileMap = Record<string, File>;
