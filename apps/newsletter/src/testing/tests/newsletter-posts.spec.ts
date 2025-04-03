@@ -45,56 +45,54 @@ describe('newsletter post routes', () => {
   // });
 
   describe('create newsletter item', () => {
-    test('add item with children', async () => {
-      const parentNode = createMockTextPost(newsletter.id, 'parent', {
+    test.only('add multiple items', async () => {
+      const parentNode1 = createMockTextPost(newsletter.id, 'parent 1', {
         id: '4',
         parentId: null,
         nextId: null,
         prevId: null,
       });
 
-      const child1Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 2',
-        {
-          id: '1',
-          parentId: '4',
-          nextId: '2',
-          prevId: null,
-        }
-      );
+      const child1Input = createMockTextPost(newsletter.id, 'text item 2', {
+        id: '1',
+        parentId: '4',
+        nextId: '2',
+        prevId: null,
+      });
 
-      const child2Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 3',
-        {
-          id: '2',
-          parentId: '4',
-          nextId: '3',
-          prevId: '1',
-        }
-      );
+      const child2Input = createMockTextPost(newsletter.id, 'text item 3', {
+        id: '2',
+        parentId: '4',
+        nextId: null,
+        prevId: '1',
+      });
 
-      const child3Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 4',
-        {
-          id: '3',
-          parentId: '4',
-          nextId: null,
-          prevId: '2',
-        }
-      );
+      const parentNode2 = createMockTextPost(newsletter.id, 'parent 2', {
+        id: '5',
+        parentId: null,
+        nextId: null,
+        prevId: null,
+      });
+
+      const child3Input = createMockTextPost(newsletter.id, 'text item 4', {
+        id: '6',
+        parentId: '5',
+        nextId: null,
+        prevId: null,
+      });
 
       const input: CreateManyNewsletterPosts = {
         newsletterId: newsletter.id,
-        position: { parentId: null, nextId: null },
-        posts: [parentNode, child1Input, child2Input, child3Input],
+        posts: [parentNode1, child1Input, child2Input, parentNode2, child3Input],
       };
-      const created = await createNewsletterPosts(user.id, input);
+      const createdIds = await createNewsletterPosts(user.id, input);
 
-      const posts = await getNewsletterPost(user.id, created);
-      console.log(JSON.stringify(posts, null, 4));
+      const result = await Promise.all(
+        createdIds.map(async (id) => {
+          return getNewsletterPost(user.id, id);
+        })
+      );
+      console.log(JSON.stringify(result, null, 4));
 
       // expect(posts).toMatchObject({
       //   position: {
@@ -128,466 +126,175 @@ describe('newsletter post routes', () => {
 
       // expect(child1);
     });
-    // test('add item between 2 existing items', async () => {
-    //   const inputTextItem1: CreateNewsletterPost = {
-    //     newsletterId: newsletter.id,
-    //     position: { parentId: null, nextId: null },
-    //     title: 'test text item 1',
-    //     details: {
-    //       type: NewsletterPostTypeName.Container,
-    //       name: 'test text item 1',
-    //     },
-    //     children: [],
-    //   };
-    //   const createdItemId1 = await createNewsletterPost(user.id, inputTextItem1);
-
-    //   const inputTextItem2: CreateNewsletterPost = {
-    //     newsletterId: newsletter.id,
-    //     title: 'text item 2',
-    //     position: { parentId: createdItemId1, nextId: null },
-    //     details: { type: NewsletterPostTypeName.Text, name: 'text item 2' },
-    //     children: [],
-    //   };
-    //   const createdItemId2 = await createNewsletterPost(user.id, inputTextItem2);
-
-    //   const inputTextItem3: CreateNewsletterPost = {
-    //     newsletterId: newsletter.id,
-    //     title: 'text item 3',
-    //     position: { parentId: createdItemId1, nextId: null },
-    //     details: { type: NewsletterPostTypeName.Text, name: 'text item 3' },
-    //     children: [],
-    //   };
-
-    //   const createdItemId3 = await createNewsletterPost(user.id, inputTextItem3);
-
-    //   const inputTextItem4: CreateNewsletterPost = {
-    //     newsletterId: newsletter.id,
-    //     title: 'text item 4',
-    //     position: { parentId: createdItemId1, nextId: createdItemId3 },
-    //     details: { type: NewsletterPostTypeName.Text, name: 'text item 4' },
-    //     children: [],
-    //   };
-    //   const createdItemId4 = await createNewsletterPost(user.id, inputTextItem4);
-
-    //   const posts = await getNewsletterPost(user.id, createdItemId1);
-    //   // console.log(JSON.stringify(posts, null, 4));
-
-    //   expect(posts).toMatchObject({
-    //     position: {
-    //       parentId: null,
-    //       nextId: null,
-    //       prevId: null,
-    //     },
-    //     details: {
-    //       newsletterPostId: createdItemId1,
-    //       id: expect.any(Number),
-    //       ...inputTextItem1.details,
-    //     },
-    //   });
-
-    //   const child1 = posts.children.find((c) => c.id === createdItemId2);
-    //   expect(child1).toMatchObject({
-    //     position: {
-    //       parentId: createdItemId1,
-    //       nextId: createdItemId4,
-    //       prevId: null,
-    //     },
-    //     details: {
-    //       newsletterPostId: createdItemId2,
-    //       id: expect.any(Number),
-    //       ...inputTextItem2.details,
-    //     },
-    //   });
-    //   const child2 = posts.children.find((c) => c.id === createdItemId3);
-    //   expect(child2).toMatchObject({
-    //     position: {
-    //       parentId: createdItemId1,
-    //       nextId: null,
-    //       prevId: createdItemId4,
-    //     },
-    //     details: {
-    //       newsletterPostId: createdItemId3,
-    //       id: expect.any(Number),
-    //       ...inputTextItem3.details,
-    //     },
-    //   });
-    //   const child3 = posts.children.find((c) => c.id === createdItemId4);
-    //   expect(child3).toMatchObject({
-    //     position: {
-    //       parentId: createdItemId1,
-    //       nextId: createdItemId3,
-    //       prevId: createdItemId2,
-    //     },
-    //     details: {
-    //       newsletterPostId: createdItemId4,
-    //       id: expect.any(Number),
-    //       ...inputTextItem4.details,
-    //     },
-    //   });
-
-    //   // expect(child1);
-    // });
-    // test('delete item between 2 existing items', async () => {
-    //   const postsBatch2 = createPostsBatch2(newsletter.id);
-    //   const posts = await addPosts(postsBatch2, user.id, newsletter.id);
-
-    //   const post1 = posts.find((p) => p.title === 'node item 1');
-    //   const post2 = posts.find((p) => p.title === 'text item 1');
-    //   const post3 = posts.find((p) => p.title === 'text item 2');
-    //   const post4 = posts.find((p) => p.title === 'text item 3');
-
-    //   expect(post1).toBeDefined();
-    //   expect(post2).toBeDefined();
-    //   expect(post3).toBeDefined();
-    //   expect(post4).toBeDefined();
-
-    //   await deleteNewsletterPost(user.id, [post3!.id]);
-
-    //   const postsAfter = await getNewsletterPost(user.id, post1!.id);
-    //   expect(postsAfter.children.length).toEqual(2);
-
-    //   const child1 = postsAfter.children.find((i) => i.id === post2!.id);
-    //   const child2 = postsAfter.children.find((i) => i.id === post4!.id);
-
-    //   expect(child1?.position).toEqual({
-    //     parentId: post1!.id,
-    //     nextId: post4!.id,
-    //     prevId: null,
-    //   });
-    //   expect(child2?.position).toEqual({
-    //     parentId: post1!.id,
-    //     nextId: null,
-    //     prevId: post2!.id,
-    //   });
-    // });
-    // test.only('update item', async () => {
-    //   const postsBatch2 = createPostsBatch2(newsletter.id);
-    //   const posts = await addPosts(postsBatch2, user.id, newsletter.id);
-    //   const post1 = posts.find((p) => p.title === 'node item 1');
-    //   const post3 = posts.find((p) => p.title === 'text item 2');
-    //   const post4 = posts.find((p) => p.title === 'text item 3');
-
-    //   expect(post1).toBeDefined();
-    //   expect(post3).toBeDefined();
-    //   expect(post4).toBeDefined();
-
-    //   await updateNewsletterPost(user.id, {
-    //     id: post3!.id,
-    //     newsletterId: newsletter.id,
-    //     position: {
-    //       prevId: post4!.id,
-    //       nextId: null,
-    //       parentId: post1!.id,
-    //     },
-    //   });
-    //   const postsAfter = await getNewsletterPost(user.id, post1!.id);
-    //   console.log(JSON.stringify(postsAfter, null, 4));
-    // });
   });
-  // describe('update newsletter item', () => {
-  //   test('swap children', async () => {
-  //     const id = await createNewsletterPost(user.id, {
-  //       newsletterId: newsletter.id,
-  //       position: { parentId: null, nextId: null },
-  //       title: 'test text item 1',
-  //       details: {
-  //         type: NewsletterPostTypeName.Container,
-  //         name: 'test text item 1',
-  //       },
-  //       children: [
-  //         createMockTextPost(newsletter.id, 'text item 2', {
-  //           id: '1',
-  //           parentId: null,
-  //           nextId: '2',
-  //           prevId: null,
-  //         }),
-  //         createMockTextPost(newsletter.id, 'text item 3', {
-  //           id: '2',
-  //           parentId: null,
-  //           nextId: null,
-  //           prevId: '1',
-  //         }),
-  //       ],
-  //     });
-
-  //     const posts = await getNewsletterPost(user.id, id);
-
-  //     const next = posts.children.find(
-  //       (c) => _.get(c, ['position', 'nextId']) === null
-  //     );
-  //     const prev = posts.children.find(
-  //       (c) => _.get(c, ['position', 'prevId']) === null
-  //     );
-
-  //     const updatedPosts = [
-  //       {
-  //         id: next!.id,
-  //         position: {
-  //           parentId: id,
-  //           nextId: prev!.id,
-  //           prevId: null,
-  //         },
-  //       },
-  //       {
-  //         id: prev!.id,
-  //         position: {
-  //           parentId: id,
-  //           nextId: null,
-  //           prevId: next!.id,
-  //         },
-  //       },
-  //     ];
-
-  //     await updateNewsletterPosts(user.id, updatedPosts);
-
-  //     const postsAfter = await getNewsletterPost(user.id, id);
-
-  //     const child1 = postsAfter.children.find((c) => c.id === next!.id);
-
-  //     expect(_.get(child1, ['position'])).toMatchObject({
-  //       parentId: id,
-  //       nextId: prev!.id,
+  // describe('delete posts', () => {
+  //   test('delete post from start', async () => {
+  //     const parentNode = createMockTextPost(newsletter.id, 'parent', {
+  //       id: '4',
+  //       parentId: null,
+  //       nextId: null,
   //       prevId: null,
   //     });
 
-  //     const child2 = postsAfter.children.find((c) => c.id === prev!.id);
+  //     const child1Input: CreateNewsletterPost = createMockTextPost(
+  //       newsletter.id,
+  //       'text item 2',
+  //       {
+  //         id: '1',
+  //         parentId: '4',
+  //         nextId: '2',
+  //         prevId: null,
+  //       }
+  //     );
 
-  //     expect(_.get(child2, ['position'])).toMatchObject({
-  //       parentId: id,
-  //       nextId: null,
-  //       prevId: next!.id,
-  //     });
+  //     const child2Input: CreateNewsletterPost = createMockTextPost(
+  //       newsletter.id,
+  //       'text item 3',
+  //       {
+  //         id: '2',
+  //         parentId: '4',
+  //         nextId: null,
+  //         prevId: '1',
+  //       }
+  //     );
+
+  //     const input: CreateManyNewsletterPosts = {
+  //       newsletterId: newsletter.id,
+  //       position: { parentId: null, nextId: null },
+  //       posts: [parentNode, child1Input, child2Input],
+  //     };
+  //     const created = await createNewsletterPosts(user.id, input);
+  //     const posts = await getNewsletterPost(user.id, created);
+
+  //     const post = posts.children?.find((c) => c.title === 'text item 2');
+
+  //     await deleteNewsletterPosts(user.id, [post!.id]);
+
+  //     const postsAfter = await getNewsletterPost(user.id, created);
+
+  //     const post1 = postsAfter.children?.find((c) => c.title === 'text item 3');
+
+  //     console.log(JSON.stringify(postsAfter, null, 4));
+
+  //     expect(post1?.position.nextId).toEqual(null);
+  //     expect(post1?.position.prevId).toEqual(null);
   //   });
+  //   test('delete post from end', async () => {
+  //     const parentNode = createMockTextPost(newsletter.id, 'parent', {
+  //       id: '4',
+  //       parentId: null,
+  //       nextId: null,
+  //       prevId: null,
+  //     });
 
-  //   // test.only('update post details / location', async () => {
-  //   //   const id = await createNewsletterPost(user.id, {
-  //   //     newsletterId: newsletter.id,
-  //   //     position: { parentId: null, nextId: null },
-  //   //     title: 'test text item 1',
-  //   //     details: {
-  //   //       type: NewsletterPostTypeName.Container,
-  //   //       name: 'test text item 1',
-  //   //     },
-  //   //     children: [],
-  //   //   });
+  //     const child1Input: CreateNewsletterPost = createMockTextPost(
+  //       newsletter.id,
+  //       'text item 2',
+  //       {
+  //         id: '1',
+  //         parentId: '4',
+  //         nextId: '2',
+  //         prevId: null,
+  //       }
+  //     );
 
-  //   //   const posts = await getNewsletterPost(user.id, id);
+  //     const child2Input: CreateNewsletterPost = createMockTextPost(
+  //       newsletter.id,
+  //       'text item 3',
+  //       {
+  //         id: '2',
+  //         parentId: '4',
+  //         nextId: null,
+  //         prevId: '1',
+  //       }
+  //     );
 
-  //   //   const next = posts.children.find(
-  //   //     (c) => _.get(c, ['position', 'nextId']) === null
-  //   //   );
-  //   //   const prev = posts.children.find(
-  //   //     (c) => _.get(c, ['position', 'prevId']) === null
-  //   //   );
+  //     const input: CreateManyNewsletterPosts = {
+  //       newsletterId: newsletter.id,
+  //       position: { parentId: null, nextId: null },
+  //       posts: [parentNode, child1Input, child2Input],
+  //     };
+  //     const created = await createNewsletterPosts(user.id, input);
+  //     const posts = await getNewsletterPost(user.id, created);
 
-  //   //   const updatedPosts = [
-  //   //     {
-  //   //       id: next!.id,
-  //   //       position: {
-  //   //         parentId: id,
-  //   //         nextId: prev!.id,
-  //   //         prevId: null,
-  //   //       },
-  //   //     },
-  //   //     {
-  //   //       id: prev!.id,
-  //   //       position: {
-  //   //         parentId: id,
-  //   //         nextId: null,
-  //   //         prevId: next!.id,
-  //   //       },
-  //   //     },
-  //   //   ];
+  //     const post = posts.children?.find((c) => c.title === 'text item 3');
 
-  //   //   await updateNewsletterPosts(user.id, updatedPosts);
+  //     await deleteNewsletterPosts(user.id, [post!.id]);
 
-  //   //   const postsAfter = await getNewsletterPost(user.id, id);
+  //     const postsAfter = await getNewsletterPost(user.id, created);
 
-  //   //   const child1 = postsAfter.children.find((c) => c.id === next!.id);
+  //     const post1 = postsAfter.children?.find((c) => c.title === 'text item 2');
 
-  //   //   expect(_.get(child1, ['position'])).toMatchObject({
-  //   //     parentId: id,
-  //   //     nextId: prev!.id,
-  //   //     prevId: null,
-  //   //   });
+  //     console.log(JSON.stringify(postsAfter, null, 4));
 
-  //   //   const child2 = postsAfter.children.find((c) => c.id === prev!.id);
+  //     expect(post1?.position.nextId).toEqual(null);
+  //     expect(post1?.position.prevId).toEqual(null);
+  //   });
+  //   test('delete post between 2 other posts', async () => {
+  //     const parentNode = createMockTextPost(newsletter.id, 'parent', {
+  //       id: '4',
+  //       parentId: null,
+  //       nextId: null,
+  //       prevId: null,
+  //     });
 
-  //   //   expect(_.get(child2, ['position'])).toMatchObject({
-  //   //     parentId: id,
-  //   //     nextId: null,
-  //   //     prevId: next!.id,
-  //   //   });
-  //   // });
+  //     const child1Input: CreateNewsletterPost = createMockTextPost(
+  //       newsletter.id,
+  //       'text item 2',
+  //       {
+  //         id: '1',
+  //         parentId: '4',
+  //         nextId: '2',
+  //         prevId: null,
+  //       }
+  //     );
+
+  //     const child2Input: CreateNewsletterPost = createMockTextPost(
+  //       newsletter.id,
+  //       'text item 3',
+  //       {
+  //         id: '2',
+  //         parentId: '4',
+  //         nextId: '3',
+  //         prevId: '1',
+  //       }
+  //     );
+
+  //     const child3Input: CreateNewsletterPost = createMockTextPost(
+  //       newsletter.id,
+  //       'text item 4',
+  //       {
+  //         id: '3',
+  //         parentId: '4',
+  //         nextId: null,
+  //         prevId: '2',
+  //       }
+  //     );
+
+  //     const input: CreateManyNewsletterPosts = {
+  //       newsletterId: newsletter.id,
+  //       position: { parentId: null, nextId: null },
+  //       posts: [parentNode, child1Input, child2Input, child3Input],
+  //     };
+  //     const created = await createNewsletterPosts(user.id, input);
+
+  //     const posts = await getNewsletterPost(user.id, created);
+
+  //     const post = posts.children?.find((c) => c.title === 'text item 3');
+
+  //     await deleteNewsletterPosts(user.id, [post!.id]);
+
+  //     const postsAfter = await getNewsletterPost(user.id, created);
+
+  //     const post1 = postsAfter.children?.find((c) => c.title === 'text item 2');
+  //     const post3 = postsAfter.children?.find((c) => c.title === 'text item 4');
+  //     console.log(JSON.stringify(postsAfter, null, 4));
+
+  //     expect(post1?.position.nextId).toEqual(post3?.id);
+  //     expect(post1?.position.prevId).toEqual(null);
+
+  //     expect(post3?.position.nextId).toEqual(null);
+  //     expect(post3?.position.prevId).toEqual(post1?.id);
+  //   });
   // });
-  describe('delete posts', () => {
-    test('delete post from start', async () => {
-      const parentNode = createMockTextPost(newsletter.id, 'parent', {
-        id: '4',
-        parentId: null,
-        nextId: null,
-        prevId: null,
-      });
-
-      const child1Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 2',
-        {
-          id: '1',
-          parentId: '4',
-          nextId: '2',
-          prevId: null,
-        }
-      );
-
-      const child2Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 3',
-        {
-          id: '2',
-          parentId: '4',
-          nextId: null,
-          prevId: '1',
-        }
-      );
-
-      const input: CreateManyNewsletterPosts = {
-        newsletterId: newsletter.id,
-        position: { parentId: null, nextId: null },
-        posts: [parentNode, child1Input, child2Input],
-      };
-      const created = await createNewsletterPosts(user.id, input);
-      const posts = await getNewsletterPost(user.id, created);
-
-      const post = posts.children?.find((c) => c.title === 'text item 2');
-
-      await deleteNewsletterPosts(user.id, [post!.id]);
-
-      const postsAfter = await getNewsletterPost(user.id, created);
-
-      const post1 = postsAfter.children?.find((c) => c.title === 'text item 3');
-
-      console.log(JSON.stringify(postsAfter, null, 4));
-
-      expect(post1?.position.nextId).toEqual(null);
-      expect(post1?.position.prevId).toEqual(null);
-    });
-    test('delete post from end', async () => {
-      const parentNode = createMockTextPost(newsletter.id, 'parent', {
-        id: '4',
-        parentId: null,
-        nextId: null,
-        prevId: null,
-      });
-
-      const child1Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 2',
-        {
-          id: '1',
-          parentId: '4',
-          nextId: '2',
-          prevId: null,
-        }
-      );
-
-      const child2Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 3',
-        {
-          id: '2',
-          parentId: '4',
-          nextId: null,
-          prevId: '1',
-        }
-      );
-
-      const input: CreateManyNewsletterPosts = {
-        newsletterId: newsletter.id,
-        position: { parentId: null, nextId: null },
-        posts: [parentNode, child1Input, child2Input],
-      };
-      const created = await createNewsletterPosts(user.id, input);
-      const posts = await getNewsletterPost(user.id, created);
-
-      const post = posts.children?.find((c) => c.title === 'text item 3');
-
-      await deleteNewsletterPosts(user.id, [post!.id]);
-
-      const postsAfter = await getNewsletterPost(user.id, created);
-
-      const post1 = postsAfter.children?.find((c) => c.title === 'text item 2');
-
-      console.log(JSON.stringify(postsAfter, null, 4));
-
-      expect(post1?.position.nextId).toEqual(null);
-      expect(post1?.position.prevId).toEqual(null);
-    });
-    test('delete post between 2 other posts', async () => {
-      const parentNode = createMockTextPost(newsletter.id, 'parent', {
-        id: '4',
-        parentId: null,
-        nextId: null,
-        prevId: null,
-      });
-
-      const child1Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 2',
-        {
-          id: '1',
-          parentId: '4',
-          nextId: '2',
-          prevId: null,
-        }
-      );
-
-      const child2Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 3',
-        {
-          id: '2',
-          parentId: '4',
-          nextId: '3',
-          prevId: '1',
-        }
-      );
-
-      const child3Input: CreateNewsletterPost = createMockTextPost(
-        newsletter.id,
-        'text item 4',
-        {
-          id: '3',
-          parentId: '4',
-          nextId: null,
-          prevId: '2',
-        }
-      );
-
-      const input: CreateManyNewsletterPosts = {
-        newsletterId: newsletter.id,
-        position: { parentId: null, nextId: null },
-        posts: [parentNode, child1Input, child2Input, child3Input],
-      };
-      const created = await createNewsletterPosts(user.id, input);
-
-      const posts = await getNewsletterPost(user.id, created);
-
-      const post = posts.children?.find((c) => c.title === 'text item 3');
-
-      await deleteNewsletterPosts(user.id, [post!.id]);
-
-      const postsAfter = await getNewsletterPost(user.id, created);
-
-      const post1 = postsAfter.children?.find((c) => c.title === 'text item 2');
-      const post3 = postsAfter.children?.find((c) => c.title === 'text item 4');
-      console.log(JSON.stringify(postsAfter, null, 4));
-
-      expect(post1?.position.nextId).toEqual(post3?.id);
-      expect(post1?.position.prevId).toEqual(null);
-
-      expect(post3?.position.nextId).toEqual(null);
-      expect(post3?.position.prevId).toEqual(post1?.id);
-    });
-  });
 });

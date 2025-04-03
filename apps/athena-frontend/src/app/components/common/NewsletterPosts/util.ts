@@ -1,5 +1,9 @@
 import _ from 'lodash';
-import { NewsletterPost, NewsletterPostDetails } from '@athena/common';
+import {
+  CreateManyNewsletterPosts,
+  NewsletterPost,
+  NewsletterPostDetails,
+} from '@athena/common';
 import { nanoid } from 'nanoid';
 import { Post } from '../../../types';
 
@@ -41,49 +45,61 @@ export const postsToTempPosts = <T extends Omit<NewsletterPost, 'children'>>(
   };
 };
 
-const isParentNode = (post: Post, posts: Post[]) => {
-  return (
-    post.tempPosition.parentId === null ||
-    !posts.find((p) => post.tempPosition.parentId === p.tempPosition.id)
-  );
-};
-
 export const formatCreatedPosts = (
   newsletterId: number,
   existingPosts: Post[],
   posts: Post[]
-) => {
-  const created = posts.filter((p) => p.position === undefined);
-
-  // TODO: currently we only create 1 parent item, but we should be able to create
-  // multiple
-  const [parents, children] = _.partition(created, (p) => isParentNode(p, created));
-  if (parents.length !== 0) {
-    const parent = parents[0];
-    const existingParent = existingPosts.find(
-      (p) => parent.tempPosition.parentId === p.tempPosition.id
-    );
-
-    const a = {
-      newsletterId,
-      position: {
-        parentId: existingParent === undefined ? null : existingParent.id ?? null,
-        nextId: null,
-      },
-      posts: [
-        { ...parent, tempPosition: { ...parent.tempPosition, parentId: null } },
-        ...children,
-      ].map((p) => ({
+): CreateManyNewsletterPosts => {
+  const [created, existing] = _.partition(posts, (p) => p.position === undefined);
+  const tempIdRealIdMap = new Map(existing.map((e) => [e.tempPosition.id, e.id]));
+  return {
+    newsletterId,
+    posts: created.map((p) => {
+      const parentId =
+        p.tempPosition.parentId === null
+          ? null
+          : tempIdRealIdMap.get(p.tempPosition.parentId);
+      const nextId =
+        p.tempPosition.nextId === null
+          ? null
+          : tempIdRealIdMap.get(p.tempPosition.nextId);
+      const prevId =
+        p.tempPosition.prevId === null
+          ? null
+          : tempIdRealIdMap.get(p.tempPosition.prevId);
+      if (
+        !_.isUndefined(parentId) ||
+        !_.isUndefined(nextId) ||
+        !_.isUndefined(prevId)
+      ) {
+        return {
+          ...p,
+          title: p.details.name,
+          date: p.date ?? null,
+          location: p.location === null ? undefined : p.location,
+          newsletterId,
+          position: {
+            parentId: parentId ?? null,
+            nextId: nextId ?? null,
+            prevId: prevId ?? null,
+          },
+          tempPosition: {
+            id: p.tempPosition.id,
+            parentId: _.isUndefined(parentId) ? p.tempPosition.parentId : null,
+            nextId: _.isUndefined(nextId) ? p.tempPosition.nextId : null,
+            prevId: _.isUndefined(prevId) ? p.tempPosition.prevId : null,
+          },
+        };
+      }
+      return {
+        ...p,
         newsletterId,
-        title: p.title ?? '',
+        title: p.details.name,
         date: p.date ?? null,
-        details: p.details as NewsletterPostDetails,
-        tempPosition: p.tempPosition,
         location: p.location === null ? undefined : p.location,
-      })),
-    };
-    return a;
-  }
+      };
+    }),
+  };
 };
 
 export const formatUpdatedPosts = (
@@ -109,6 +125,7 @@ export const formatUpdatedPosts = (
       date: p.date ?? null,
       details: p.details as NewsletterPostDetails,
       tempPosition: p.tempPosition,
+      position: p.position,
       location: p.location === null ? undefined : p.location,
     }));
 };
@@ -119,17 +136,4 @@ export const formatDeletedPosts = (existingPosts: Post[], posts: Post[]) => {
       .filter((p) => p.id !== undefined)
       .map((p) => p.id as number),
   };
-};
-
-export const getChildPosts = (id: string, posts: Post[]) => {
-  const filtered = posts.filter((p) => p.tempPosition.parentId === id);
-
-  if (filtered.length === 0) return [];
-
-  const arr = [...filtered];
-  for (let i = 0; i < filtered.length; i++) {
-    arr.push(...getChildPosts(filtered[i].tempPosition.id, posts));
-  }
-
-  return arr;
 };

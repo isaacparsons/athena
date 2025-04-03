@@ -4,6 +4,7 @@ import {
   NewsletterPostBase,
   NewsletterPostTypeName,
   DateRange,
+  TempNodePosition,
 } from './lib';
 import { NewsletterPost, MediaPostDetails, TextPostDetails } from './entity';
 
@@ -70,3 +71,19 @@ type NonUndefined<T> = T extends undefined ? never : T;
 export function areDefinedOrNull<T>(values: T[]): values is NonUndefined<T>[] {
   return values.every(_.negate(_.isUndefined));
 }
+
+export const getChildPosts = <T extends { tempPosition: TempNodePosition }>(
+  id: string,
+  posts: T[]
+) => {
+  const filtered = posts.filter((p) => p.tempPosition.parentId === id);
+
+  if (filtered.length === 0) return [];
+
+  const arr = [...filtered];
+  for (let i = 0; i < filtered.length; i++) {
+    arr.push(...getChildPosts(filtered[i].tempPosition.id, posts));
+  }
+
+  return arr;
+};

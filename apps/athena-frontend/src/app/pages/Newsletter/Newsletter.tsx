@@ -40,6 +40,7 @@ export function Newsletter() {
     newsletterPosts,
     fetchNewsletter,
     createPosts,
+    updatePosts,
     deletePosts,
     createTemplate,
   } = useStore(
@@ -47,6 +48,7 @@ export function Newsletter() {
       newsletters: state.newsletters.data,
       newsletterPosts: state.newsletterPosts.data,
       createPosts: state.newsletterPosts.create,
+      updatePosts: state.newsletterPosts.update,
       deletePosts: state.newsletterPosts.delete,
       loading: state.newsletters.loading,
       fetchNewsletter: state.newsletters.fetch,
@@ -74,7 +76,7 @@ export function Newsletter() {
     const updated = formatUpdatedPosts(newsletter.id, existingPosts, data.posts);
     const deleted = formatDeletedPosts(existingPosts, data.posts);
 
-    if (created) {
+    if (created && created.posts.length > 0) {
       promiseWithNotifications.execute(createPosts(created, files), {
         successMsg: 'Items created!',
         errorMsg: 'Unable to create items :(',
@@ -84,6 +86,12 @@ export function Newsletter() {
       promiseWithNotifications.execute(deletePosts(newsletterId, deleted), {
         successMsg: 'Items deleted!',
         errorMsg: 'Unable to delete items :(',
+      });
+    }
+    if (updated.length > 0 && newsletterId !== undefined) {
+      promiseWithNotifications.execute(updatePosts(newsletterId, updated, files), {
+        successMsg: 'Items updated!',
+        errorMsg: 'Unable to update items :(',
       });
     }
     toggleEditing();

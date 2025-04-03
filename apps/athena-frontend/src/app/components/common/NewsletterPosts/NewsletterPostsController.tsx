@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useSelectItems } from '@athena/hooks';
@@ -12,9 +13,9 @@ import {
   EditingHeader,
 } from '@athena/components';
 import { ArrowBackIcon, CheckIcon, DeleteIcon, TemplateIcon } from '@athena/icons';
-import { getChildPosts } from './util';
 import { useNewsletterPostsForm } from '@athena/hooks';
 import { Post } from '../../../types';
+import { getChildPosts } from '@athena/common';
 
 interface NewsletterPostsControllerProps {
   newsletterId: number;
@@ -96,7 +97,12 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     setCreateTemplatePosts(posts);
   };
 
-  const hasChanged = useMemo(() => posts.length !== fields.length, [fields, posts]);
+  const hasChanged = useMemo(
+    () =>
+      JSON.stringify(posts) !==
+      JSON.stringify(fields.map((f) => _.omit(f, 'postId'))),
+    [fields, posts]
+  );
 
   return (
     <WithDialog parent={parent}>

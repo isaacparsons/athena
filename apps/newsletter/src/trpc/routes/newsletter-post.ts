@@ -2,8 +2,6 @@ import { trpc, loggedInProcedure } from '..';
 import { nanoid } from 'nanoid';
 import {
   createManyNewsletterPosts,
-  createNewsletterPost,
-  // createNewsletterPostsBatch,
   deleteBatchInput,
   getInput,
   getPostUploadLinks,
@@ -35,11 +33,6 @@ const router = trpc.router({
     .mutation(async ({ input, ctx }) => {
       return ctx.dao.newsletterPost.createMany(ctx.user.userId, input);
     }),
-  // createBatch: loggedInProcedure
-  //   .input(createNewsletterPostsBatch)
-  //   .mutation(async ({ input, ctx }) => {
-  //     return ctx.dao.newsletterPost.createBatch(ctx.user.userId, input);
-  //   }),
   update: loggedInProcedure
     .input(updateNewsletterPosts)
     .mutation(({ input, ctx }) => {

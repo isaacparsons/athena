@@ -22,6 +22,7 @@ import {
   NodePosition,
   TempNodePosition,
   CreateManyNewsletterPosts,
+  getChildPosts,
 } from '@athena/common';
 import {
   location,
@@ -61,7 +62,7 @@ export type INewsletterPostDAO = IEntityDAO<
   NewsletterPostEntity
 > & {
   deleteMany(userId: number, input: DeleteBatchInput): Promise<void>;
-  createMany(userId: number, input: CreateManyNewsletterPosts): Promise<number>;
+  createMany(userId: number, input: CreateManyNewsletterPosts): Promise<number[]>;
   // createBatch(userId: number, input: CreateNewsletterPostsBatch): Promise<number[]>;
   get(id: number): Promise<NewsletterPostEntity>;
   getByNewsletterId(id: number): Promise<Omit<NewsletterPostEntity, 'children'>[]>;
@@ -189,56 +190,65 @@ export class NewsletterPostDAO
     );
   }
 
+  private async createParentNode(
+    db: DBConnection,
+    userId: number,
+    newsletterId: number,
+    input: CreateNewsletterPost
+  ) {
+    const position = input.position ?? {
+      parentId: null,
+      nextId: null,
+      prevId: null,
+    };
+    const { location, title, date, details } = input;
+    const { prevId, nextId } = await this.getNeighbours(db, newsletterId, position);
+
+    const locationId = location ? await new LocationDAO(db).post(location) : null;
+
+    const { id } = await this.postEntities(db, userId, [
+      {
+        title,
+        date,
+        locationId,
+        newsletterId,
+        nextId,
+        prevId,
+        parentId: position.parentId,
+      },
+    ])
+      .returning('id')
+      .executeTakeFirstOrThrow();
+
+    if (nextId !== null)
+      await this.updateEntity(db, userId, {
+        id: nextId,
+        prevId: id,
+      }).executeTakeFirstOrThrow();
+    if (prevId !== null)
+      await this.updateEntity(db, userId, {
+        id: prevId,
+        nextId: id,
+      }).executeTakeFirstOrThrow();
+
+    await new NewsletterPostDetailsDAO(db).post(id, details);
+    return id;
+  }
+
   async createMany(userId: number, input: CreateManyNewsletterPosts) {
     return this.db.transaction().execute(async (trx: Transaction) => {
-      const { position, posts, newsletterId } = input;
+      const { posts, newsletterId } = input;
+      const parents = posts.filter((p) => p.tempPosition.parentId === null);
 
-      const [parents, children] = _.partition(
-        posts,
-        (p) => p.tempPosition.parentId === null
-      );
-      const parent = _.get(parents, [0]);
-      if (parent === undefined) throw new Error('a parent node must be specified');
+      const ids = [];
+      for await (const parent of parents) {
+        const id = await this.createParentNode(trx, userId, newsletterId, parent);
+        const children = getChildPosts(parent.tempPosition.id, posts);
+        await this.createChildNodes(trx, userId, id, children);
+        ids.push(id);
+      }
 
-      const { prevId, nextId } = await this.getNeighbours(
-        trx,
-        newsletterId,
-        position
-      );
-
-      const locationId = parent.location
-        ? await new LocationDAO(trx).post(parent.location)
-        : null;
-
-      const { id } = await this.postEntities(trx, userId, [
-        {
-          title: parent.title,
-          date: parent.date,
-          locationId,
-          newsletterId,
-          nextId,
-          prevId,
-          parentId: position.parentId,
-        },
-      ])
-        .returning('id')
-        .executeTakeFirstOrThrow();
-
-      if (nextId !== null)
-        await this.updateEntity(trx, userId, {
-          id: nextId,
-          prevId: id,
-        }).executeTakeFirstOrThrow();
-      if (prevId !== null)
-        await this.updateEntity(trx, userId, {
-          id: prevId,
-          nextId: id,
-        }).executeTakeFirstOrThrow();
-
-      await new NewsletterPostDetailsDAO(trx).post(id, parent.details);
-      await this.createChildNodes(trx, userId, id, children);
-
-      return id;
+      return ids;
     });
   }
 

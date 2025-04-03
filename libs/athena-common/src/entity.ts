@@ -85,6 +85,7 @@ export const createNewsletterPostBase = createRequestSchema(
     z.object({
       details: createNewsletterPostDetails,
       location: createLocation.optional(),
+      position: nodePositionInput.optional(),
     })
   )
 );
@@ -97,7 +98,6 @@ export type CreateNewsletterPost = z.infer<typeof createNewsletterPost>;
 
 export const createManyNewsletterPosts = z.object({
   posts: z.array(createNewsletterPost),
-  position: nodePositionInput,
   newsletterId: z.coerce.number(),
 });
 

@@ -107,7 +107,7 @@ export async function createNewsletterPosts(
 ) {
   return router.newsletterPosts.createMany(
     newsletterPostMockRequest('createMany')(userId, input)
-  ) as Promise<number>;
+  ) as Promise<number[]>;
 }
 
 // export async function createNewsletterPostsBatch(

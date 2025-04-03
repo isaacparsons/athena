@@ -5,6 +5,7 @@ import {
   DeleteBatchInput,
   NewsletterPost,
   NewsletterPostTypeName,
+  UpdateNewsletterPosts,
 } from '@athena/common';
 import { Slices } from '@athena/store';
 import { StateCreator } from 'zustand';
@@ -18,6 +19,11 @@ export interface NewsletterPostsSlice {
     data: Record<number, NewsletterPost>;
     saving: boolean;
     create: (input: CreateManyNewsletterPosts, files?: FileMap) => Promise<void>;
+    update: (
+      newsletterId: number,
+      input: UpdateNewsletterPosts,
+      files?: FileMap
+    ) => Promise<void>;
     delete: (newsletterId: number, input: DeleteBatchInput) => Promise<void>;
   };
 }
@@ -87,6 +93,21 @@ export const createNewsletterPostsSlice: StateCreator<
 
       await get().newsletters.fetch(input.newsletterId);
 
+      set((state) => {
+        state.newsletterPosts.saving = false;
+      });
+    },
+    update: async (
+      newsletterId: number,
+      input: UpdateNewsletterPosts,
+      files?: FileMap
+    ) => {
+      set((state) => {
+        state.newsletterPosts.saving = true;
+      });
+      // TODO update images if necessary
+      await asyncTrpcClient.newsletterPosts.update.mutate(input);
+      await get().newsletters.fetch(newsletterId);
       set((state) => {
         state.newsletterPosts.saving = false;
       });
