@@ -5,11 +5,11 @@ services:
     ports:
       - ${DB_PORT}:${DB_PORT}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      # - ./docker/initdb:/docker-entrypoint-initdb.d
+      # - postgres_data:/var/lib/postgresql/data
+      - ./docker/initdb/0100.sql:/docker-entrypoint-initdb.d/0100.sql
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-volumes:
-  postgres_data:
+# volumes:
+#   postgres_data:

@@ -102,16 +102,6 @@
           "commands": ["nx run newsletter:db:destroy && nx run newsletter:db:init"]
         }
       }
-    },
-    "codegen": {
-      "executor": "nx:run-commands",
-      "configurations": {
-        "db": {
-          "commands": [
-            "kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"
-          ]
-        }
-      }
     }
   }
 }

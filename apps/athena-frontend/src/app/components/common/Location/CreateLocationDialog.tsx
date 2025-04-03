@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import GoogleMap from 'google-map-react';
+// import GoogleMap from 'google-map-react';
 import {
   Button,
   DialogActions,
@@ -47,9 +47,9 @@ export function CreateLocationDialog<T extends CreateLocation>({
     setLoading(false);
   }, []);
 
-  const handleLocationChange = (e: GoogleMap.ClickEventValue) => {
-    setCurrentLocation({ latitude: e.lat, longitude: e.lng });
-  };
+  // const handleLocationChange = (e: GoogleMap.ClickEventValue) => {
+  //   setCurrentLocation({ latitude: e.lat, longitude: e.lng });
+  // };
 
   const handleSave = () => {
     const pos =
@@ -70,7 +70,7 @@ export function CreateLocationDialog<T extends CreateLocation>({
     <StyledDialog fullScreen open={open} onClose={onClose}>
       <DialogTitle>Select Location</DialogTitle>
       <DialogContent>
-        <Box sx={{ width: '100%', height: 400 }}>
+        {/* <Box sx={{ width: '100%', height: 400 }}>
           {currentLocation && !loading ? (
             <GoogleMap
               onClick={handleLocationChange}
@@ -86,7 +86,7 @@ export function CreateLocationDialog<T extends CreateLocation>({
           ) : (
             <CircularProgress />
           )}
-        </Box>
+        </Box> */}
         <TextField
           margin="dense"
           id={'location.name'}

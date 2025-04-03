@@ -49,3 +49,11 @@ run api
 ```sh
 nx run newsletter:build && docker-compose --env-file ./.env.local build && docker-compose --env-file ./.env.local up api
 ```
+
+generate dump
+
+```sh
+docker exec -it <container> bash -c "pg_dump newsletter -U postgres -f /var/lib/postgresql/newsletter-dump.sql"
+
+docker cp <container>:/var/lib/postgresql/newsletter-dump.sql /Users/isaacparsons/Desktop/newsletter-dump.sql
+```

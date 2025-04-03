@@ -6,7 +6,15 @@ services:
     build:
       context: .
       dockerfile: ./apps/newsletter/Dockerfile
-    env_file: '.env'
+    env_file: .env.local
+    # environment:
+    # APP_PORT: ${APP_PORT}
+    # APP_HOST: ${APP_HOST}
+    # CLIENT_PORT: ${CLIENT_PORT}
+    # CLIENT_HOST: ${CLIENT_HOST}
+    # DB_HOST: ${DB_HOST}
+    # DB_PORT: ${DB_PORT}
+    # NODE_ENV: production
 
   db:
     image: postgres
@@ -16,7 +24,8 @@ services:
     volumes:
       # - postgres_data:/var/lib/postgresql/data
       - ./apps/newsletter/docker/initdb/0100.sql:/docker-entrypoint-initdb.d/0100.sql
-    env_file: .env
+
+    env_file: .env.local
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}

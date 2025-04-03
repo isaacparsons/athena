@@ -35,11 +35,11 @@ export const createMockRequest =
           isAuthenticated: () => true,
         } as any,
         res: {} as any,
-      }),
+      } as any),
       path: '',
       rawInput: input,
       type,
-    };
+    } as any;
   };
 
 const newsletterMockRequest = createMockRequest('newsletters');
@@ -140,7 +140,7 @@ export async function getTemplatesByUserId(userId: number) {
 export async function updateTemplate(userId: number, input: UpdateTemplate) {
   return router.templates.update(
     templateMockRequest('update')(userId, input)
-  ) as Promise<number[]>;
+  ) as Promise<number>;
 }
 
 export async function deleteTemplate(userId: number, input: DeleteInput) {
