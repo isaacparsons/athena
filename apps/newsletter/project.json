@@ -9,6 +9,12 @@
       "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
+      "dependsOn": [
+        {
+          "target": "generate-api",
+          "projects": "self"
+        }
+      ],
       "options": {
         "platform": "node",
         "outputPath": "dist/apps/newsletter",
@@ -54,19 +60,20 @@
         }
       }
     },
-    "generate": {
+    "generate-api": {
       "executor": "nx:run-commands",
-      "configurations": {
-        "api": {
-          "commands": [
-            "tsc -p apps/newsletter/tsconfig.app.json --declaration --outDir types/server"
-          ]
-        },
-        "db": {
-          "commands": [
-            "kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"
-          ]
-        }
+      "options": {
+        "commands": [
+          "tsc -p apps/newsletter/tsconfig.app.json --declaration --outDir types/server"
+        ]
+      }
+    },
+    "generate-db": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"
+        ]
       }
     },
     "db": {
@@ -101,6 +108,40 @@
         "reset": {
           "commands": ["nx run newsletter:db:destroy && nx run newsletter:db:init"]
         }
+      }
+    },
+    "configure-gcs-bucket": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "gcloud storage buckets update gs://athena-newsletter --cors-file=./resources/gcs-cors.json"
+        ]
+      }
+    },
+    "up": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "options": {
+        "commands": [""]
+      },
+      "configurations": {
+        "development": {
+          "commands": [
+            "docker-compose -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env.local build && docker-compose  -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env.local up -d db api"
+          ]
+        },
+        "production": {
+          "commands": [
+            "docker-compose -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env build && docker-compose  -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env up -d db api"
+          ]
+        }
+      }
+    },
+    "down": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "production",
+      "options": {
+        "commands": ["docker rm -f athena-db-1 && docker rm -f athena-api-1"]
       }
     }
   }

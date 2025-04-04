@@ -1,1 +1,0 @@
-docker rm -f athena-db-1 && docker rm -f athena-api-1
