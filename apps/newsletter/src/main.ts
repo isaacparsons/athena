@@ -2,26 +2,28 @@ import 'reflect-metadata';
 import express from 'express';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import cors from 'cors';
-import { getConfig } from './util';
+import { getConfig, isProduction } from './util';
 import { createContext, appRouter, initPassport } from './trpc';
 import path from 'path';
 
 const config = getConfig();
+const corsConfig = isProduction()
+  ? {
+      credentials: true,
+      origin: [
+        `http://${config.client.host}:${config.client.port}`,
+        `https://storage.googleapis.com/${config.gcs.bucketName}`,
+      ],
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    }
+  : {
+      credentials: false,
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    };
 
 export let app = express();
-app.use(
-  cors({
-    // credentials: true,
-    // origin: [
-    //   `http://${config.client.host}:${config.client.port}`,
-    //   'https://storage.googleapis.com/athena-newsletter',
-    // ],
-    credentials: false,
-    origin: '*',
-    // AccessControlAllowOrigin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  })
-);
+app.use(cors(corsConfig));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app = initPassport(app);
@@ -48,7 +50,7 @@ app.listen(config.app.port, config.app.host, () => {
   console.log(`[ ready ] http://${config.app.host}:${config.app.port}`);
 });
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.CLIENT_HOST !== 'localhost') {
   // web app
   const webApp = express();
   const webAppPath = path.join(__dirname, '..', '..', '..', '..', 'athena-frontend');

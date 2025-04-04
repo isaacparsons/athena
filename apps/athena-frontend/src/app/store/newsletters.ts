@@ -48,6 +48,7 @@ export const createNewslettersSlice: StateCreator<
     create: async (newsletter: CreateNewsletter) => {
       const id = await asyncTrpcClient.newsletters.create.mutate(newsletter);
       await get().newsletters.fetch(id);
+      await get().user.fetch();
       return id;
     },
   },

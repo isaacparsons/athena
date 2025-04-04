@@ -8,10 +8,6 @@ process.env['NODE_CONFIG_DIR'] = configPath;
 import config from 'config';
 import { Config } from './types/types';
 
-import * as R from 'fp-ts/Record';
-import * as O from 'fp-ts/Option';
-import { pipe } from 'fp-ts/function';
-
 export function getConfig(): Config {
   return {
     app: config.util.toObject(config.get('app')),
@@ -36,26 +32,4 @@ export async function parseCsvFile(file: string) {
   return records;
 }
 
-// import { isMediaItem, NewsletterPostBase } from '@athena/common';
-// import { IGCSManager } from '@athena/services';
-
-// export const signMediaItemUrls =
-//   (gcs: IGCSManager) =>
-//   async (items: NewsletterPostBase[]): Promise<NewsletterPostBase[]> =>
-//     Promise.all(items.map(async (item) => signMediaItemUrl(gcs)(item)));
-
-// export const signMediaItemUrl =
-//   (gcs: IGCSManager) =>
-//   async (item: NewsletterPostBase): Promise<NewsletterPostBase> => {
-//     if (isMediaItem(item)) {
-//       const signedUrl = await gcs.getSignedUrl(item.details.fileName, 'read');
-//       return {
-//         ...item,
-//         details: {
-//           ...item.details,
-//           fileName: signedUrl,
-//         },
-//       };
-//     }
-//     return item;
-//   };
+export const isProduction = () => process.env.NODE_ENV === 'production';

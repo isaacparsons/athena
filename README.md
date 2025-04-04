@@ -22,32 +22,28 @@ To see all available targets to run for a project, run:
 npx nx show project newsletter
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
+run dev
 
 ```sh
-npx nx g @nx/node:app demo
+nx run newsletter:up
 ```
 
-To generate a new library, use:
+run prod
 
 ```sh
-npx nx g @nx/node:lib mylib
+nx run newsletter:up:production
 ```
 
-run api
+teardown
 
 ```sh
-nx run newsletter:build && docker-compose --env-file ./.env.local build && docker-compose --env-file ./.env.local up api
+nx run newsletter:down
+```
+
+generate db types
+
+```sh
+nx run newsletter:generate:db
 ```
 
 generate dump

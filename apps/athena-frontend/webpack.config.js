@@ -1,6 +1,17 @@
 const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { NxReactWebpackPlugin } = require('@nx/react/webpack-plugin');
 const { join } = require('path');
+const fs = require('fs');
+const dotenv = require('dotenv');
+const webpack = require('webpack');
+
+const envPath = join(__dirname, '.env');
+const env = dotenv.parse(fs.readFileSync(envPath));
+
+const envKeys = Object.entries(env).reduce((acc, [key, value]) => {
+  acc[`process.env.${key}`] = JSON.stringify(value);
+  return acc;
+}, {});
 
 module.exports = {
   output: {
@@ -10,6 +21,7 @@ module.exports = {
     port: 4200,
   },
   plugins: [
+    new webpack.DefinePlugin(envKeys),
     new NxAppWebpackPlugin({
       tsConfig: './tsconfig.app.json',
       compiler: 'babel',

@@ -121,27 +121,28 @@
     "up": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "self"
+        }
+      ],
       "options": {
-        "commands": [""]
+        "commands": [
+          "echo \"REACT_APP_HOST=${APP_HOST}\" > apps/athena-frontend/.env && echo \"REACT_APP_PORT=${APP_PORT}\" >> apps/athena-frontend/.env && echo \"REACT_APP_ADMIN_SECRET=${ADMIN_SECRET}\" >> apps/athena-frontend/.env && nx run athena-frontend:build",
+          "docker-compose -f apps/newsletter/docker-compose.yaml build && docker-compose  -f apps/newsletter/docker-compose.yaml up -d db api"
+        ]
       },
       "configurations": {
-        "development": {
-          "commands": [
-            "docker-compose -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env.local build && docker-compose  -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env.local up -d db api"
-          ]
-        },
-        "production": {
-          "commands": [
-            "docker-compose -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env build && docker-compose  -f apps/newsletter/docker-compose.yaml --env-file apps/newsletter/.env up -d db api"
-          ]
-        }
+        "development": {},
+        "production": {}
       }
     },
     "down": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "production",
       "options": {
-        "commands": ["docker rm -f athena-db-1 && docker rm -f athena-api-1"]
+        "commands": ["docker rm -f newsletter-db-1 && docker rm -f newsletter-api-1"]
       }
     }
   }

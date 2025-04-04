@@ -6,7 +6,24 @@ services:
     build:
       context: ../../
       dockerfile: apps/newsletter/Dockerfile
-    env_file: .env.local
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      APP_SESSION_SECRET: ${APP_SESSION_SECRET}
+      APP_SESSION_COOKIE_NAME: ${APP_SESSION_COOKIE_NAME}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      GOOGLE_STORAGE_BUCKET_NAME: ${GOOGLE_STORAGE_BUCKET_NAME}
+      ADMIN_SECRET: ${ADMIN_SECRET}
+      CLIENT_HOST: ${CLIENT_HOST}
+      CLIENT_PORT: ${CLIENT_PORT}
+      APP_HOST: ${APP_HOST}
+      APP_PORT: ${APP_PORT}
+
+    # env_file: .env.local
   db:
     image: postgres
     ports:
