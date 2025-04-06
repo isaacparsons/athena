@@ -2,7 +2,12 @@ import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { Slices } from '@athena/store';
-import { CreateNewsletter, Newsletter, NewsletterPost } from '@athena/common';
+import {
+  CreateNewsletter,
+  Newsletter,
+  NewsletterPost,
+  UpdateNewsletter,
+} from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 
 export type StoreNewsletter = Newsletter;
@@ -13,6 +18,7 @@ export interface NewslettersSlice {
     data: Record<number, StoreNewsletter>;
     fetch: (id: number) => Promise<void>;
     create: (newsletter: CreateNewsletter) => Promise<number>;
+    // update: (newsletter: UpdateNewsletter) => Promise<number>;
   };
 }
 

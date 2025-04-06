@@ -5,7 +5,7 @@ import { CreateLocation, UpdateLocation } from '@athena/common';
 import { TYPES } from '../types/types';
 
 export interface ILocationDAO {
-  post(input: CreateLocation): Promise<number>;
+  create(input: CreateLocation): Promise<number>;
   update(input: UpdateLocation): Promise<number>;
 }
 
@@ -13,7 +13,7 @@ export interface ILocationDAO {
 export class LocationDAO implements ILocationDAO {
   constructor(@inject(TYPES.DBClient) readonly db: DBConnection) {}
 
-  async post(input: CreateLocation) {
+  async create(input: CreateLocation) {
     const res = await this.db
       .insertInto('location')
       .values({

@@ -1,4 +1,4 @@
-import { NewsletterBase, TemplateBase, User } from '@athena/common';
+import { Newsletter, ReadUser, Template } from '@athena/common';
 import 'reflect-metadata';
 import { DBConnection } from '@athena/db';
 import { inject, injectable } from 'inversify';
@@ -8,9 +8,9 @@ import { INewsletterDAO } from './newsletter';
 import { ITemplateDAO } from './template';
 
 export interface IUserDAO {
-  get(id: number): Promise<User>;
-  newsletters: (userId: number) => Promise<NewsletterBase[]>;
-  templates: (userId: number) => Promise<TemplateBase[]>;
+  read(id: number): Promise<ReadUser>;
+  newsletters: (userId: number) => Promise<Newsletter[]>;
+  templates: (userId: number) => Promise<Template[]>;
 }
 
 @injectable()
@@ -21,7 +21,7 @@ export class UserDAO implements IUserDAO {
     @inject(TYPES.ITemplateDAO) readonly templateDAO: ITemplateDAO
   ) {}
 
-  async get(id: number): Promise<User> {
+  async read(id: number): Promise<ReadUser> {
     const user = await this.db
       .selectFrom('user')
       .where('user.id', '=', id)
@@ -37,11 +37,11 @@ export class UserDAO implements IUserDAO {
     };
   }
 
-  async newsletters(userId: number): Promise<NewsletterBase[]> {
-    return this.newsletterDAO.getByUserId(userId);
+  async newsletters(userId: number): Promise<Newsletter[]> {
+    return this.newsletterDAO.readByUserId(userId);
   }
 
-  async templates(userId: number): Promise<TemplateBase[]> {
-    return this.templateDAO.getByUserId(userId);
+  async templates(userId: number): Promise<Template[]> {
+    return this.templateDAO.readByUserId(userId);
   }
 }

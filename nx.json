@@ -67,7 +67,8 @@
       "options": {
         "buildTargetName": "build",
         "serveTargetName": "serve",
-        "previewTargetName": "preview"
+        "previewTargetName": "preview",
+        "defaultConfiguration": "development"
       }
     },
     {

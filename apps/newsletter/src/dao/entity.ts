@@ -20,11 +20,15 @@ import { UpdateObjectExpression } from 'kysely/dist/cjs/parser/update-set-parser
 export type EntityMetaRow = {
   creator: SelectUser;
   modifier: SelectUser | null;
+  created: string;
+  modified: string | null;
 };
 
 export type EntityRow<R> = R & {
   creator: SelectUser;
   modifier: SelectUser | null;
+  created: string;
+  modified: string | null;
 };
 
 export interface IEntityDAO<R, E extends Entity> {
@@ -34,6 +38,7 @@ export interface IEntityDAO<R, E extends Entity> {
 @injectable()
 export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> {
   abstract tableName: T;
+
   selectEntity(db: DBConnection) {
     const eb = expressionBuilder<Database, EntityTableName>();
     return db.selectFrom(this.tableName).select([
@@ -98,8 +103,6 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
   deleteEntity(db: DBConnection) {
     return db.deleteFrom(this.tableName);
   }
-
-  //   toEntity: (row: R) => E;
 
   withTransaction<T>(db: DBConnection, execute: (db: DBConnection) => Promise<T>) {
     if (db.isTransaction) return execute(db);

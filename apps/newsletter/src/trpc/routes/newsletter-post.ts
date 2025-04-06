@@ -1,19 +1,19 @@
 import { trpc, loggedInProcedure } from '..';
 import { nanoid } from 'nanoid';
 import {
-  createManyNewsletterPosts,
   deleteBatchInput,
-  getInput,
-  getPostUploadLinks,
-  updateNewsletterPosts,
+  readPostUploadLinksSchema,
+  readInput,
+  createManyNewsletterPostsSchema,
+  updateManyNewsletterPostsSchema,
 } from '@athena/common';
 
 const router = trpc.router({
-  get: loggedInProcedure.input(getInput).query(async ({ input, ctx }) => {
-    return ctx.dao.newsletterPost.get(input.id);
+  read: loggedInProcedure.input(readInput).query(async ({ input, ctx }) => {
+    return ctx.dao.newsletterPost.read(input.id);
   }),
-  getPostUploadLinks: loggedInProcedure
-    .input(getPostUploadLinks)
+  readPostUploadLinks: loggedInProcedure
+    .input(readPostUploadLinksSchema)
     .query(async ({ input, ctx }) => {
       return Promise.all(
         input.posts.map(async (post) => {
@@ -29,14 +29,14 @@ const router = trpc.router({
     }),
 
   createMany: loggedInProcedure
-    .input(createManyNewsletterPosts)
+    .input(createManyNewsletterPostsSchema)
     .mutation(async ({ input, ctx }) => {
       return ctx.dao.newsletterPost.createMany(ctx.user.userId, input);
     }),
-  update: loggedInProcedure
-    .input(updateNewsletterPosts)
+  updateMany: loggedInProcedure
+    .input(updateManyNewsletterPostsSchema)
     .mutation(({ input, ctx }) => {
-      return ctx.dao.newsletterPost.update(ctx.user.userId, input);
+      return ctx.dao.newsletterPost.updateMany(ctx.user.userId, input);
     }),
   deleteMany: loggedInProcedure
     .input(deleteBatchInput)

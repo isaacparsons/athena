@@ -1,0 +1,141 @@
+import { z } from 'zod';
+import {
+  countrySchema,
+  createLocationSchema,
+  createManyTemplateNodesSchema,
+  createMediaPostDetailsSchema,
+  createNewsletterSchema,
+  createTemplateNodeSchema,
+  createTemplateSchema,
+  createTextPostDetailsSchema,
+  readPostUploadLinksSchema,
+  inviteNewsletterUser,
+  locationSchema,
+  mediaPostDetailsSchema,
+  newsletterPostSchema,
+  newsletterSchema,
+  NodePosition,
+  templateNodeSchema,
+  templateSchema,
+  textPostDetailsSchema,
+  updateLocationSchema,
+  updateMediaPostDetailsSchema,
+  updateNewsletterSchema,
+  updateTemplateNodeSchema,
+  updateTemplateSchema,
+  updateTextPostDetailsSchema,
+  user,
+} from './lib';
+import {
+  createManyNewsletterPostsSchema,
+  createNewsletterPostSchema,
+  updateManyNewsletterPostsSchema,
+  updateNewsletterPostSchema,
+} from './entity';
+
+/**
+ * User
+ */
+export type User = z.infer<typeof user>;
+
+export type Meta = {
+  creator: User;
+  modifier: User | null;
+  created: string;
+  modified: string | null;
+};
+
+export type Entity = { id: number; meta: Meta };
+export type WithEntity<T> = T & Entity;
+
+/**
+ * Newsletter
+ */
+
+export type Newsletter = WithEntity<z.infer<typeof newsletterSchema.base>>;
+
+export type ReadNewsletter = Newsletter & {
+  members: User[];
+  posts: NewsletterPost[];
+  owner: User;
+  children?: Newsletter;
+};
+
+export type CreateNewsletter = z.infer<typeof createNewsletterSchema>;
+export type UpdateNewsletter = z.infer<typeof updateNewsletterSchema>;
+
+export type ReadUser = {
+  newsletters: Newsletter[];
+  templates: Template[];
+};
+
+export type InviteNewsletterUser = z.infer<typeof inviteNewsletterUser>;
+
+/**
+ * Newsletter Post
+ */
+
+export type TextPostDetails = z.infer<typeof textPostDetailsSchema.base>;
+export type CreateTextPostDetails = z.infer<typeof createTextPostDetailsSchema>;
+export type UpdateTextPostDetails = z.infer<typeof updateTextPostDetailsSchema>;
+
+export type MediaPostDetails = z.infer<typeof mediaPostDetailsSchema.base>;
+export type CreateMediaPostDetails = z.infer<typeof createMediaPostDetailsSchema>;
+export type UpdateMediaPostDetails = z.infer<typeof updateMediaPostDetailsSchema>;
+
+export type UpdatePostDetails = UpdateTextPostDetails | UpdateMediaPostDetails;
+export type NewsletterPostDetails = TextPostDetails | MediaPostDetails;
+
+export type NewsletterPost = WithEntity<z.infer<typeof newsletterPostSchema.base>>;
+
+export type ReadNewsletterPost = NewsletterPost & {
+  position: NodePosition;
+  location: Location | null;
+};
+
+export type CreateNewsletterPost = z.infer<typeof createNewsletterPostSchema>;
+export type UpdateNewsletterPost = z.infer<typeof updateNewsletterPostSchema>;
+
+export type UpdateManyNewsletterPosts = z.infer<
+  typeof updateManyNewsletterPostsSchema
+>;
+export type CreateManyNewsletterPosts = z.infer<
+  typeof createManyNewsletterPostsSchema
+>;
+
+export type ReadPostUploadLinks = z.infer<typeof readPostUploadLinksSchema>;
+
+export type PostUploadLink = {
+  id: string;
+  url: string;
+  fileName: string;
+};
+
+export type ReadPostUploadLinksResponse = PostUploadLink[];
+
+/**
+ * Template
+ */
+
+export type TemplateNode = WithEntity<z.infer<typeof templateNodeSchema.base>>;
+export type CreateTemplateNode = z.infer<typeof createTemplateNodeSchema>;
+export type UpdateTemplateNode = z.infer<typeof updateTemplateNodeSchema>;
+export type CreateManyTemplateNodes = z.infer<typeof createManyTemplateNodesSchema>;
+
+export type Template = WithEntity<z.infer<typeof templateSchema.base>>;
+export type CreateTemplate = z.infer<typeof createTemplateSchema>;
+export type ReadTemplate = Template & { members: User[]; nodes: TemplateNode[] };
+export type UpdateTemplate = z.infer<typeof updateTemplateSchema>;
+
+/**
+ * Location
+ */
+
+export type Location = z.infer<typeof locationSchema.base>;
+export type CreateLocation = z.infer<typeof createLocationSchema>;
+export type UpdateLocation = z.infer<typeof updateLocationSchema>;
+
+/**
+ * Country
+ */
+export type Country = z.infer<typeof countrySchema>;

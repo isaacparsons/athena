@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { makeEntitySchemas, nodePosition } from './common';
 
 export enum MediaFormat {
   Image = 'image',
@@ -17,13 +18,8 @@ export const postDetailType = z.union([
   z.literal(NewsletterPostTypeName.Text),
 ]);
 
-const postDetailBase = z.object({
-  id: z.coerce.number(),
-  type: postDetailType,
+export const mediaPostDetailsSchema = makeEntitySchemas({
   newsletterPostId: z.coerce.number(),
-});
-
-export const mediaPostInput = z.object({
   type: z.literal(NewsletterPostTypeName.Media),
   fileName: z.string(),
   format: mediaFormat,
@@ -31,71 +27,51 @@ export const mediaPostInput = z.object({
   name: z.string(),
 });
 
-export type MediaPostInput = z.infer<typeof mediaPostInput>;
+export const createMediaPostDetailsSchema = mediaPostDetailsSchema.create.omit({
+  newsletterPostId: true,
+});
 
-export const mediaPostDetails = postDetailBase.merge(mediaPostInput);
+export const updateMediaPostDetailsSchema = mediaPostDetailsSchema.update.required({
+  type: true,
+});
 
-export const createMediaDetails = mediaPostDetails
-  .omit({ id: true, newsletterPostId: true })
-  .partial({ caption: true });
-
-export const updateMediaDetails = mediaPostDetails
-  .partial()
-  .required({ id: true, newsletterPostId: true, type: true });
-
-export const textPostInput = z.object({
+export const textPostDetailsSchema = makeEntitySchemas({
+  newsletterPostId: z.coerce.number(),
   type: z.literal(NewsletterPostTypeName.Text),
   description: z.string().nullable(),
   link: z.string().nullable(),
   name: z.string(),
 });
-export type TextPostInput = z.infer<typeof textPostInput>;
-export type PostDetailsInput = MediaPostInput | TextPostInput;
 
-export const textPostDetails = postDetailBase.merge(textPostInput);
+export const createTextPostDetailsSchema = textPostDetailsSchema.create.omit({
+  newsletterPostId: true,
+});
 
-export const createTextDetails = textPostDetails
-  .omit({ id: true, newsletterPostId: true })
-  .partial()
-  .required({ type: true, name: true });
+export const updateTextPostDetailsSchema = textPostDetailsSchema.update;
 
-export const updateTextDetails = textPostDetails
-  .partial()
-  .required({ id: true, newsletterPostId: true, type: true });
-
-export const createNewsletterPostDetails = z.discriminatedUnion('type', [
-  createMediaDetails,
-  createTextDetails,
+export const postDetailsSchema = z.discriminatedUnion('type', [
+  mediaPostDetailsSchema.base,
+  textPostDetailsSchema.base,
 ]);
 
-export const updateNewsletterPostDetails = z.discriminatedUnion('type', [
-  updateMediaDetails,
-  updateTextDetails,
+export const createPostDetailsSchema = z.discriminatedUnion('type', [
+  createMediaPostDetailsSchema,
+  createTextPostDetailsSchema,
 ]);
 
-export type UpdateNewsletterPostDetails = z.infer<
-  typeof updateNewsletterPostDetails
->;
+export const updateNewsletterPostDetailsSchema = z.discriminatedUnion('type', [
+  updateMediaPostDetailsSchema,
+  updateTextPostDetailsSchema,
+]);
 
-export const newsletterPostBase = z.object({
-  id: z.coerce.number(),
+export const newsletterPostSchema = makeEntitySchemas({
   newsletterId: z.coerce.number(),
   title: z.string(),
   date: z.string().nullable(),
+  details: postDetailsSchema,
+  position: nodePosition,
 });
 
-export type NewsletterPostBase = z.infer<typeof newsletterPostBase>;
-
-export const getPostUploadLinks = z.object({
+export const readPostUploadLinksSchema = z.object({
   posts: z.array(z.object({ id: z.string() })),
 });
-
-export type GetPostUploadLinks = z.infer<typeof getPostUploadLinks>;
-
-export type PostUploadLink = {
-  id: string;
-  url: string;
-  fileName: string;
-};
-
-export type GetPostUploadLinksResponse = PostUploadLink[];

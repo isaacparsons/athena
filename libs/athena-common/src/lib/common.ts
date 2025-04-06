@@ -1,4 +1,16 @@
-import { z } from 'zod';
+import { z, ZodRawShape } from 'zod';
+
+export function makeEntitySchemas<TShape extends ZodRawShape>(shape: TShape) {
+  const base = z.object(shape).extend({ id: z.number() });
+  const create = base.omit({ id: true });
+  const update = base.partial().extend({ id: z.number() });
+
+  return {
+    base,
+    create,
+    update,
+  };
+}
 
 export type Nullable<T> = T | null;
 
@@ -12,10 +24,10 @@ export const geoPositionInput = z.object({
 
 export type GeoPosition = z.infer<typeof geoPositionInput>;
 
-export const getInput = z.object({
+export const readInput = z.object({
   id: z.coerce.number(),
 });
-export type GetInput = z.infer<typeof getInput>;
+export type ReadInput = z.infer<typeof readInput>;
 
 export const deleteInput = z.object({
   id: z.coerce.number(),
@@ -27,27 +39,7 @@ export const deleteBatchInput = z.object({
 });
 export type DeleteBatchInput = z.infer<typeof deleteBatchInput>;
 
-export function updateRequestSchema<T extends z.ZodRawShape>(
-  schema: z.ZodObject<T>
-) {
-  return schema.merge(z.object({ id: z.coerce.number() })) as z.ZodObject<
-    T & { id: z.ZodNumber }
-  >;
-}
-
-export function createRequestSchema<T extends z.AnyZodObject>(schema: T) {
-  return schema.omit({ id: true, meta: true }) as z.ZodObject<
-    Omit<T['shape'], 'id' | 'meta'>
-  >;
-}
-
-export const readRequestSchema = z.object({ id: z.coerce.number() });
-export const deleteRequestSchema = z.object({ id: z.coerce.number() });
-export const deleteManyRequestSchema = z.array(z.coerce.number());
-
-// /**
-//  * Date
-//  */
+/** Date */
 
 export const dateInput = z.string().min(8);
 
@@ -78,9 +70,65 @@ export const nodePositionInput = nodePosition.omit({ prevId: true });
 
 export type NodePositionInput = z.infer<typeof nodePositionInput>;
 
-/**
- * Helpers
- */
-export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+export const withTempPosition = {
+  tempPosition: tempNodePosition,
 };
+
+// export function excludeFields<T extends Record<string, any>, K extends keyof T>(
+//   obj: T,
+//   keys: K[]
+// ): Omit<T, K> {
+//   const result = { ...obj };
+//   for (const key of keys) {
+//     delete result[key];
+//   }
+//   return result;
+// }
+
+// export const PaginationSchema = z.object({
+//   page: z.number().min(1).default(1),
+//   pageSize: z.number().min(1).max(100).default(20),
+// });
+
+// export const PaginatedResultSchema = <T extends ZodTypeAny>(itemSchema: T) =>
+//   z.object({
+//     items: z.array(itemSchema),
+//     total: z.number(),
+//     page: z.number(),
+//     pageSize: z.number(),
+//   });
+
+// export const UUID = z.string().uuid();
+
+// export const ISODateString = z.string().refine(val => !isNaN(Date.parse(val)), {
+//   message: "Invalid ISO date string"
+// });
+
+// export const withUuidFields = {
+//   id: UUID,
+//   createdAt: ISODateString,
+//   updatedAt: ISODateString,
+// };
+
+// export const withNumberIdFields = {
+//   id: z.number(),
+//   createdAt: ISODateString,
+//   updatedAt: ISODateString,
+// };
+
+// export const withDeletedAt = {
+//   deletedAt: ISODateString.nullish()
+// };
+
+// export function transformExcludeFields<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
+//   const result = { ...obj };
+//   for (const key of keys) delete result[key];
+//   return result;
+// }
+
+// export async function transformArray<T, R>(
+//   arr: T[],
+//   fn: (item: T) => Promise<R>
+// ): Promise<R[]> {
+//   return Promise.all(arr.map(fn));
+// }

@@ -130,7 +130,7 @@ export function Newsletter() {
         </IconButton>
       </ActionBar>
       <CustomContainer>
-        <Properties data={newsletter.properties} />
+        <Properties data={newsletter.properties} editing={editing} />
         <Members data={newsletter.members} />
         <NewsletterPostsController
           editing={editing}

@@ -6,3 +6,4 @@ export * from './lib/newsletter';
 export * from './lib/newsletter-post';
 export * from './lib/template';
 export * from './entity';
+export * from './types';

@@ -18,7 +18,7 @@ import {
   InviteNewsletterUser,
   NewsletterRole,
   NewsletterPermissions,
-  NewsletterBase,
+  ReadNewsletter,
 } from '@athena/common';
 import { creator, modifier, owner } from '../db/helpers';
 import { IGCSManager } from '@athena/services';
@@ -64,8 +64,8 @@ type NewsletterRow = EntityMetaRow &
   };
 
 export type INewsletterDAO = IEntityDAO<NewsletterRow, Newsletter> & {
-  get(id: number): Promise<Newsletter>;
-  getByUserId(id: number): Promise<NewsletterBase[]>;
+  read(id: number): Promise<ReadNewsletter>;
+  readByUserId(id: number): Promise<Newsletter[]>;
   create(userId: number, input: CreateNewsletter): Promise<number>;
   update(userId: number, input: UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
@@ -92,10 +92,8 @@ export class NewsletterDAO
     return {
       id: row.id,
       meta: mapMeta(row),
-      properties: {
-        name: row.name,
-        dateRange: mapDateRange(row),
-      },
+      name: row.name,
+      dateRange: mapDateRange(row),
       owner: mapUser(row.owner),
       members: mapUsers(row.members),
       posts: row.posts,
@@ -113,7 +111,7 @@ export class NewsletterDAO
     ).as('members');
   }
 
-  async get(id: number): Promise<Newsletter> {
+  async read(id: number): Promise<ReadNewsletter> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletter = await this.selectEntity(trx)
         .select((eb) => [
@@ -127,12 +125,12 @@ export class NewsletterDAO
         .executeTakeFirstOrThrow(
           () => new Error(`newsletter with id: ${id} does not exist`)
         );
-      const posts = await this.newsletterItemDAO.getByNewsletterId(id);
+      const posts = await this.newsletterItemDAO.readByNewsletterId(id);
       return this.toEntity({ ...newsletter, posts });
     });
   }
 
-  getByUserId(id: number): Promise<NewsletterBase[]> {
+  readByUserId(id: number): Promise<Newsletter[]> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletters = await trx
         .selectFrom('user_newsletter as un')
@@ -166,9 +164,9 @@ export class NewsletterDAO
     return this.db.transaction().execute(async (trx: Transaction) => {
       const newsletter = await this.postEntities(trx, userId, [
         {
-          name: input.properties.name,
-          startDate: input.properties.dateRange?.start,
-          endDate: input.properties.dateRange?.end,
+          name: input.name,
+          startDate: input.dateRange?.start,
+          endDate: input.dateRange?.end,
           ownerId: userId,
         },
       ])
@@ -190,9 +188,9 @@ export class NewsletterDAO
   async update(userId: number, input: UpdateNewsletter): Promise<number> {
     const res = await this.updateEntity(this.db, userId, {
       id: input.id,
-      name: input.properties.name,
-      startDate: input.properties.dateRange?.start,
-      endDate: input.properties.dateRange?.end,
+      name: input.name,
+      startDate: input.dateRange?.start,
+      endDate: input.dateRange?.end,
     })
       .returning('id')
       .where('id', '=', input.id)

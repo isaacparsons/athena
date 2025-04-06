@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { createRequestSchema, dateRangeInput, updateRequestSchema } from './common';
+import { dateRangeInput, makeEntitySchemas } from './common';
 
-export const newsletterProperties = z.object({
+export const newsletterSchema = makeEntitySchemas({
   name: z
     .string()
     .min(1, { message: 'Name must be at least 1 characters long' })
@@ -9,12 +9,8 @@ export const newsletterProperties = z.object({
   dateRange: dateRangeInput,
 });
 
-export type NewsletterProperties = z.infer<typeof newsletterProperties>;
-
-export const newsletterBase = z.object({
-  id: z.coerce.number(),
-  properties: newsletterProperties,
-});
+export const createNewsletterSchema = newsletterSchema.create;
+export const updateNewsletterSchema = newsletterSchema.update;
 
 export enum NewsletterRole {
   READ_ONLY = 'read-only',
@@ -37,16 +33,8 @@ export enum NewsletterPermissions {
 export const newsletterRole = z.nativeEnum(NewsletterRole);
 export const newsletterPermissions = z.nativeEnum(NewsletterPermissions);
 
-export const createNewsletter = createRequestSchema(newsletterBase);
-export type CreateNewsletter = z.infer<typeof createNewsletter>;
-
-export const updateNewsletter = updateRequestSchema(newsletterBase);
-export type UpdateNewsletter = z.infer<typeof updateNewsletter>;
-
 export const inviteNewsletterUser = z.object({
   newsletterId: z.coerce.number(),
   email: z.coerce.string(),
   role: newsletterRole,
 });
-
-export type InviteNewsletterUser = z.infer<typeof inviteNewsletterUser>;

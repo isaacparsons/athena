@@ -18,7 +18,7 @@ import {
   CreateNewsletter,
   createNewsletter as createNewsletterInput,
 } from '@athena/common';
-import { StyledDialog } from '@athena/components';
+import { CustomDateRange, StyledDialog } from '@athena/components';
 import { usePromiseWithNotification } from '@athena/hooks';
 import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '@athena/store';
@@ -43,7 +43,7 @@ export function CreateNewsletterDialog(props: CreateNewsletterDialogProps) {
     formState: { errors, isValid, isSubmitting },
   } = useForm<CreateNewsletter>({
     resolver: zodResolver(createNewsletterInput),
-    mode: 'onChange',
+    mode: 'onSubmit',
     defaultValues: {
       properties: {
         name: '',
@@ -85,7 +85,15 @@ export function CreateNewsletterDialog(props: CreateNewsletterDialogProps) {
           helperText={errors.properties?.name?.message}
           error={Boolean(errors.properties?.name)}
         />
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Controller
+          control={control}
+          name="properties.dateRange"
+          render={({ field: { onChange, value } }) => (
+            <CustomDateRange value={value} editing={true} onChange={onChange} />
+          )}
+        />
+
+        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Stack direction="row" display="flex" justifyContent="space-between">
             <Controller
               control={control}
@@ -118,7 +126,7 @@ export function CreateNewsletterDialog(props: CreateNewsletterDialogProps) {
               )}
             />
           </Stack>
-        </LocalizationProvider>
+        </LocalizationProvider> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

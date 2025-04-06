@@ -1,18 +1,17 @@
 import {
   CreateNewsletter,
   NewsletterPost,
-  UpdateNewsletterPosts,
   UpdateNewsletter,
   InviteNewsletterUser,
   Newsletter,
   CreateNewsletterPost,
   CreateManyNewsletterPosts,
   CreateTemplate,
-  GetInput,
   Template,
-  TemplateBase,
   UpdateTemplate,
   DeleteInput,
+  UpdateManyNewsletterPosts,
+  ReadInput,
   // CreateNewsletterPostsBatch,
 } from '@athena/common';
 import { createContext } from '../trpc';
@@ -48,8 +47,8 @@ const userMockRequest = createMockRequest('users');
 const templateMockRequest = createMockRequest('templates');
 
 export async function getNewsletter(userId: number, newsletterId: number) {
-  return router.newsletters.get(
-    newsletterMockRequest('get')(userId, { id: newsletterId })
+  return router.newsletters.read(
+    newsletterMockRequest('read')(userId, { id: newsletterId })
   ) as Promise<Newsletter>;
 }
 
@@ -81,8 +80,8 @@ export async function inviteNewsletterUser(
 }
 
 export async function getNewsletterPost(userId: number, newsletterPostId: number) {
-  return router.newsletterPosts.get(
-    newsletterPostMockRequest('get')(userId, { id: newsletterPostId })
+  return router.newsletterPosts.read(
+    newsletterPostMockRequest('read')(userId, { id: newsletterPostId })
   ) as Promise<NewsletterPost>;
 }
 
@@ -92,12 +91,12 @@ export async function deleteNewsletterPosts(userId: number, ids: number[]) {
   );
 }
 
-export async function updateNewsletterPosts(
+export async function updateManyNewsletterPosts(
   userId: number,
-  input: UpdateNewsletterPosts
+  input: UpdateManyNewsletterPosts
 ) {
-  return router.newsletterPosts.update(
-    newsletterPostMockRequest('update')(userId, input)
+  return router.newsletterPosts.updateMany(
+    newsletterPostMockRequest('updateMany')(userId, input)
   );
 }
 
@@ -125,15 +124,15 @@ export async function createTemplate(userId: number, input: CreateTemplate) {
   ) as Promise<number>;
 }
 
-export async function getTemplate(userId: number, input: GetInput) {
-  return router.templates.get(
-    templateMockRequest('get')(userId, input)
+export async function getTemplate(userId: number, input: ReadInput) {
+  return router.templates.read(
+    templateMockRequest('read')(userId, input)
   ) as Promise<Template>;
 }
 
 export async function getTemplatesByUserId(userId: number) {
   return router.users.templates(userMockRequest('templates')(userId, {})) as Promise<
-    TemplateBase[]
+    Template[]
   >;
 }
 

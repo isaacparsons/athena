@@ -118,10 +118,11 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           handleSelectAll={handleSelectAll}
         >
           <>
-            <Delete sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
+            {/* <Delete 
+            sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} /> */}
             <CreateTemplate
               onClick={handleCreateTemplate}
-              sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }}
+              sx={{ m: 0.3, height: 35, width: 35, borderRadius: 17.5 }}
             />
           </>
         </EditingHeader>

@@ -98,3 +98,12 @@ export const useTemplates = () => {
   );
   return templates;
 };
+
+export const useNewsletters = () => {
+  return useStore(
+    useShallow((state) => ({
+      newsletters: state.user.data?.newsletters ?? [],
+      loading: state.user.loading,
+    }))
+  );
+};

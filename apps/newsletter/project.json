@@ -76,12 +76,37 @@
         ]
       }
     },
+    "db-start": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "options": {
+        "commands": [
+          "docker compose -f apps/newsletter/docker-compose.yaml up db -d"
+        ]
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "setup-local": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "options": {
+        "commands": [
+          "echo \"APP_HOST=localhost\" > apps/newsletter/.env.development.local",
+          "echo \"CLIENT_HOST=localhost\" >> apps/newsletter/.env.development.local",
+          "echo \"DATABASE_URL=postgres://postgres:postgres@localhost:5432/newsletter\" >> apps/newsletter/.env.development.local"
+        ]
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
     "db": {
       "executor": "nx:run-commands",
       "configurations": {
-        "start": {
-          "commands": ["docker compose -f apps/newsletter/docker-compose.yaml up -d"]
-        },
         "stop": {
           "commands": ["docker compose -f apps/newsletter/docker-compose.yaml down"]
         },

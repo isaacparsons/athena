@@ -2,8 +2,8 @@ import _ from 'lodash';
 import { DBConnection, SelectTemplateNode } from '@athena/db';
 import { EntityDAO, EntityMetaRow, IEntityDAO } from './entity';
 import {
+  CreateManyTemplateNodes,
   CreateTemplateNode,
-  CreateTemplateNodes,
   NodePosition,
   NodePositionInput,
   TemplateNode,
@@ -14,9 +14,7 @@ import { inject, injectable, injectFromBase } from 'inversify';
 import { TYPES } from '../types/types';
 import { mapMeta } from './mapping';
 
-import * as O from 'fp-ts/Option';
 import { pipe } from 'fp-ts/function';
-import * as T from 'fp-ts/Task';
 import * as A from 'fp-ts/Array';
 import * as TE from 'fp-ts/TaskEither';
 
@@ -24,8 +22,8 @@ type TemplateNodeRow = EntityMetaRow &
   Omit<SelectTemplateNode, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'>;
 
 export type ITemplateNodeDAO = IEntityDAO<TemplateNodeRow, TemplateNode> & {
-  getByTemplateId(id: number): Promise<TemplateNode[]>;
-  createMany(userId: number, input: CreateTemplateNodes): Promise<number[]>;
+  readByTemplateId(id: number): Promise<TemplateNode[]>;
+  createMany(userId: number, input: CreateManyTemplateNodes): Promise<number[]>;
   updateMany(userId: number, input: UpdateTemplateNode[]): Promise<number[]>;
 };
 
@@ -55,7 +53,7 @@ export class TemplateNodeDAO
     };
   }
 
-  async getByTemplateId(id: number): Promise<TemplateNode[]> {
+  async readByTemplateId(id: number): Promise<TemplateNode[]> {
     const nodes = await this.selectEntity(this.db)
       .select(['data', 'nextId', 'prevId', 'parentId', 'templateId'])
       .where('templateId', '=', id)
@@ -85,7 +83,7 @@ export class TemplateNodeDAO
     return { prevId: prev === undefined ? null : prev.id, nextId };
   }
 
-  async createMany(userId: number, input: CreateTemplateNodes) {
+  async createMany(userId: number, input: CreateManyTemplateNodes) {
     const { position, nodes, templateId } = input;
     if (nodes.length === 0) return [];
     const [parents, children] = _.partition(

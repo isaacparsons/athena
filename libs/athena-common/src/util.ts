@@ -1,12 +1,11 @@
 import _ from 'lodash';
 import {
   MediaFormat,
-  NewsletterPostBase,
   NewsletterPostTypeName,
   DateRange,
   TempNodePosition,
 } from './lib';
-import { NewsletterPost, MediaPostDetails, TextPostDetails } from './entity';
+import { NewsletterPost } from './types';
 
 export const logObject = (item: any, label?: string) => {
   if (label) {
@@ -46,23 +45,23 @@ export function mimeTypeToMediaFormat(mimeType: string): MediaFormat {
 
 export const nullToUndefined = (v: any) => (_.isNull(v) ? undefined : v);
 
-export const isMediaPost = (
-  post: NewsletterPost
-): post is NewsletterPost<MediaPostDetails> => {
-  return (
-    (post as NewsletterPost<MediaPostDetails>).details.type ===
-    NewsletterPostTypeName.Media
-  );
-};
+// export const isMediaPost = (
+//   post: NewsletterPost
+// ): post is NewsletterPost<MediaPostDetails> => {
+//   return (
+//     (post as NewsletterPost<MediaPostDetails>).details.type ===
+//     NewsletterPostTypeName.Media
+//   );
+// };
 
-export const isTextPost = (
-  post: NewsletterPost
-): post is NewsletterPost<TextPostDetails> => {
-  return (
-    (post as NewsletterPost<TextPostDetails>).details.type ===
-    NewsletterPostTypeName.Text
-  );
-};
+// export const isTextPost = (
+//   post: NewsletterPost
+// ): post is NewsletterPost<TextPostDetails> => {
+//   return (
+//     (post as NewsletterPost<TextPostDetails>).details.type ===
+//     NewsletterPostTypeName.Text
+//   );
+// };
 
 export const isNumberOrNull = _.overSome([_.isNumber, _.isNull]);
 

@@ -15,14 +15,15 @@ import {
   NewsletterPostDetailsDAO,
 } from '@athena/dao';
 import {
-  NewsletterPost as NewsletterPostEntity,
+  NewsletterPost,
   DeleteBatchInput,
   CreateNewsletterPost,
-  UpdateNewsletterPosts,
+  UpdateManyNewsletterPosts,
   NodePosition,
   TempNodePosition,
   CreateManyNewsletterPosts,
   getChildPosts,
+  ReadNewsletterPost,
 } from '@athena/common';
 import {
   location,
@@ -32,7 +33,6 @@ import {
 } from '../db/helpers';
 import { inject, injectable, injectFromBase } from 'inversify';
 import { TYPES } from '../types/types';
-import { NewsletterPost } from '../types/db';
 import {
   mapLocation,
   mapMeta,
@@ -40,8 +40,9 @@ import {
   mapPosition,
 } from './mapping';
 import { IGCSManager } from '@athena/services';
-import { EntityDAO, EntityMetaRow, IEntityDAO } from './entity';
+import { EntityDAO, EntityMetaRow } from './entity';
 import { Selectable } from 'kysely';
+import * as DB from '../types/db';
 
 import * as O from 'fp-ts/Option';
 import { pipe } from 'fp-ts/function';
@@ -50,29 +51,25 @@ import * as A from 'fp-ts/Array';
 import * as TE from 'fp-ts/TaskEither';
 
 export type NewsletterPostRow = EntityMetaRow &
-  Omit<Selectable<NewsletterPost>, 'modifierId' | 'creatorId' | 'locationId'> & {
+  Omit<Selectable<DB.NewsletterPost>, 'modifierId' | 'creatorId' | 'locationId'> & {
     mediaDetails: SelectNewsletterPostMedia | null;
     textDetails: SelectNewsletterPostText | null;
     location: SelectLocation | null;
     children: Omit<NewsletterPostRow, 'children'>[];
   };
 
-export type INewsletterPostDAO = IEntityDAO<
-  NewsletterPostRow,
-  NewsletterPostEntity
-> & {
+export type INewsletterPostDAO = {
   deleteMany(userId: number, input: DeleteBatchInput): Promise<void>;
   createMany(userId: number, input: CreateManyNewsletterPosts): Promise<number[]>;
-  // createBatch(userId: number, input: CreateNewsletterPostsBatch): Promise<number[]>;
-  get(id: number): Promise<NewsletterPostEntity>;
-  getByNewsletterId(id: number): Promise<Omit<NewsletterPostEntity, 'children'>[]>;
-  update(userId: number, input: UpdateNewsletterPosts): Promise<number[]>;
+  read(id: number): Promise<ReadNewsletterPost>;
+  readByNewsletterId(id: number): Promise<NewsletterPost[]>;
+  updateMany(userId: number, input: UpdateManyNewsletterPosts): Promise<number[]>;
 };
 
 @injectable()
 @injectFromBase()
 export class NewsletterPostDAO
-  extends EntityDAO<'newsletter_post', NewsletterPostRow, NewsletterPostEntity>
+  extends EntityDAO<'newsletter_post', NewsletterPostRow, NewsletterPost>
   implements INewsletterPostDAO
 {
   tableName = 'newsletter_post' as any;
@@ -131,12 +128,12 @@ export class NewsletterPostDAO
     db: DBConnection,
     userId: number,
     parentNodeId: number,
-    nodes: CreateNewsletterPost[]
+    nodes: CreateManyNewsletterPosts['posts']
   ) {
     const n1 = await Promise.all(
       nodes.map(async (n) => {
         const locationId = n.location
-          ? await new LocationDAO(db).post(n.location)
+          ? await new LocationDAO(db).create(n.location)
           : null;
         return { ...n, locationId };
       })
@@ -146,7 +143,7 @@ export class NewsletterPostDAO
       n1.map<Promise<[string, number]>>(async (n) => {
         const { id } = await this.postEntities(db, userId, [
           {
-            ..._.omit(n, ['details', 'tempPosition', 'location']),
+            ..._.omit(n, ['details', 'tempPosition', 'location', 'position']),
             nextId: null,
             prevId: null,
             parentId: null,
@@ -155,7 +152,7 @@ export class NewsletterPostDAO
           .returning('id')
           .executeTakeFirstOrThrow();
 
-        await new NewsletterPostDetailsDAO(db).post(id, n.details);
+        await new NewsletterPostDetailsDAO(db).create(id, n.details);
 
         return [n.tempPosition.id, id];
       })
@@ -204,7 +201,7 @@ export class NewsletterPostDAO
     const { location, title, date, details } = input;
     const { prevId, nextId } = await this.getNeighbours(db, newsletterId, position);
 
-    const locationId = location ? await new LocationDAO(db).post(location) : null;
+    const locationId = location ? await new LocationDAO(db).create(location) : null;
 
     const { id } = await this.postEntities(db, userId, [
       {
@@ -231,7 +228,7 @@ export class NewsletterPostDAO
         nextId: id,
       }).executeTakeFirstOrThrow();
 
-    await new NewsletterPostDetailsDAO(db).post(id, details);
+    await new NewsletterPostDetailsDAO(db).create(id, details);
     return id;
   }
 
@@ -252,7 +249,7 @@ export class NewsletterPostDAO
     });
   }
 
-  async get(id: number): Promise<NewsletterPostEntity> {
+  async read(id: number): Promise<ReadNewsletterPost> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const parentItem = await this.selectEntity(trx)
         .select((eb) => [
@@ -319,9 +316,7 @@ export class NewsletterPostDAO
     });
   }
 
-  async getByNewsletterId(
-    id: number
-  ): Promise<Omit<NewsletterPostEntity, 'children'>[]> {
+  async readByNewsletterId(id: number): Promise<NewsletterPost[]> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const items = await selectEntityColumns(trx, 'newsletter_post')
         .where('newsletter_post.newsletterId', '=', id)
@@ -364,12 +359,12 @@ export class NewsletterPostDAO
     });
   }
 
-  async update(userId: number, input: UpdateNewsletterPosts) {
+  async updateMany(userId: number, input: UpdateManyNewsletterPosts) {
     return this.db.transaction().execute(async (trx: Transaction) => {
       // TODO: should probably verify theyre structure is correct
 
       const updatePostLocation = (
-        post: UpdateNewsletterPosts[number]
+        post: UpdateManyNewsletterPosts[number]
       ): O.Option<T.Task<number>> =>
         pipe(
           O.fromNullable(post.location),
@@ -377,7 +372,7 @@ export class NewsletterPostDAO
         );
 
       const updatePostDetail = (
-        post: UpdateNewsletterPosts[number]
+        post: UpdateManyNewsletterPosts[number]
       ): O.Option<T.Task<number>> =>
         pipe(
           O.fromNullable(post.details),
@@ -385,7 +380,7 @@ export class NewsletterPostDAO
         );
 
       const updatePost = (
-        post: UpdateNewsletterPosts[number]
+        post: UpdateManyNewsletterPosts[number]
       ): TE.TaskEither<Error, number> =>
         pipe(
           TE.tryCatch(

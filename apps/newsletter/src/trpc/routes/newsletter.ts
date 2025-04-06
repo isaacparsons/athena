@@ -1,23 +1,23 @@
 import { trpc, loggedInProcedure } from '..';
 import {
-  createNewsletter,
+  createNewsletterSchema,
   deleteInput,
-  getInput,
+  readInput,
   inviteNewsletterUser,
-  updateNewsletter,
+  updateNewsletterSchema,
 } from '@athena/common';
 
 const router = trpc.router({
-  get: loggedInProcedure.input(getInput).query(async ({ input, ctx }) => {
-    return await ctx.dao.newsletter.get(input.id);
+  read: loggedInProcedure.input(readInput).query(async ({ input, ctx }) => {
+    return await ctx.dao.newsletter.read(input.id);
   }),
   create: loggedInProcedure
-    .input(createNewsletter)
+    .input(createNewsletterSchema)
     .mutation(async ({ ctx, input }) => {
       return await ctx.dao.newsletter.create(ctx.user.userId, input);
     }),
   update: loggedInProcedure
-    .input(updateNewsletter)
+    .input(updateNewsletterSchema)
     .mutation(async ({ ctx, input }) => {
       return await ctx.dao.newsletter.update(ctx.user.userId, input);
     }),

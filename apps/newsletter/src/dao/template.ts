@@ -15,8 +15,8 @@ import {
   Template,
   CreateTemplate,
   TemplateType,
-  TemplateBase,
   UpdateTemplate,
+  ReadTemplate,
 } from '@athena/common';
 import { TYPES } from '../types/types';
 import { mapMeta, mapUsers } from './mapping';
@@ -32,8 +32,8 @@ type TemplateRow = EntityMetaRow &
   };
 
 export type ITemplateDAO = IEntityDAO<TemplateRow, Template> & {
-  get(id: number): Promise<Template>;
-  getByUserId(id: number): Promise<TemplateBase[]>;
+  read(id: number): Promise<ReadTemplate>;
+  readByUserId(id: number): Promise<Template[]>;
   create(userId: number, input: CreateTemplate): Promise<number>;
   update(userId: number, input: UpdateTemplate): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
@@ -74,7 +74,7 @@ export class TemplateDAO
     ).as('members');
   }
 
-  async get(id: number): Promise<Template> {
+  async read(id: number): Promise<ReadTemplate> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const template = await this.selectEntity(trx)
         .select((eb) => [
@@ -86,7 +86,7 @@ export class TemplateDAO
         .where('id', '=', id)
         .executeTakeFirstOrThrow();
 
-      const nodes = await new TemplateNodeDAO(trx).getByTemplateId(id);
+      const nodes = await new TemplateNodeDAO(trx).readByTemplateId(id);
       return this.toEntity({
         ...template,
         nodes,
@@ -94,7 +94,7 @@ export class TemplateDAO
     });
   }
 
-  async getByUserId(id: number): Promise<TemplateBase[]> {
+  async readByUserId(id: number): Promise<Template[]> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const templates = await trx
         .selectFrom('user_template as ut')
