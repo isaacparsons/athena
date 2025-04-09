@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { dateRangeInput, makeEntitySchemas } from './common';
+import { dateRangeSchema, makeEntitySchemas } from './common';
 
 export const newsletterSchema = makeEntitySchemas({
   name: z
     .string()
     .min(1, { message: 'Name must be at least 1 characters long' })
     .max(100, { message: 'Name must be at less than 100 characters long' }),
-  dateRange: dateRangeInput,
+  dateRange: dateRangeSchema,
 });
 
 export const createNewsletterSchema = newsletterSchema.create;

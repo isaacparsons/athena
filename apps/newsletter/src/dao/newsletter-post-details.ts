@@ -17,7 +17,7 @@ export interface INewsletterPostDetailsDAO {
     newsletterItemId: number,
     input: CreateNewsletterPost['details']
   ): Promise<void>;
-  update(input: UpdatePostDetails): Promise<number>;
+  update(newsletterPostId: number, input: UpdatePostDetails): Promise<number>;
 }
 
 @injectable()
@@ -78,7 +78,7 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
 
     throw new Error('unrecognized item type');
   }
-  async update(input: UpdatePostDetails): Promise<number> {
+  async update(newsletterPostId: number, input: UpdatePostDetails): Promise<number> {
     const table =
       input.type === NewsletterPostTypeName.Text
         ? 'newsletter_post_text'
@@ -91,7 +91,7 @@ export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {
       .updateTable(table)
       .set(input)
       .returning('id')
-      .where('id', '=', input.id)
+      .where('newsletterPostId', '=', newsletterPostId)
       .executeTakeFirstOrThrow();
     return result.id;
   }

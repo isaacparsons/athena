@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import { Chip, Stack, Avatar } from '@mui/material';
-import { UserBase } from '@athena/common';
+import { User } from '@athena/common';
 
 interface MembersProps {
-  data: UserBase[];
+  data: User[];
 }
 
 export function Members(props: MembersProps) {

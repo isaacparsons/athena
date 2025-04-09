@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { Properties } from './Properties';
 import {
   MediaFormat,
-  NewsletterPost as INewsletterPost,
+  ReadNewsletterPost,
   NewsletterPostTypeName,
 } from '@athena/common';
 const user = {
@@ -16,7 +16,7 @@ const user = {
   firstName: 'user',
   lastName: 'one',
 };
-const mockPost: INewsletterPost = {
+const mockPost: ReadNewsletterPost = {
   id: 1,
   meta: {
     creator: user,

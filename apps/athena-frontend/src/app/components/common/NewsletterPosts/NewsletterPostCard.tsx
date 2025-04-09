@@ -1,10 +1,7 @@
 import _ from 'lodash';
 import {
-  CreateMediaPostDetails,
   CreateNewsletterPost,
-  CreateTextPostDetails,
   MediaFormat,
-  NewsletterPostDetails,
   NewsletterPostTypeName,
 } from '@athena/common';
 import {
@@ -19,6 +16,13 @@ import { createStyledIcon } from '../Styled/createStyledIcon';
 import { ArrowForwardIcon } from '@athena/icons';
 import { Box, Typography } from '@mui/material';
 import ReactPlayer from 'react-player';
+import {
+  isMediaDetails,
+  isTextDetails,
+  MediaPostDetailsForm,
+  PostDetailsForm,
+  TextPostDetailsForm,
+} from '../../../types';
 
 interface NewsletterPostCardProps {
   onClick?: () => void;
@@ -38,15 +42,13 @@ export function NewsletterPostCard(props: NewsletterPostCardProps) {
   );
 }
 
-interface NewsletterPostDetailsProps<T> {
-  data: T;
-  onChange?: (post: T) => void;
+interface NewsletterPostDetailsProps {
+  data: PostDetailsForm;
+  onChange?: (details: PostDetailsForm) => void;
   editing?: boolean;
 }
 
-export function NewsletterPostDetailsContent<
-  T extends Omit<NewsletterPostDetails, 'id' | 'newsletterPostId'>
->(props: NewsletterPostDetailsProps<T>) {
+export function NewsletterPostDetailsContent(props: NewsletterPostDetailsProps) {
   const { data, editing, onChange } = props;
 
   const handleChange = (name: string) => {
@@ -55,16 +57,10 @@ export function NewsletterPostDetailsContent<
 
   return (
     <>
-      {data.type === NewsletterPostTypeName.Text && (
-        <TextPostDetails
-          editing={editing}
-          data={data as CreateTextPostDetails}
-          onChange={handleChange}
-        />
+      {isTextDetails(data) && (
+        <TextPostDetails editing={editing} data={data} onChange={handleChange} />
       )}
-      {data?.type === NewsletterPostTypeName.Media && (
-        <MediaPostDetails editing={editing} data={data as any} />
-      )}
+      {isMediaDetails(data) && <MediaPostDetails editing={editing} data={data} />}
     </>
   );
 }
@@ -106,15 +102,13 @@ export function NewsletterPostProperties<T extends CreateNewsletterPost>(
   );
 }
 
-interface TextPostDetailsProps<T> {
-  data: T;
+interface TextPostDetailsProps {
+  data: TextPostDetailsForm;
   editing?: boolean;
   onChange?: (value: string) => void;
 }
 
-function TextPostDetails<T extends CreateTextPostDetails>(
-  props: TextPostDetailsProps<T>
-) {
+function TextPostDetails(props: TextPostDetailsProps) {
   const { data, editing, onChange } = props;
   return editing ? (
     <StyledTextField
@@ -132,15 +126,13 @@ function TextPostDetails<T extends CreateTextPostDetails>(
   );
 }
 
-interface MediaPostDetailsProps<T> {
-  data: T;
+interface MediaPostDetailsProps {
+  data: MediaPostDetailsForm;
   editing?: boolean;
   onChange?: (value: string) => void;
 }
 
-function MediaPostDetails<T extends CreateMediaPostDetails>(
-  props: MediaPostDetailsProps<T>
-) {
+function MediaPostDetails(props: MediaPostDetailsProps) {
   const { data, editing, onChange } = props;
   const { format, fileName, name, caption } = data;
 

@@ -4,10 +4,18 @@ import {
   updateNewsletterPostDetailsSchema,
 } from './lib/newsletter-post';
 import { createPostDetailsSchema } from './lib/newsletter-post';
-import { locationSchema, withTempPosition } from './lib';
+import { locationSchema, userSchema, withTempPosition } from './lib';
+
+export const metaSchema = z.object({
+  creator: userSchema,
+  modifier: userSchema.nullable(),
+  created: z.string(),
+  modified: z.string().nullable(),
+});
 
 export const createNewsletterPostSchema = newsletterPostSchema.create
   .omit({ details: true })
+  .partial({ position: true })
   .extend({
     details: createPostDetailsSchema,
     location: locationSchema.create.optional(),
@@ -17,11 +25,15 @@ export const updateNewsletterPostSchema = newsletterPostSchema.update
   .omit({ details: true })
   .extend({
     details: updateNewsletterPostDetailsSchema.optional(),
-    location: locationSchema.update.optional(),
+    location: locationSchema.update.or(locationSchema.create).optional(),
   });
 
+const createTempNewsletterPostSchema = createNewsletterPostSchema
+  .partial({ position: true })
+  .extend(withTempPosition);
+
 export const createManyNewsletterPostsSchema = z.object({
-  posts: z.array(createNewsletterPostSchema.extend(withTempPosition)),
+  posts: z.array(createTempNewsletterPostSchema),
   newsletterId: z.coerce.number(),
 });
 

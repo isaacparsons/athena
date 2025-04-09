@@ -1,5 +1,5 @@
-import { TemplateBase } from '@athena/common';
-import { PostInput } from '../../../types';
+import { Template } from '@athena/common';
+import { CreateNewsletterPostForm } from '../../../types';
 import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '@athena/store';
 import { useState } from 'react';
@@ -18,10 +18,10 @@ import { templateToPosts } from '../../../../util';
 
 interface CreatePostsFromTemplateDialogProps {
   newsletterId: number;
-  data: TemplateBase[];
+  data: Template[];
   open: boolean;
   onClose: () => void;
-  onInsert: (newsletterId: number, post: PostInput) => void;
+  onInsert: (input: CreateNewsletterPostForm) => void;
 }
 export function CreatePostsFromTemplateDialog(
   props: CreatePostsFromTemplateDialogProps
@@ -34,9 +34,9 @@ export function CreatePostsFromTemplateDialog(
     }))
   );
 
-  const [selected, setSelected] = useState<TemplateBase | null>(null);
+  const [selected, setSelected] = useState<Template | null>(null);
 
-  const handleSelected = (template: TemplateBase) => {
+  const handleSelected = (template: Template) => {
     setSelected((state) => {
       if (state?.id === template.id) return null;
       return template;
@@ -47,7 +47,7 @@ export function CreatePostsFromTemplateDialog(
     if (selected) {
       const template = await fetchTemplate(selected.id);
       const posts = templateToPosts(newsletterId, template);
-      posts.forEach((p) => onInsert(newsletterId, p));
+      posts.forEach((p) => onInsert(p));
     }
     onClose();
   };

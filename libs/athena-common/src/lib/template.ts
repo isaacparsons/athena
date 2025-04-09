@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { makeEntitySchemas, nodePosition, tempNodePosition } from './common';
+import {
+  makeEntitySchemas,
+  nodePositionSchema,
+  tempNodePositionSchema,
+} from './common';
 
 export enum TemplateType {
   Newsletter = 'newsletter',
@@ -8,18 +12,18 @@ export enum TemplateType {
 const templateType = z.nativeEnum(TemplateType);
 
 export const templateNodeSchema = makeEntitySchemas({
-  position: nodePosition,
+  position: nodePositionSchema,
   templateId: z.coerce.number(),
   data: z.record(z.string(), z.string()),
 });
 
 export const createTemplateNodeSchema = templateNodeSchema.create
-  .extend({ tempPosition: tempNodePosition })
+  .extend({ tempPosition: tempNodePositionSchema })
   .omit({ templateId: true, position: true });
 
 export const createManyTemplateNodesSchema = z.object({
   templateId: z.coerce.number(),
-  position: nodePosition,
+  position: nodePositionSchema,
   nodes: z.array(createTemplateNodeSchema),
 });
 

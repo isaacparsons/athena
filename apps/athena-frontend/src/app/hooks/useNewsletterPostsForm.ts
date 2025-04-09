@@ -1,19 +1,23 @@
 import _ from 'lodash';
 import { Control, useFieldArray } from 'react-hook-form';
-import { Post, PostInput } from '../types';
+import {
+  CreateNewsletterPostForm,
+  NewsletterPostForm,
+  UpdateNewsletterPostForm,
+} from '../types';
 
-export const useNewsletterPostsForm = <T extends { posts: Post[] }>(
+export const useNewsletterPostsForm = <T extends { posts: NewsletterPostForm[] }>(
   control: Control<T>,
-  parent: Post | null,
-  posts: Post[]
+  parent: NewsletterPostForm | null,
+  posts: NewsletterPostForm[]
 ) => {
   const { fields, remove, insert, update } = useFieldArray<
-    { posts: Post[] },
+    { posts: NewsletterPostForm[] },
     'posts',
     'postId'
   >({
     name: 'posts',
-    control: control as unknown as Control<{ posts: Post[] }>,
+    control: control as unknown as Control<{ posts: NewsletterPostForm[] }>,
     keyName: 'postId',
   });
 
@@ -22,16 +26,13 @@ export const useNewsletterPostsForm = <T extends { posts: Post[] }>(
     if (postIdx > -1) remove(postIdx);
   };
 
-  const handleUpdate = (id: string, change: Partial<Post>) => {
+  const handleUpdate = (input: UpdateNewsletterPostForm) => {
+    const { id, change } = input;
     const postIdx = fields.findIndex((p) => p.tempPosition.id === id);
-    if (postIdx > -1)
-      update(postIdx, {
-        ...fields[postIdx],
-        ...change,
-      });
+    if (postIdx > -1) update(postIdx, _.merge(fields[postIdx], change));
   };
 
-  const handleInsert = (newsletterId: number, post: PostInput) => {
+  const handleInsert = (post: CreateNewsletterPostForm) => {
     const parentId = parent?.tempPosition.id ?? null;
     const prev = fields.find(
       (p) => p.tempPosition.nextId === null && p.tempPosition.parentId === parentId
@@ -42,10 +43,7 @@ export const useNewsletterPostsForm = <T extends { posts: Post[] }>(
     const inputPrevId = _.get(post, ['tempPosition', 'prevId']);
 
     insert(fields.length, {
-      newsletterId,
-      title: post.details.name,
-      date: null,
-      details: post.details,
+      ...post,
       tempPosition: {
         parentId: inputParentId === undefined ? parentId : inputParentId,
         id: inputId === undefined ? fields.length.toString() : inputId,
@@ -53,7 +51,6 @@ export const useNewsletterPostsForm = <T extends { posts: Post[] }>(
         prevId:
           inputPrevId === undefined ? prev?.tempPosition.id ?? null : inputPrevId,
       },
-      file: post.file,
     });
   };
 

@@ -19,6 +19,7 @@ import {
   NewsletterRole,
   NewsletterPermissions,
   ReadNewsletter,
+  ReadNewsletterPost,
 } from '@athena/common';
 import { creator, modifier, owner } from '../db/helpers';
 import { IGCSManager } from '@athena/services';
@@ -58,7 +59,7 @@ export const newsletterRolePermissionsMap: Record<
 
 type NewsletterRow = EntityMetaRow &
   Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
-    posts: Omit<NewsletterPost, 'children'>[];
+    posts: Omit<ReadNewsletterPost, 'children'>[];
     owner: SelectUser;
     members: SelectUser[];
   };

@@ -14,7 +14,6 @@ import {
   mediaPostDetailsSchema,
   newsletterPostSchema,
   newsletterSchema,
-  NodePosition,
   templateNodeSchema,
   templateSchema,
   textPostDetailsSchema,
@@ -24,26 +23,45 @@ import {
   updateTemplateNodeSchema,
   updateTemplateSchema,
   updateTextPostDetailsSchema,
-  user,
+  userSchema,
+  geoPositionSchema,
+  readSchema,
+  deleteSchema,
+  deleteManySchema,
+  dateRangeSchema,
+  nodePositionSchema,
+  tempNodePositionSchema,
+  nodePositionInputSchema,
 } from './lib';
 import {
   createManyNewsletterPostsSchema,
   createNewsletterPostSchema,
+  metaSchema,
   updateManyNewsletterPostsSchema,
   updateNewsletterPostSchema,
 } from './entity';
+/**
+ * Common
+ */
+export type GeoPosition = z.infer<typeof geoPositionSchema>;
+
+export type Read = z.infer<typeof readSchema>;
+
+export type Delete = z.infer<typeof deleteSchema>;
+export type DeleteMany = z.infer<typeof deleteManySchema>;
+
+export type DateRange = z.infer<typeof dateRangeSchema>;
+
+export type NodePosition = z.infer<typeof nodePositionSchema>;
+export type TempNodePosition = z.infer<typeof tempNodePositionSchema>;
+export type NodePositionInput = z.infer<typeof nodePositionInputSchema>;
 
 /**
  * User
  */
-export type User = z.infer<typeof user>;
+export type User = z.infer<typeof userSchema>;
 
-export type Meta = {
-  creator: User;
-  modifier: User | null;
-  created: string;
-  modified: string | null;
-};
+export type Meta = z.infer<typeof metaSchema>;
 
 export type Entity = { id: number; meta: Meta };
 export type WithEntity<T> = T & Entity;
@@ -56,7 +74,7 @@ export type Newsletter = WithEntity<z.infer<typeof newsletterSchema.base>>;
 
 export type ReadNewsletter = Newsletter & {
   members: User[];
-  posts: NewsletterPost[];
+  posts: ReadNewsletterPost[];
   owner: User;
   children?: Newsletter;
 };
@@ -64,7 +82,7 @@ export type ReadNewsletter = Newsletter & {
 export type CreateNewsletter = z.infer<typeof createNewsletterSchema>;
 export type UpdateNewsletter = z.infer<typeof updateNewsletterSchema>;
 
-export type ReadUser = {
+export type ReadUser = User & {
   newsletters: Newsletter[];
   templates: Template[];
 };
@@ -86,11 +104,15 @@ export type UpdateMediaPostDetails = z.infer<typeof updateMediaPostDetailsSchema
 export type UpdatePostDetails = UpdateTextPostDetails | UpdateMediaPostDetails;
 export type NewsletterPostDetails = TextPostDetails | MediaPostDetails;
 
-export type NewsletterPost = WithEntity<z.infer<typeof newsletterPostSchema.base>>;
+export type NewsletterPost<T extends NewsletterPostDetails = NewsletterPostDetails> =
+  WithEntity<z.infer<typeof newsletterPostSchema.base>> & {
+    details: T;
+  };
 
 export type ReadNewsletterPost = NewsletterPost & {
   position: NodePosition;
   location: Location | null;
+  children?: Omit<ReadNewsletterPost, 'children'>[];
 };
 
 export type CreateNewsletterPost = z.infer<typeof createNewsletterPostSchema>;
@@ -99,6 +121,7 @@ export type UpdateNewsletterPost = z.infer<typeof updateNewsletterPostSchema>;
 export type UpdateManyNewsletterPosts = z.infer<
   typeof updateManyNewsletterPostsSchema
 >;
+
 export type CreateManyNewsletterPosts = z.infer<
   typeof createManyNewsletterPostsSchema
 >;

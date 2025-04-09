@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Newsletter, NewsletterPost } from '@athena/common';
+import { NewsletterPost, ReadNewsletter } from '@athena/common';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStore } from '@athena/store';
@@ -22,7 +22,7 @@ export const useFilterArray = <T>(array: T[], filters: ((val: T) => boolean)[]) 
 
 export const useNewsletter = (
   newsletterId: number | undefined,
-  newsletters: Record<number, Newsletter>
+  newsletters: Record<number, ReadNewsletter>
 ) =>
   useMemo(
     () =>

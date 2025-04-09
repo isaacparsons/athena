@@ -16,7 +16,7 @@ import {
   Templates,
   Template,
 } from './pages';
-import { UserBase } from '@athena/common';
+import { User } from '@athena/common';
 import { Appbar } from '@athena/components';
 import { NewsletterPost } from './pages/NewsletterPost';
 
@@ -134,7 +134,7 @@ export const router = createHashRouter(routerConfig);
 
 interface ProtectedRouteProps {
   element: ReactNode;
-  user: UserBase | null;
+  user: User | null;
 }
 export function ProtectedRoute(props: ProtectedRouteProps) {
   const { element, user } = props;

@@ -14,10 +14,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
-import {
-  CreateNewsletter,
-  createNewsletter as createNewsletterInput,
-} from '@athena/common';
+import { CreateNewsletter, createNewsletterSchema } from '@athena/common';
 import { CustomDateRange, StyledDialog } from '@athena/components';
 import { usePromiseWithNotification } from '@athena/hooks';
 import { useShallow } from 'zustand/react/shallow';
@@ -42,15 +39,13 @@ export function CreateNewsletterDialog(props: CreateNewsletterDialogProps) {
     reset,
     formState: { errors, isValid, isSubmitting },
   } = useForm<CreateNewsletter>({
-    resolver: zodResolver(createNewsletterInput),
+    resolver: zodResolver(createNewsletterSchema),
     mode: 'onSubmit',
     defaultValues: {
-      properties: {
-        name: '',
-        dateRange: {
-          start: new Date().toISOString(),
-          end: null,
-        },
+      name: '',
+      dateRange: {
+        start: new Date().toISOString(),
+        end: null,
       },
     },
   });
@@ -76,18 +71,18 @@ export function CreateNewsletterDialog(props: CreateNewsletterDialogProps) {
       <DialogTitle>Create Newsletter</DialogTitle>
       <DialogContent>
         <TextField
-          {...register('properties.name')}
+          {...register('name')}
           margin="dense"
           label="Name"
           type="text"
           fullWidth
           variant="outlined"
-          helperText={errors.properties?.name?.message}
-          error={Boolean(errors.properties?.name)}
+          helperText={errors.name?.message}
+          error={Boolean(errors.name)}
         />
         <Controller
           control={control}
-          name="properties.dateRange"
+          name="dateRange"
           render={({ field: { onChange, value } }) => (
             <CustomDateRange value={value} editing={true} onChange={onChange} />
           )}

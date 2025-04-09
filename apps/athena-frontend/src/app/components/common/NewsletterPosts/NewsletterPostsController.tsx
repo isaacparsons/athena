@@ -14,18 +14,19 @@ import {
 } from '@athena/components';
 import { ArrowBackIcon, CheckIcon, DeleteIcon, TemplateIcon } from '@athena/icons';
 import { useNewsletterPostsForm } from '@athena/hooks';
-import { Post } from '../../../types';
+import { NewsletterPostForm, newsletterPostFormSchema } from '../../../types';
 import { getChildPosts } from '@athena/common';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 interface NewsletterPostsControllerProps {
   newsletterId: number;
-  posts: Post[];
-  onSave?: (data: { posts: Post[] }) => void;
+  posts: NewsletterPostForm[];
+  onSave?: (data: { posts: NewsletterPostForm[] }) => void;
   editing?: boolean;
-  setCreateTemplatePosts: (posts: Post[]) => void;
+  setCreateTemplatePosts: (posts: NewsletterPostForm[]) => void;
 }
 
-const Delete = createStyledIcon(DeleteIcon);
 const CreateTemplate = createStyledIcon(TemplateIcon);
 
 const BackButton = createStyledIcon(ArrowBackIcon);
@@ -33,18 +34,22 @@ const BackButton = createStyledIcon(ArrowBackIcon);
 export function NewsletterPostsController(props: NewsletterPostsControllerProps) {
   const { posts, newsletterId, editing, onSave, setCreateTemplatePosts } = props;
 
-  const [parent, setParent] = useState<null | Post>(null);
+  const [parent, setParent] = useState<null | NewsletterPostForm>(null);
 
   const {
     control,
     handleSubmit,
     reset,
     // formState: { errors, isValid, isSubmitting },
-  } = useForm<{ posts: Post[] }>({
-    // resolver: zodResolver(z.array(createNewsletterPostChild)),
+  } = useForm<{ posts: NewsletterPostForm[] }>({
+    resolver: zodResolver(
+      z.object({
+        posts: z.array(newsletterPostFormSchema),
+      })
+    ),
     defaultValues: { posts: posts },
     values: { posts },
-    // mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   const { fields, insert, update, remove } = useNewsletterPostsForm(
@@ -65,13 +70,15 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     [fields, posts]
   );
 
-  const handleOpenPostDetails = (post: Post) => {
-    if ((!editing && post.id !== undefined) || editing) {
+  const handleOpenPostDetails = (post: NewsletterPostForm) => {
+    if ((!editing && _.get(post, 'id') !== undefined) || editing) {
       setParent(post);
     }
   };
 
-  const handleSave: SubmitHandler<{ posts: Post[] }> = async (data) => {
+  const handleSave: SubmitHandler<{ posts: NewsletterPostForm[] }> = async (
+    data
+  ) => {
     if (onSave) onSave(data);
     reset();
   };
@@ -92,15 +99,8 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           curr,
           ...getChildPosts(curr.tempPosition.id, fields),
         ],
-        [] as Post[]
-      )
-      .map((p) => ({
-        ...p,
-        title: p.details.name,
-        date: p.date === undefined ? null : p.date,
-        location: p.location === null ? undefined : p.location,
-      }));
-
+        [] as NewsletterPostForm[]
+      );
     setCreateTemplatePosts(posts);
   };
 

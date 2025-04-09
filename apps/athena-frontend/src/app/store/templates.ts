@@ -2,14 +2,14 @@ import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { Slices } from '@athena/store';
-import { CreateTemplate, Template } from '@athena/common';
+import { CreateTemplate, ReadTemplate } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 
 export interface TemplatesSlice {
   templates: {
     loading: boolean;
-    data: Record<number, Template>;
-    fetch: (id: number) => Promise<Template>;
+    data: Record<number, ReadTemplate>;
+    fetch: (id: number) => Promise<ReadTemplate>;
     create: (template: CreateTemplate) => Promise<number>;
   };
 }
@@ -27,7 +27,7 @@ export const createTemplatesSlice: StateCreator<
       set((state) => {
         state.templates.loading = true;
       });
-      const template = await asyncTrpcClient.templates.get.query({
+      const template = await asyncTrpcClient.templates.read.query({
         id,
       });
       set((state) => {

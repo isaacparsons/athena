@@ -1,8 +1,8 @@
-import { TemplateBase } from '@athena/common';
+import { Template } from '@athena/common';
 import { Stack, Typography } from '@mui/material';
 
 interface TemplateCardContentProps {
-  data: TemplateBase;
+  data: Template;
 }
 
 export function TemplateCardContent(props: TemplateCardContentProps) {

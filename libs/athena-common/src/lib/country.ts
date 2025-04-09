@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { geoPositionInput } from './common';
+import { geoPositionSchema } from './common';
 
 export const countrySchema = z.object({
   name: z.string(),
-  geoPosition: geoPositionInput,
+  geoPosition: geoPositionSchema,
 });

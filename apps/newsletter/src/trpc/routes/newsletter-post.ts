@@ -1,15 +1,15 @@
 import { trpc, loggedInProcedure } from '..';
 import { nanoid } from 'nanoid';
 import {
-  deleteBatchInput,
+  deleteManySchema,
   readPostUploadLinksSchema,
-  readInput,
+  readSchema,
   createManyNewsletterPostsSchema,
   updateManyNewsletterPostsSchema,
 } from '@athena/common';
 
 const router = trpc.router({
-  read: loggedInProcedure.input(readInput).query(async ({ input, ctx }) => {
+  read: loggedInProcedure.input(readSchema).query(async ({ input, ctx }) => {
     return ctx.dao.newsletterPost.read(input.id);
   }),
   readPostUploadLinks: loggedInProcedure
@@ -39,7 +39,7 @@ const router = trpc.router({
       return ctx.dao.newsletterPost.updateMany(ctx.user.userId, input);
     }),
   deleteMany: loggedInProcedure
-    .input(deleteBatchInput)
+    .input(deleteManySchema)
     .mutation(async ({ input, ctx }) => {
       return ctx.dao.newsletterPost.deleteMany(ctx.user.userId, input);
     }),

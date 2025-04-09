@@ -1,14 +1,15 @@
 import { Stack, Typography } from '@mui/material';
 import { CustomDateRange } from '@athena/components';
 import {
-  NewsletterProperties as INewsletterProperties,
-  updateNewsletter,
+  CreateNewsletter,
+  ReadNewsletter,
+  updateNewsletterSchema,
 } from '@athena/common';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 interface NewsletterPropertiesProps {
-  data: INewsletterProperties;
+  data: ReadNewsletter;
   editing: boolean;
 }
 
@@ -22,15 +23,13 @@ export function Properties(props: NewsletterPropertiesProps) {
     reset,
     formState: { errors, isValid, isSubmitting },
   } = useForm<CreateNewsletter>({
-    resolver: zodResolver(updateNewsletter),
+    resolver: zodResolver(updateNewsletterSchema),
     mode: 'onSubmit',
     defaultValues: {
-      properties: {
-        name: '',
-        dateRange: {
-          start: new Date().toISOString(),
-          end: null,
-        },
+      name: '',
+      dateRange: {
+        start: new Date().toISOString(),
+        end: null,
       },
     },
   });

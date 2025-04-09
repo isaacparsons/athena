@@ -6,7 +6,7 @@ import {
 } from '@athena/components';
 import { Checkbox } from '@mui/material';
 import { ArrowForwardIcon, CloseIcon } from '@athena/icons';
-import { Post } from '../../../types';
+import { NewsletterPostForm, UpdateNewsletterPostForm } from '../../../types';
 
 const Close = createStyledIcon(CloseIcon);
 const DetailsCard = createStyledIcon(ArrowForwardIcon);
@@ -14,11 +14,11 @@ const DetailsCard = createStyledIcon(ArrowForwardIcon);
 interface NewsletterPostsListItemProps {
   editing: boolean;
   selected: Set<string>;
-  value: Post;
+  value: NewsletterPostForm;
   handleSelect: (id: string) => void;
   handleRemove: (id: string) => void;
-  handleUpdate: (id: string, change: Partial<Post>) => void;
-  handleOpenPostDetails: (post: Post) => void;
+  handleUpdate: (input: UpdateNewsletterPostForm) => void;
+  handleOpenPostDetails: (post: NewsletterPostForm) => void;
 }
 
 export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
@@ -50,12 +50,15 @@ export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
           ) : null
         }
       />
-      {value.details && (
+      {value && value.details && (
         <NewsletterPostDetailsContent
           editing={editing}
           data={value.details}
           onChange={(details) => {
-            handleUpdate(value.tempPosition.id, { details });
+            handleUpdate({
+              id: value.tempPosition.id,
+              change: { ...value, details },
+            });
           }}
         />
       )}

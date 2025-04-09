@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { CircularProgress, IconButton, Skeleton } from '@mui/material';
 import { useStore } from '@athena/store';
@@ -22,12 +23,14 @@ import {
   usePromiseWithNotification,
 } from '@athena/hooks';
 import { CreateTemplateDialog } from './CreateTemplateDialog';
-import { FileMap, Post } from '../../types';
+import { NewsletterPostForm } from '../../types';
 import { CreateTemplate } from '@athena/common';
 
 export function Newsletter() {
   const [editing, setEditing] = useState(true);
-  const [createTemplatePosts, setCreateTemplatePosts] = useState<Post[]>([]);
+  const [createTemplatePosts, setCreateTemplatePosts] = useState<
+    NewsletterPostForm[]
+  >([]);
 
   const toggleEditing = () => setEditing((editing) => !editing);
 
@@ -66,13 +69,15 @@ export function Newsletter() {
 
   if (!newsletter) return null;
 
-  const handleSavePosts = async (data: { posts: Post[] }) => {
+  const handleSavePosts = async (data: { posts: NewsletterPostForm[] }) => {
     const files = data.posts.reduce((prev, curr) => {
-      if (curr.file !== undefined) prev[curr.tempPosition.id] = curr.file;
+      const file = _.get(curr, ['details', 'file']) as File | undefined;
+      if (file !== undefined)
+        return [...prev, [curr.tempPosition.id, file] as [string, File]];
       return prev;
-    }, {} as FileMap);
+    }, [] as [string, File][]);
 
-    const created = formatCreatedPosts(newsletter.id, existingPosts, data.posts);
+    const created = formatCreatedPosts(newsletter.id, data.posts);
     const updated = formatUpdatedPosts(newsletter.id, existingPosts, data.posts);
     const deleted = formatDeletedPosts(existingPosts, data.posts);
 
@@ -130,7 +135,7 @@ export function Newsletter() {
         </IconButton>
       </ActionBar>
       <CustomContainer>
-        <Properties data={newsletter.properties} editing={editing} />
+        <Properties data={newsletter} editing={editing} />
         <Members data={newsletter.members} />
         <NewsletterPostsController
           editing={editing}

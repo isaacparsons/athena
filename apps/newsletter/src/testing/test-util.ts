@@ -9,9 +9,9 @@ import {
   CreateTemplate,
   Template,
   UpdateTemplate,
-  DeleteInput,
+  Delete,
   UpdateManyNewsletterPosts,
-  ReadInput,
+  Read,
   // CreateNewsletterPostsBatch,
 } from '@athena/common';
 import { createContext } from '../trpc';
@@ -124,7 +124,7 @@ export async function createTemplate(userId: number, input: CreateTemplate) {
   ) as Promise<number>;
 }
 
-export async function getTemplate(userId: number, input: ReadInput) {
+export async function getTemplate(userId: number, input: Read) {
   return router.templates.read(
     templateMockRequest('read')(userId, input)
   ) as Promise<Template>;
@@ -142,7 +142,7 @@ export async function updateTemplate(userId: number, input: UpdateTemplate) {
   ) as Promise<number>;
 }
 
-export async function deleteTemplate(userId: number, input: DeleteInput) {
+export async function deleteTemplate(userId: number, input: Delete) {
   return router.templates.delete(
     templateMockRequest('delete')(userId, input)
   ) as Promise<number>;

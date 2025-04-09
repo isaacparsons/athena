@@ -2,25 +2,31 @@ import _ from 'lodash';
 import {
   CreateTemplateNode,
   NewsletterPostTypeName,
-  Template,
+  ReadTemplate,
 } from '@athena/common';
-import { Post, PostInput } from '../app/types';
+import { CreateNewsletterPostForm, NewsletterPostForm } from '../app/types';
 import { nanoid } from 'nanoid';
 
-export const toTemplateNodes = (posts: Post[]): CreateTemplateNode[] =>
+export const toTemplateNodes = (posts: NewsletterPostForm[]): CreateTemplateNode[] =>
   posts.map((p) => {
     const data: Record<string, string> = {
-      title: p.title ?? p.details.name,
+      title: p.title ?? p.details?.name ?? '',
     };
     if (p.date !== null) _.set(data, ['date'], p.date);
 
-    if (p.details.type === NewsletterPostTypeName.Text) {
+    if (
+      !_.isUndefined(p.details) &&
+      p.details.type === NewsletterPostTypeName.Text
+    ) {
       _.set(data, ['details.type'], NewsletterPostTypeName.Text);
       _.set(data, ['details.name'], p.details.name);
       if (p.details.description !== null)
         _.set(data, ['details.description'], p.details.description);
       if (p.details.link !== null) _.set(data, ['details.link'], p.details.link);
-    } else if (p.details.type === NewsletterPostTypeName.Media) {
+    } else if (
+      !_.isUndefined(p.details) &&
+      p.details.type === NewsletterPostTypeName.Media
+    ) {
       _.set(data, ['details.type'], NewsletterPostTypeName.Media);
       _.set(data, ['details.name'], p.details.name);
       _.set(data, ['details.fileName'], p.details.fileName);
@@ -49,8 +55,8 @@ export const toTemplateNodes = (posts: Post[]): CreateTemplateNode[] =>
 
 export const templateToPosts = (
   newsletterId: number,
-  template: Template
-): PostInput[] => {
+  template: ReadTemplate
+): CreateNewsletterPostForm[] => {
   const { nodes } = template;
 
   const base = {
@@ -78,5 +84,5 @@ export const templateToPosts = (
 
       return { ...prev, tempPosition };
     }, base)
-  ) as PostInput[];
+  ) as CreateNewsletterPostForm[];
 };

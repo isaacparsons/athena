@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const user = z.object({
+export const userSchema = z.object({
   id: z.coerce.number(),
   email: z.string(),
   firstName: z.string().nullable(),

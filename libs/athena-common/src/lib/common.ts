@@ -17,61 +17,49 @@ export type Nullable<T> = T | null;
 export const id = z.coerce.number();
 export type Id = z.infer<typeof id>;
 
-export const geoPositionInput = z.object({
+export const geoPositionSchema = z.object({
   latitude: z.coerce.number(),
   longitude: z.coerce.number(),
 });
 
-export type GeoPosition = z.infer<typeof geoPositionInput>;
-
-export const readInput = z.object({
+export const readSchema = z.object({
   id: z.coerce.number(),
 });
-export type ReadInput = z.infer<typeof readInput>;
 
-export const deleteInput = z.object({
+export const deleteSchema = z.object({
   id: z.coerce.number(),
 });
-export type DeleteInput = z.infer<typeof deleteInput>;
 
-export const deleteBatchInput = z.object({
+export const deleteManySchema = z.object({
   ids: z.array(z.coerce.number()),
 });
-export type DeleteBatchInput = z.infer<typeof deleteBatchInput>;
 
 /** Date */
 
-export const dateInput = z.string().min(8);
+export const dateSchema = z.string().min(8);
 
-export const dateRangeInput = z.object({
-  start: dateInput.nullable(),
-  end: dateInput.nullable(),
+export const dateRangeSchema = z.object({
+  start: dateSchema.nullable(),
+  end: dateSchema.nullable(),
 });
 
-export type DateRange = z.infer<typeof dateRangeInput>;
-
-export const nodePosition = z.object({
+export const nodePositionSchema = z.object({
   parentId: z.coerce.number().nullable(),
   nextId: z.coerce.number().nullable(),
   prevId: z.coerce.number().nullable(),
 });
 
-export type NodePosition = z.infer<typeof nodePosition>;
-
-export const tempNodePosition = z.object({
+export const tempNodePositionSchema = z.object({
   id: z.string(),
   parentId: z.coerce.string().nullable(),
   nextId: z.coerce.string().nullable(),
   prevId: z.coerce.string().nullable(),
 });
-export type TempNodePosition = z.infer<typeof tempNodePosition>;
 
-export const nodePositionInput = nodePosition.omit({ prevId: true });
-
-export type NodePositionInput = z.infer<typeof nodePositionInput>;
+export const nodePositionInputSchema = nodePositionSchema.omit({ prevId: true });
 
 export const withTempPosition = {
-  tempPosition: tempNodePosition,
+  tempPosition: tempNodePositionSchema,
 };
 
 // export function excludeFields<T extends Record<string, any>, K extends keyof T>(

@@ -1,11 +1,11 @@
-import { TemplateBase } from '@athena/common';
+import { Template } from '@athena/common';
 import { CustomList, CustomListItem } from '@athena/components';
 import { useNavigate } from 'react-router-dom';
 import { TemplateCard } from '../../components/common/Template/TemplateCard';
 import { TemplateCardContent } from '../../components/common/Template';
 
 interface UserTemplatesProps {
-  data: TemplateBase[];
+  data: Template[];
 }
 export function UserTemplates(props: UserTemplatesProps) {
   const { data } = props;

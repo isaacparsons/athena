@@ -16,14 +16,14 @@ import {
 import { ArrowBackIcon, CheckIcon, CloseIcon, DeleteIcon } from '@athena/icons';
 
 import { toTemplateNodes } from '../../../util';
-import { Post } from '../../types';
+import { NewsletterPostForm } from '../../types';
 
 const Delete = createStyledIcon(DeleteIcon);
 const Close = createStyledIcon(CloseIcon);
 
 interface CreateTemplateDialogProps {
   newsletterId: number;
-  posts: Post[];
+  posts: NewsletterPostForm[];
   onSave: (input: CreateTemplate) => void;
   onClose: () => void;
 }
@@ -32,13 +32,13 @@ const BackButton = createStyledIcon(ArrowBackIcon);
 
 type FormValues = {
   name: string;
-  posts: Post[];
+  posts: NewsletterPostForm[];
 };
 
 export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
   const { posts, newsletterId, onSave, onClose } = props;
 
-  const [parent, setParent] = useState<null | Post>(null);
+  const [parent, setParent] = useState<null | NewsletterPostForm>(null);
 
   const {
     control,
@@ -63,7 +63,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
     'tempPosition.id'
   );
 
-  const handleOpenPostDetails = (post: Post) => {
+  const handleOpenPostDetails = (post: NewsletterPostForm) => {
     setParent(post);
   };
 

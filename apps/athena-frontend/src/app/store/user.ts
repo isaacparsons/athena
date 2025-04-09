@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import { Slices } from '@athena/store';
-import { User } from '@athena/common';
+import { ReadUser } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 
 export interface UserSlice {
   user: {
     loading: boolean;
-    data: User | null;
+    data: ReadUser | null;
     fetch: () => Promise<void>;
   };
 }
@@ -25,7 +25,7 @@ export const createUserSlice: StateCreator<
       set((state) => {
         state.user.loading = true;
       });
-      const user = await asyncTrpcClient.users.get.query();
+      const user = await asyncTrpcClient.users.read.query();
       set((state) => {
         state.user.data = user;
         state.user.loading = false;

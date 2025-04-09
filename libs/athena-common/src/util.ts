@@ -1,11 +1,21 @@
 import _ from 'lodash';
+import { nanoid } from 'nanoid';
+import { MediaFormat, NewsletterPostTypeName } from './lib';
+
 import {
-  MediaFormat,
-  NewsletterPostTypeName,
+  MediaPostDetails,
+  NewsletterPost,
+  TextPostDetails,
   DateRange,
   TempNodePosition,
-} from './lib';
-import { NewsletterPost } from './types';
+  NodePosition,
+} from './types';
+
+import { pipe, flow } from 'fp-ts/function';
+import * as A from 'fp-ts/Array';
+import * as R from 'fp-ts/Record';
+import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
 
 export const logObject = (item: any, label?: string) => {
   if (label) {
@@ -45,23 +55,23 @@ export function mimeTypeToMediaFormat(mimeType: string): MediaFormat {
 
 export const nullToUndefined = (v: any) => (_.isNull(v) ? undefined : v);
 
-// export const isMediaPost = (
-//   post: NewsletterPost
-// ): post is NewsletterPost<MediaPostDetails> => {
-//   return (
-//     (post as NewsletterPost<MediaPostDetails>).details.type ===
-//     NewsletterPostTypeName.Media
-//   );
-// };
+export const isMediaPost = (
+  post: NewsletterPost
+): post is NewsletterPost<MediaPostDetails> => {
+  return (
+    (post as NewsletterPost<MediaPostDetails>).details.type ===
+    NewsletterPostTypeName.Media
+  );
+};
 
-// export const isTextPost = (
-//   post: NewsletterPost
-// ): post is NewsletterPost<TextPostDetails> => {
-//   return (
-//     (post as NewsletterPost<TextPostDetails>).details.type ===
-//     NewsletterPostTypeName.Text
-//   );
-// };
+export const isTextPost = (
+  post: NewsletterPost
+): post is NewsletterPost<TextPostDetails> => {
+  return (
+    (post as NewsletterPost<TextPostDetails>).details.type ===
+    NewsletterPostTypeName.Text
+  );
+};
 
 export const isNumberOrNull = _.overSome([_.isNumber, _.isNull]);
 
@@ -86,3 +96,158 @@ export const getChildPosts = <T extends { tempPosition: TempNodePosition }>(
 
   return arr;
 };
+
+// add temporary position
+// go through each item and add entry to map [existing id, created id]
+// go through each item and add tempPosition from position, converting to the temporary ids
+
+// resolve temporary positions
+// go through each item and add entry to map [tempPosition.id, existing id]
+// go through each item and add position from tempPosition, converting to the temporary ids
+
+// go through each item in an array and add a [k,v] to a map
+// args
+//  items: T[]
+//  key: (item: T) => string | number
+//  val: (item: T) => any
+export const makeIdMap = <T, K, V>(
+  items: T[],
+  keyValFn: (item: T) => [K, V]
+): Map<K, V> => new Map(items.map(keyValFn));
+
+export const addPropertyToItems = <T, P extends string, V>(
+  items: T[],
+  transformFn: (item: T) => T & { [key in P]: V }
+): (T & { [key in P]: V })[] => items.map(transformFn);
+
+const getId = <K, V>(map: Map<K, V>, key: K): V => {
+  const val = map.get(key);
+  if (val === undefined) throw new Error('Not found');
+  return val;
+};
+
+export const addTempPositionToItems = <
+  T extends { id: number; position: NodePosition }
+>(
+  items: T[]
+) => {
+  const map = makeIdMap(items, (i) => [i.id, nanoid()]);
+  return addPropertyToItems(items, (i) => ({
+    ...i,
+    tempPosition: {
+      id: getId(map, i.id),
+      parentId:
+        i.position.parentId === null ? null : getId(map, i.position.parentId),
+      nextId: i.position.nextId === null ? null : getId(map, i.position.nextId),
+      prevId: i.position.prevId === null ? null : getId(map, i.position.prevId),
+    },
+  }));
+};
+
+export const fromItemsWithTempPosition = <
+  T extends { id: number; tempPosition: TempNodePosition }
+>(
+  items: T[]
+): (T & { position: NodePosition })[] => {
+  const map = makeIdMap(items, (i) => [i.tempPosition.id, i.id]);
+  return addPropertyToItems<T, 'position', NodePosition>(items, (i) => {
+    const position = {
+      parentId:
+        i.tempPosition.parentId === null
+          ? null
+          : getId(map, i.tempPosition.parentId),
+      nextId:
+        i.tempPosition.nextId === null ? null : getId(map, i.tempPosition.nextId),
+      prevId:
+        i.tempPosition.prevId === null ? null : getId(map, i.tempPosition.prevId),
+    } as NodePosition;
+
+    return {
+      ...i,
+      id: getId(map, i.tempPosition.id),
+      position,
+    };
+  });
+};
+
+// type Id = string | number;
+
+// type WithTempPosition<T> = T & { tempPosition: TempNodePosition };
+// type WithPosition<T> = T & { position: NodePosition };
+
+// const makeIdMap = <K extends Id>(keys: K[]): Record<K, string> =>
+//   pipe(
+//     keys,
+//     A.map((k) => [k, nanoid()] as const),
+//     R.fromEntries
+//   );
+
+// const resolveRef = <K extends Id>(
+//   map: Record<K, string>,
+//   id: K | null
+// ): E.Either<Error, string | null> =>
+//   id === null
+//     ? E.right(null)
+//     : pipe(
+//         O.fromNullable(map[id]),
+//         E.fromOption(() => new Error(`Missing ID mapping for ${id}`))
+//       );
+
+// const parsePosition: <T>(input: T) => E.Either<Error, NodePosition> =
+//   (input) => E.tryCatch(
+//     () => nodePositionSchema.parse(input),
+//     (e) => new Error(`Invalid position: ${String(e)}`)
+//   );
+
+// export const addTempPositionToItems = <
+//   T extends { id: number; position: NodePosition }
+// >(
+//   items: T[]
+// ): E.Either<Error, WithTempPosition<T>[]> => {
+//   const idMap = makeIdMap(items.map((item) => item.id));
+
+//   return pipe(
+//     items,
+//     A.traverse(E.Applicative)((item) =>
+//       pipe(
+//         E.Do,
+//         E.bind('id', () => resolveRef(idMap, item.id)),
+//         E.bind('parentId', () => resolveRef(idMap, item.position.parentId)),
+//         E.bind('nextId', () => resolveRef(idMap, item.position.nextId)),
+//         E.bind('prevId', () => resolveRef(idMap, item.position.prevId)),
+//         E.map(({ id, parentId, nextId, prevId }) => ({
+//           ...item,
+//           tempPosition: { id: id!, parentId, nextId, prevId },
+//         }))
+//       )
+//     )
+//   );
+// };
+
+// export const fromItemsWithTempPosition = <
+//   T extends { tempPosition: TempNodePosition }
+// >(
+//   items: T[]
+// ): E.Either<Error, WithPosition<T>[]> => {
+//   const idMap = makeIdMap(items.map((item) => item.tempPosition.id));
+
+//   return pipe(
+//     items,
+//     A.traverse(E.Applicative)((item) =>
+//       pipe(
+//         E.Do,
+//         E.bind('parentId', () => resolveRef(idMap, item.tempPosition.parentId)),
+//         E.bind('nextId', () => resolveRef(idMap, item.tempPosition.nextId)),
+//         E.bind('prevId', () => resolveRef(idMap, item.tempPosition.prevId)),
+//         E.bind('id', () =>
+//           resolveRef(idMap, item.tempPosition.id).map((id) => Number(id))
+//         ),
+//         E.map(({ id, parentId, nextId, prevId }) => ({
+//           ...item,
+//           id,
+//           position: { parentId, nextId, prevId },
+//         }))
+//       )
+//     )
+//   );
+// };

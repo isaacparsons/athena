@@ -2,7 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import { CustomDate, Location } from '@athena/components';
 import { useStore } from '@athena/store';
 import { useShallow } from 'zustand/react/shallow';
-import { CreateLocation, NewsletterPost, NewsletterPostBase } from '@athena/common';
+import { CreateLocation, NewsletterPost } from '@athena/common';
 import { useState } from 'react';
 
 interface PropertiesProps {

@@ -4,11 +4,11 @@ import { MediaIcon, TemplateIcon, TextIcon } from '@athena/icons';
 import { mimeTypeToMediaFormat, NewsletterPostTypeName } from '@athena/common';
 import { useTemplates } from '@athena/hooks';
 import { CreatePostsFromTemplateDialog, FileSelection } from '@athena/components';
-import { PostInput } from '../../../types';
+import { CreateNewsletterPostForm } from '../../../types';
 
 interface AddNewsletterPostButtonProps {
   newsletterId: number;
-  insert: (newsletterId: number, post: PostInput) => void;
+  insert: (input: CreateNewsletterPostForm) => void;
 }
 
 export function AddNewsletterPostButton(props: AddNewsletterPostButtonProps) {
@@ -31,7 +31,10 @@ export function AddNewsletterPostButton(props: AddNewsletterPostButtonProps) {
   };
 
   const handleAddTextItem = () => {
-    insert(newsletterId, {
+    insert({
+      newsletterId,
+      title: '',
+      date: null,
       details: {
         type: NewsletterPostTypeName.Text,
         name: '',
@@ -42,7 +45,10 @@ export function AddNewsletterPostButton(props: AddNewsletterPostButtonProps) {
   };
 
   const handleFileAdded = (file: File) => {
-    insert(newsletterId, {
+    insert({
+      newsletterId,
+      title: '',
+      date: null,
       details: {
         // date: new Date(file.lastModified).toISOString(),
         type: NewsletterPostTypeName.Media,

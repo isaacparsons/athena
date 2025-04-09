@@ -16,7 +16,7 @@ import {
 } from '@athena/dao';
 import {
   NewsletterPost,
-  DeleteBatchInput,
+  DeleteMany,
   CreateNewsletterPost,
   UpdateManyNewsletterPosts,
   NodePosition,
@@ -24,6 +24,9 @@ import {
   CreateManyNewsletterPosts,
   getChildPosts,
   ReadNewsletterPost,
+  fromItemsWithTempPosition,
+  UpdateLocation,
+  CreateLocation,
 } from '@athena/common';
 import {
   location,
@@ -59,10 +62,10 @@ export type NewsletterPostRow = EntityMetaRow &
   };
 
 export type INewsletterPostDAO = {
-  deleteMany(userId: number, input: DeleteBatchInput): Promise<void>;
+  deleteMany(userId: number, input: DeleteMany): Promise<void>;
   createMany(userId: number, input: CreateManyNewsletterPosts): Promise<number[]>;
   read(id: number): Promise<ReadNewsletterPost>;
-  readByNewsletterId(id: number): Promise<NewsletterPost[]>;
+  readByNewsletterId(id: number): Promise<ReadNewsletterPost[]>;
   updateMany(userId: number, input: UpdateManyNewsletterPosts): Promise<number[]>;
 };
 
@@ -139,8 +142,54 @@ export class NewsletterPostDAO
       })
     );
 
-    const map = await Promise.all(
-      n1.map<Promise<[string, number]>>(async (n) => {
+    // const map = await Promise.all(
+    //   n1.map<Promise<[string, number]>>(async (n) => {
+    //     const { id } = await this.postEntities(db, userId, [
+    //       {
+    //         ..._.omit(n, ['details', 'tempPosition', 'location', 'position']),
+    //         nextId: null,
+    //         prevId: null,
+    //         parentId: null,
+    //       },
+    //     ])
+    //       .returning('id')
+    //       .executeTakeFirstOrThrow();
+
+    //     await new NewsletterPostDetailsDAO(db).create(id, n.details);
+
+    //     return [n.tempPosition.id, id];
+    //   })
+    // );
+    // const idMap = new Map(map);
+
+    // const getRealPosition = (
+    //   pos: TempNodePosition
+    // ): NodePosition & { id: number } => {
+    //   const id = idMap.get(pos.id);
+    //   const parent = pos.parentId !== null ? idMap.get(pos.parentId) : null;
+    //   const parentId = parent === undefined ? parentNodeId : parent;
+    //   const nextId = _.isNull(pos.nextId) ? null : idMap.get(pos.nextId);
+    //   const prevId = _.isNull(pos.prevId) ? null : idMap.get(pos.prevId);
+
+    //   if (
+    //     !_.isUndefined(id) &&
+    //     !_.isUndefined(parentId) &&
+    //     !_.isUndefined(nextId) &&
+    //     !_.isUndefined(prevId)
+    //   )
+    //     return { id, parentId, nextId, prevId };
+
+    //   throw new Error('error');
+    // };
+
+    // await Promise.all(
+    //   nodes.map(async (n) => {
+    //     const realPos = getRealPosition(n.tempPosition);
+    //     await this.updateEntity(db, userId, realPos).executeTakeFirstOrThrow();
+    //   })
+    // );
+    const items = await Promise.all(
+      n1.map(async (n) => {
         const { id } = await this.postEntities(db, userId, [
           {
             ..._.omit(n, ['details', 'tempPosition', 'location', 'position']),
@@ -154,35 +203,16 @@ export class NewsletterPostDAO
 
         await new NewsletterPostDetailsDAO(db).create(id, n.details);
 
-        return [n.tempPosition.id, id];
+        return { ...n, id };
       })
     );
-    const idMap = new Map(map);
-
-    const getRealPosition = (
-      pos: TempNodePosition
-    ): NodePosition & { id: number } => {
-      const id = idMap.get(pos.id);
-      const parent = pos.parentId !== null ? idMap.get(pos.parentId) : null;
-      const parentId = parent === undefined ? parentNodeId : parent;
-      const nextId = _.isNull(pos.nextId) ? null : idMap.get(pos.nextId);
-      const prevId = _.isNull(pos.prevId) ? null : idMap.get(pos.prevId);
-
-      if (
-        !_.isUndefined(id) &&
-        !_.isUndefined(parentId) &&
-        !_.isUndefined(nextId) &&
-        !_.isUndefined(prevId)
-      )
-        return { id, parentId, nextId, prevId };
-
-      throw new Error('error');
-    };
 
     await Promise.all(
-      nodes.map(async (n) => {
-        const realPos = getRealPosition(n.tempPosition);
-        await this.updateEntity(db, userId, realPos).executeTakeFirstOrThrow();
+      fromItemsWithTempPosition(items).map(async (n) => {
+        await this.updateEntity(db, userId, {
+          id: n.id,
+          ...n.position,
+        }).executeTakeFirstOrThrow();
       })
     );
   }
@@ -316,7 +346,7 @@ export class NewsletterPostDAO
     });
   }
 
-  async readByNewsletterId(id: number): Promise<NewsletterPost[]> {
+  async readByNewsletterId(id: number): Promise<ReadNewsletterPost[]> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const items = await selectEntityColumns(trx, 'newsletter_post')
         .where('newsletter_post.newsletterId', '=', id)
@@ -368,7 +398,13 @@ export class NewsletterPostDAO
       ): O.Option<T.Task<number>> =>
         pipe(
           O.fromNullable(post.location),
-          O.map((loc) => () => new LocationDAO(trx).update(loc))
+          O.map((loc) => () => {
+            if (_.get(loc, 'id') !== undefined) {
+              return new LocationDAO(trx).create(loc as CreateLocation);
+            } else {
+              return new LocationDAO(trx).update(loc as UpdateLocation);
+            }
+          })
         );
 
       const updatePostDetail = (
@@ -376,7 +412,10 @@ export class NewsletterPostDAO
       ): O.Option<T.Task<number>> =>
         pipe(
           O.fromNullable(post.details),
-          O.map((details) => () => new NewsletterPostDetailsDAO(trx).update(details))
+          O.map(
+            (details) => () =>
+              new NewsletterPostDetailsDAO(trx).update(post.id, details)
+          )
         );
 
       const updatePost = (
@@ -414,7 +453,7 @@ export class NewsletterPostDAO
     });
   }
 
-  async deleteMany(userId: number, input: DeleteBatchInput) {
+  async deleteMany(userId: number, input: DeleteMany) {
     const { ids } = input;
     await this.db.transaction().execute(async (trx: Transaction) => {
       const deletedPosts = await trx

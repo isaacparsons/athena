@@ -1,27 +1,23 @@
 import { Stack, Typography } from '@mui/material';
-import { NewsletterBase, formatDate, formatDateRange } from '@athena/common';
+import { Newsletter, formatDate, formatDateRange } from '@athena/common';
 import { ArrowForwardIcon, CalendarMonthIcon } from '@athena/icons';
 import { CustomCard, CustomCardFooter, CustomIconButton } from '@athena/components';
 
 interface NewsletterCardProps {
-  data: NewsletterBase;
+  data: Newsletter;
   onClick: () => void;
 }
 export function NewsletterCard(props: NewsletterCardProps) {
   const { data, onClick } = props;
-  const { properties, meta } = data;
+  const { dateRange, name, meta } = data;
 
-  const formattedDateRange = properties.dateRange
-    ? formatDateRange(properties.dateRange)
-    : '';
+  const formattedDateRange = dateRange ? formatDateRange(dateRange) : '';
   const formattedLastModifiedDate = meta.modified ? formatDate(meta.modified) : '';
 
   return (
     <CustomCard onClick={onClick}>
       <Stack direction={'column'} sx={{ alignItems: 'flex-start' }}>
-        <Typography sx={{ color: 'primary.main', fontSize: 25 }}>
-          {properties.name}
-        </Typography>
+        <Typography sx={{ color: 'primary.main', fontSize: 25 }}>{name}</Typography>
         <Stack direction="row">
           {formattedDateRange && (
             <CalendarMonthIcon sx={{ color: 'primary.main' }} />

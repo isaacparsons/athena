@@ -3,12 +3,12 @@ import { StyledCard } from '@athena/components';
 import { List, ListItem } from '@mui/material';
 import React from 'react';
 import { useFilterArray } from '@athena/hooks';
-import { Post } from '../../../types';
+import { NewsletterPostForm } from '../../../types';
 
 interface NewsletterPostsListProps {
-  posts: Post[];
-  parent: null | Post;
-  render: (post: Post) => React.ReactNode;
+  posts: NewsletterPostForm[];
+  parent: null | NewsletterPostForm;
+  render: (post: NewsletterPostForm) => React.ReactNode;
 }
 
 export function NewsletterPostsList(props: NewsletterPostsListProps) {

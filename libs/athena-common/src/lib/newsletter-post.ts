@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { makeEntitySchemas, nodePosition } from './common';
+import { makeEntitySchemas, nodePositionSchema } from './common';
 
 export enum MediaFormat {
   Image = 'image',
@@ -31,9 +31,9 @@ export const createMediaPostDetailsSchema = mediaPostDetailsSchema.create.omit({
   newsletterPostId: true,
 });
 
-export const updateMediaPostDetailsSchema = mediaPostDetailsSchema.update.required({
-  type: true,
-});
+export const updateMediaPostDetailsSchema = mediaPostDetailsSchema.update
+  .omit({ newsletterPostId: true, id: true })
+  .required({ type: true });
 
 export const textPostDetailsSchema = makeEntitySchemas({
   newsletterPostId: z.coerce.number(),
@@ -47,7 +47,9 @@ export const createTextPostDetailsSchema = textPostDetailsSchema.create.omit({
   newsletterPostId: true,
 });
 
-export const updateTextPostDetailsSchema = textPostDetailsSchema.update;
+export const updateTextPostDetailsSchema = textPostDetailsSchema.update
+  .omit({ newsletterPostId: true, id: true })
+  .required({ type: true });
 
 export const postDetailsSchema = z.discriminatedUnion('type', [
   mediaPostDetailsSchema.base,
@@ -69,7 +71,7 @@ export const newsletterPostSchema = makeEntitySchemas({
   title: z.string(),
   date: z.string().nullable(),
   details: postDetailsSchema,
-  position: nodePosition,
+  position: nodePositionSchema,
 });
 
 export const readPostUploadLinksSchema = z.object({
