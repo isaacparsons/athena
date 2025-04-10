@@ -93,7 +93,7 @@ ALTER SEQUENCE public.federated_credential_id_seq OWNED BY public.federated_cred
 
 CREATE TABLE public.location (
     id integer NOT NULL,
-    "countryCode" character varying,
+    "country" character varying,
     name character varying,
     longitude double precision,
     latitude double precision

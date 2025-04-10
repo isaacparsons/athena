@@ -89,6 +89,17 @@
         "production": {}
       }
     },
+    "db-destroy": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "options": {
+        "commands": ["docker compose -f apps/newsletter/docker-compose.yaml down -v"]
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
     "setup-local": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
@@ -109,11 +120,6 @@
       "configurations": {
         "stop": {
           "commands": ["docker compose -f apps/newsletter/docker-compose.yaml down"]
-        },
-        "destroy": {
-          "commands": [
-            "docker compose -f apps/newsletter/docker-compose.yaml down -v"
-          ]
         },
         "create-tables": {
           "commands": [

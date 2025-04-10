@@ -71,7 +71,6 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
   };
 
   const handleSave: SubmitHandler<{ posts: NewsletterPostForm[] }> = (data) => {
-    console.log('hello');
     if (onSave) onSave(data);
     reset();
   };

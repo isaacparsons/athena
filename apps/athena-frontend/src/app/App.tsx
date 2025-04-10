@@ -8,6 +8,7 @@ import { router } from './AppRoutes';
 import { RouterProvider } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '@frontend/store';
+import { LocationProvider } from './components';
 
 export const App = () => {
   // const queryClient = new QueryClient();
@@ -31,11 +32,13 @@ export const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <NotificationsProvider>
-        {/* <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <LocationProvider>
+          {/* <trpc.Provider client={trpcClient} queryClient={queryClient}>
           <QueryClientProvider client={queryClient}> */}
-        <RouterProvider router={router} />
-        {/* </QueryClientProvider>
+          <RouterProvider router={router} />
+          {/* </QueryClientProvider>
         </trpc.Provider> */}
+        </LocationProvider>
       </NotificationsProvider>
     </ThemeProvider>
   );

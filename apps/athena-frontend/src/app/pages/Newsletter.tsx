@@ -76,10 +76,8 @@ export function Newsletter() {
       return prev;
     }, [] as [string, File][]);
 
-    console.log('hi');
     const created = formatCreatedPosts(newsletter.id, data.posts);
     const updated = formatUpdatedPosts(newsletter.id, existingPosts, data.posts);
-    console.log(updated);
 
     const deleted = formatDeletedPosts(existingPosts, data.posts);
 
