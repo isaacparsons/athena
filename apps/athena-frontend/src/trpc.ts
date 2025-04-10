@@ -6,19 +6,19 @@
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import type { AppRouter } from '@backend/trpc';
-const apiUrl = `http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/api/v1/trpc`;
-const adminSecret = `${process.env.REACT_APP_ADMIN_SECRET}`;
+import { getConfig } from '@frontend/config';
 
-const headers = adminSecret
+const config = getConfig();
+const headers = config.ADMIN_SECRET
   ? {
-      'admin-secret': adminSecret,
+      'admin-secret': config.ADMIN_SECRET,
     }
   : {};
 
 export const asyncTrpcClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: apiUrl,
+      url: config.API_URL,
       async headers() {
         return headers;
       },

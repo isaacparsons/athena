@@ -19,6 +19,7 @@ import {
 } from './pages';
 import { User } from '@athena/common';
 import { Appbar } from '@frontend/components';
+import { useUser } from './hooks';
 
 export enum RoutePaths {
   home = '/',
@@ -29,7 +30,7 @@ export enum RoutePaths {
   templates = '/templates',
   template = '/templates/:templateId',
   // newsletterItemTemplate = '/templates/item/:newsletterItemTemplateId',
-  // account="/account"
+  account = '/account',
   // settings="/settings"
 }
 
@@ -80,7 +81,11 @@ const routerConfig: RouteObject[] = [
   },
   {
     path: RoutePaths.home,
-    element: <Home />,
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
   },
   {
     path: RoutePaths.login,
@@ -89,41 +94,53 @@ const routerConfig: RouteObject[] = [
   {
     path: RoutePaths.newsletters,
     element: (
-      <WithAppbar>
-        <WithOutlet>
-          <Newsletters />
-        </WithOutlet>
-      </WithAppbar>
+      <ProtectedRoute>
+        <WithAppbar>
+          <WithOutlet>
+            <Newsletters />
+          </WithOutlet>
+        </WithAppbar>
+      </ProtectedRoute>
     ),
   },
   {
     path: RoutePaths.newsletter,
     element: (
-      <WithOutlet>
-        <Newsletter />
-      </WithOutlet>
+      <ProtectedRoute>
+        <WithOutlet>
+          <Newsletter />
+        </WithOutlet>
+      </ProtectedRoute>
     ),
   },
   {
     path: RoutePaths.newsletterPost,
-    element: <NewsletterPost />,
+    element: (
+      <ProtectedRoute>
+        <NewsletterPost />
+      </ProtectedRoute>
+    ),
   },
   {
     path: RoutePaths.templates,
     element: (
-      <WithAppbar>
-        <WithOutlet>
-          <Templates />
-        </WithOutlet>
-      </WithAppbar>
+      <ProtectedRoute>
+        <WithAppbar>
+          <WithOutlet>
+            <Templates />
+          </WithOutlet>
+        </WithAppbar>
+      </ProtectedRoute>
     ),
   },
   {
     path: RoutePaths.template,
     element: (
-      <WithAppbar>
-        <Template />
-      </WithAppbar>
+      <ProtectedRoute>
+        <WithAppbar>
+          <Template />
+        </WithAppbar>
+      </ProtectedRoute>
     ),
   },
 ];
@@ -133,10 +150,11 @@ export const appBarVisiblePaths = ['/', '/login', '/templates'];
 export const router = createHashRouter(routerConfig);
 
 interface ProtectedRouteProps {
-  element: ReactNode;
-  user: User | null;
+  children: ReactNode;
+  // user: User | null;
 }
 export function ProtectedRoute(props: ProtectedRouteProps) {
-  const { element, user } = props;
-  return user ? element : <Navigate to="/login" replace={true} />;
+  const { children } = props;
+  const { user } = useUser();
+  return user ? children : <Navigate to="/login" replace={true} />;
 }

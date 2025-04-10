@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import { GOOGLE_API_KEY } from '@frontend/config';
+import { getConfig } from '@frontend/config';
 import { GeoPosition } from '@athena/common';
+
+const config = getConfig();
 
 const LocationContext = createContext<{
   loading: boolean;
@@ -34,7 +36,7 @@ export function LocationProvider(props: LocationProviderProps) {
   return (
     <LocationContext.Provider value={{ loading, position: currentLocation }}>
       <APIProvider
-        apiKey={GOOGLE_API_KEY}
+        apiKey={config.GOOGLE_API_KEY}
         onLoad={() => console.log('Maps API has loaded.')}
       >
         {props.children}

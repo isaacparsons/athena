@@ -40,7 +40,7 @@ export function createContext({ req, res }: CreateExpressContextOptions) {
     req,
     res,
     gcs: container.get<IGCSManager>(TYPES.IGCSManager),
-    db: container.get<Kysely<DB>>(TYPES.DBClient),
+    db: req.db, //container.get<Kysely<DB>>(TYPES.DBClient),
     dao: {
       user: container.get<IUserDAO>(TYPES.IUserDAO),
       newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),

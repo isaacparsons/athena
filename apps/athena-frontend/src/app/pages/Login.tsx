@@ -1,11 +1,16 @@
+import { getConfig } from '@frontend/config';
+import { useUser } from '@frontend/hooks';
 import {
   SignInPage,
   AppProvider,
   SupportedAuthProvider,
   AuthProvider,
 } from '@toolpad/core';
+import { useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+import { RoutePaths } from '../AppRoutes';
 
-const authUrl = 'http://localhost:3000/v1/auth/google';
+const config = getConfig();
 const googleId = 'google' as SupportedAuthProvider;
 const providers = [{ id: googleId, name: 'Google' }];
 const BRANDING = {
@@ -20,6 +25,13 @@ const BRANDING = {
 };
 
 export function Login() {
+  const { user, fetchUser } = useUser();
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  if (user) return <Navigate to={RoutePaths.home} replace={true} />;
+
   return (
     <AppProvider branding={BRANDING}>
       <SignInPage
@@ -28,7 +40,7 @@ export function Login() {
           formData?: unknown,
           callbackUrl?: string
         ) => {
-          window.location.href = authUrl;
+          window.location.href = config.GOOGLE_AUTH_URL;
         }}
         providers={providers}
       />

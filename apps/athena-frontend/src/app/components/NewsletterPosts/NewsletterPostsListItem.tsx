@@ -4,6 +4,7 @@ import {
   NewsletterPostDetailsContent,
   DetailsCardIcon,
   CloseIcon,
+  StyledCard,
 } from '@frontend/components';
 import { Checkbox } from '@mui/material';
 import { NewsletterPostForm, UpdateNewsletterPostForm } from '@frontend/types';
@@ -29,23 +30,30 @@ export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
     handleOpenPostDetails,
   } = props;
 
+  const handleClick = () => {
+    handleOpenPostDetails(value);
+  };
+
+  const handleRemovePost = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    handleRemove(value.tempPosition.id);
+    e.stopPropagation();
+  };
+
   return (
-    <>
+    <StyledCard onClick={handleClick}>
       <CustomCardHeader
         left={
           editing ? (
             <Checkbox
+              sx={{ zIndex: 999 }}
               edge="end"
               onChange={() => handleSelect(value.tempPosition.id)}
               checked={selected.has(value.tempPosition.id)}
+              onClick={(e) => e.stopPropagation()}
             />
           ) : null
         }
-        right={
-          editing ? (
-            <CloseIcon onClick={() => handleRemove(value.tempPosition.id)} />
-          ) : null
-        }
+        right={editing ? <CloseIcon onClick={handleRemovePost} /> : null}
       />
       {value && value.details && (
         <NewsletterPostDetailsContent
@@ -59,9 +67,7 @@ export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
           }}
         />
       )}
-      <CustomCardFooter
-        right={<DetailsCardIcon onClick={() => handleOpenPostDetails(value)} />}
-      />
-    </>
+      <CustomCardFooter right={<DetailsCardIcon />} />
+    </StyledCard>
   );
 }

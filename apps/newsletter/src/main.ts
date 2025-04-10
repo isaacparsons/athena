@@ -5,8 +5,12 @@ import cors from 'cors';
 import { getConfig, isProduction } from './util';
 import { createContext, appRouter, initPassport } from './trpc';
 import path from 'path';
+import { container } from './inversify.config';
+import { Kysely } from 'kysely';
+import { DB, TYPES } from './types';
 
 const config = getConfig();
+
 const corsConfig = isProduction()
   ? {
       credentials: true,
@@ -26,6 +30,10 @@ export let app = express();
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  req.db = container.get<Kysely<DB>>(TYPES.DBClient);
+  next();
+});
 app = initPassport(app);
 
 app.get('/health', (req, res) => {
@@ -33,7 +41,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use(
-  '/api/v1/trpc',
+  '/v1/api/trpc',
   createExpressMiddleware({
     router: appRouter,
     createContext: createContext,

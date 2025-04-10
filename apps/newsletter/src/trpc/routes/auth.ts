@@ -1,4 +1,4 @@
-import { Router, Express, Request, Response } from 'express';
+import { Express, Request, Response } from 'express';
 import passport from 'passport';
 import {
   Profile,
@@ -12,7 +12,7 @@ import { UserSession } from '@athena/common';
 
 const config = getConfig();
 
-const SCOPES = ['profile', 'email', 'https://www.googleapis.com/auth/drive'];
+const SCOPES = ['profile', 'email'];
 
 const GOOGLE_AUTH: StrategyOptionsWithRequest = {
   clientID: config.google.clientId,
@@ -23,30 +23,12 @@ const GOOGLE_AUTH: StrategyOptionsWithRequest = {
   passReqToCallback: true,
 };
 
-const router = Router();
-
-router.get(
-  '/google',
-  passport.authenticate('google', {
-    scope: SCOPES,
-    accessType: 'offline',
-    prompt: 'consent',
-  })
-);
-
-router.get(
-  '/google/redirect',
-  passport.authenticate('google', {
-    successRedirect: 'http://localhost:4200',
-    failureRedirect: '/',
-  })
-);
-
-router.get('/logout', (req: Request, res: Response) => {
-  req.logout(() => {
-    res.send('OK');
-  });
-});
+const BASE_URL = '/v1/auth';
+const GOOGLE_AUTH_URL = `${BASE_URL}/google`;
+const GOOGLE_AUTH_REDIRECT_URL = `${BASE_URL}/google/redirect`;
+const LOGOUT_URL = `${BASE_URL}/logout`;
+const GOOGLE_SUCCESS_REDIRECT_URL = `http://${config.client.host}:${config.client.port}`;
+const GOOGLE_FAILURE_REDIRECT_URL = '/';
 
 export function initPassport(app: Express) {
   app.use(
@@ -97,7 +79,7 @@ export function initPassport(app: Express) {
         }
 
         const credentials = await req.db
-          .selectFrom('federatedCredential')
+          .selectFrom('federated_credential')
           .where((eb) =>
             eb.and([eb('subjectId', '=', profile.id), eb('provider', '=', 'google')])
           )
@@ -106,7 +88,7 @@ export function initPassport(app: Express) {
 
         if (!credentials) {
           await req.db
-            .insertInto('federatedCredential')
+            .insertInto('federated_credential')
             .values({
               subjectId: profile.id,
               provider: 'google',
@@ -143,7 +125,29 @@ export function initPassport(app: Express) {
       done(null, user);
     }
   );
+  app.get(
+    GOOGLE_AUTH_URL,
+    passport.authenticate('google', {
+      scope: SCOPES,
+      accessType: 'offline',
+      prompt: 'consent',
+    })
+  );
+
+  app.get(
+    GOOGLE_AUTH_REDIRECT_URL,
+    passport.authenticate('google', {
+      successRedirect: GOOGLE_SUCCESS_REDIRECT_URL,
+      failureRedirect: GOOGLE_FAILURE_REDIRECT_URL,
+    })
+  );
+
+  app.get(LOGOUT_URL, (req: Request, res: Response) => {
+    req.logout(() => {
+      res.send('OK');
+    });
+  });
   return app;
 }
 
-export default router;
+// export default router;

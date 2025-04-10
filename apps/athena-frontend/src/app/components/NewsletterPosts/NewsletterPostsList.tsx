@@ -1,5 +1,3 @@
-import { StyledCard } from '@frontend/components';
-
 import { List, ListItem } from '@mui/material';
 import React from 'react';
 import { useFilterArray } from '@frontend/hooks';
@@ -22,7 +20,7 @@ export function NewsletterPostsList(props: NewsletterPostsListProps) {
     <List dense sx={{ width: '100%' }}>
       {postsAtCurrentDepth.map((value) => (
         <ListItem key={value.tempPosition.id.toString()} disablePadding>
-          <StyledCard>{render(value)}</StyledCard>
+          {render(value)}
         </ListItem>
       ))}
     </List>

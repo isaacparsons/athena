@@ -11,7 +11,6 @@ import { Slices } from '@frontend/store';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { asyncTrpcClient } from '../../trpc';
-import { CreateNewsletterPostForm } from '../types';
 
 export interface NewsletterPostsSlice {
   newsletterPosts: {

@@ -1,24 +1,15 @@
 import { useEffect } from 'react';
-
 import { CircularProgress } from '@mui/material';
-import { useStore } from '@frontend/store';
-import { useShallow } from 'zustand/react/shallow';
-import { useNavigate, redirect } from 'react-router-dom';
-import Cookies from 'js-cookie';
-
-const SESSION_COOKIE_NAME = 'newsletter_session';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '@frontend/hooks';
+import { RoutePaths } from '../AppRoutes';
 
 export function Home() {
-  const { user, loading } = useStore(
-    useShallow((state) => ({
-      user: state.user.data,
-      loading: state.user.loading,
-    }))
-  );
+  const { user, loading } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user !== null) navigate('/newsletters');
+    if (user !== null) navigate(RoutePaths.newsletters);
   }, [user, navigate]);
 
   if (loading) return <CircularProgress />;

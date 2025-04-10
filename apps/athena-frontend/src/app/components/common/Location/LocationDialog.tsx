@@ -16,7 +16,9 @@ import {
 } from '@mui/material';
 import { CreateLocation, GeoPosition } from '@athena/common';
 import { StyledDialog, useLocation } from '@frontend/components';
-import { GOOGLE_MAP_ID } from '@frontend/config';
+import { getConfig } from '@frontend/config';
+
+const config = getConfig();
 
 interface LocationDialogProps<T> {
   open: boolean;
@@ -132,7 +134,7 @@ function LocationMap(props: LocationMapProps) {
     <Map
       onClick={onClick}
       defaultZoom={13}
-      mapId={GOOGLE_MAP_ID}
+      mapId={config.GOOGLE_MAP_ID}
       defaultCenter={DEFAULT_POSITION}
     >
       <AdvancedMarker

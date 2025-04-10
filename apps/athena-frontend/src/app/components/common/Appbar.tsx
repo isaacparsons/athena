@@ -22,9 +22,9 @@ import {
   SettingsIcon,
   HomeIcon,
 } from '@frontend/icons';
-import { useStore } from '@frontend/store';
-import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
+import { RoutePaths } from '../../AppRoutes';
+import { useUser } from '@frontend/hooks';
 
 interface AppbarProps {
   title: string;
@@ -33,11 +33,7 @@ interface AppbarProps {
 export function Appbar(props: AppbarProps) {
   const { title } = props;
 
-  const { user } = useStore(
-    useShallow((state) => ({
-      user: state.user,
-    }))
-  );
+  const { user, logout } = useUser();
   const navigate = useNavigate();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -53,17 +49,35 @@ export function Appbar(props: AppbarProps) {
             <DrawerListItem
               text={'Home'}
               icon={<HomeIcon />}
-              onClick={() => navigate('/')}
+              onClick={() => navigate(RoutePaths.home)}
             />
             <DrawerListItem
               text={'Templates'}
               icon={<TemplateIcon />}
-              onClick={() => navigate('/templates')}
+              onClick={() => navigate(RoutePaths.templates)}
+            />
+            <DrawerListItem
+              text={'Account'}
+              icon={<AccountCircleIcon />}
+              onClick={() => navigate(RoutePaths.account)}
             />
           </List>
           <Divider />
           <List>
             <DrawerListItem text={'Settings'} icon={<SettingsIcon />} />
+            {user ? (
+              <ListItem key={'logout'} disablePadding>
+                <Button variant={'outlined'} color="error" onClick={logout}>
+                  Logout
+                </Button>
+              </ListItem>
+            ) : (
+              <ListItem key={'login'} disablePadding>
+                <Button color="inherit" onClick={() => navigate('/login')}>
+                  Login
+                </Button>
+              </ListItem>
+            )}
           </List>
         </Box>
       </Drawer>
@@ -81,13 +95,6 @@ export function Appbar(props: AppbarProps) {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           {title}
         </Typography>
-        {user ? (
-          <AccountCircleIcon />
-        ) : (
-          <Button color="inherit" onClick={() => navigate('/login')}>
-            Login
-          </Button>
-        )}
       </Toolbar>
     </AppBar>
   );
@@ -95,7 +102,7 @@ export function Appbar(props: AppbarProps) {
 
 interface DrawerListItemProps {
   text: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   onClick?: () => void;
 }
 
@@ -104,7 +111,7 @@ function DrawerListItem(props: DrawerListItemProps) {
   return (
     <ListItem key={text} disablePadding>
       <ListItemButton onClick={onClick}>
-        <ListItemIcon>{icon}</ListItemIcon>
+        {icon && <ListItemIcon>{icon}</ListItemIcon>}
         <ListItemText primary={text} />
       </ListItemButton>
     </ListItem>

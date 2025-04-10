@@ -35,10 +35,18 @@ export const createNewslettersSlice: StateCreator<
         state.newsletters.loading = false;
         state.newsletters.data[newsletter.id] = newsletter;
 
-        _.values(state.newsletterPosts.data)
-          .filter((p) => p.id === id)
-          .forEach((p) => _.unset(state.newsletters.data, [p.id]));
+        const existingPosts = _.values(state.newsletterPosts.data).filter(
+          (p) => p.newsletterId === id
+        );
 
+        const deletedPosts = _.differenceBy(
+          existingPosts,
+          newsletter.posts,
+          (p) => p.id
+        );
+        deletedPosts.forEach((p) => {
+          delete state.newsletterPosts.data[p.id];
+        });
         newsletter.posts.forEach((p) => {
           state.newsletterPosts.data[p.id] = p;
         });

@@ -25,9 +25,9 @@ export const supertestLink = (app: App, options: SupertestLinkOptions) => {
       const headers = { accept: 'application/json', ...options.headers };
       const url =
         method === 'get'
-          ? `${options.trpcPath}/${
-              requesterOptions.path
-            }?input=${encodeURIComponent(JSON.stringify(input))}`
+          ? `${options.trpcPath}/${requesterOptions.path}?input=${encodeURIComponent(
+              JSON.stringify(input)
+            )}`
           : `${options.trpcPath}/${requesterOptions.path}`;
 
       request(app)
@@ -64,7 +64,7 @@ export const supertestLink = (app: App, options: SupertestLinkOptions) => {
 export const trpcTestClient = createTRPCProxyClient({
   links: [
     supertestLink(app, {
-      trpcPath: '/api/v1/trpc',
+      trpcPath: '/v1/api/trpc',
       // headers: { Authorization: token },
     }),
   ],

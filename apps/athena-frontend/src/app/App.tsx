@@ -1,33 +1,40 @@
-import { useEffect } from 'react';
+import _ from 'lodash';
+import { useCallback, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material';
-import { NotificationsProvider } from '@frontend/hooks';
+import { NotificationsProvider, useUser } from '@frontend/hooks';
 import { theme } from '@frontend/theme';
 // import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // import { trpc, trpcClient } from '../trpc';
 import { router } from './AppRoutes';
-import { RouterProvider } from 'react-router-dom';
-import { useShallow } from 'zustand/react/shallow';
-import { useStore } from '@frontend/store';
+import { RouterProvider, useNavigate } from 'react-router-dom';
 import { LocationProvider } from './components';
+import Cookies from 'js-cookie';
+import { getConfig } from '@frontend/config';
+
+const config = getConfig();
 
 export const App = () => {
+  // const navigate = useNavigate();
   // const queryClient = new QueryClient();
 
-  const { fetchUser } = useStore(
-    useShallow((state) => ({ fetchUser: state.user.fetch }))
-  );
+  // const { fetchUser } = useUser();
 
   // const checkSession = useCallback(async () => {
-  //   const sessionId = Cookies.get(SESSION_COOKIE_NAME);
+  //   const cookieName = config.SESSION_COOKIE_NAME;
+  //   const sessionId = _.isUndefined(cookieName)
+  //     ? undefined
+  //     : Cookies.get(cookieName);
+  //   console.log(sessionId);
   //   if (!sessionId) {
   //     navigate('/login');
+  //   } else {
+  //     fetchUser();
   //   }
-  // }, [api, navigate, user]);
+  // }, [navigate, fetchUser]);
 
-  useEffect(() => {
-    // checkSession();
-    fetchUser();
-  }, [fetchUser]);
+  // useEffect(() => {
+  //   checkSession();
+  // }, [checkSession]);
 
   return (
     <ThemeProvider theme={theme}>

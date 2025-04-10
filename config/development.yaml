@@ -3,7 +3,7 @@ app:
   port: 3000
   sessionSecret: '123456789'
   sessionCookieName: newsletter_session
-  adminSecret: '123456'
+  adminSecret: '789'
 
 db:
   host: localhost
