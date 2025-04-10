@@ -1,4 +1,3 @@
-export * from './types';
 export * from './country';
 export * from './federated-credential';
 export * from './location';
@@ -9,3 +8,4 @@ export * from './user';
 export * from './template';
 export * from './user-newsletter';
 export * from './client';
+export * from './helpers';

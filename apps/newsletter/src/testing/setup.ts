@@ -5,10 +5,10 @@ import { parse } from 'yaml';
 import fs from 'fs/promises';
 import path from 'path';
 import { faker } from '@faker-js/faker';
-import { Database, DB, DBConnection, Pool, PostgresDialect } from '@athena/db';
+import { DBConnection } from '@backend/types';
 import { Container } from 'inversify';
-import { TYPES } from '../types/types';
 import { container } from '../inversify.config';
+import { TYPES } from '../types/types';
 
 const generateTypeMap = {
   email: faker.internet.email,

@@ -1,9 +1,8 @@
 import _ from 'lodash';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { DBConnection } from '@athena/db';
 import { CreateLocation, UpdateLocation } from '@athena/common';
-import { TYPES } from '../types/types';
+import { TYPES, DBConnection } from '@backend/types';
 
 export interface ILocationDAO {
   create(input: CreateLocation): Promise<number>;

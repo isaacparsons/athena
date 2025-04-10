@@ -24,12 +24,13 @@
       "@frontend/types": ["apps/athena-frontend/src/app/types"],
       "@frontend/util": ["apps/athena-frontend/src/util"],
       "@frontend/components": ["apps/athena-frontend/src/app/components"],
-      "@athena/api": ["types/athena.ts"],
-      "@athena/trpc": ["types/server/apps/newsletter/src/trpc/index.d.ts"],
+      "@backend/api": ["types/athena.ts"],
+      "@backend/trpc": ["types/server/apps/newsletter/src/trpc/index.d.ts"],
       "@athena/common": ["libs/athena-common/src/index.ts"],
-      "@athena/db": ["apps/newsletter/src/db/index.ts"],
-      "@athena/services": ["apps/newsletter/src/services/index.ts"],
-      "@athena/dao": ["apps/newsletter/src/dao/index.ts"]
+      "@backend/db": ["apps/newsletter/src/db/index.ts"],
+      "@backend/services": ["apps/newsletter/src/services/index.ts"],
+      "@backend/dao": ["apps/newsletter/src/dao/index.ts"],
+      "@backend/types": ["apps/newsletter/src/types/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

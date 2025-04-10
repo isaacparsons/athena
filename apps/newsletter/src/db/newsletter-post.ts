@@ -1,10 +1,5 @@
-import { CreateTableBuilder, Insertable, Selectable, sql, Updateable } from 'kysely';
-import { DBConnection, TABLE_NAMES, EntityTable } from '@athena/db';
-import { NewsletterPost } from '../types/db';
-
-export type SelectNewsletterPost = Selectable<NewsletterPost>;
-export type InsertNewsletterPost = Insertable<NewsletterPost>;
-export type UpdateNewsletterPost = Updateable<NewsletterPost>;
+import { CreateTableBuilder } from 'kysely';
+import { DBConnection, TABLE_NAMES, EntityTable } from '@backend/types';
 
 export class NewsletterPostTableClient extends EntityTable<
   'newsletter_post',

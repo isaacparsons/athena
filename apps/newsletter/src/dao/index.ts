@@ -5,3 +5,4 @@ export * from './newsletter-post-details';
 export * from './template';
 export * from './template-node';
 export * from './user';
+export * from './entity';

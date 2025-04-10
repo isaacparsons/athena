@@ -1,15 +1,6 @@
 import { inject, injectable, injectFromBase } from 'inversify';
 import 'reflect-metadata';
-import _ from 'lodash';
-import { INewsletterPostDAO } from '@athena/dao';
-import {
-  DBConnection,
-  Database,
-  SelectNewsletter,
-  SelectUser,
-  Transaction,
-  jsonArrayFrom,
-} from '@athena/db';
+import { INewsletterPostDAO } from '@backend/dao';
 import {
   Newsletter,
   CreateNewsletter,
@@ -20,9 +11,17 @@ import {
   ReadNewsletter,
   ReadNewsletterPost,
 } from '@athena/common';
-import { creator, modifier, owner } from '../db/helpers';
-import { IGCSManager } from '@athena/services';
-import { TYPES } from '../types/types';
+import { creator, modifier, owner } from '@backend/db';
+import { IGCSManager } from '@backend/services';
+import {
+  TYPES,
+  DBConnection,
+  DB,
+  SelectNewsletter,
+  SelectUser,
+  Transaction,
+  jsonArrayFrom,
+} from '@backend/types';
 import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
 import { EntityDAO, IEntityDAO, EntityMetaRow } from './entity';
 import { Expression, expressionBuilder } from 'kysely';
@@ -101,7 +100,7 @@ export class NewsletterDAO
   }
 
   private members(newsletterId: Expression<number>) {
-    const eb = expressionBuilder<Database, 'user_newsletter' | 'user'>();
+    const eb = expressionBuilder<DB, 'user_newsletter' | 'user'>();
     return jsonArrayFrom(
       eb
         .selectFrom('user_newsletter as un')

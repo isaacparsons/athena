@@ -1,4 +1,3 @@
-import { Database, DB } from '@athena/db';
 import {
   UserDAO,
   NewsletterDAO,
@@ -10,13 +9,14 @@ import {
   INewsletterPostDAO,
   TemplateDAO,
   ITemplateDAO,
-} from '@athena/dao';
-import { GCSManager, IGCSManager } from '@athena/services';
+} from '@backend/dao';
+import { GCSManager, IGCSManager } from '@backend/services';
 import { Request, Response } from 'express';
 import { UserSession } from '@athena/common';
 import { container } from '../inversify.config';
-import { TYPES } from '../types/types';
+import { TYPES, DB } from '@backend/types';
 import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
+import { Kysely } from 'kysely';
 
 export type Context = {
   req: Request & {
@@ -25,7 +25,7 @@ export type Context = {
   };
   res: Response;
   gcs: GCSManager;
-  db: DB<Database>;
+  db: Kysely<DB>;
   dao: {
     user: UserDAO;
     newsletter: NewsletterDAO;
@@ -40,7 +40,7 @@ export function createContext({ req, res }: CreateExpressContextOptions) {
     req,
     res,
     gcs: container.get<IGCSManager>(TYPES.IGCSManager),
-    db: container.get<DB<Database>>(TYPES.DBClient),
+    db: container.get<Kysely<DB>>(TYPES.DBClient),
     dao: {
       user: container.get<IUserDAO>(TYPES.IUserDAO),
       newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),

@@ -1,15 +1,6 @@
 import { inject, injectable, injectFromBase } from 'inversify';
 import 'reflect-metadata';
 import {
-  Database,
-  DBConnection,
-  Expression,
-  jsonArrayFrom,
-  SelectTemplate,
-  SelectUser,
-  Transaction,
-} from '@athena/db';
-import {
   NewsletterRole,
   TemplateNode,
   Template,
@@ -18,12 +9,20 @@ import {
   UpdateTemplate,
   ReadTemplate,
 } from '@athena/common';
-import { TYPES } from '../types/types';
+import {
+  TYPES,
+  DBConnection,
+  Transaction,
+  SelectTemplate,
+  SelectUser,
+  DB,
+  jsonArrayFrom,
+} from '@backend/types';
 import { mapMeta, mapUsers } from './mapping';
 import { EntityDAO, IEntityDAO, EntityMetaRow } from './entity';
-import { expressionBuilder } from 'kysely';
-import { TemplateNodeDAO } from '@athena/dao';
-import { creator, modifier } from '../db/helpers';
+import { expressionBuilder, Expression } from 'kysely';
+import { TemplateNodeDAO } from '@backend/dao';
+import { creator, modifier } from '@backend/db';
 
 type TemplateRow = EntityMetaRow &
   Omit<SelectTemplate, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
@@ -64,7 +63,7 @@ export class TemplateDAO
   }
 
   private members(templateId: Expression<number>) {
-    const eb = expressionBuilder<Database, 'user_template' | 'user'>();
+    const eb = expressionBuilder<DB, 'user_template' | 'user'>();
     return jsonArrayFrom(
       eb
         .selectFrom('user_template as ut')

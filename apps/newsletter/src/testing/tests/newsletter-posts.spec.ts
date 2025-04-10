@@ -6,7 +6,7 @@ import {
   NewsletterPostTypeName,
   TempNodePosition,
 } from '@athena/common';
-import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
+import { DBManagerClient, SelectNewsletter, SelectUser } from '@backend/db';
 import {
   createNewsletterPosts,
   deleteNewsletterPosts,

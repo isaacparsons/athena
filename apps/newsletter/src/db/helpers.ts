@@ -3,7 +3,7 @@ import {
   EntityTableName,
   Expression,
   jsonObjectFrom,
-} from '@athena/db';
+} from '@backend/types';
 
 export const newsletterPostDetailsMedia = (
   db: DBConnection,

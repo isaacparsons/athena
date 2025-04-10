@@ -1,24 +1,5 @@
-import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, TABLE_NAMES } from '@athena/db';
-import { NewsletterPostMedia, NewsletterPostText } from '../types/db';
-
-export interface NewsletterPostMediaTable {
-  name: TABLE_NAMES.NEWSLETTER_POST_MEDIA;
-  columns: NewsletterPostMedia;
-}
-
-export type SelectNewsletterPostMedia = Selectable<NewsletterPostMedia>;
-export type InsertNewsletterPostMedia = Insertable<NewsletterPostMedia>;
-export type UpdateNewsletterPostMedia = Updateable<NewsletterPostMedia>;
-
-export interface NewsletterPostTextTable {
-  name: TABLE_NAMES.NEWSLETTER_POST_TEXT;
-  columns: NewsletterPostText;
-}
-
-export type SelectNewsletterPostText = Selectable<NewsletterPostText>;
-export type InsertNewsletterPostText = Insertable<NewsletterPostText>;
-export type UpdateNewsletterPostText = Updateable<NewsletterPostText>;
+import { CreateTableBuilder } from 'kysely';
+import { DBConnection, Table, TABLE_NAMES } from '@backend/types';
 
 export class NewsletterPostMediaTableClient extends Table<
   'newsletter_post_media',

@@ -5,7 +5,7 @@
 // } from '@trpc/react-query';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import type { AppRouter } from '@athena/trpc';
+import type { AppRouter } from '@backend/trpc';
 const apiUrl = `http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/api/v1/trpc`;
 const adminSecret = `${process.env.REACT_APP_ADMIN_SECRET}`;
 

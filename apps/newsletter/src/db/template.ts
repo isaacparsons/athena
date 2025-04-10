@@ -1,10 +1,5 @@
-import { CreateTableBuilder, Insertable, Selectable, Updateable, sql } from 'kysely';
-import { DBConnection, EntityTable } from '@athena/db';
-import { Template, TemplateNode } from '../types/db';
-
-export type SelectTemplate = Selectable<Template>;
-export type InsertTemplate = Insertable<Template>;
-export type UpdateTemplate = Updateable<Template>;
+import { CreateTableBuilder, sql } from 'kysely';
+import { DBConnection, EntityTable } from '@backend/types';
 
 type TemplateTableColums = 'name' | 'config' | 'type';
 
@@ -22,10 +17,6 @@ export class TemplateTableClient extends EntityTable<
       .addColumn('type', sql`template_type`, (cb) => cb.notNull())
       .addColumn('config', 'json');
 }
-
-export type SelectTemplateNode = Selectable<TemplateNode>;
-export type InsertTemplateNode = Insertable<TemplateNode>;
-export type UpdateTemplateNode = Updateable<TemplateNode>;
 
 type TemplateNodeTableColums =
   | 'parentId'

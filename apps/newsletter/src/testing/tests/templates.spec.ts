@@ -1,7 +1,7 @@
 import { createFixture } from '../setup';
 import _ from 'lodash';
 import { CreateTemplate, TemplateType } from '@athena/common';
-import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
+import { DBManagerClient, SelectNewsletter, SelectUser } from '@backend/db';
 import {
   createTemplate,
   deleteTemplate,

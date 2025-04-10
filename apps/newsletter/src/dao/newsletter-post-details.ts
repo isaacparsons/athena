@@ -1,6 +1,5 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { DBConnection } from '@athena/db';
 import {
   NewsletterPostTypeName,
   NewsletterPostDetails,
@@ -9,7 +8,7 @@ import {
   CreateNewsletterPost,
   UpdatePostDetails,
 } from '@athena/common';
-import { TYPES } from '../types/types';
+import { TYPES, DBConnection } from '@backend/types';
 
 export interface INewsletterPostDetailsDAO {
   read(newsletterItemId: number): Promise<NewsletterPostDetails>;

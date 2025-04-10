@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { container } from '../inversify.config';
-import { INewsletterDAO, INewsletterPostDAO } from '@athena/dao';
+import { INewsletterDAO, INewsletterPostDAO } from '@backend/dao';
 import {
   CountryTableClient,
   UserNewsletterTableClient,
@@ -11,14 +11,10 @@ import {
   NewsletterPostTableClient,
   NewsletterPostMediaTableClient,
   NewsletterPostTextTableClient,
-  ITable,
-  TABLE_NAMES,
-  DBConnection,
-  sql,
   TemplateTableClient,
   TemplateNodeTableClient,
-} from '@athena/db';
-import { TYPES } from '../types/types';
+} from '@backend/db';
+import { TYPES, ITable, TABLE_NAMES, DBConnection, sql } from '@backend/types';
 import { UserTemplateTableClient } from './user-template';
 // import { nanoid } from 'nanoid';
 

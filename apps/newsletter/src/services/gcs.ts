@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Bucket, Storage } from '@google-cloud/storage';
-import { GCSConfig, TYPES } from '../types/types';
+import { TYPES, GCSConfig } from '@backend/types';
 
 const storage = new Storage({
   keyFilename:

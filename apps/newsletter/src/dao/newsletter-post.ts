@@ -2,25 +2,22 @@ import _ from 'lodash';
 import 'reflect-metadata';
 import {
   DBConnection,
+  Transaction,
   SelectLocation,
   SelectNewsletterPostMedia,
   SelectNewsletterPostText,
-  Transaction,
-} from '@athena/db';
-
+} from '@backend/types';
 import {
   ILocationDAO,
   INewsletterPostDetailsDAO,
   LocationDAO,
   NewsletterPostDetailsDAO,
-} from '@athena/dao';
+} from '@backend/dao';
 import {
   NewsletterPost,
   DeleteMany,
   CreateNewsletterPost,
   UpdateManyNewsletterPosts,
-  NodePosition,
-  TempNodePosition,
   CreateManyNewsletterPosts,
   getChildPosts,
   ReadNewsletterPost,
@@ -34,16 +31,16 @@ import {
   newsletterPostDetailsMedia,
   newsletterPostDetailsText,
   selectEntityColumns,
-} from '../db/helpers';
+} from '@backend/db';
 import { inject, injectable, injectFromBase } from 'inversify';
-import { TYPES } from '../types/types';
+import { TYPES } from '@backend/types';
 import {
   mapLocation,
   mapMeta,
   mapNewsletterPostDetails,
   mapPosition,
 } from './mapping';
-import { IGCSManager } from '@athena/services';
+import { IGCSManager } from '@backend/services';
 import { EntityDAO, EntityMetaRow } from './entity';
 import { Selectable } from 'kysely';
 import * as DB from '../types/db';

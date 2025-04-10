@@ -1,12 +1,5 @@
-import { CreateTableBuilder, Insertable, Selectable } from 'kysely';
-import {
-  DBConnection,
-  Table,
-} from '@athena/db';
-import { Country } from '../types/db';
-
-export type SelectCountry = Selectable<Country>;
-export type InsertCountry = Insertable<Country>;
+import { CreateTableBuilder } from 'kysely';
+import { DBConnection, Table } from '@backend/types';
 
 export class CountryTableClient extends Table<
   'location',

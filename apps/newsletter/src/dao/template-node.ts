@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { DBConnection, SelectTemplateNode } from '@athena/db';
 import { EntityDAO, EntityMetaRow, IEntityDAO } from './entity';
 import {
   CreateManyTemplateNodes,
@@ -10,7 +9,7 @@ import {
   UpdateTemplateNode,
 } from '@athena/common';
 import { inject, injectable, injectFromBase } from 'inversify';
-import { TYPES } from '../types/types';
+import { TYPES, DBConnection, SelectTemplateNode } from '@backend/types';
 import { mapMeta } from './mapping';
 
 import { pipe } from 'fp-ts/function';

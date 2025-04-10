@@ -7,7 +7,7 @@ import {
   inviteNewsletterUser,
   updateNewsletter,
 } from '../test-util';
-import { DBManagerClient, SelectNewsletter, SelectUser } from '@athena/db';
+import { DBManagerClient, SelectNewsletter, SelectUser } from '@backend/db';
 import { NewsletterRole, CreateNewsletter } from '@athena/common';
 const dbClient = new DBManagerClient();
 

@@ -1,15 +1,5 @@
-import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
-import { UserNewsletter } from '../types/db';
-import { DBConnection, Table, TABLE_NAMES } from './types';
-
-export interface UserNewsletterTable {
-  name: TABLE_NAMES.USER_NEWSLETTER;
-  columns: UserNewsletter;
-}
-
-export type SelectUserNewsletter = Selectable<UserNewsletter>;
-export type InsertUserNewsletter = Insertable<UserNewsletter>;
-export type UpdateUserNewsletter = Updateable<UserNewsletter>;
+import { CreateTableBuilder } from 'kysely';
+import { DBConnection, Table } from '@backend/types';
 
 export class UserNewsletterTableClient extends Table<
   'user_newsletter',

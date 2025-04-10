@@ -39,7 +39,7 @@ export interface FederatedCredential {
 }
 
 export interface Location {
-  countryCode: string | null;
+  country: string | null;
   id: Generated<number>;
   latitude: number | null;
   longitude: number | null;
@@ -71,13 +71,6 @@ export interface NewsletterPost {
   parentId: number | null;
   prevId: number | null;
   title: string;
-}
-
-export interface NewsletterPostContainer {
-  id: Generated<number>;
-  name: string;
-  newsletterPostId: number;
-  type: string;
 }
 
 export interface NewsletterPostMedia {
@@ -148,7 +141,6 @@ export interface DB {
   location: Location;
   newsletter: Newsletter;
   newsletter_post: NewsletterPost;
-  newsletter_post_container: NewsletterPostContainer;
   newsletter_post_media: NewsletterPostMedia;
   newsletter_post_text: NewsletterPostText;
   template: Template;

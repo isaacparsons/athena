@@ -19,15 +19,16 @@ import {
   TemplateNodeDAO,
 } from './dao';
 import { GCSManager, IGCSManager } from './services';
-import { Database, DB, Pool, PostgresDialect } from './db';
+import { DB, Pool, PostgresDialect } from '@backend/types';
 import { getConfig } from './util';
+import { Kysely } from 'kysely';
 
 const config = getConfig();
 
 const container = new Container();
 container.bind<GCSConfig>(TYPES.gcsConfig).toConstantValue(config.gcs);
 container.bind(TYPES.DBClient).toConstantValue(
-  new DB<Database>({
+  new Kysely<DB>({
     dialect: new PostgresDialect({
       pool: new Pool({
         database: config.db.name,

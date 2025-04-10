@@ -70,9 +70,14 @@
     },
     "generate-db": {
       "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {},
+        "production": {}
+      },
       "options": {
         "commands": [
-          "kysely-codegen --env-file apps/newsletter/.env.local && cp ./node_modules/kysely-codegen/dist/db.d.ts ./apps/newsletter/src/types/db.d.ts"
+          "kysely-codegen --env-file apps/newsletter/.env.development.local --out-file ./apps/newsletter/src/types/db.ts"
         ]
       }
     },

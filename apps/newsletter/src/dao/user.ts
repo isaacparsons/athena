@@ -1,11 +1,9 @@
-import { Newsletter, ReadUser, Template } from '@athena/common';
 import 'reflect-metadata';
-import { DBConnection } from '@athena/db';
+import { Newsletter, ReadUser, Template } from '@athena/common';
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../types/types';
+import { TYPES, DBConnection } from '@backend/types';
 import { mapUser } from './mapping';
-import { INewsletterDAO } from './newsletter';
-import { ITemplateDAO } from './template';
+import { INewsletterDAO, ITemplateDAO } from '@backend/dao';
 
 export interface IUserDAO {
   read(id: number): Promise<ReadUser>;

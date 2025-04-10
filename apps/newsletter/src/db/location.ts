@@ -1,15 +1,5 @@
-import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
-import { DBConnection, Table, TABLE_NAMES } from '@athena/db';
-import { Location } from '../types/db';
-
-export interface LocationTable {
-  name: TABLE_NAMES.LOCATION;
-  columns: Location;
-}
-
-export type SelectLocation = Selectable<Location>;
-export type InsertLocation = Insertable<Location>;
-export type UpdateLocation = Updateable<Location>;
+import { CreateTableBuilder } from 'kysely';
+import { DBConnection, Table } from '@backend/types';
 
 export class LocationTableClient extends Table<
   'location',

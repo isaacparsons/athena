@@ -5,7 +5,7 @@ import {
   SelectNewsletterPostMedia,
   SelectNewsletterPostText,
   SelectUser,
-} from '@athena/db';
+} from '@backend/types';
 
 export const mapUser = (user: SelectUser) => ({
   ...user,
@@ -44,7 +44,7 @@ export const mapLocation = <T extends { location: SelectLocation | null }>(
     ? {
         id: location.id,
         name: _.isNull(location.name) ? null : location.name,
-        country: _.isNull(location.countryCode) ? null : location.countryCode,
+        country: _.isNull(location.country) ? null : location.country,
         geoPosition:
           location.latitude && location.longitude
             ? {

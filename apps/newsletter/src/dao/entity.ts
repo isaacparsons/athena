@@ -1,13 +1,12 @@
-import _ from 'lodash';
 import { Entity } from '@athena/common';
 import {
-  Database,
+  DB,
   DBConnection,
   EntityTableName,
   jsonObjectFrom,
   SelectUser,
   Transaction,
-} from '@athena/db';
+} from '@backend/types';
 import { injectable } from 'inversify';
 import { expressionBuilder, UpdateObject } from 'kysely';
 import {
@@ -40,7 +39,7 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
   abstract tableName: T;
 
   selectEntity(db: DBConnection) {
-    const eb = expressionBuilder<Database, EntityTableName>();
+    const eb = expressionBuilder<DB, EntityTableName>();
     return db.selectFrom(this.tableName).select([
       `id`,
       `created`,
@@ -65,7 +64,7 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
     db: DBConnection,
     userId: number,
     values: Omit<
-      InsertObject<Database, T>,
+      InsertObject<DB, T>,
       'created' | 'creatorId' | 'modifier' | 'modified'
     >[]
   ) {
@@ -75,7 +74,7 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
         ...v,
         created,
         creatorId: userId,
-      })) as InsertExpression<Database, T>
+      })) as InsertExpression<DB, T>
     );
   }
 
@@ -83,10 +82,7 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
     db: DBConnection,
     userId: number,
     input: { id: number } & Partial<
-      Omit<
-        UpdateObject<Database, T>,
-        'created' | 'creatorId' | 'modifier' | 'modified'
-      >
+      Omit<UpdateObject<DB, T>, 'created' | 'creatorId' | 'modifier' | 'modified'>
     >
   ) {
     const { id, ...values } = input;
@@ -96,7 +92,7 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
         ...values,
         modified: new Date().toISOString(),
         modifierId: userId,
-      } as UpdateObjectExpression<Database, ExtractTableAlias<Database, T>, ExtractTableAlias<Database, T>>)
+      } as UpdateObjectExpression<DB, ExtractTableAlias<DB, T>, ExtractTableAlias<DB, T>>)
       .where('id', '=', id as any);
   }
 

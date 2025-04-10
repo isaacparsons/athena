@@ -1,10 +1,5 @@
-import { CreateTableBuilder, Insertable, Selectable, Updateable } from 'kysely';
-import { UserTemplate } from '../types/db';
-import { DBConnection, Table } from './types';
-
-export type SelectUserTemplate = Selectable<UserTemplate>;
-export type InsertUserTemplate = Insertable<UserTemplate>;
-export type UpdateUserTemplate = Updateable<UserTemplate>;
+import { CreateTableBuilder } from 'kysely';
+import { DBConnection, Table } from '@backend/types';
 
 export class UserTemplateTableClient extends Table<
   'user_template',
