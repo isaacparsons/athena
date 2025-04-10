@@ -1,5 +1,4 @@
 export * from './common';
-// export * from './NewsletterPosts';
-export * from './common/Location';
+export * from './NewsletterPosts';
 export * from './Newsletter';
-// export * from './NewsletterPostTemplate';
+export * from './Templates';

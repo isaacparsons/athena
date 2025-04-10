@@ -11,8 +11,8 @@
 // } from '@mui/material';
 // import { mapToArray } from '@athena/common';
 // import { convertFromTemplateItems } from '../../../util';
-// import { useAddItemsStore, useStore } from '@athena/store';
-// import { CustomCard, CustomList, CustomListItem } from '@athena/components';
+// import { useAddItemsStore, useStore } from '@frontend/store';
+// import { CustomCard, CustomList, CustomListItem } from '@frontend/components';
 
 // interface AddItemFromTemplateDialogProps {
 //   parentId: string | null;

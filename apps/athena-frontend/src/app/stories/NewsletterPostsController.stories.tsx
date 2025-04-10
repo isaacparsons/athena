@@ -3,8 +3,8 @@ import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 import { ThemeProvider } from '@mui/material';
-import { theme } from '@athena/theme';
-import { NewsletterPostsController } from '@athena/components';
+import { theme } from '@frontend/theme';
+import { NewsletterPostsController } from '@frontend/components';
 import { createMockPost, mediaPost, textPost } from '../../util/test-data';
 
 const meta: Meta<typeof NewsletterPostsController> = {

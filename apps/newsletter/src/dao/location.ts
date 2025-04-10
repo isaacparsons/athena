@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { DBConnection } from '@athena/db';
@@ -29,11 +30,7 @@ export class LocationDAO implements ILocationDAO {
   async update(input: UpdateLocation): Promise<number> {
     const result = await this.db
       .updateTable('location')
-      .set({
-        ...(input.name ? { name: input.name } : {}),
-        ...(input.country ? { countryCode: input.country } : {}),
-        ...(input.geoPosition ? { position: input.geoPosition } : {}),
-      })
+      .set({ ..._.omit(input, 'id') })
       .returning('id')
       .where('id', '=', input.id)
       .executeTakeFirstOrThrow();

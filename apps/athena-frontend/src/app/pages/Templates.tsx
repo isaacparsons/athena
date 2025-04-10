@@ -1,9 +1,11 @@
-import { createCustomFab, CustomContainer } from '@athena/components';
-import { AddIcon } from '@athena/icons';
-import { useStore } from '@athena/store';
-import { useState } from 'react';
+import {
+  createCustomFab,
+  CustomContainer,
+  UserTemplates,
+} from '@frontend/components';
+import { AddIcon } from '@frontend/icons';
+import { useStore } from '@frontend/store';
 import { useShallow } from 'zustand/react/shallow';
-import { UserTemplates } from './UserTemplates';
 import { CircularProgress } from '@mui/material';
 
 const AddFab = createCustomFab(AddIcon);

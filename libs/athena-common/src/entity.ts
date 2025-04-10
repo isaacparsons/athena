@@ -18,14 +18,14 @@ export const createNewsletterPostSchema = newsletterPostSchema.create
   .partial({ position: true })
   .extend({
     details: createPostDetailsSchema,
-    location: locationSchema.create.optional(),
+    location: locationSchema.create.nullable().optional(),
   });
 
 export const updateNewsletterPostSchema = newsletterPostSchema.update
   .omit({ details: true })
   .extend({
     details: updateNewsletterPostDetailsSchema.optional(),
-    location: locationSchema.update.or(locationSchema.create).optional(),
+    location: locationSchema.update.or(locationSchema.create).nullable().optional(),
   });
 
 const createTempNewsletterPostSchema = createNewsletterPostSchema

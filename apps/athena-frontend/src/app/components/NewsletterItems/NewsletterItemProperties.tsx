@@ -1,6 +1,6 @@
 // import { Stack, Typography } from '@mui/material';
-// import { CustomLocationInput, CustomDate } from '@athena/components';
-// import { StoreNewsletterPost, useStore } from '@athena/store';
+// import { CustomLocationInput, CustomDate } from '@frontend/components';
+// import { StoreNewsletterPost, useStore } from '@frontend/store';
 // import { useShallow } from 'zustand/react/shallow';
 // import { CreateLocation } from '@athena/common';
 

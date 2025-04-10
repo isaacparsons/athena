@@ -1,5 +1,5 @@
 import { DateRange, formatDate } from '@athena/common';
-import { CalendarTodayIcon } from '@athena/icons';
+import { CalendarTodayIcon } from '@frontend/icons';
 import { Stack, Typography } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';

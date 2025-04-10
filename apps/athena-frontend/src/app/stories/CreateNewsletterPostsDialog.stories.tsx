@@ -3,10 +3,10 @@ import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 import { ThemeProvider } from '@mui/material';
-import { theme } from '@athena/theme';
+import { theme } from '@frontend/theme';
 import { CreateNewsletterDialog } from '../pages/Newsletters';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { CreateNewsletterPostsDialog } from '@athena/components';
+import { CreateNewsletterPostsDialog } from '@frontend/components';
 import { NewsletterPostTypeName } from '@athena/common';
 
 const meta: Meta<typeof CreateNewsletterPostsDialog> = {

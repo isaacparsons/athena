@@ -1,10 +1,9 @@
 import { CreateTemplate, TemplateType } from '@athena/common';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNewsletterPostsForm, useSelectItems } from '@athena/hooks';
+import { useNewsletterPostsForm, useSelectItems } from '@frontend/hooks';
 import {
   CustomCardHeader,
-  createStyledIcon,
   StyledDialog,
   StyledFab,
   AddNewsletterPostButton,
@@ -12,14 +11,14 @@ import {
   NewsletterPostsListItem,
   EditingHeader,
   StyledTextField,
-} from '@athena/components';
-import { ArrowBackIcon, CheckIcon, CloseIcon, DeleteIcon } from '@athena/icons';
+  DeleteIcon,
+  CloseIcon,
+  BackButtonIcon,
+} from '@frontend/components';
+import { CheckIcon } from '@frontend/icons';
 
-import { toTemplateNodes } from '../../../util';
-import { NewsletterPostForm } from '../../types';
-
-const Delete = createStyledIcon(DeleteIcon);
-const Close = createStyledIcon(CloseIcon);
+import { toTemplateNodes } from '@frontend/util';
+import { NewsletterPostForm } from '@frontend/types';
 
 interface CreateTemplateDialogProps {
   newsletterId: number;
@@ -27,8 +26,6 @@ interface CreateTemplateDialogProps {
   onSave: (input: CreateTemplate) => void;
   onClose: () => void;
 }
-
-const BackButton = createStyledIcon(ArrowBackIcon);
 
 type FormValues = {
   name: string;
@@ -89,8 +86,8 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
     <StyledDialog fullScreen open={posts.length > 0}>
       <>
         <CustomCardHeader
-          left={parent === null ? null : <BackButton onClick={handleBack} />}
-          right={<Close onClick={onClose} />}
+          left={parent === null ? null : <BackButtonIcon onClick={handleBack} />}
+          right={<CloseIcon onClick={onClose} />}
         />
         <StyledTextField
           required
@@ -106,7 +103,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
           allSelected={allSelected}
           handleSelectAll={handleSelectAll}
         >
-          <Delete sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
+          <DeleteIcon sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
         </EditingHeader>
         <NewsletterPostsList
           posts={fields}

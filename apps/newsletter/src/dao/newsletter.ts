@@ -14,7 +14,6 @@ import {
   Newsletter,
   CreateNewsletter,
   UpdateNewsletter,
-  NewsletterPost,
   InviteNewsletterUser,
   NewsletterRole,
   NewsletterPermissions,

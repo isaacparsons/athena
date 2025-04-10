@@ -7,7 +7,7 @@ import {
   ReadNewsletterPost,
   UpdateManyNewsletterPosts,
 } from '@athena/common';
-import { Slices } from '@athena/store';
+import { Slices } from '@frontend/store';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { asyncTrpcClient } from '../../trpc';

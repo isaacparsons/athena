@@ -3,10 +3,10 @@ import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 import { ThemeProvider } from '@mui/material';
-import { theme } from '@athena/theme';
+import { theme } from '@frontend/theme';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { UserNewsletters } from '../pages/Newsletters/UserNewsletters';
-import { NewsletterPostDetails } from '@athena/components';
+import { UserNewsletters } from '../components/Newsletter/UserNewsletters';
+import { NewsletterPostDetails } from '@frontend/components';
 import { NewsletterPostTypeName } from '@athena/common';
 
 const NewsletterPostTextDetails = NewsletterPostDetails.Text;

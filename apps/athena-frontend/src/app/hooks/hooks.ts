@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { NewsletterPost, ReadNewsletter } from '@athena/common';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useStore } from '@athena/store';
+import { useStore } from '@frontend/store';
 import { useShallow } from 'zustand/react/shallow';
 
 export const usePosts = (

@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
 import { Button, ButtonGroup } from '@mui/material';
-import { MediaIcon, TemplateIcon, TextIcon } from '@athena/icons';
+import { MediaIcon, TemplateIcon, TextIcon } from '@frontend/icons';
 import { mimeTypeToMediaFormat, NewsletterPostTypeName } from '@athena/common';
-import { useTemplates } from '@athena/hooks';
-import { CreatePostsFromTemplateDialog, FileSelection } from '@athena/components';
-import { CreateNewsletterPostForm } from '../../../types';
+import { useTemplates } from '@frontend/hooks';
+import { CreatePostsFromTemplateDialog, FileSelection } from '@frontend/components';
+import { CreateNewsletterPostForm } from '@frontend/types';
 
 interface AddNewsletterPostButtonProps {
   newsletterId: number;

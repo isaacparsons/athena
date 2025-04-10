@@ -1,6 +1,6 @@
 import { ButtonBase, Stack, Typography } from '@mui/material';
-import { CalendarTodayIcon, EditIcon } from '@athena/icons';
-import { CustomDateInput } from './CustomDateInput';
+import { CalendarTodayIcon, EditIcon } from '@frontend/icons';
+import { CustomDateInput } from '@frontend/components';
 import { useState } from 'react';
 import { formatDate } from '@athena/common';
 

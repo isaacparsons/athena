@@ -1,51 +1,11 @@
 import _ from 'lodash';
 import {
   CreateManyNewsletterPosts,
-  NewsletterPost,
   UpdateManyNewsletterPosts,
 } from '@athena/common';
-import { nanoid } from 'nanoid';
-import { postHasId, NewsletterPostForm } from '../../../types';
+import { postHasId, NewsletterPostForm } from '@frontend/types';
 import { pipe } from 'fp-ts/lib/function';
 import * as A from 'fp-ts/Array';
-
-export const postsToTempPosts = <T extends Omit<NewsletterPost, 'children'>>(
-  posts: T[]
-) => {
-  const existingPostsWithTempId = posts.map((p) => [nanoid(), p]) as [string, T][];
-
-  const existingPostIdTempIdMap = new Map(
-    [...existingPostsWithTempId].map(([p1, p2]) => [p2.id, p1]) as [number, string][]
-  );
-
-  const tempPosts = existingPostsWithTempId.map(([tempId, p]) => {
-    return [
-      tempId,
-      {
-        ...p,
-        tempPosition: {
-          id: tempId,
-          parentId:
-            p.position.parentId === null
-              ? null
-              : existingPostIdTempIdMap.get(p.position.parentId) ?? null,
-          nextId:
-            p.position.nextId === null
-              ? null
-              : existingPostIdTempIdMap.get(p.position.nextId) ?? null,
-          prevId:
-            p.position.prevId === null
-              ? null
-              : existingPostIdTempIdMap.get(p.position.prevId) ?? null,
-        },
-      },
-    ];
-  }) as [string, NewsletterPostForm][];
-
-  return {
-    posts: tempPosts.map(([, p]) => p),
-  };
-};
 
 export const formatCreatedPosts = (
   newsletterId: number,

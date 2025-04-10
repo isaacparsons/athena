@@ -4,7 +4,7 @@ import {
   CreateNewsletterPostForm,
   NewsletterPostForm,
   UpdateNewsletterPostForm,
-} from '../types';
+} from '@frontend/types';
 
 export const useNewsletterPostsForm = <T extends { posts: NewsletterPostForm[] }>(
   control: Control<T>,

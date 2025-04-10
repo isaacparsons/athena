@@ -15,10 +15,10 @@ import {
   Newsletters,
   Templates,
   Template,
+  NewsletterPost,
 } from './pages';
 import { User } from '@athena/common';
-import { Appbar } from '@athena/components';
-import { NewsletterPost } from './pages/NewsletterPost';
+import { Appbar } from '@frontend/components';
 
 export enum RoutePaths {
   home = '/',

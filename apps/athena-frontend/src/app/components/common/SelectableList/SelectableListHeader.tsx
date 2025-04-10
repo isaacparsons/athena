@@ -1,8 +1,7 @@
 import { Box, Checkbox, Stack } from '@mui/material';
 import { useMemo } from 'react';
 import _ from 'lodash';
-import { createStyledIcon } from '../Styled/createStyledIcon';
-import { CloseIcon, EditIcon } from '@athena/icons';
+import { CloseIcon, EditIcon } from '@frontend/components';
 
 interface SelectableListHeaderProps<U, T extends { id: NonNullable<U> }> {
   data: T[];
@@ -12,9 +11,6 @@ interface SelectableListHeaderProps<U, T extends { id: NonNullable<U> }> {
   editing: boolean;
   toggleEditing: () => void;
 }
-
-const Close = createStyledIcon(CloseIcon);
-const Edit = createStyledIcon(EditIcon);
 
 export function SelectableListHeader<U, T extends { id: NonNullable<U> }>(
   props: SelectableListHeaderProps<U, T>
@@ -50,12 +46,12 @@ export function SelectableListHeader<U, T extends { id: NonNullable<U> }>(
             onChange={() => handleSelectAll()}
             checked={allSelected}
           />
-          <Close onClick={handleClose} />
+          <CloseIcon onClick={handleClose} />
         </>
       ) : (
         <>
           <Box></Box>
-          <Edit onClick={handleEdit} />
+          <EditIcon onClick={handleEdit} />
         </>
       )}
     </Stack>

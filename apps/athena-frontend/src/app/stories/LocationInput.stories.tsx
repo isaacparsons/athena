@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from "@storybook/test";
+import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
-import { LocationInput } from '@athena/components'
+import { LocationInput } from '@frontend/components';
 
 const meta: Meta<typeof LocationInput> = {
   component: LocationInput,
@@ -11,21 +11,18 @@ const meta: Meta<typeof LocationInput> = {
 export default meta;
 type Story = StoryObj<typeof LocationInput>;
 
-
 export const Primary = {
-  args: {
-
-  },
+  args: {},
 };
 
 export const WithLocation = {
   args: {
     location: {
       name: 'Test Location',
-      countryCode: "CA",
+      countryCode: 'CA',
       lattitude: 123.456,
-      longitude: 789.101
-    }
+      longitude: 789.101,
+    },
   },
 };
 
@@ -35,9 +32,9 @@ export const Selected = {
     selected: true,
     location: {
       name: 'Test Location',
-      countryCode: "CA",
+      countryCode: 'CA',
       lattitude: 123.456,
-      longitude: 789.101
-    }
+      longitude: 789.101,
+    },
   },
 };

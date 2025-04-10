@@ -3,8 +3,8 @@ import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 import { ThemeProvider } from '@mui/material';
-import { theme } from '@athena/theme';
-import { NewsletterPostCard } from '@athena/components';
+import { theme } from '@frontend/theme';
+import { NewsletterPostCard } from '@frontend/components';
 import { NewsletterPostTypeName } from '@athena/common';
 
 const meta: Meta<typeof NewsletterPostCard> = {

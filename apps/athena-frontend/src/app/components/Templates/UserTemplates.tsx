@@ -1,8 +1,8 @@
 import { Template } from '@athena/common';
-import { CustomList, CustomListItem } from '@athena/components';
+import { CustomList, CustomListItem } from '@frontend/components';
 import { useNavigate } from 'react-router-dom';
-import { TemplateCard } from '../../components/common/Template/TemplateCard';
-import { TemplateCardContent } from '../../components/common/Template';
+import { TemplateCard } from '../common/Template/TemplateCard';
+import { TemplateCardContent } from '../common/Template';
 
 interface UserTemplatesProps {
   data: Template[];

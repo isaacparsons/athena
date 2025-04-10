@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
-import { CustomDate } from '@athena/components';
+import { CustomDate } from '@frontend/components';
 import { ThemeProvider } from '@mui/material';
-import { theme } from '@athena/theme';
+import { theme } from '@frontend/theme';
 
 const meta: Meta<typeof CustomDate> = {
   component: CustomDate,

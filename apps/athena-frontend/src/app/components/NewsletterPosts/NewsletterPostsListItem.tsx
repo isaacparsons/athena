@@ -1,15 +1,12 @@
 import {
   CustomCardFooter,
   CustomCardHeader,
-  createStyledIcon,
   NewsletterPostDetailsContent,
-} from '@athena/components';
+  DetailsCardIcon,
+  CloseIcon,
+} from '@frontend/components';
 import { Checkbox } from '@mui/material';
-import { ArrowForwardIcon, CloseIcon } from '@athena/icons';
-import { NewsletterPostForm, UpdateNewsletterPostForm } from '../../../types';
-
-const Close = createStyledIcon(CloseIcon);
-const DetailsCard = createStyledIcon(ArrowForwardIcon);
+import { NewsletterPostForm, UpdateNewsletterPostForm } from '@frontend/types';
 
 interface NewsletterPostsListItemProps {
   editing: boolean;
@@ -46,7 +43,7 @@ export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
         }
         right={
           editing ? (
-            <Close onClick={() => handleRemove(value.tempPosition.id)} />
+            <CloseIcon onClick={() => handleRemove(value.tempPosition.id)} />
           ) : null
         }
       />
@@ -63,7 +60,7 @@ export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
         />
       )}
       <CustomCardFooter
-        right={<DetailsCard onClick={() => handleOpenPostDetails(value)} />}
+        right={<DetailsCardIcon onClick={() => handleOpenPostDetails(value)} />}
       />
     </>
   );

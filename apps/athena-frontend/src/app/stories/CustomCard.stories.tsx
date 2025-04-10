@@ -1,11 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from "@storybook/test";
+import { fn } from '@storybook/test';
 
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 import { Box } from '@mui/material';
-import { CustomCardHeader, CustomCardFooter, CustomIconButton, CustomCard, CustomCheckbox } from '@athena/components';
-import { ArrowBackIcon, CancelIcon } from '@athena/icons';
+import {
+  CustomCardHeader,
+  CustomCardFooter,
+  CustomIconButton,
+  CustomCard,
+  CustomCheckbox,
+} from '@frontend/components';
+import { ArrowBackIcon, CancelIcon } from '@frontend/icons';
 
 const meta: Meta<typeof CustomCard> = {
   component: CustomCard,
@@ -14,75 +20,81 @@ const meta: Meta<typeof CustomCard> = {
 export default meta;
 type Story = StoryObj<typeof CustomCard>;
 
-
 export const Primary = {
-  args: {
-
-  },
+  args: {},
 };
 
 export const Heading: Story = {
   args: {
-    children: <>
-      <CustomCardHeader
-        left={
-          <CustomIconButton
-            onClick={() => console.log('click')}
-            icon={
-              <ArrowBackIcon sx={{ fontSize: 25, color: 'white' }} />
-            } />
-        }
-        right={
-          <CustomIconButton
-            onClick={() => console.log('click')}
-            icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />} />
-        }
-      />
-      <CustomCardFooter /></>
-  }
+    children: (
+      <>
+        <CustomCardHeader
+          left={
+            <CustomIconButton
+              onClick={() => console.log('click')}
+              icon={<ArrowBackIcon sx={{ fontSize: 25, color: 'white' }} />}
+            />
+          }
+          right={
+            <CustomIconButton
+              onClick={() => console.log('click')}
+              icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />}
+            />
+          }
+        />
+        <CustomCardFooter />
+      </>
+    ),
+  },
 };
-
 
 export const Other: Story = {
   args: {
     src: `https://picsum.photos/1000/1000`,
-    children: <>
-      <CustomCardHeader
-        left={
-          <CustomIconButton
-            onClick={() => console.log('click')}
-            icon={
-              <ArrowBackIcon sx={{ fontSize: 25, color: 'white' }} />
-            } />
-        }
-        right={
-          <CustomIconButton
-            onClick={() => console.log('click')}
-            icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />} />
-        }
-      />
-      <CustomCardFooter /></>
-  }
+    children: (
+      <>
+        <CustomCardHeader
+          left={
+            <CustomIconButton
+              onClick={() => console.log('click')}
+              icon={<ArrowBackIcon sx={{ fontSize: 25, color: 'white' }} />}
+            />
+          }
+          right={
+            <CustomIconButton
+              onClick={() => console.log('click')}
+              icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />}
+            />
+          }
+        />
+        <CustomCardFooter />
+      </>
+    ),
+  },
 };
-
 
 export const Selected: Story = {
   args: {
     src: `https://picsum.photos/1000/1000`,
-    children: <>
-      <CustomCardHeader
-        left={
-          <CustomCheckbox
-            id={1}
-            onClick={() => console.log('click')}
-            value={true} />
-        }
-        right={
-          <CustomIconButton
-            onClick={() => console.log('click')}
-            icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />} />
-        }
-      />
-      <CustomCardFooter /></>
-  }
+    children: (
+      <>
+        <CustomCardHeader
+          left={
+            <CustomCheckbox
+              id={1}
+              onClick={() => console.log('click')}
+              value={true}
+            />
+          }
+          right={
+            <CustomIconButton
+              onClick={() => console.log('click')}
+              icon={<CancelIcon sx={{ fontSize: 25, color: 'white' }} />}
+            />
+          }
+        />
+        <CustomCardFooter />
+      </>
+    ),
+  },
 };

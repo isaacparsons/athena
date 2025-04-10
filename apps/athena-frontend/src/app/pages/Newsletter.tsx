@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { CircularProgress, IconButton, Skeleton } from '@mui/material';
-import { useStore } from '@athena/store';
+import { useStore } from '@frontend/store';
 import { useShallow } from 'zustand/react/shallow';
-import { Properties } from './Properties';
-import { Members } from './Members';
 import {
+  NewsletterProperties,
+  NewsletterMembers,
   ActionBar,
   BackButton,
   CustomContainer,
@@ -13,18 +13,17 @@ import {
   formatDeletedPosts,
   formatUpdatedPosts,
   NewsletterPostsController,
-  postsToTempPosts,
-} from '@athena/components';
-import { CloseIcon, EditIcon } from '@athena/icons';
+  CreateTemplateDialog,
+} from '@frontend/components';
+import { CloseIcon, EditIcon } from '@frontend/icons';
 import {
   useNewsletter,
   useParamId,
   usePosts,
   usePromiseWithNotification,
-} from '@athena/hooks';
-import { CreateTemplateDialog } from './CreateTemplateDialog';
-import { NewsletterPostForm } from '../../types';
-import { CreateTemplate } from '@athena/common';
+} from '@frontend/hooks';
+import { NewsletterPostForm } from '@frontend/types';
+import { addTempPositionToItems, CreateTemplate } from '@athena/common';
 
 export function Newsletter() {
   const [editing, setEditing] = useState(true);
@@ -65,7 +64,7 @@ export function Newsletter() {
 
   const newsletter = useNewsletter(newsletterId, newsletters);
   const posts = usePosts(newsletterId, newsletterPosts);
-  const { posts: existingPosts } = useMemo(() => postsToTempPosts(posts), [posts]);
+  const existingPosts = useMemo(() => addTempPositionToItems(posts), [posts]);
 
   if (!newsletter) return null;
 
@@ -77,8 +76,11 @@ export function Newsletter() {
       return prev;
     }, [] as [string, File][]);
 
+    console.log('hi');
     const created = formatCreatedPosts(newsletter.id, data.posts);
     const updated = formatUpdatedPosts(newsletter.id, existingPosts, data.posts);
+    console.log(updated);
+
     const deleted = formatDeletedPosts(existingPosts, data.posts);
 
     if (created && created.posts.length > 0) {
@@ -135,8 +137,8 @@ export function Newsletter() {
         </IconButton>
       </ActionBar>
       <CustomContainer>
-        <Properties data={newsletter} editing={editing} />
-        <Members data={newsletter.members} />
+        <NewsletterProperties data={newsletter} editing={editing} />
+        <NewsletterMembers data={newsletter.members} />
         <NewsletterPostsController
           editing={editing}
           newsletterId={newsletter.id}

@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { CustomCheckbox, CustomCardHeader } from '@athena/components';
+import { CustomCheckbox, CustomCardHeader } from '@frontend/components';
 
 interface ToggleListHeaderProps {
   allSelected: boolean;
@@ -9,17 +9,20 @@ interface ToggleListHeaderProps {
 }
 
 export function ToggleListHeader(props: ToggleListHeaderProps) {
-  const {
-    allSelected,
-    selectable,
-    selectedItemIds,
-    onToggleSelectAll,
-  } = props;
+  const { allSelected, selectable, selectedItemIds, onToggleSelectAll } = props;
 
   if (!selectable) return null;
   return (
     <Box sx={{ borderRadius: 5, bgColor: 'white', boxShadow: 1 }}>
-      <CustomCardHeader left={<CustomCheckbox id='select-all' value={selectedItemIds.size > 0 && allSelected} onClick={onToggleSelectAll} />}>
+      <CustomCardHeader
+        left={
+          <CustomCheckbox
+            id="select-all"
+            value={selectedItemIds.size > 0 && allSelected}
+            onClick={onToggleSelectAll}
+          />
+        }
+      >
         <Typography>Select all</Typography>
       </CustomCardHeader>
     </Box>

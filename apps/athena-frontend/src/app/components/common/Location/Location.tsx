@@ -1,11 +1,11 @@
 import { ButtonBase, Typography, Stack } from '@mui/material';
-import { EditIcon, LocationIcon } from '@athena/icons';
+import { EditIcon, LocationIcon } from '@frontend/icons';
 import { CreateLocation } from '@athena/common';
-import { CreateLocationDialog } from './';
+import { LocationDialog } from '@frontend/components';
 import { useState } from 'react';
 
 interface LocationProps<T> {
-  readonly: boolean;
+  editing: boolean;
   onChange?: (location: T) => void;
   location?: T | null;
 }
@@ -15,7 +15,7 @@ const defaultProps = {
 };
 
 export function Location<T extends CreateLocation>(props: LocationProps<T>) {
-  const { location, onChange, readonly } = props;
+  const { location, onChange, editing } = props;
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const handleCloseLocationDialog = () => setLocationDialogOpen(false);
   const handleOpenLocationDialog = () => setLocationDialogOpen(true);
@@ -25,10 +25,12 @@ export function Location<T extends CreateLocation>(props: LocationProps<T>) {
     setLocationDialogOpen(false);
   };
 
+  if (!editing && !location) return null;
+
   return (
     <>
-      <CreateLocationDialog
-        open={!readonly && locationDialogOpen}
+      <LocationDialog
+        open={editing && locationDialogOpen}
         onClose={handleCloseLocationDialog}
         onSave={handleSaveLocation}
       />
@@ -48,12 +50,12 @@ export function Location<T extends CreateLocation>(props: LocationProps<T>) {
           }}
         >
           <LocationIcon sx={{ color: 'white' }} />
-          {!readonly && !location ? (
+          {editing && !location ? (
             <Typography sx={{ color: 'white' }}> Add location</Typography>
           ) : (
             location && <LocationLabel location={location} />
           )}
-          {!readonly && <EditIcon sx={{ color: 'white' }} />}
+          {editing && <EditIcon sx={{ color: 'white' }} />}
         </Stack>
       </ButtonBase>
     </>

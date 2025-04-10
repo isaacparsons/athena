@@ -1,5 +1,5 @@
 // import { Box, Typography } from '@mui/material';
-// import { StoreNewsletterPost } from '@athena/store';
+// import { StoreNewsletterPost } from '@frontend/store';
 // import { useNavigate } from 'react-router-dom';
 // import {
 //   CustomCard,
@@ -7,8 +7,8 @@
 //   CustomCardHeader,
 //   CustomCheckbox,
 //   CustomIconButton,
-// } from '@athena/components';
-// import { ArrowForwardIcon } from '@athena/icons';
+// } from '@frontend/components';
+// import { ArrowForwardIcon } from '@frontend/icons';
 // import { MediaFormat, NewsletterPostPostName } from '@athena/common';
 // import ReactPlayer from 'react-player';
 

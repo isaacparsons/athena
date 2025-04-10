@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {
+  addTempPositionToItems,
   CreateTemplateNode,
   NewsletterPostTypeName,
   ReadTemplate,
@@ -65,24 +66,44 @@ export const templateToPosts = (
     date: null,
   };
 
-  const idMap = new Map(nodes.map((n) => [n.id, nanoid()]));
-
-  return nodes.map((node) =>
+  return addTempPositionToItems(nodes).map((node) =>
     _.toPairs(node.data).reduce((prev, curr) => {
       _.set(prev, curr[0], curr[1]);
-      const tempPosition = {
-        id: idMap.get(node.id),
-        parentId:
-          node.position.parentId === null
-            ? undefined
-            : idMap.get(node.position.parentId),
-        nextId:
-          node.position.nextId === null ? null : idMap.get(node.position.nextId),
-        prevId:
-          node.position.prevId === null ? null : idMap.get(node.position.prevId),
-      };
-
-      return { ...prev, tempPosition };
+      return prev;
     }, base)
   ) as CreateNewsletterPostForm[];
 };
+
+// export const templateToPosts = (
+//   newsletterId: number,
+//   template: ReadTemplate
+// ): CreateNewsletterPostForm[] => {
+//   const { nodes } = template;
+
+//   const base = {
+//     newsletterId,
+//     title: '',
+//     date: null,
+//   };
+
+//   const idMap = new Map(nodes.map((n) => [n.id, nanoid()]));
+
+//   return nodes.map((node) =>
+//     _.toPairs(node.data).reduce((prev, curr) => {
+//       _.set(prev, curr[0], curr[1]);
+//       const tempPosition = {
+//         id: idMap.get(node.id),
+//         parentId:
+//           node.position.parentId === null
+//             ? undefined
+//             : idMap.get(node.position.parentId),
+//         nextId:
+//           node.position.nextId === null ? null : idMap.get(node.position.nextId),
+//         prevId:
+//           node.position.prevId === null ? null : idMap.get(node.position.prevId),
+//       };
+
+//       return { ...prev, tempPosition };
+//     }, base)
+//   ) as CreateNewsletterPostForm[];
+// };

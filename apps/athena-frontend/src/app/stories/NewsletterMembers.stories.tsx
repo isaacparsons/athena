@@ -3,7 +3,7 @@ import { fn } from '@storybook/test';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
 import { ThemeProvider } from '@mui/material';
-import { theme } from '@athena/theme';
+import { theme } from '@frontend/theme';
 import { NewsletterMembers } from '../pages';
 
 const meta: Meta<typeof NewsletterMembers> = {

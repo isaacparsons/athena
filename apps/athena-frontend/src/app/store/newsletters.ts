@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
-import { Slices } from '@athena/store';
+import { Slices } from '@frontend/store';
 import { CreateNewsletter, ReadNewsletter } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 

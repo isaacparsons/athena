@@ -1,20 +1,22 @@
 import _ from 'lodash';
 import { useMemo, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useSelectItems } from '@athena/hooks';
+import { useSelectItems } from '@frontend/hooks';
 import {
   CustomCardHeader,
-  createStyledIcon,
   StyledDialog,
   StyledFab,
   AddNewsletterPostButton,
   NewsletterPostsList,
   NewsletterPostsListItem,
   EditingHeader,
-} from '@athena/components';
-import { ArrowBackIcon, CheckIcon, DeleteIcon, TemplateIcon } from '@athena/icons';
-import { useNewsletterPostsForm } from '@athena/hooks';
-import { NewsletterPostForm, newsletterPostFormSchema } from '../../../types';
+  NewsletterPostProperties,
+  CreateTemplateIcon,
+  BackButtonIcon,
+} from '@frontend/components';
+import { CheckIcon } from '@frontend/icons';
+import { useNewsletterPostsForm } from '@frontend/hooks';
+import { NewsletterPostForm } from '@frontend/types';
 import { getChildPosts } from '@athena/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,10 +29,6 @@ interface NewsletterPostsControllerProps {
   setCreateTemplatePosts: (posts: NewsletterPostForm[]) => void;
 }
 
-const CreateTemplate = createStyledIcon(TemplateIcon);
-
-const BackButton = createStyledIcon(ArrowBackIcon);
-
 export function NewsletterPostsController(props: NewsletterPostsControllerProps) {
   const { posts, newsletterId, editing, onSave, setCreateTemplatePosts } = props;
 
@@ -42,11 +40,7 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     reset,
     // formState: { errors, isValid, isSubmitting },
   } = useForm<{ posts: NewsletterPostForm[] }>({
-    resolver: zodResolver(
-      z.object({
-        posts: z.array(newsletterPostFormSchema),
-      })
-    ),
+    // resolver: zodResolver(z.object({ posts: z.array(newsletterPostFormSchema) })),
     defaultValues: { posts: posts },
     values: { posts },
     mode: 'onSubmit',
@@ -76,9 +70,8 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     }
   };
 
-  const handleSave: SubmitHandler<{ posts: NewsletterPostForm[] }> = async (
-    data
-  ) => {
+  const handleSave: SubmitHandler<{ posts: NewsletterPostForm[] }> = (data) => {
+    console.log('hello');
     if (onSave) onSave(data);
     reset();
   };
@@ -108,8 +101,15 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     <WithDialog parent={parent}>
       <>
         <CustomCardHeader
-          left={parent === null ? null : <BackButton onClick={handleBack} />}
+          left={parent === null ? null : <BackButtonIcon onClick={handleBack} />}
         />
+        {parent !== null && (
+          <NewsletterPostProperties
+            data={parent}
+            editing={Boolean(editing)}
+            onChange={update}
+          />
+        )}
         <EditingHeader
           enabled={fields.length > 0}
           editing={Boolean(editing)}
@@ -120,7 +120,7 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           <>
             {/* <Delete 
             sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} /> */}
-            <CreateTemplate
+            <CreateTemplateIcon
               onClick={handleCreateTemplate}
               sx={{ m: 0.3, height: 35, width: 35, borderRadius: 17.5 }}
             />

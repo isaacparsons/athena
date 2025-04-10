@@ -2,7 +2,7 @@ import { useNotifications } from '@toolpad/core';
 import {
   errorNotificationOptions,
   successNotificationOptions,
-} from '../../config';
+} from '@frontend/config';
 interface PromiseWithNotificationOptions<T> {
   successMsg: string;
   errorMsg: string;
@@ -29,4 +29,3 @@ export const usePromiseWithNotification = () => {
     close: notifications.close,
   };
 };
-

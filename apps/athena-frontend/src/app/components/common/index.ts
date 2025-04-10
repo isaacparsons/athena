@@ -6,7 +6,7 @@ export * from './CustomContainer';
 export * from './Fab';
 export * from './Date';
 export * from './HideOnScroll';
-export * from './NewsletterPosts';
+export * from '../NewsletterPosts';
 export * from './CustomCard';
 export * from './CustomIconButton';
 export * from './CustomList';

@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/material';
-import { CustomDateRange } from '@athena/components';
+import { CustomDateRange } from '@frontend/components';
 import {
   CreateNewsletter,
   ReadNewsletter,
@@ -13,7 +13,7 @@ interface NewsletterPropertiesProps {
   editing: boolean;
 }
 
-export function Properties(props: NewsletterPropertiesProps) {
+export function NewsletterProperties(props: NewsletterPropertiesProps) {
   const { data, editing } = props;
 
   const {

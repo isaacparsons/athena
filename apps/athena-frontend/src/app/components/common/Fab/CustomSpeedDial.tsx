@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { SpeedDial, SpeedDialAction } from '@mui/material';
-import { MenuIcon } from '@athena/icons';
+import { MenuIcon } from '@frontend/icons';
 
 interface Action {
   icon: ReactNode;

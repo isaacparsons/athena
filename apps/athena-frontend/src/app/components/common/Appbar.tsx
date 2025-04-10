@@ -21,8 +21,8 @@ import {
   TemplateIcon,
   SettingsIcon,
   HomeIcon,
-} from '@athena/icons';
-import { useStore } from '@athena/store';
+} from '@frontend/icons';
+import { useStore } from '@frontend/store';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 

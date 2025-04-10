@@ -1,7 +1,7 @@
 import { Template } from '@athena/common';
-import { CreateNewsletterPostForm } from '../../../types';
+import { CreateNewsletterPostForm } from '@frontend/types';
 import { useShallow } from 'zustand/react/shallow';
-import { useStore } from '@athena/store';
+import { useStore } from '@frontend/store';
 import { useState } from 'react';
 import {
   Button,
@@ -12,9 +12,8 @@ import {
   List,
   ListItem,
 } from '@mui/material';
-import { TemplateCard } from './TemplateCard';
-import { TemplateCardContent } from './TemplateCardContent';
-import { templateToPosts } from '../../../../util';
+import { TemplateCard, TemplateCardContent } from '@frontend/components';
+import { templateToPosts } from '@frontend/util';
 
 interface CreatePostsFromTemplateDialogProps {
   newsletterId: number;

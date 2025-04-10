@@ -6,7 +6,7 @@ interface MembersProps {
   data: User[];
 }
 
-export function Members(props: MembersProps) {
+export function NewsletterMembers(props: MembersProps) {
   const { data } = props;
 
   return (

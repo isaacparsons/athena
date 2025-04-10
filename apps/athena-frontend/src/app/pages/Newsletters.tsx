@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { CustomContainer, createCustomFab } from '@athena/components';
+import {
+  CustomContainer,
+  createCustomFab,
+  CreateNewsletterDialog,
+  UserNewsletters,
+} from '@frontend/components';
 import { CircularProgress } from '@mui/material';
-import { CreateNewsletterDialog, UserNewsletters } from './';
-import { AddIcon } from '@athena/icons';
-import { useNewsletters } from '@athena/hooks';
+import { AddIcon } from '@frontend/icons';
+import { useNewsletters } from '@frontend/hooks';
 
 const AddFab = createCustomFab(AddIcon);
 

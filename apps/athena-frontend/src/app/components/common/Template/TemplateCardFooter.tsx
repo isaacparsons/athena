@@ -1,5 +1,5 @@
-import { CustomCardFooter, CustomIconButton } from '@athena/components';
-import { ArrowForwardIcon } from '@athena/icons';
+import { CustomCardFooter, CustomIconButton } from '@frontend/components';
+import { ArrowForwardIcon } from '@frontend/icons';
 
 interface TemplateCardFooterProps {
   onClick: () => void;

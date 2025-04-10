@@ -1,22 +1,18 @@
 import _ from 'lodash';
 import { useParams } from 'react-router-dom';
-import {} from '@athena/components';
+import { NewsletterPostProperties } from '@frontend/components';
 import { useMemo } from 'react';
-import { useStore } from '@athena/store';
+import { useStore } from '@frontend/store';
 import { useShallow } from 'zustand/react/shallow';
-import { Properties } from './Properties';
-import {
-  MediaFormat,
-  ReadNewsletterPost,
-  NewsletterPostTypeName,
-} from '@athena/common';
+import { MediaFormat, NewsletterPostTypeName } from '@athena/common';
+import { NewsletterPostForm } from '@frontend/types';
 const user = {
   id: 1,
   email: 'user1@email.com',
   firstName: 'user',
   lastName: 'one',
 };
-const mockPost: ReadNewsletterPost = {
+const mockPost: NewsletterPostForm = {
   id: 1,
   meta: {
     creator: user,
@@ -41,8 +37,12 @@ const mockPost: ReadNewsletterPost = {
     nextId: null,
     prevId: null,
   },
-  location: null,
-  children: [],
+  tempPosition: {
+    id: '1',
+    nextId: null,
+    prevId: null,
+    parentId: null,
+  },
 };
 
 export function NewsletterPost() {
@@ -73,7 +73,7 @@ export function NewsletterPost() {
 
   return (
     <>
-      <Properties data={mockPost} />
+      <NewsletterPostProperties data={mockPost} />
     </>
     // <NewsletterPostsProvider newsletterId={newsletterId} parentId={newsletterItemId}>
     //   <NewsletterPostProperties item={item} />

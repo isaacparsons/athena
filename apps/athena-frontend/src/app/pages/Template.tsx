@@ -3,10 +3,10 @@ import {
   CustomContainer,
   CustomList,
   CustomListItem,
-} from '@athena/components';
-import { useParamId, useTemplate } from '@athena/hooks';
-import { AddIcon } from '@athena/icons';
-import { useStore } from '@athena/store';
+} from '@frontend/components';
+import { useParamId, useTemplate } from '@frontend/hooks';
+import { AddIcon } from '@frontend/icons';
+import { useStore } from '@frontend/store';
 import { CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';

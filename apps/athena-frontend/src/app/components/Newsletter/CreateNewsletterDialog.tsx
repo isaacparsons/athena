@@ -15,10 +15,10 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { CreateNewsletter, createNewsletterSchema } from '@athena/common';
-import { CustomDateRange, StyledDialog } from '@athena/components';
-import { usePromiseWithNotification } from '@athena/hooks';
+import { CustomDateRange, StyledDialog } from '@frontend/components';
+import { usePromiseWithNotification } from '@frontend/hooks';
 import { useShallow } from 'zustand/react/shallow';
-import { useStore } from '@athena/store';
+import { useStore } from '@frontend/store';
 
 interface CreateNewsletterDialogProps {
   open: boolean;

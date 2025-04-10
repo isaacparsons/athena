@@ -1,4 +1,4 @@
-import { CustomCard } from '@athena/components';
+import { CustomCard } from '@frontend/components';
 import React from 'react';
 
 interface TemplateCardProps {

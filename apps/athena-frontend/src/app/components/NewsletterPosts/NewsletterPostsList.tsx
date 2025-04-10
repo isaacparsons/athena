@@ -1,9 +1,9 @@
-import { StyledCard } from '@athena/components';
+import { StyledCard } from '@frontend/components';
 
 import { List, ListItem } from '@mui/material';
 import React from 'react';
-import { useFilterArray } from '@athena/hooks';
-import { NewsletterPostForm } from '../../../types';
+import { useFilterArray } from '@frontend/hooks';
+import { NewsletterPostForm } from '@frontend/types';
 
 interface NewsletterPostsListProps {
   posts: NewsletterPostForm[];

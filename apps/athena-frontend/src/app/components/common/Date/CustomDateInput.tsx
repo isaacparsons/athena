@@ -4,7 +4,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Button, DialogActions, DialogContent } from '@mui/material';
-import { StyledDialog } from '@athena/components';
+import { StyledDialog } from '@frontend/components';
 
 interface CustomDateInputProps {
   open: boolean;
@@ -19,7 +19,9 @@ export function CustomDateInput({
   onClose,
   open,
 }: CustomDateInputProps) {
-  const [value, setValue] = useState<Dayjs | null>(dayjs(date));
+  const [value, setValue] = useState<Dayjs | null>(
+    dayjs(date === null ? undefined : date)
+  );
 
   const handleDateChange = (newValue: dayjs.Dayjs | null) => {
     setValue(newValue);

@@ -1,5 +1,5 @@
 import { Newsletter } from '@athena/common';
-import { CustomList, CustomListItem, NewsletterCard } from '@athena/components';
+import { CustomList, CustomListItem, NewsletterCard } from '@frontend/components';
 import { useNavigate } from 'react-router-dom';
 
 interface NewslettersProps {

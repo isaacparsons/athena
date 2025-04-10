@@ -1,7 +1,11 @@
 import { Stack, Typography } from '@mui/material';
 import { Newsletter, formatDate, formatDateRange } from '@athena/common';
-import { ArrowForwardIcon, CalendarMonthIcon } from '@athena/icons';
-import { CustomCard, CustomCardFooter, CustomIconButton } from '@athena/components';
+import { ArrowForwardIcon, CalendarMonthIcon } from '@frontend/icons';
+import {
+  CustomCard,
+  CustomCardFooter,
+  CustomIconButton,
+} from '@frontend/components';
 
 interface NewsletterCardProps {
   data: Newsletter;

@@ -1,19 +1,11 @@
-import _ from 'lodash';
-import {
-  CreateNewsletterPost,
-  MediaFormat,
-  NewsletterPostTypeName,
-} from '@athena/common';
+import { MediaFormat } from '@athena/common';
 import {
   CustomCard,
   CustomCardFooter,
-  CustomDate,
   ImageCard,
-  Location,
   StyledTextField,
-} from '@athena/components';
-import { createStyledIcon } from '../Styled/createStyledIcon';
-import { ArrowForwardIcon } from '@athena/icons';
+  DetailsCardIcon,
+} from '@frontend/components';
 import { Box, Typography } from '@mui/material';
 import ReactPlayer from 'react-player';
 import {
@@ -22,14 +14,12 @@ import {
   MediaPostDetailsForm,
   PostDetailsForm,
   TextPostDetailsForm,
-} from '../../../types';
+} from '@frontend/types';
 
 interface NewsletterPostCardProps {
   onClick?: () => void;
   children?: React.ReactNode;
 }
-
-const DetailsCard = createStyledIcon(ArrowForwardIcon);
 
 export function NewsletterPostCard(props: NewsletterPostCardProps) {
   const { children, onClick } = props;
@@ -37,7 +27,7 @@ export function NewsletterPostCard(props: NewsletterPostCardProps) {
   return (
     <CustomCard>
       {children}
-      <CustomCardFooter right={<DetailsCard />} />
+      <CustomCardFooter right={<DetailsCardIcon />} />
     </CustomCard>
   );
 }
@@ -61,43 +51,6 @@ export function NewsletterPostDetailsContent(props: NewsletterPostDetailsProps) 
         <TextPostDetails editing={editing} data={data} onChange={handleChange} />
       )}
       {isMediaDetails(data) && <MediaPostDetails editing={editing} data={data} />}
-    </>
-  );
-}
-
-interface NewsletterPostPropertiesProps<T> {
-  editing: boolean;
-  data: T;
-  onChange: (post: Partial<T>) => void;
-}
-export function NewsletterPostProperties<T extends CreateNewsletterPost>(
-  props: NewsletterPostPropertiesProps<T>
-) {
-  const { data, onChange, editing } = props;
-
-  const { date, details, location } = data;
-
-  const handleLocationChange = (location: T['location']) => {
-    onChange({ location } as Partial<T>);
-  };
-
-  const handleUpdateDate = (date: string | null) => {
-    onChange({ date } as Partial<T>);
-  };
-  return (
-    <>
-      <Location
-        readonly={!editing}
-        location={location}
-        onChange={handleLocationChange}
-      />
-      <CustomDate value={date} editing={editing} onChange={handleUpdateDate} />
-      {details?.type === NewsletterPostTypeName.Text && (
-        <TextPostDetails editing={editing} data={details} />
-      )}
-      {details?.type === NewsletterPostTypeName.Media && (
-        <MediaPostDetails editing={editing} data={details} />
-      )}
     </>
   );
 }

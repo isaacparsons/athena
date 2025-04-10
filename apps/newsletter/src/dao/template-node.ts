@@ -5,10 +5,8 @@ import {
   CreateManyTemplateNodes,
   CreateTemplateNode,
   fromItemsWithTempPosition,
-  NodePosition,
   NodePositionInput,
   TemplateNode,
-  TempNodePosition,
   UpdateTemplateNode,
 } from '@athena/common';
 import { inject, injectable, injectFromBase } from 'inversify';
@@ -159,53 +157,6 @@ export class TemplateNodeDAO
     );
 
     return items.map((n) => n.id);
-
-    // const map = await Promise.all(
-    //   nodes.map<Promise<[string, number]>>(async (n) => {
-    //     const { id } = await this.postEntities(db, userId, [
-    //       {
-    //         ..._.omit(n, ['tempPosition']),
-    //         nextId: null,
-    //         prevId: null,
-    //         parentId: null,
-    //         templateId,
-    //       },
-    //     ])
-    //       .returning('id')
-    //       .executeTakeFirstOrThrow();
-
-    //     return [n.tempPosition.id, id];
-    //   })
-    // );
-    // const idMap = new Map(map);
-
-    // const getRealPosition = (
-    //   pos: TempNodePosition
-    // ): NodePosition & { id: number } => {
-    //   const id = idMap.get(pos.id);
-    //   const parent = pos.parentId !== null ? idMap.get(pos.parentId) : null;
-    //   const parentId = parent === undefined ? parentNodeId : parent;
-    //   const nextId = _.isNull(pos.nextId) ? null : idMap.get(pos.nextId);
-    //   const prevId = _.isNull(pos.prevId) ? null : idMap.get(pos.prevId);
-
-    //   if (
-    //     !_.isUndefined(id) &&
-    //     !_.isUndefined(parentId) &&
-    //     !_.isUndefined(nextId) &&
-    //     !_.isUndefined(prevId)
-    //   )
-    //     return { id, parentId, nextId, prevId };
-
-    //   throw new Error('error');
-    // };
-
-    // await Promise.all(
-    //   nodes.map(async (n) => {
-    //     const realPos = getRealPosition(n.tempPosition);
-    //     await this.updateEntity(db, userId, realPos).executeTakeFirstOrThrow();
-    //   })
-    // );
-    // return map.map((n) => n[1]);
   }
 
   async updateMany(userId: number, input: UpdateTemplateNode[]) {

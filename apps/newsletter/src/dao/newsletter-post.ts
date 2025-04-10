@@ -142,52 +142,6 @@ export class NewsletterPostDAO
       })
     );
 
-    // const map = await Promise.all(
-    //   n1.map<Promise<[string, number]>>(async (n) => {
-    //     const { id } = await this.postEntities(db, userId, [
-    //       {
-    //         ..._.omit(n, ['details', 'tempPosition', 'location', 'position']),
-    //         nextId: null,
-    //         prevId: null,
-    //         parentId: null,
-    //       },
-    //     ])
-    //       .returning('id')
-    //       .executeTakeFirstOrThrow();
-
-    //     await new NewsletterPostDetailsDAO(db).create(id, n.details);
-
-    //     return [n.tempPosition.id, id];
-    //   })
-    // );
-    // const idMap = new Map(map);
-
-    // const getRealPosition = (
-    //   pos: TempNodePosition
-    // ): NodePosition & { id: number } => {
-    //   const id = idMap.get(pos.id);
-    //   const parent = pos.parentId !== null ? idMap.get(pos.parentId) : null;
-    //   const parentId = parent === undefined ? parentNodeId : parent;
-    //   const nextId = _.isNull(pos.nextId) ? null : idMap.get(pos.nextId);
-    //   const prevId = _.isNull(pos.prevId) ? null : idMap.get(pos.prevId);
-
-    //   if (
-    //     !_.isUndefined(id) &&
-    //     !_.isUndefined(parentId) &&
-    //     !_.isUndefined(nextId) &&
-    //     !_.isUndefined(prevId)
-    //   )
-    //     return { id, parentId, nextId, prevId };
-
-    //   throw new Error('error');
-    // };
-
-    // await Promise.all(
-    //   nodes.map(async (n) => {
-    //     const realPos = getRealPosition(n.tempPosition);
-    //     await this.updateEntity(db, userId, realPos).executeTakeFirstOrThrow();
-    //   })
-    // );
     const items = await Promise.all(
       n1.map(async (n) => {
         const { id } = await this.postEntities(db, userId, [
@@ -427,6 +381,7 @@ export class NewsletterPostDAO
               this.updateEntity(trx, userId, {
                 id: post.id,
                 title: post.title,
+                date: post.date,
                 parentId: post.position?.parentId ?? null,
                 nextId: post.position?.nextId ?? null,
                 prevId: post.position?.prevId ?? null,

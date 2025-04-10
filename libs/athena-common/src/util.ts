@@ -97,19 +97,6 @@ export const getChildPosts = <T extends { tempPosition: TempNodePosition }>(
   return arr;
 };
 
-// add temporary position
-// go through each item and add entry to map [existing id, created id]
-// go through each item and add tempPosition from position, converting to the temporary ids
-
-// resolve temporary positions
-// go through each item and add entry to map [tempPosition.id, existing id]
-// go through each item and add position from tempPosition, converting to the temporary ids
-
-// go through each item in an array and add a [k,v] to a map
-// args
-//  items: T[]
-//  key: (item: T) => string | number
-//  val: (item: T) => any
 export const makeIdMap = <T, K, V>(
   items: T[],
   keyValFn: (item: T) => [K, V]
@@ -132,7 +119,7 @@ export const addTempPositionToItems = <
   items: T[]
 ) => {
   const map = makeIdMap(items, (i) => [i.id, nanoid()]);
-  return addPropertyToItems(items, (i) => ({
+  return addPropertyToItems<T, 'tempPosition', TempNodePosition>(items, (i) => ({
     ...i,
     tempPosition: {
       id: getId(map, i.id),

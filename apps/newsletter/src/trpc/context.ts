@@ -4,14 +4,12 @@ import {
   NewsletterDAO,
   LocationDAO,
   NewsletterPostDAO,
-  // NewsletterPostTemplateDAO,
   INewsletterDAO,
   IUserDAO,
   ILocationDAO,
   INewsletterPostDAO,
   TemplateDAO,
   ITemplateDAO,
-  // INewsletterPostTemplateDAO,
 } from '@athena/dao';
 import { GCSManager, IGCSManager } from '@athena/services';
 import { Request, Response } from 'express';
@@ -19,14 +17,6 @@ import { UserSession } from '@athena/common';
 import { container } from '../inversify.config';
 import { TYPES } from '../types/types';
 import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
-
-// type ContextInput = {
-//   req: Request & {
-//     user?: UserSession;
-//     isAuthenticated(): () => boolean;
-//   };
-//   res: Response;
-// };
 
 export type Context = {
   req: Request & {
