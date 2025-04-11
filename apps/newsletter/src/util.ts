@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import _ from 'lodash';
 import { parse } from 'csv-parse';
 import { finished } from 'stream/promises';
 import path from 'path';
@@ -33,3 +32,4 @@ export async function parseCsvFile(file: string) {
 }
 
 export const isProduction = () => process.env.NODE_ENV === 'production';
+export const isAuthEnabled = () => Boolean(process.env.AUTH_DISABLED) === false;

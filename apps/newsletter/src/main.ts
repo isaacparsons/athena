@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
-import { getConfig, isProduction } from './util';
+import { getConfig, isAuthEnabled, isProduction } from './util';
 import path from 'path';
 import {
   sessionMiddleware,
@@ -12,6 +12,7 @@ import {
 import { authRoutes } from './auth';
 
 const config = getConfig();
+console.log({ config, authEnabled: isAuthEnabled() });
 
 const HOST = `http://${config.client.host}:${config.client.port}`;
 const corsConfig = isProduction()
@@ -21,8 +22,10 @@ const corsConfig = isProduction()
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     }
   : {
-      credentials: true, //false
-      origin: [HOST, `https://storage.googleapis.com/${config.gcs.bucketName}`], //'*',
+      credentials: isAuthEnabled(),
+      origin: isAuthEnabled()
+        ? [HOST, `https://storage.googleapis.com/${config.gcs.bucketName}`]
+        : '*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     };
 

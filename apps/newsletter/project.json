@@ -13,10 +13,6 @@
         {
           "target": "generate-api",
           "projects": "self"
-        },
-        {
-          "target": "copy-to-react-env",
-          "projects": "self"
         }
       ],
       "options": {
@@ -109,27 +105,13 @@
         "production": {}
       }
     },
-    "copy-to-react-env": {
-      "executor": "nx:run-commands",
-      "defaultConfiguration": "development",
-      "options": {
-        "commands": [
-          "echo \"REACT_APP_HOST=${CLIENT_HOST}\" > apps/athena-frontend/.env && echo \"REACT_APP_PORT=${APP_PORT}\" >> apps/athena-frontend/.env && echo \"REACT_APP_ADMIN_SECRET=${ADMIN_SECRET}\" >> apps/athena-frontend/.env && echo \"REACT_APP_SESSION_COOKIE_NAME=${APP_SESSION_COOKIE_NAME}\" >> apps/athena-frontend/.env && nx run athena-frontend:build"
-        ]
-      },
-      "configurations": {
-        "development": {},
-        "production": {}
-      }
-    },
     "setup-local": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
       "options": {
         "commands": [
           "echo \"APP_HOST=localhost\" > apps/newsletter/.env.development.local",
-          "echo \"CLIENT_HOST=localhost\" >> apps/newsletter/.env.development.local",
-          "echo \"DATABASE_URL=postgres://postgres:postgres@localhost:5432/newsletter\" >> apps/newsletter/.env.development.local"
+          "echo \"CLIENT_HOST=localhost\" >> apps/newsletter/.env.development.local"
         ]
       },
       "configurations": {
@@ -140,9 +122,6 @@
     "db": {
       "executor": "nx:run-commands",
       "configurations": {
-        "stop": {
-          "commands": ["docker compose -f apps/newsletter/docker-compose.yaml down"]
-        },
         "create-tables": {
           "commands": [
             "npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/create-tables.ts"
@@ -152,14 +131,6 @@
           "commands": [
             "npx tsx --tsconfig apps/newsletter/tsconfig.app.json apps/newsletter/src/scripts/seed.ts"
           ]
-        },
-        "init": {
-          "commands": [
-            "nx run newsletter:db:start  && nx run newsletter:db:create-tables && nx run newsletter:db:seed"
-          ]
-        },
-        "reset": {
-          "commands": ["nx run newsletter:db:destroy && nx run newsletter:db:init"]
         }
       }
     },
@@ -178,7 +149,8 @@
         {
           "target": "build",
           "projects": "self"
-        }
+        },
+        "athena-frontend:build"
       ],
       "options": {
         "commands": [

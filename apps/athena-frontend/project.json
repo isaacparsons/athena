@@ -5,5 +5,39 @@
   "projectType": "application",
   "tags": [],
   "// targets": "to see all targets run: nx show project athena-frontend --web",
-  "targets": {}
+  "targets": {
+    "build": {
+      "options": {
+        "cwd": "apps/athena-frontend",
+        "args": ["--node-env=production"],
+        "command": "webpack-cli build"
+      },
+      "cache": true,
+      "dependsOn": ["^build", "copy-to-react-env"],
+      "inputs": [
+        "production",
+        "^production",
+        {
+          "externalDependencies": ["webpack-cli"]
+        }
+      ],
+      "outputs": ["{workspaceRoot}/dist/apps/athena-frontend"],
+      "executor": "nx:run-commands",
+      "configurations": {},
+      "parallelism": true
+    },
+    "copy-to-react-env": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "options": {
+        "commands": [
+          "echo \"REACT_APP_HOST=${CLIENT_HOST}\" > apps/athena-frontend/.env && echo \"REACT_APP_PORT=${APP_PORT}\" >> apps/athena-frontend/.env && echo \"REACT_APP_ADMIN_SECRET=${APP_ADMIN_SECRET}\" >> apps/athena-frontend/.env && echo \"REACT_APP_SESSION_COOKIE_NAME=${APP_SESSION_COOKIE_NAME}\" >> apps/athena-frontend/.env"
+        ]
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    }
+  }
 }

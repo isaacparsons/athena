@@ -15,6 +15,7 @@ const headers = config.ADMIN_SECRET
     }
   : {};
 
+console.log(`${process.env.NODE_ENV}`);
 export const asyncTrpcClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
@@ -25,7 +26,7 @@ export const asyncTrpcClient = createTRPCProxyClient<AppRouter>({
       async fetch(url, options) {
         return fetch(url, {
           ...options,
-          credentials: 'include',
+          // credentials: 'include',
         });
       },
     }),
