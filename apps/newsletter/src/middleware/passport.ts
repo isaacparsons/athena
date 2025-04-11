@@ -62,4 +62,5 @@ export const passportMiddleware = (app: Express) => {
       done(null, user);
     }
   );
+  return app;
 };

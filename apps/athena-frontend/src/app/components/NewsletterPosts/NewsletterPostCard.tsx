@@ -73,6 +73,7 @@ function TextPostDetails(props: TextPostDetailsProps) {
       onChange={(e) => {
         if (onChange) onChange(e.target.value);
       }}
+      onClick={(e) => e.stopPropagation()}
     />
   ) : (
     <Typography variant="h6">{data?.name ?? ''}</Typography>

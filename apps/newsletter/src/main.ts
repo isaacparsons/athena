@@ -1,23 +1,8 @@
-import _ from 'lodash';
 import 'reflect-metadata';
 import express from 'express';
-import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import cors from 'cors';
 import { getConfig, isProduction } from './util';
-import { createContext, appRouter } from './trpc';
-
 import path from 'path';
-import { container } from './inversify.config';
-import { Kysely } from 'kysely';
-import {
-  DB,
-  TYPES,
-  ILocationDAO,
-  INewsletterDAO,
-  INewsletterPostDAO,
-  ITemplateDAO,
-  IUserDAO,
-} from '@backend/types';
 import {
   sessionMiddleware,
   passportMiddleware,
@@ -28,42 +13,26 @@ import { authRoutes } from './auth';
 
 const config = getConfig();
 
+const HOST = `http://${config.client.host}:${config.client.port}`;
 const corsConfig = isProduction()
   ? {
       credentials: true,
-      origin: [
-        `http://${config.client.host}:${config.client.port}`,
-        `https://storage.googleapis.com/${config.gcs.bucketName}`,
-      ],
+      origin: [HOST, `https://storage.googleapis.com/${config.gcs.bucketName}`],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     }
   : {
       credentials: true, //false
-      origin: 'http://localhost:4200', //'*',
+      origin: [HOST, `https://storage.googleapis.com/${config.gcs.bucketName}`], //'*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     };
 
-console.log(corsConfig);
-
-const app = express();
+let app = express();
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(sessionMiddleware);
 app.use(contextMiddleware);
-passportMiddleware(app);
-// app.use((req, res, next) => {
-//   req.db = container.get<Kysely<DB>>(TYPES.DBClient);
-//   req.dao = {
-//     user: container.get<IUserDAO>(TYPES.IUserDAO),
-//     newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),
-//     location: container.get<ILocationDAO>(TYPES.ILocationDAO),
-//     newsletterPost: container.get<INewsletterPostDAO>(TYPES.INewsletterPostDAO),
-//     template: container.get<ITemplateDAO>(TYPES.ITemplateDAO),
-//   };
-//   next();
-// });
-// app = initPassport(app);
+app = passportMiddleware(app);
 app.use('/v1/auth', authRoutes);
 
 app.get('/health', (req, res) => {
