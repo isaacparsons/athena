@@ -48,7 +48,7 @@ app.listen(config.app.port, config.app.host, () => {
   console.log(`[ ready ] http://${config.app.host}:${config.app.port}`);
 });
 
-if (Boolean(process.env.DISABLE_WEB) === false) {
+if (Boolean(process.env.WEB_DISABLED) === false) {
   // web app
   const webApp = express();
   const webAppPath = path.join(__dirname, '..', '..', '..', '..', 'athena-frontend');

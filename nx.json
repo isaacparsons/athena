@@ -65,6 +65,7 @@
     {
       "plugin": "@nx/webpack/plugin",
       "options": {
+        "cache": false,
         "buildTargetName": "build",
         "serveTargetName": "serve",
         "previewTargetName": "preview",

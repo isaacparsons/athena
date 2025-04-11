@@ -56,6 +56,7 @@ export function AddNewsletterPostButton(props: AddNewsletterPostButtonProps) {
         name: '',
         format: mimeTypeToMediaFormat(file.type),
         fileName: URL.createObjectURL(file),
+        file: file,
       },
     });
   };

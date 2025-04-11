@@ -72,16 +72,17 @@ export const createNewsletterPostsSlice: StateCreator<
               posts: files.map(([id]) => ({ id })),
             });
 
+      console.log(signedUrls);
       const signedUrlsMap = new Map(signedUrls.map((su) => [su.id, su]));
 
       const posts = await Promise.all(
         input.posts.map(async (post) => {
           if (post.details.type === NewsletterPostTypeName.Media) {
             const itemUploadInfo = signedUrlsMap.get(post.tempPosition.id);
-            const file = _.get(files, post.tempPosition.id);
+            const file = files?.find((f) => f[0] === post.tempPosition.id);
 
             if (!itemUploadInfo || !file) throw new Error('invalid file');
-            await axios.put(itemUploadInfo.url, file);
+            await axios.put(itemUploadInfo.url, file[1]);
             post.details.fileName = itemUploadInfo.fileName;
           }
           return post;

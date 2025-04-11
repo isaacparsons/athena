@@ -16,8 +16,6 @@ export const loggedInProcedure = publicProcedure.use(async (opts) => {
   //   },
   // });
 
-  console.log('logged in - user', ctx.req.user);
-  console.log('logged in - authenticated', ctx.req.isAuthenticated());
   const adminSecret = _.get(ctx, ['req', 'headers', 'admin-secret']);
   if (adminSecret === config.app.adminSecret) {
     const admin = await ctx.db

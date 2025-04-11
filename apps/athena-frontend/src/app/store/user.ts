@@ -34,12 +34,12 @@ export const createUserSlice: StateCreator<
         ? undefined
         : Cookies.get(cookieName);
 
-      if (sessionId) {
-        const user = await asyncTrpcClient.users.read.query();
-        set((state) => {
-          state.user.data = user;
-        });
-      }
+      // if (sessionId) {
+      const user = await asyncTrpcClient.users.read.query();
+      set((state) => {
+        state.user.data = user;
+      });
+      // }
 
       set((state) => {
         state.user.loading = false;

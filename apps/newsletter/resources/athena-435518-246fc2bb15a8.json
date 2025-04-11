@@ -1,0 +1,14 @@
+{
+    "type": "service_account",
+    "project_id": "athena-435518",
+    "private_key_id": "246fc2bb15a83f674a2a1b1ca9bcb075e3b83f22",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCdD2HR465VHsxm\nxBCka41hm6BBSxTVDCq+RNa3Ctmi6hiMUfF6yVbVlw0FY8u6Ufl6yKxwVqFzzONz\nccs/+JVYiv9UHapN3U6uhmSPb6WZGeK4vNn1TuKwQEZ1BOsJwQ7i8Ug+73VKFU2Y\nWcg5/L9E+Wba+vzh8eqGNNMzTdAhJEVo5XldM9lCBlTZ7bkBC5W8ttkf8EYeMioD\n6MgvBREEBWdfod21fDqrKG2iThkqIKdXx87ySlhLDebEbKXoxAvDXciAK9ENylZW\n+jo3FDdpoC61aKplT4u93uDniP3Ht8xkx+Vyi2r3OMz/QhCTkUdUl6dNyQm2m0ua\nKgdBDpGXAgMBAAECggEAFvKh6MBa/u3ekJ9SDSv3vsy1yAR32T8LWbyGIL1xmheZ\nGZt5bGbRjKiiyuhPYnxKttFuPIWz1k8X5oy4VTL1Yzf/4WLqOLE+p0pUlA6MhAef\ntD1HnUt23KivgraCvuyZx7fYRfXHzdi5+yoXEr3mlmXYTOOCImMt0IkUWLkkUUsY\nShV68/u/oU6IQgJggJ2TdJ0UAZmaCpdruvOtEQqkoP54JwACs1oo+ueIyEPMquPa\n180i4S0N8+ab72XNDcTNq7eqRftqLNE6Ycy+KE/1tN9WB7YOsWaLBAn5cOKfxkdn\nsfNIAIsQc1P5ciTvzRvlP1yhvTo9S/vwaqjagG8IcQKBgQDNilOlA0gBdqyMSrIM\n5afUXw+ulzeRTe7cF1CHNzu9qn9vjnm8HwLkshie3nFQ7syWZH4vWZXKto38wAXM\nzVxgQIrgTREw5H4Fg6jnReKkEnvM0YMgfhAWqsSeoydJIVbKnkBwOBS1AKNEYina\n0bk7Z0BHJyQSrCwlPxZP2jmmRwKBgQDDnjK7g/hI9jBlZg7IuhX+t6RJ+DQA/UyB\nhqTKvYnyKijpzwpUbYh/vpQqyr6WPuxy6ou75oFut0DdQEgXQ4mxFa7a8tQKksiB\n4hyyjtwM1Ah13CQkGRNOj5EwiEKD3+vGbYrr3oHcAoX0CAK0Bl+i7qr8fK2Ia01A\nrHNo36VSMQKBgQDLrWqL13+QK7h64T4lN6Ki+XyBx0mCTNcI9HWROHOT1JOpyWbq\nu1RTqgRp0gY6bBkCYx0D8ONV2KdFMkfNFieXHf5AnT4O1C3pavmCDKe1bLePVIJ7\nPVDWFWz3wreYaVgnOsCiM4CZiMNBbYEKXM8QhZWVrLy7YC/yzNxgTuDX2wKBgQC6\nnBS7i1Z0i955LJXX6KUI27kvE0bQ1tKAEajs+0k4Kf3jpa2uAtufOXfxJn4PqDE6\nIwNwGaHJs6l+J09eWgBlXVDz74hWGdaLCN/leqDy3+a+QGZ9xSoE3LJdwO7rDNbH\n8UIAZsAs2H9e37FseVQMg2+781g79li45IooNoloUQKBgF608cntq9zCe1P1pT9+\no3Yt94i9evA0+X27iQ9zIqy+XS7DTx2wq5impBZshcZF+O5+ErMI6p8JoppuVaMD\nFZHccQSpJmF7ayVMFCSgOAx7tOv++SpeuH2GVwX1B0Q7ESg6qS7IZZBHKxORU9RE\n456I902McjD9YZFmikQufq6O\n-----END PRIVATE KEY-----\n",
+    "client_email": "athena-newsletter@athena-435518.iam.gserviceaccount.com",
+    "client_id": "101319812354754228224",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/athena-newsletter%40athena-435518.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+  

@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 # COPY package*.json ./
 # RUN npm install
 COPY dist/apps ./dist
+# COPY apps/newsletter/resources ./dist/newsletter/resources
 COPY config ./config
 WORKDIR /usr/src/app/dist/newsletter
 RUN npm install

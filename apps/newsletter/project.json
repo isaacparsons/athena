@@ -22,7 +22,7 @@
         "bundle": false,
         "main": "apps/newsletter/src/main.ts",
         "tsConfig": "apps/newsletter/tsconfig.app.json",
-        "assets": ["apps/newsletter/src/assets"],
+        "assets": ["apps/newsletter/resources/**/*"],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,

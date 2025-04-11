@@ -12,7 +12,7 @@
         "args": ["--node-env=production"],
         "command": "webpack-cli build"
       },
-      "cache": true,
+      "cache": false,
       "dependsOn": ["^build", "copy-to-react-env"],
       "inputs": [
         "production",
