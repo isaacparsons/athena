@@ -6,3 +6,4 @@ export * from './country';
 export * from './newsletter';
 export * from './newsletter-post';
 export * from './template';
+export * from './federated-credential';

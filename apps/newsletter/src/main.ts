@@ -1,13 +1,30 @@
+import _ from 'lodash';
 import 'reflect-metadata';
 import express from 'express';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import cors from 'cors';
 import { getConfig, isProduction } from './util';
-import { createContext, appRouter, initPassport } from './trpc';
+import { createContext, appRouter } from './trpc';
+
 import path from 'path';
 import { container } from './inversify.config';
 import { Kysely } from 'kysely';
-import { DB, TYPES } from './types';
+import {
+  DB,
+  TYPES,
+  ILocationDAO,
+  INewsletterDAO,
+  INewsletterPostDAO,
+  ITemplateDAO,
+  IUserDAO,
+} from '@backend/types';
+import {
+  sessionMiddleware,
+  passportMiddleware,
+  trpcMiddleware,
+  contextMiddleware,
+} from './middleware';
+import { authRoutes } from './auth';
 
 const config = getConfig();
 
@@ -21,44 +38,45 @@ const corsConfig = isProduction()
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     }
   : {
-      credentials: false,
-      origin: '*',
+      credentials: true, //false
+      origin: 'http://localhost:4200', //'*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     };
 
-export let app = express();
+console.log(corsConfig);
+
+const app = express();
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-  req.db = container.get<Kysely<DB>>(TYPES.DBClient);
-  next();
-});
-app = initPassport(app);
+app.use(sessionMiddleware);
+app.use(contextMiddleware);
+passportMiddleware(app);
+// app.use((req, res, next) => {
+//   req.db = container.get<Kysely<DB>>(TYPES.DBClient);
+//   req.dao = {
+//     user: container.get<IUserDAO>(TYPES.IUserDAO),
+//     newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),
+//     location: container.get<ILocationDAO>(TYPES.ILocationDAO),
+//     newsletterPost: container.get<INewsletterPostDAO>(TYPES.INewsletterPostDAO),
+//     template: container.get<ITemplateDAO>(TYPES.ITemplateDAO),
+//   };
+//   next();
+// });
+// app = initPassport(app);
+app.use('/v1/auth', authRoutes);
 
 app.get('/health', (req, res) => {
   res.send({ status: 'OK' });
 });
 
-app.use(
-  '/v1/api/trpc',
-  createExpressMiddleware({
-    router: appRouter,
-    createContext: createContext,
-    onError(opts) {
-      const { error, type, path, input, ctx, req } = opts;
-      console.error('Error:', error);
-      // if (error.code === 'INTERNAL_SERVER_ERROR') {
-      // }
-    },
-  })
-);
+app.use('/v1/api/trpc', trpcMiddleware);
 
 app.listen(config.app.port, config.app.host, () => {
   console.log(`[ ready ] http://${config.app.host}:${config.app.port}`);
 });
 
-if (process.env.CLIENT_HOST !== 'localhost') {
+if (Boolean(process.env.DISABLE_WEB) === false) {
   // web app
   const webApp = express();
   const webAppPath = path.join(__dirname, '..', '..', '..', '..', 'athena-frontend');
@@ -68,7 +86,7 @@ if (process.env.CLIENT_HOST !== 'localhost') {
     res.sendFile(path.join(webAppPath, 'index.html'));
   });
 
-  webApp.listen(config.client.port, config.client.host, () => {
-    console.log(`[ ready ] http://${config.client.host}:${config.client.port}`);
+  webApp.listen(config.client.port, config.app.host, () => {
+    console.log(`[ ready ] http://${config.app.host}:${config.client.port}`);
   });
 }

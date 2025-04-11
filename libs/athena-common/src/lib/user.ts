@@ -7,6 +7,8 @@ export const userSchema = z.object({
   lastName: z.string().nullable(),
 });
 
+export const createUserSchema = userSchema.omit({ id: true });
+
 export interface UserSession {
   email: string;
   userId: number;

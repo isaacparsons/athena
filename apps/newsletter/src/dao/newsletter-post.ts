@@ -3,16 +3,11 @@ import 'reflect-metadata';
 import {
   DBConnection,
   Transaction,
-  SelectLocation,
-  SelectNewsletterPostMedia,
-  SelectNewsletterPostText,
+  INewsletterPostDAO,
+  NewsletterPostRow,
+  IGCSManager,
 } from '@backend/types';
-import {
-  ILocationDAO,
-  INewsletterPostDetailsDAO,
-  LocationDAO,
-  NewsletterPostDetailsDAO,
-} from '@backend/dao';
+import { LocationDAO, NewsletterPostDetailsDAO } from '@backend/dao';
 import {
   NewsletterPost,
   DeleteMany,
@@ -33,39 +28,20 @@ import {
   selectEntityColumns,
 } from '@backend/db';
 import { inject, injectable, injectFromBase } from 'inversify';
-import { TYPES } from '@backend/types';
+import { TYPES, INewsletterPostDetailsDAO, ILocationDAO } from '@backend/types';
 import {
   mapLocation,
   mapMeta,
   mapNewsletterPostDetails,
   mapPosition,
 } from './mapping';
-import { IGCSManager } from '@backend/services';
-import { EntityDAO, EntityMetaRow } from './entity';
-import { Selectable } from 'kysely';
-import * as DB from '../types/db';
+import { EntityDAO } from './entity';
 
 import * as O from 'fp-ts/Option';
 import { pipe } from 'fp-ts/function';
 import * as T from 'fp-ts/Task';
 import * as A from 'fp-ts/Array';
 import * as TE from 'fp-ts/TaskEither';
-
-export type NewsletterPostRow = EntityMetaRow &
-  Omit<Selectable<DB.NewsletterPost>, 'modifierId' | 'creatorId' | 'locationId'> & {
-    mediaDetails: SelectNewsletterPostMedia | null;
-    textDetails: SelectNewsletterPostText | null;
-    location: SelectLocation | null;
-    children: Omit<NewsletterPostRow, 'children'>[];
-  };
-
-export type INewsletterPostDAO = {
-  deleteMany(userId: number, input: DeleteMany): Promise<void>;
-  createMany(userId: number, input: CreateManyNewsletterPosts): Promise<number[]>;
-  read(id: number): Promise<ReadNewsletterPost>;
-  readByNewsletterId(id: number): Promise<ReadNewsletterPost[]>;
-  updateMany(userId: number, input: UpdateManyNewsletterPosts): Promise<number[]>;
-};
 
 @injectable()
 @injectFromBase()

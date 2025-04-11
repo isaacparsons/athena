@@ -7,7 +7,8 @@ import {
   inviteNewsletterUser,
   updateNewsletter,
 } from '../test-util';
-import { DBManagerClient, SelectNewsletter, SelectUser } from '@backend/db';
+import { DBManagerClient } from '@backend/db';
+import { SelectNewsletter, SelectUser } from '@backend/types';
 import { NewsletterRole, CreateNewsletter } from '@athena/common';
 const dbClient = new DBManagerClient();
 
@@ -47,12 +48,10 @@ describe('newsletter routes', () => {
     const user = _.get(entities, ['user', 0]) as SelectUser;
 
     const newsletterInput: CreateNewsletter = {
-      properties: {
-        name: 'test newsletter 2',
-        dateRange: {
-          start: new Date().toISOString(),
-          end: new Date().toISOString(),
-        },
+      name: 'test newsletter 2',
+      dateRange: {
+        start: new Date().toISOString(),
+        end: new Date().toISOString(),
       },
     };
     const newsletterId = await createNewsletter(user.id, newsletterInput);
@@ -65,7 +64,7 @@ describe('newsletter routes', () => {
         creator: user,
         created: expect.any(String),
       },
-      properties: newsletterInput.properties,
+      ...newsletterInput,
       owner: user,
       members: expect.arrayContaining([user]),
       posts: [],
@@ -81,12 +80,10 @@ describe('newsletter routes', () => {
       ]) as SelectNewsletter;
 
       const newsletterInput: CreateNewsletter = {
-        properties: {
-          name: 'updated test newsletter 1',
-          dateRange: {
-            start: new Date().toISOString(),
-            end: new Date().toISOString(),
-          },
+        name: 'updated test newsletter 1',
+        dateRange: {
+          start: new Date().toISOString(),
+          end: new Date().toISOString(),
         },
       };
 
@@ -104,7 +101,7 @@ describe('newsletter routes', () => {
           modified: expect.any(String),
           modifier: user,
         },
-        properties: newsletterInput.properties,
+        ...newsletterInput,
         owner: user,
         members: expect.arrayContaining([user]),
         posts: [],

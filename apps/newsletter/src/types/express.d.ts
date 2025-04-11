@@ -1,10 +1,7 @@
 import { Kysely } from 'kysely';
 import { Database } from '../src/db/db';
-import { UserDAO } from '../dao/user';
-
-type DAO = {
-  user: UserDAO;
-};
+import { DAO } from './types';
+import { IGCSManager } from '@backend/services';
 
 declare global {
   namespace Express {
@@ -17,6 +14,7 @@ declare global {
     interface Request {
       db: Kysely<Database>;
       dao: DAO;
+      gcs: IGCSManager;
       user?: UserSession;
       isAuthenticated(): this is AuthenticatedRequest;
     }

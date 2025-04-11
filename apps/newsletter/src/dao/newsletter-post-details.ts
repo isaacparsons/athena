@@ -8,16 +8,7 @@ import {
   CreateNewsletterPost,
   UpdatePostDetails,
 } from '@athena/common';
-import { TYPES, DBConnection } from '@backend/types';
-
-export interface INewsletterPostDetailsDAO {
-  read(newsletterItemId: number): Promise<NewsletterPostDetails>;
-  create(
-    newsletterItemId: number,
-    input: CreateNewsletterPost['details']
-  ): Promise<void>;
-  update(newsletterPostId: number, input: UpdatePostDetails): Promise<number>;
-}
+import { TYPES, DBConnection, INewsletterPostDetailsDAO } from '@backend/types';
 
 @injectable()
 export class NewsletterPostDetailsDAO implements INewsletterPostDetailsDAO {

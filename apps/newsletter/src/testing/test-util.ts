@@ -12,6 +12,9 @@ import {
   Delete,
   UpdateManyNewsletterPosts,
   Read,
+  ReadNewsletter,
+  ReadNewsletterPost,
+  ReadTemplate,
   // CreateNewsletterPostsBatch,
 } from '@athena/common';
 import { createContext } from '../trpc';
@@ -49,7 +52,7 @@ const templateMockRequest = createMockRequest('templates');
 export async function getNewsletter(userId: number, newsletterId: number) {
   return router.newsletters.read(
     newsletterMockRequest('read')(userId, { id: newsletterId })
-  ) as Promise<Newsletter>;
+  ) as Promise<ReadNewsletter>;
 }
 
 export async function createNewsletter(userId: number, input: CreateNewsletter) {
@@ -82,7 +85,7 @@ export async function inviteNewsletterUser(
 export async function getNewsletterPost(userId: number, newsletterPostId: number) {
   return router.newsletterPosts.read(
     newsletterPostMockRequest('read')(userId, { id: newsletterPostId })
-  ) as Promise<NewsletterPost>;
+  ) as Promise<ReadNewsletterPost>;
 }
 
 export async function deleteNewsletterPosts(userId: number, ids: number[]) {
@@ -127,7 +130,7 @@ export async function createTemplate(userId: number, input: CreateTemplate) {
 export async function getTemplate(userId: number, input: Read) {
   return router.templates.read(
     templateMockRequest('read')(userId, input)
-  ) as Promise<Template>;
+  ) as Promise<ReadTemplate>;
 }
 
 export async function getTemplatesByUserId(userId: number) {

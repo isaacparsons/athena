@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import { container } from '../inversify.config';
-import { INewsletterDAO, INewsletterPostDAO } from '@backend/dao';
 import {
   CountryTableClient,
   UserNewsletterTableClient,
@@ -14,7 +13,15 @@ import {
   TemplateTableClient,
   TemplateNodeTableClient,
 } from '@backend/db';
-import { TYPES, ITable, TABLE_NAMES, DBConnection, sql } from '@backend/types';
+import {
+  TYPES,
+  ITable,
+  TABLE_NAMES,
+  DBConnection,
+  sql,
+  INewsletterDAO,
+  INewsletterPostDAO,
+} from '@backend/types';
 import { UserTemplateTableClient } from './user-template';
 // import { nanoid } from 'nanoid';
 

@@ -71,6 +71,7 @@ import {
   UserNewsletter,
   UserTemplate,
 } from './db';
+import * as common from '@athena/common';
 
 export { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres';
 export { Pool } from 'pg';
@@ -221,3 +222,126 @@ export type UpdateUserNewsletter = Updateable<UserNewsletter>;
 export type SelectUserTemplate = Selectable<UserTemplate>;
 export type InsertUserTemplate = Insertable<UserTemplate>;
 export type UpdateUserTemplate = Updateable<UserTemplate>;
+
+// dao
+
+export type EntityMetaRow = {
+  creator: SelectUser;
+  modifier: SelectUser | null;
+  created: string;
+  modified: string | null;
+};
+
+export type EntityRow<R> = R & {
+  creator: SelectUser;
+  modifier: SelectUser | null;
+  created: string;
+  modified: string | null;
+};
+
+export interface IEntityDAO<R, E extends common.Entity> {
+  toEntity: (row: R) => E;
+}
+
+export interface ILocationDAO {
+  create(input: common.CreateLocation): Promise<number>;
+  update(input: common.UpdateLocation): Promise<number>;
+}
+
+export interface INewsletterPostDetailsDAO {
+  read(newsletterItemId: number): Promise<common.NewsletterPostDetails>;
+  create(
+    newsletterItemId: number,
+    input: common.CreateNewsletterPost['details']
+  ): Promise<void>;
+  update(newsletterPostId: number, input: common.UpdatePostDetails): Promise<number>;
+}
+
+export type NewsletterPostRow = EntityMetaRow &
+  Omit<Selectable<NewsletterPost>, 'modifierId' | 'creatorId' | 'locationId'> & {
+    mediaDetails: SelectNewsletterPostMedia | null;
+    textDetails: SelectNewsletterPostText | null;
+    location: SelectLocation | null;
+    children: Omit<NewsletterPostRow, 'children'>[];
+  };
+
+export type INewsletterPostDAO = {
+  deleteMany(userId: number, input: common.DeleteMany): Promise<void>;
+  createMany(
+    userId: number,
+    input: common.CreateManyNewsletterPosts
+  ): Promise<number[]>;
+  read(id: number): Promise<common.ReadNewsletterPost>;
+  readByNewsletterId(id: number): Promise<common.ReadNewsletterPost[]>;
+  updateMany(
+    userId: number,
+    input: common.UpdateManyNewsletterPosts
+  ): Promise<number[]>;
+};
+
+export type NewsletterRow = EntityMetaRow &
+  Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
+    posts: Omit<common.ReadNewsletterPost, 'children'>[];
+    owner: SelectUser;
+    members: SelectUser[];
+  };
+
+export type INewsletterDAO = IEntityDAO<NewsletterRow, common.Newsletter> & {
+  read(id: number): Promise<common.ReadNewsletter>;
+  readByUserId(id: number): Promise<common.Newsletter[]>;
+  create(userId: number, input: common.CreateNewsletter): Promise<number>;
+  update(userId: number, input: common.UpdateNewsletter): Promise<number>;
+  delete(userId: number, id: number): Promise<number>;
+  inviteUser(userId: number, input: common.InviteNewsletterUser): Promise<void>;
+};
+
+export type TemplateNodeRow = EntityMetaRow &
+  Omit<SelectTemplateNode, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'>;
+
+export type ITemplateNodeDAO = IEntityDAO<TemplateNodeRow, common.TemplateNode> & {
+  readByTemplateId(id: number): Promise<common.TemplateNode[]>;
+  createMany(
+    userId: number,
+    input: common.CreateManyTemplateNodes
+  ): Promise<number[]>;
+  updateMany(userId: number, input: common.UpdateTemplateNode[]): Promise<number[]>;
+};
+
+export type TemplateRow = EntityMetaRow &
+  Omit<SelectTemplate, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
+    nodes: common.TemplateNode[];
+    members: SelectUser[];
+  };
+
+export type ITemplateDAO = IEntityDAO<TemplateRow, common.Template> & {
+  read(id: number): Promise<common.ReadTemplate>;
+  readByUserId(id: number): Promise<common.Template[]>;
+  create(userId: number, input: common.CreateTemplate): Promise<number>;
+  update(userId: number, input: common.UpdateTemplate): Promise<number>;
+  delete(userId: number, id: number): Promise<number>;
+};
+
+export interface IUserDAO {
+  read(id: number): Promise<common.ReadUser>;
+  newsletters: (userId: number) => Promise<common.Newsletter[]>;
+  templates: (userId: number) => Promise<common.Template[]>;
+  upsert(
+    input: common.CreateUser,
+    federatedCredential: Omit<common.CreateFederatedCredential, 'userId'>
+  ): Promise<common.User>;
+}
+
+export type DAO = {
+  user: IUserDAO;
+  newsletter: INewsletterDAO;
+  location: ILocationDAO;
+  newsletterPost: INewsletterPostDAO;
+  template: ITemplateDAO;
+};
+
+export interface IGCSManager {
+  getSignedUrl(
+    fileName: string,
+    action: 'read' | 'write' | 'delete' | 'resumable'
+  ): Promise<string>;
+}

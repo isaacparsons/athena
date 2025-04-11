@@ -22,6 +22,12 @@ export const asyncTrpcClient = createTRPCProxyClient<AppRouter>({
       async headers() {
         return headers;
       },
+      async fetch(url, options) {
+        return fetch(url, {
+          ...options,
+          credentials: 'include',
+        });
+      },
     }),
   ],
 });

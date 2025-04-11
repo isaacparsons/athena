@@ -4,7 +4,6 @@ import {
   DBConnection,
   EntityTableName,
   jsonObjectFrom,
-  SelectUser,
   Transaction,
 } from '@backend/types';
 import { injectable } from 'inversify';
@@ -15,24 +14,6 @@ import {
 } from 'kysely/dist/cjs/parser/insert-values-parser';
 import { ExtractTableAlias } from 'kysely/dist/cjs/parser/table-parser';
 import { UpdateObjectExpression } from 'kysely/dist/cjs/parser/update-set-parser';
-
-export type EntityMetaRow = {
-  creator: SelectUser;
-  modifier: SelectUser | null;
-  created: string;
-  modified: string | null;
-};
-
-export type EntityRow<R> = R & {
-  creator: SelectUser;
-  modifier: SelectUser | null;
-  created: string;
-  modified: string | null;
-};
-
-export interface IEntityDAO<R, E extends Entity> {
-  toEntity: (row: R) => E;
-}
 
 @injectable()
 export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> {

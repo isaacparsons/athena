@@ -2,7 +2,6 @@ import { inject, injectable, injectFromBase } from 'inversify';
 import 'reflect-metadata';
 import {
   NewsletterRole,
-  TemplateNode,
   Template,
   CreateTemplate,
   TemplateType,
@@ -13,30 +12,16 @@ import {
   TYPES,
   DBConnection,
   Transaction,
-  SelectTemplate,
-  SelectUser,
   DB,
   jsonArrayFrom,
+  TemplateRow,
+  ITemplateDAO,
 } from '@backend/types';
 import { mapMeta, mapUsers } from './mapping';
-import { EntityDAO, IEntityDAO, EntityMetaRow } from './entity';
+import { EntityDAO } from './entity';
 import { expressionBuilder, Expression } from 'kysely';
 import { TemplateNodeDAO } from '@backend/dao';
 import { creator, modifier } from '@backend/db';
-
-type TemplateRow = EntityMetaRow &
-  Omit<SelectTemplate, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
-    nodes: TemplateNode[];
-    members: SelectUser[];
-  };
-
-export type ITemplateDAO = IEntityDAO<TemplateRow, Template> & {
-  read(id: number): Promise<ReadTemplate>;
-  readByUserId(id: number): Promise<Template[]>;
-  create(userId: number, input: CreateTemplate): Promise<number>;
-  update(userId: number, input: UpdateTemplate): Promise<number>;
-  delete(userId: number, id: number): Promise<number>;
-};
 
 @injectable()
 @injectFromBase()

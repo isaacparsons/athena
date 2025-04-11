@@ -1,15 +1,22 @@
 import 'reflect-metadata';
-import { Newsletter, ReadUser, Template } from '@athena/common';
+import {
+  CreateFederatedCredential,
+  CreateUser,
+  Newsletter,
+  ReadUser,
+  Template,
+  User,
+} from '@athena/common';
 import { inject, injectable } from 'inversify';
-import { TYPES, DBConnection } from '@backend/types';
+import {
+  TYPES,
+  DBConnection,
+  IUserDAO,
+  INewsletterDAO,
+  ITemplateDAO,
+  Transaction,
+} from '@backend/types';
 import { mapUser } from './mapping';
-import { INewsletterDAO, ITemplateDAO } from '@backend/dao';
-
-export interface IUserDAO {
-  read(id: number): Promise<ReadUser>;
-  newsletters: (userId: number) => Promise<Newsletter[]>;
-  templates: (userId: number) => Promise<Template[]>;
-}
 
 @injectable()
 export class UserDAO implements IUserDAO {
@@ -41,5 +48,49 @@ export class UserDAO implements IUserDAO {
 
   async templates(userId: number): Promise<Template[]> {
     return this.templateDAO.readByUserId(userId);
+  }
+
+  async upsert(
+    input: CreateUser,
+    federatedCredential: Omit<CreateFederatedCredential, 'userId'>
+  ): Promise<User> {
+    return this.db.transaction().execute(async (trx: Transaction) => {
+      const { email, firstName, lastName } = input;
+      const { subjectId, provider } = federatedCredential;
+      let user = await trx
+        .selectFrom('user')
+        .where('email', '=', email)
+        .selectAll()
+        .executeTakeFirst();
+
+      if (!user) {
+        user = await trx
+          .insertInto('user')
+          .values({ firstName, lastName, email })
+          .returningAll()
+          .executeTakeFirstOrThrow();
+      }
+
+      const credentials = await trx
+        .selectFrom('federated_credential')
+        .where((eb) =>
+          eb.and([eb('subjectId', '=', subjectId), eb('provider', '=', provider)])
+        )
+        .selectAll()
+        .executeTakeFirst();
+
+      if (!credentials) {
+        await trx
+          .insertInto('federated_credential')
+          .values({
+            subjectId: subjectId,
+            provider: provider,
+            userId: user.id,
+          })
+          .returningAll()
+          .executeTakeFirstOrThrow();
+      }
+      return user;
+    });
   }
 }

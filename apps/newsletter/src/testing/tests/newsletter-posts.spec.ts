@@ -2,28 +2,28 @@ import { createFixture } from '../setup';
 import _ from 'lodash';
 import {
   CreateManyNewsletterPosts,
-  CreateNewsletterPost,
   NewsletterPostTypeName,
   TempNodePosition,
 } from '@athena/common';
-import { DBManagerClient, SelectNewsletter, SelectUser } from '@backend/db';
-import {
-  createNewsletterPosts,
-  deleteNewsletterPosts,
-  getNewsletterPost,
-  updateNewsletterPosts,
-} from '../test-util';
+import { DBManagerClient } from '@backend/db';
+import { SelectNewsletter, SelectUser } from '@backend/types';
+import { createNewsletterPosts, getNewsletterPost } from '../test-util';
 
 const createMockTextPost = (
   newsletterId: number,
   name: string,
   tempPosition: TempNodePosition
-): CreateNewsletterPost => ({
+): CreateManyNewsletterPosts['posts'][number] => ({
   newsletterId,
   title: name,
   date: null,
   tempPosition,
-  details: { type: NewsletterPostTypeName.Text, name },
+  details: {
+    type: NewsletterPostTypeName.Text,
+    name,
+    link: null,
+    description: null,
+  },
 });
 
 const dbClient = new DBManagerClient();

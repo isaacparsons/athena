@@ -2,24 +2,27 @@ import { Container } from 'inversify';
 import { GCSConfig, TYPES } from './types/types';
 import {
   NewsletterDAO,
-  INewsletterDAO,
-  INewsletterPostDetailsDAO,
   NewsletterPostDAO,
   NewsletterPostDetailsDAO,
-  INewsletterPostDAO,
-  IUserDAO,
   UserDAO,
-  // INewsletterPostTemplateDAO,
-  // NewsletterPostTemplateDAO,
-  ILocationDAO,
   LocationDAO,
   TemplateDAO,
-  ITemplateDAO,
-  ITemplateNodeDAO,
   TemplateNodeDAO,
 } from './dao';
-import { GCSManager, IGCSManager } from './services';
-import { DB, Pool, PostgresDialect } from '@backend/types';
+import { GCSManager } from './services';
+import {
+  DB,
+  Pool,
+  PostgresDialect,
+  INewsletterDAO,
+  INewsletterPostDetailsDAO,
+  INewsletterPostDAO,
+  ILocationDAO,
+  IUserDAO,
+  ITemplateDAO,
+  ITemplateNodeDAO,
+  IGCSManager,
+} from '@backend/types';
 import { getConfig } from './util';
 import { Kysely } from 'kysely';
 
@@ -60,9 +63,6 @@ container
   .bind<ITemplateNodeDAO>(TYPES.ITemplateNodeDAO)
   .to(TemplateNodeDAO)
   .inSingletonScope();
-// container
-//   .bind<INewsletterPostTemplateDAO>(TYPES.INewsletterPostTemplateDAO)
-//   .to(NewsletterPostTemplateDAO);
 container.bind<IGCSManager>(TYPES.IGCSManager).to(GCSManager).inSingletonScope();
 
 export { container };

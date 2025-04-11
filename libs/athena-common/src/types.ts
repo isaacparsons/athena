@@ -32,6 +32,9 @@ import {
   nodePositionSchema,
   tempNodePositionSchema,
   nodePositionInputSchema,
+  createUserSchema,
+  createFederatedCredentialSchema,
+  federatedCredentialSchema,
 } from './lib';
 import {
   createManyNewsletterPostsSchema,
@@ -57,9 +60,18 @@ export type TempNodePosition = z.infer<typeof tempNodePositionSchema>;
 export type NodePositionInput = z.infer<typeof nodePositionInputSchema>;
 
 /**
+ * Federated Credential
+ */
+export type FederatedCredential = z.infer<typeof federatedCredentialSchema>;
+export type CreateFederatedCredential = z.infer<
+  typeof createFederatedCredentialSchema
+>;
+
+/**
  * User
  */
 export type User = z.infer<typeof userSchema>;
+export type CreateUser = z.infer<typeof createUserSchema>;
 
 export type Meta = z.infer<typeof metaSchema>;
 

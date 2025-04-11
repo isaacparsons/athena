@@ -1,6 +1,5 @@
 import { inject, injectable, injectFromBase } from 'inversify';
 import 'reflect-metadata';
-import { INewsletterPostDAO } from '@backend/dao';
 import {
   Newsletter,
   CreateNewsletter,
@@ -9,21 +8,21 @@ import {
   NewsletterRole,
   NewsletterPermissions,
   ReadNewsletter,
-  ReadNewsletterPost,
 } from '@athena/common';
 import { creator, modifier, owner } from '@backend/db';
-import { IGCSManager } from '@backend/services';
 import {
   TYPES,
   DBConnection,
   DB,
-  SelectNewsletter,
-  SelectUser,
   Transaction,
   jsonArrayFrom,
+  NewsletterRow,
+  INewsletterDAO,
+  INewsletterPostDAO,
+  IGCSManager,
 } from '@backend/types';
 import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
-import { EntityDAO, IEntityDAO, EntityMetaRow } from './entity';
+import { EntityDAO } from './entity';
 import { Expression, expressionBuilder } from 'kysely';
 
 export const newsletterRolePermissionsMap: Record<
@@ -53,22 +52,6 @@ export const newsletterRolePermissionsMap: Record<
     NewsletterPermissions.READ,
     NewsletterPermissions.COMMENT,
   ],
-};
-
-type NewsletterRow = EntityMetaRow &
-  Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
-    posts: Omit<ReadNewsletterPost, 'children'>[];
-    owner: SelectUser;
-    members: SelectUser[];
-  };
-
-export type INewsletterDAO = IEntityDAO<NewsletterRow, Newsletter> & {
-  read(id: number): Promise<ReadNewsletter>;
-  readByUserId(id: number): Promise<Newsletter[]>;
-  create(userId: number, input: CreateNewsletter): Promise<number>;
-  update(userId: number, input: UpdateNewsletter): Promise<number>;
-  delete(userId: number, id: number): Promise<number>;
-  inviteUser(userId: number, input: InviteNewsletterUser): Promise<void>;
 };
 
 @injectable()

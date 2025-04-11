@@ -1,7 +1,8 @@
 app:
   host: localhost
   port: 3000
-
+  sessionCookieName: newsletter_session
+  sessionSecret: 123456789
 db:
   host: localhost
   port: 5432

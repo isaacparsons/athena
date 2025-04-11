@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { EntityDAO, EntityMetaRow, IEntityDAO } from './entity';
+import { EntityDAO } from './entity';
 import {
   CreateManyTemplateNodes,
   CreateTemplateNode,
@@ -9,21 +9,17 @@ import {
   UpdateTemplateNode,
 } from '@athena/common';
 import { inject, injectable, injectFromBase } from 'inversify';
-import { TYPES, DBConnection, SelectTemplateNode } from '@backend/types';
+import {
+  TYPES,
+  DBConnection,
+  ITemplateNodeDAO,
+  TemplateNodeRow,
+} from '@backend/types';
 import { mapMeta } from './mapping';
 
 import { pipe } from 'fp-ts/function';
 import * as A from 'fp-ts/Array';
 import * as TE from 'fp-ts/TaskEither';
-
-type TemplateNodeRow = EntityMetaRow &
-  Omit<SelectTemplateNode, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'>;
-
-export type ITemplateNodeDAO = IEntityDAO<TemplateNodeRow, TemplateNode> & {
-  readByTemplateId(id: number): Promise<TemplateNode[]>;
-  createMany(userId: number, input: CreateManyTemplateNodes): Promise<number[]>;
-  updateMany(userId: number, input: UpdateTemplateNode[]): Promise<number[]>;
-};
 
 @injectable()
 @injectFromBase()
