@@ -4,7 +4,8 @@ import {
   CustomList,
   CustomListItem,
 } from '@frontend/components';
-import { useParamId, useTemplate } from '@frontend/hooks';
+import { useParamId } from '@frontend/hooks';
+import { useTemplate } from '@frontend/store';
 import { AddIcon } from '@frontend/icons';
 import { useStore } from '@frontend/store';
 import { CircularProgress } from '@mui/material';
@@ -17,7 +18,6 @@ export function Template() {
   const { template, loading } = useTemplate(templateId);
 
   const [editing, setEditing] = useState(false);
-  console.log(template);
 
   if (loading) return <CircularProgress />;
 

@@ -24,7 +24,7 @@ import {
 } from '@frontend/icons';
 import { useNavigate } from 'react-router-dom';
 import { RoutePaths } from '../../AppRoutes';
-import { useUser } from '@frontend/hooks';
+import { useUser } from '@frontend/store';
 
 interface AppbarProps {
   title: string;

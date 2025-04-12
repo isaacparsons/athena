@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
-import { Slices } from '@frontend/store';
+import { Slices, useStore } from '@frontend/store';
 import { CreateNewsletter, ReadNewsletter } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
+import { useShallow } from 'zustand/react/shallow';
+import { useEffect, useMemo } from 'react';
 
 export interface NewslettersSlice {
   newsletters: {
@@ -12,6 +14,7 @@ export interface NewslettersSlice {
     fetch: (id: number) => Promise<void>;
     create: (newsletter: CreateNewsletter) => Promise<number>;
     // update: (newsletter: UpdateNewsletter) => Promise<number>;
+    delete: (id: number) => Promise<number>;
   };
 }
 
@@ -58,5 +61,42 @@ export const createNewslettersSlice: StateCreator<
       await get().user.fetch();
       return id;
     },
+    delete: async (id: number) => {
+      const deletedId = await asyncTrpcClient.newsletters.delete.mutate({ id });
+      set((state) => {
+        delete state.newsletters.data[id];
+      });
+      await get().user.fetch();
+      return deletedId;
+    },
   },
 });
+
+export const useNewsletters = () => {
+  return useStore(
+    useShallow((state) => ({
+      fetch: state.newsletters.fetch,
+      deleteNewsletter: state.newsletters.delete,
+      newsletters: state.newsletters.data,
+      loading: state.newsletters.loading,
+    }))
+  );
+};
+
+export const useNewsletter = (newsletterId: number | undefined) => {
+  const { newsletters, fetch } = useNewsletters();
+
+  useEffect(() => {
+    if (newsletterId !== undefined && !newsletters[newsletterId]) {
+      fetch(newsletterId);
+    }
+  }, [newsletters, newsletterId, fetch]);
+
+  return useMemo(
+    () =>
+      newsletterId !== undefined && newsletters[newsletterId]
+        ? newsletters[newsletterId]
+        : undefined,
+    [newsletterId, newsletters]
+  );
+};

@@ -1,5 +1,5 @@
 import { getConfig } from '@frontend/config';
-import { useUser } from '@frontend/hooks';
+import { useUser } from '@frontend/store';
 import {
   SignInPage,
   AppProvider,

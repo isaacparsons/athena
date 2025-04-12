@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { useCallback, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material';
-import { NotificationsProvider, useUser } from '@frontend/hooks';
+import { NotificationsProvider } from '@frontend/hooks';
 import { theme } from '@frontend/theme';
 // import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // import { trpc, trpcClient } from '../trpc';

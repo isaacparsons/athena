@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Button, ButtonGroup } from '@mui/material';
 import { MediaIcon, TemplateIcon, TextIcon } from '@frontend/icons';
 import { mimeTypeToMediaFormat, NewsletterPostTypeName } from '@athena/common';
-import { useUser } from '@frontend/hooks';
+import { useUser } from '@frontend/store';
 import { CreatePostsFromTemplateDialog, FileSelection } from '@frontend/components';
 import { CreateNewsletterPostForm } from '@frontend/types';
 

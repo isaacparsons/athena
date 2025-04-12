@@ -3,14 +3,16 @@ import axios from 'axios';
 import {
   CreateManyNewsletterPosts,
   DeleteMany,
+  NewsletterPost,
   NewsletterPostTypeName,
   ReadNewsletterPost,
   UpdateManyNewsletterPosts,
 } from '@athena/common';
-import { Slices } from '@frontend/store';
+import { Slices, useStore } from '@frontend/store';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { asyncTrpcClient } from '../../trpc';
+import { useShallow } from 'zustand/react/shallow';
 
 export interface NewsletterPostsSlice {
   newsletterPosts: {
@@ -126,3 +128,24 @@ export const createNewsletterPostsSlice: StateCreator<
     },
   },
 });
+
+export const useNewsletterPosts = (newsletterId: number | undefined) => {
+  const { posts, createPosts, updatePosts, deletePosts, loading } = useStore(
+    useShallow((state) => ({
+      posts: state.newsletterPosts.data,
+      loading: state.newsletterPosts.loading,
+      createPosts: state.newsletterPosts.create,
+      updatePosts: state.newsletterPosts.update,
+      deletePosts: state.newsletterPosts.delete,
+    }))
+  );
+  return {
+    loading,
+    posts: Object.values(posts).filter(
+      (p) => p.newsletterId === newsletterId
+    ) as NewsletterPost[],
+    createPosts,
+    updatePosts,
+    deletePosts,
+  };
+};

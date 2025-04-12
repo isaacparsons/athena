@@ -17,7 +17,7 @@ import {
   Template,
 } from './pages';
 import { Appbar } from '@frontend/components';
-import { useUser } from './hooks';
+import { useUser } from '@frontend/store';
 
 export enum RoutePaths {
   home = '/',

@@ -11,10 +11,6 @@ import {
   NewsletterPostsSlice,
 } from './newsletter-posts';
 import { createTemplatesSlice, TemplatesSlice } from './templates';
-// import {
-//   createNewsletterPostTemplatesSlice,
-//   NewsletterPostTemplatesSlice,
-// } from './newsletter-item-templates';
 
 export type Slices = UserSlice &
   NewslettersSlice &
@@ -29,7 +25,6 @@ export const useStore = create<Slices>()(
         ...createNewslettersSlice(...a),
         ...createNewsletterPostsSlice(...a),
         ...createTemplatesSlice(...a),
-        // ...createNewsletterPostTemplatesSlice(...a),
       }))
     )
   )
@@ -38,5 +33,4 @@ export const useStore = create<Slices>()(
 export * from './user';
 export * from './newsletters';
 export * from './newsletter-posts';
-// export * from './newsletter-items';
-// export * from './newsletter-item-templates';
+export * from './templates';

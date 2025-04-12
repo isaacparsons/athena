@@ -15,15 +15,18 @@ import {
   NewsletterPostMenu,
 } from '@frontend/components';
 import { CloseIcon, MoreVertIcon } from '@frontend/icons';
+import { useParamId, usePromiseWithNotification } from '@frontend/hooks';
+
+import { NewsletterPostForm } from '@frontend/types';
+import { addTempPositionToItems, CreateTemplate } from '@athena/common';
 import {
   useNewsletter,
   useNewsletterPosts,
-  useParamId,
-  usePromiseWithNotification,
+  useNewsletters,
   useTemplates,
-} from '@frontend/hooks';
-import { NewsletterPostForm } from '@frontend/types';
-import { addTempPositionToItems, CreateTemplate } from '@athena/common';
+} from '@frontend/store';
+import { useNavigate } from 'react-router-dom';
+import { RoutePaths } from '../AppRoutes';
 
 export function Newsletter() {
   const [editing, setEditing] = useState(false);
@@ -34,6 +37,18 @@ export function Newsletter() {
     NewsletterPostForm[]
   >([]);
 
+  const newsletterId = useParamId('newsletterId');
+  const promiseWithNotifications = usePromiseWithNotification();
+
+  const navigate = useNavigate();
+  const { createTemplate } = useTemplates();
+  const { deleteNewsletter } = useNewsletters();
+  const newsletter = useNewsletter(newsletterId);
+
+  const { posts, createPosts, updatePosts, deletePosts, loading } =
+    useNewsletterPosts(newsletterId);
+  const existingPosts = useMemo(() => addTempPositionToItems(posts), [posts]);
+
   const toggleEditing = () => setEditing((editing) => !editing);
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setSettingsMenuAnchorEl(event.currentTarget);
@@ -41,17 +56,6 @@ export function Newsletter() {
   const handleMenuClose = () => {
     setSettingsMenuAnchorEl(null);
   };
-
-  const newsletterId = useParamId('newsletterId');
-  const promiseWithNotifications = usePromiseWithNotification();
-
-  const { createTemplate } = useTemplates();
-
-  const newsletter = useNewsletter(newsletterId);
-
-  const { posts, createPosts, updatePosts, deletePosts, loading } =
-    useNewsletterPosts(newsletterId);
-  const existingPosts = useMemo(() => addTempPositionToItems(posts), [posts]);
 
   if (!newsletter) return null;
 
@@ -94,7 +98,13 @@ export function Newsletter() {
   };
 
   const handleDeleteNewsletter = () => {
-    console.log('hi');
+    if (newsletterId) {
+      promiseWithNotifications.execute(deleteNewsletter(newsletterId), {
+        successMsg: 'Newsletter deleted!',
+        errorMsg: 'Unable to delete newsletter :(',
+      });
+      navigate(RoutePaths.newsletters);
+    }
   };
 
   const handleSaveTemplate = (input: CreateTemplate) => {

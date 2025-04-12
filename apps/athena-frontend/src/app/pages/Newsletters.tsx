@@ -7,7 +7,7 @@ import {
 } from '@frontend/components';
 import { CircularProgress } from '@mui/material';
 import { AddIcon } from '@frontend/icons';
-import { useUser } from '@frontend/hooks';
+import { useUser } from '@frontend/store';
 
 const AddFab = createCustomFab(AddIcon);
 

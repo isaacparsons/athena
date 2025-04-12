@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
-import { Slices } from '@frontend/store';
+import { Slices, useStore } from '@frontend/store';
 import { ReadUser } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 import { getConfig } from '@frontend/config';
 import Cookies from 'js-cookie';
+import { useShallow } from 'zustand/react/shallow';
 
 export interface UserSlice {
   user: {
@@ -61,3 +62,22 @@ export const createUserSlice: StateCreator<
     },
   },
 });
+
+export const useUser = () => {
+  const { user, fetchUser, logout, loading } = useStore(
+    useShallow((state) => ({
+      user: state.user.data,
+      loading: state.user.loading,
+      fetchUser: state.user.fetch,
+      logout: state.user.logout,
+    }))
+  );
+  return {
+    fetchUser,
+    user,
+    logout,
+    loading,
+    newsletters: user?.newsletters ?? [],
+    templates: user?.templates ?? [],
+  };
+};

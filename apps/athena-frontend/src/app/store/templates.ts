@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
-import { Slices } from '@frontend/store';
+import { Slices, useStore } from '@frontend/store';
 import { CreateTemplate, ReadTemplate } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
+import { useShallow } from 'zustand/react/shallow';
+import { useEffect, useMemo } from 'react';
 
 export interface TemplatesSlice {
   templates: {
@@ -44,3 +46,31 @@ export const createTemplatesSlice: StateCreator<
     },
   },
 });
+
+export const useTemplates = () => {
+  return useStore(
+    useShallow((state) => ({
+      createTemplate: state.templates.create,
+    }))
+  );
+};
+
+export const useTemplate = (id: number | undefined) => {
+  const { loading, templates, fetchTemplate } = useStore(
+    useShallow((state) => ({
+      templates: state.templates.data,
+      fetchTemplate: state.templates.fetch,
+      loading: state.templates.loading,
+    }))
+  );
+
+  useEffect(() => {
+    if (id) fetchTemplate(id);
+  }, [id, fetchTemplate]);
+
+  const template = useMemo(() => {
+    return id === undefined ? undefined : templates[id];
+  }, [id, templates]);
+
+  return { template, loading };
+};

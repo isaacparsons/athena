@@ -4,19 +4,14 @@ import {
   UserTemplates,
 } from '@frontend/components';
 import { AddIcon } from '@frontend/icons';
-import { useStore } from '@frontend/store';
-import { useShallow } from 'zustand/react/shallow';
 import { CircularProgress } from '@mui/material';
+import { useUser } from '@frontend/store';
 
 const AddFab = createCustomFab(AddIcon);
 
 export function Templates() {
-  const { templates, loading } = useStore(
-    useShallow((state) => ({
-      templates: state.user.data?.templates ?? [],
-      loading: state.user.loading,
-    }))
-  );
+  const { templates, loading } = useUser();
+
   console.log({
     templates,
   });

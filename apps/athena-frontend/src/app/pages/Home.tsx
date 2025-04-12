@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '@frontend/hooks';
+import { useUser } from '@frontend/store';
 import { RoutePaths } from '../AppRoutes';
 
 export function Home() {
