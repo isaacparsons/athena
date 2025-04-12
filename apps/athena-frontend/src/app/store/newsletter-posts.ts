@@ -72,7 +72,6 @@ export const createNewsletterPostsSlice: StateCreator<
               posts: files.map(([id]) => ({ id })),
             });
 
-      console.log(signedUrls);
       const signedUrlsMap = new Map(signedUrls.map((su) => [su.id, su]));
 
       const posts = await Promise.all(

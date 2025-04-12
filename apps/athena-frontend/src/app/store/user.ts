@@ -38,12 +38,13 @@ export const createUserSlice: StateCreator<
       const user = await asyncTrpcClient.users.read.query();
       set((state) => {
         state.user.data = user;
+        state.user.loading = false;
       });
       // }
 
-      set((state) => {
-        state.user.loading = false;
-      });
+      // set((state) => {
+      //   state.user.loading = false;
+      // });
     },
     logout: () => {
       set((state) => {

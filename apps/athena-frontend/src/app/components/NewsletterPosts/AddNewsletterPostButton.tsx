@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Button, ButtonGroup } from '@mui/material';
 import { MediaIcon, TemplateIcon, TextIcon } from '@frontend/icons';
 import { mimeTypeToMediaFormat, NewsletterPostTypeName } from '@athena/common';
-import { useTemplates } from '@frontend/hooks';
+import { useUser } from '@frontend/hooks';
 import { CreatePostsFromTemplateDialog, FileSelection } from '@frontend/components';
 import { CreateNewsletterPostForm } from '@frontend/types';
 
@@ -14,7 +14,7 @@ interface AddNewsletterPostButtonProps {
 export function AddNewsletterPostButton(props: AddNewsletterPostButtonProps) {
   const { newsletterId, insert } = props;
 
-  const templates = useTemplates();
+  const { templates } = useUser();
 
   const inputFile = useRef<HTMLInputElement | null>(null);
   const [createPostFromTemplateDialogOpen, setCreatePostFromTemplateDialogOpen] =

@@ -15,9 +15,7 @@ import {
   Newsletters,
   Templates,
   Template,
-  NewsletterPost,
 } from './pages';
-import { User } from '@athena/common';
 import { Appbar } from '@frontend/components';
 import { useUser } from './hooks';
 
@@ -25,11 +23,9 @@ export enum RoutePaths {
   home = '/',
   newsletters = '/newsletters',
   newsletter = '/newsletters/:newsletterId',
-  newsletterPost = '/newsletters/:newsletterId/posts/:newsletterPostId',
   login = '/login',
   templates = '/templates',
   template = '/templates/:templateId',
-  // newsletterItemTemplate = '/templates/item/:newsletterItemTemplateId',
   account = '/account',
   // settings="/settings"
 }
@@ -114,14 +110,6 @@ const routerConfig: RouteObject[] = [
     ),
   },
   {
-    path: RoutePaths.newsletterPost,
-    element: (
-      <ProtectedRoute>
-        <NewsletterPost />
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: RoutePaths.templates,
     element: (
       <ProtectedRoute>
@@ -151,7 +139,6 @@ export const router = createHashRouter(routerConfig);
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  // user: User | null;
 }
 export function ProtectedRoute(props: ProtectedRouteProps) {
   const { children } = props;

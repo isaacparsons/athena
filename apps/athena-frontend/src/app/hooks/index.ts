@@ -3,3 +3,8 @@ export { useNotifications, NotificationsProvider } from '@toolpad/core';
 export * from './hooks';
 export * from './useNewsletterPostsForm';
 export * from './useUser';
+export * from './useNewsletter';
+export * from './useNewsletters';
+export * from './useTemplate';
+export * from './useTemplates';
+export * from './useNewsletterPosts';

@@ -12,7 +12,6 @@ import {
 import { authRoutes } from './auth';
 
 const config = getConfig();
-console.log({ config, authEnabled: isAuthEnabled() });
 
 const HOST = `http://${config.client.host}:${config.client.port}`;
 const corsConfig = isProduction()

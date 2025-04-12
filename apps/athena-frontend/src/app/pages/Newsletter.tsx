@@ -1,8 +1,6 @@
 import _ from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CircularProgress, IconButton, Skeleton } from '@mui/material';
-import { useStore } from '@frontend/store';
-import { useShallow } from 'zustand/react/shallow';
 import {
   NewsletterProperties,
   NewsletterMembers,
@@ -14,56 +12,45 @@ import {
   formatUpdatedPosts,
   NewsletterPostsController,
   CreateTemplateDialog,
+  NewsletterPostMenu,
 } from '@frontend/components';
-import { CloseIcon, EditIcon } from '@frontend/icons';
+import { CloseIcon, MoreVertIcon } from '@frontend/icons';
 import {
   useNewsletter,
+  useNewsletterPosts,
   useParamId,
-  usePosts,
   usePromiseWithNotification,
+  useTemplates,
 } from '@frontend/hooks';
 import { NewsletterPostForm } from '@frontend/types';
 import { addTempPositionToItems, CreateTemplate } from '@athena/common';
 
 export function Newsletter() {
-  const [editing, setEditing] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [settingsMenuAnchorEl, setSettingsMenuAnchorEl] =
+    useState<null | HTMLElement>(null);
+
   const [createTemplatePosts, setCreateTemplatePosts] = useState<
     NewsletterPostForm[]
   >([]);
 
   const toggleEditing = () => setEditing((editing) => !editing);
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setSettingsMenuAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setSettingsMenuAnchorEl(null);
+  };
 
   const newsletterId = useParamId('newsletterId');
   const promiseWithNotifications = usePromiseWithNotification();
 
-  const {
-    loading,
-    newsletters,
-    newsletterPosts,
-    fetchNewsletter,
-    createPosts,
-    updatePosts,
-    deletePosts,
-    createTemplate,
-  } = useStore(
-    useShallow((state) => ({
-      newsletters: state.newsletters.data,
-      newsletterPosts: state.newsletterPosts.data,
-      createPosts: state.newsletterPosts.create,
-      updatePosts: state.newsletterPosts.update,
-      deletePosts: state.newsletterPosts.delete,
-      loading: state.newsletters.loading,
-      fetchNewsletter: state.newsletters.fetch,
-      createTemplate: state.templates.create,
-    }))
-  );
+  const { createTemplate } = useTemplates();
 
-  useEffect(() => {
-    if (newsletterId) fetchNewsletter(newsletterId);
-  }, [newsletterId, fetchNewsletter]);
+  const newsletter = useNewsletter(newsletterId);
 
-  const newsletter = useNewsletter(newsletterId, newsletters);
-  const posts = usePosts(newsletterId, newsletterPosts);
+  const { posts, createPosts, updatePosts, deletePosts, loading } =
+    useNewsletterPosts(newsletterId);
   const existingPosts = useMemo(() => addTempPositionToItems(posts), [posts]);
 
   if (!newsletter) return null;
@@ -106,6 +93,10 @@ export function Newsletter() {
     setCreateTemplatePosts([]);
   };
 
+  const handleDeleteNewsletter = () => {
+    console.log('hi');
+  };
+
   const handleSaveTemplate = (input: CreateTemplate) => {
     promiseWithNotifications.execute(createTemplate(input), {
       successMsg: 'Template created!',
@@ -126,13 +117,20 @@ export function Newsletter() {
         onSave={handleSaveTemplate}
       />
       <ActionBar backBtn={<BackButton />}>
-        <IconButton size="large" onClick={() => setEditing(!editing)}>
-          {editing ? (
-            <CloseIcon sx={{ color: 'secondary.light' }} />
-          ) : (
-            <EditIcon htmlColor="#fff" fontSize="inherit" />
-          )}
-        </IconButton>
+        {editing ? (
+          <CloseIcon onClick={() => setEditing(false)} />
+        ) : (
+          <IconButton size="large" onClick={handleMenuClick}>
+            <MoreVertIcon sx={{ color: 'white' }} />
+          </IconButton>
+        )}
+
+        <NewsletterPostMenu
+          anchorEl={settingsMenuAnchorEl}
+          onClose={handleMenuClose}
+          onEdit={() => setEditing(!editing)}
+          onDelete={handleDeleteNewsletter}
+        />
       </ActionBar>
       <CustomContainer>
         <NewsletterProperties data={newsletter} editing={editing} />

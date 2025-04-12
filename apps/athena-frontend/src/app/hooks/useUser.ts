@@ -10,5 +10,12 @@ export const useUser = () => {
       logout: state.user.logout,
     }))
   );
-  return { fetchUser, user, logout, loading };
+  return {
+    fetchUser,
+    user,
+    logout,
+    loading,
+    newsletters: user?.newsletters ?? [],
+    templates: user?.templates ?? [],
+  };
 };

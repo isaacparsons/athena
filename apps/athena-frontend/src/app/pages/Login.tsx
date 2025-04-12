@@ -25,10 +25,10 @@ const BRANDING = {
 };
 
 export function Login() {
-  const { user, fetchUser } = useUser();
+  const { user, fetchUser, loading } = useUser();
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    if (!user && !loading) fetchUser();
+  }, [user, fetchUser, loading]);
 
   if (user) return <Navigate to={RoutePaths.home} replace={true} />;
 

@@ -6,3 +6,4 @@ export * from './util';
 export * from './NewsletterPostsListItem';
 export * from './EditingHeader';
 export * from './NewsletterPostProperties';
+export * from './NewsletterPostMenu';

@@ -1,9 +1,7 @@
 import _ from 'lodash';
-import { NewsletterPost, ReadNewsletter } from '@athena/common';
-import { useEffect, useMemo, useState } from 'react';
+import { NewsletterPost } from '@athena/common';
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useStore } from '@frontend/store';
-import { useShallow } from 'zustand/react/shallow';
 
 export const usePosts = (
   newsletterId: number | undefined,
@@ -19,18 +17,6 @@ export const usePosts = (
 
 export const useFilterArray = <T>(array: T[], filters: ((val: T) => boolean)[]) =>
   useMemo(() => array.filter((i) => _.overEvery(filters)(i)), [array, filters]);
-
-export const useNewsletter = (
-  newsletterId: number | undefined,
-  newsletters: Record<number, ReadNewsletter>
-) =>
-  useMemo(
-    () =>
-      newsletterId !== undefined && newsletters[newsletterId]
-        ? newsletters[newsletterId]
-        : undefined,
-    [newsletterId, newsletters]
-  );
 
 export const useParamId = (key: string) => {
   const params = useParams();
@@ -68,42 +54,4 @@ export const useSelectItems = <T>(data: T[], key: string) => {
 
 export const useEntries = <T extends object>(object: T) => {
   return useMemo(() => _.values(object), [object]);
-};
-
-export const useTemplate = (id: number | undefined) => {
-  const { loading, templates, fetchTemplate } = useStore(
-    useShallow((state) => ({
-      templates: state.templates.data,
-      fetchTemplate: state.templates.fetch,
-      loading: state.templates.loading,
-    }))
-  );
-
-  useEffect(() => {
-    if (id) fetchTemplate(id);
-  }, [id, fetchTemplate]);
-
-  const template = useMemo(() => {
-    return id === undefined ? undefined : templates[id];
-  }, [id, templates]);
-
-  return { template, loading };
-};
-
-export const useTemplates = () => {
-  const { templates } = useStore(
-    useShallow((state) => ({
-      templates: state.user.data?.templates ?? [],
-    }))
-  );
-  return templates;
-};
-
-export const useNewsletters = () => {
-  return useStore(
-    useShallow((state) => ({
-      newsletters: state.user.data?.newsletters ?? [],
-      loading: state.user.loading,
-    }))
-  );
 };
