@@ -138,7 +138,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "gcloud storage buckets update gs://athena-newsletter --cors-file=./resources/gcs-cors.json"
+          "gcloud storage buckets update gs://athena-newsletter --cors-file=apps/newsletter/resources/gcs-cors.json"
         ]
       }
     },
