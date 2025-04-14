@@ -19,6 +19,7 @@ export interface NewsletterPostsSlice {
     loading: boolean;
     data: Record<number, ReadNewsletterPost>;
     saving: boolean;
+    fetch: (id: number) => Promise<ReadNewsletterPost>;
     create: (
       input: CreateManyNewsletterPosts,
       files?: [string, File][]
@@ -61,6 +62,7 @@ export const createNewsletterPostsSlice: StateCreator<
           state.newsletterPosts.data[child.id] = child;
         });
       });
+      return post;
     },
     create: async (input: CreateManyNewsletterPosts, files?: [string, File][]) => {
       set((state) => {
@@ -90,12 +92,14 @@ export const createNewsletterPostsSlice: StateCreator<
         })
       );
 
-      await asyncTrpcClient.newsletterPosts.createMany.mutate({
+      const postIds = await asyncTrpcClient.newsletterPosts.createMany.mutate({
         ...input,
         posts,
       });
 
       await get().newsletters.fetch(input.newsletterId);
+
+      await Promise.all(postIds.map(async (id) => get().newsletterPosts.fetch(id)));
 
       set((state) => {
         state.newsletterPosts.saving = false;
@@ -129,7 +133,7 @@ export const createNewsletterPostsSlice: StateCreator<
   },
 });
 
-export const useNewsletterPosts = (newsletterId: number | undefined) => {
+export const useNewsletterPosts = (newsletterId: number) => {
   const { posts, createPosts, updatePosts, deletePosts, loading } = useStore(
     useShallow((state) => ({
       posts: state.newsletterPosts.data,

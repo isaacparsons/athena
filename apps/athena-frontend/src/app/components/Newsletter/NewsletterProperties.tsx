@@ -1,43 +1,79 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack, TextField, Typography } from '@mui/material';
 import { CustomDateRange } from '@frontend/components';
-import {
-  CreateNewsletter,
-  ReadNewsletter,
-  updateNewsletterSchema,
-} from '@athena/common';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { ReadNewsletter } from '@athena/common';
+import { useUpdateNewsletterForm } from '@frontend/hooks';
+import { Control, Controller } from 'react-hook-form';
 
 interface NewsletterPropertiesProps {
-  data: ReadNewsletter;
+  // data: ReadNewsletter;
   editing: boolean;
+  control: Control<
+    {
+      id: number;
+      name?: string | undefined;
+      dateRange?:
+        | {
+            start: string | null;
+            end: string | null;
+          }
+        | undefined;
+    },
+    any,
+    {
+      id: number;
+      name?: string | undefined;
+      dateRange?:
+        | {
+            start: string | null;
+            end: string | null;
+          }
+        | undefined;
+    }
+  >;
 }
 
 export function NewsletterProperties(props: NewsletterPropertiesProps) {
-  const { data, editing } = props;
-
-  const {
-    control,
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm<CreateNewsletter>({
-    resolver: zodResolver(updateNewsletterSchema),
-    mode: 'onSubmit',
-    defaultValues: {
-      name: '',
-      dateRange: {
-        start: new Date().toISOString(),
-        end: null,
-      },
-    },
-  });
+  const { editing, control } = props;
 
   return (
     <Stack spacing={1}>
-      <Typography variant="h4">{data.name}</Typography>
-      <CustomDateRange value={data.dateRange} editing={editing} />
+      <Controller
+        control={control}
+        name="name"
+        render={({ field: { onChange, value } }) =>
+          editing ? (
+            <TextField
+              margin="dense"
+              label="Name"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={value}
+              onChange={onChange}
+              // helperText={errors.name?.message}
+              // error={Boolean(errors.name)}
+            />
+          ) : (
+            <Typography variant="h4">{value}</Typography>
+          )
+        }
+      />
+      <Controller
+        control={control}
+        name="dateRange"
+        render={({ field: { onChange, value } }) => (
+          <CustomDateRange
+            value={
+              value ?? {
+                start: new Date().toISOString(),
+                end: null,
+              }
+            }
+            editing={editing}
+            onChange={editing ? onChange : undefined}
+          />
+        )}
+      />
     </Stack>
   );
 }

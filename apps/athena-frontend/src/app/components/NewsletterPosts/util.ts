@@ -32,6 +32,7 @@ const hasPostChanged =
     const postBefore = existingPosts.find(
       (ep) => ep.tempPosition.id === post.tempPosition.id
     );
+
     return (
       postBefore !== undefined &&
       !_.isEqual(postBefore, post) &&

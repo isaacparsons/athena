@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { Slices, useStore } from '@frontend/store';
-import { CreateNewsletter, ReadNewsletter } from '@athena/common';
+import { CreateNewsletter, ReadNewsletter, UpdateNewsletter } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect, useMemo } from 'react';
@@ -12,8 +12,8 @@ export interface NewslettersSlice {
     loading: boolean;
     data: Record<number, ReadNewsletter>;
     fetch: (id: number) => Promise<void>;
-    create: (newsletter: CreateNewsletter) => Promise<number>;
-    // update: (newsletter: UpdateNewsletter) => Promise<number>;
+    create: (input: CreateNewsletter) => Promise<number>;
+    update: (input: UpdateNewsletter) => Promise<number>;
     delete: (id: number) => Promise<number>;
   };
 }
@@ -55,9 +55,15 @@ export const createNewslettersSlice: StateCreator<
         });
       });
     },
-    create: async (newsletter: CreateNewsletter) => {
-      const id = await asyncTrpcClient.newsletters.create.mutate(newsletter);
+    create: async (input: CreateNewsletter) => {
+      const id = await asyncTrpcClient.newsletters.create.mutate(input);
       await get().newsletters.fetch(id);
+      await get().user.fetch();
+      return id;
+    },
+    update: async (input: UpdateNewsletter) => {
+      const id = await asyncTrpcClient.newsletters.update.mutate(input);
+      await get().newsletters.fetch(input.id);
       await get().user.fetch();
       return id;
     },
@@ -77,26 +83,25 @@ export const useNewsletters = () => {
     useShallow((state) => ({
       fetch: state.newsletters.fetch,
       deleteNewsletter: state.newsletters.delete,
+      create: state.newsletters.create,
+      update: state.newsletters.update,
       newsletters: state.newsletters.data,
       loading: state.newsletters.loading,
     }))
   );
 };
 
-export const useNewsletter = (newsletterId: number | undefined) => {
-  const { newsletters, fetch } = useNewsletters();
+export const useNewsletter = (newsletterId: number) => {
+  const { newsletters, fetch, loading } = useNewsletters();
 
   useEffect(() => {
-    if (newsletterId !== undefined && !newsletters[newsletterId]) {
-      fetch(newsletterId);
-    }
-  }, [newsletters, newsletterId, fetch]);
+    if (!newsletters[newsletterId] && !loading) fetch(newsletterId);
+  }, [newsletters, newsletterId, fetch, loading]);
 
-  return useMemo(
-    () =>
-      newsletterId !== undefined && newsletters[newsletterId]
-        ? newsletters[newsletterId]
-        : undefined,
-    [newsletterId, newsletters]
-  );
+  return useMemo(() => {
+    return {
+      loading,
+      newsletter: newsletters[newsletterId],
+    };
+  }, [newsletterId, newsletters, loading]);
 };

@@ -29,7 +29,6 @@ interface CreateTemplateDialogProps {
 
 type FormValues = {
   name: string;
-  posts: NewsletterPostForm[];
 };
 
 export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
@@ -38,22 +37,16 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
   const [parent, setParent] = useState<null | NewsletterPostForm>(null);
 
   const {
-    control,
     handleSubmit,
     register,
     // formState: { errors, isValid, isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<{ name: string }>({
     // resolver: zodResolver(z.array(createNewsletterPostChild)),
-    defaultValues: { posts: posts, name: '' },
-    values: { posts: posts, name: '' },
+    defaultValues: { name: '' },
     // mode: 'onChange',
   });
 
-  const { fields, insert, update, remove } = useNewsletterPostsForm(
-    control,
-    parent,
-    posts
-  );
+  const { fields, insert, update, remove } = useNewsletterPostsForm(parent, posts);
 
   const { selected, handleSelect, allSelected, handleSelectAll } = useSelectItems(
     fields,
@@ -65,7 +58,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
   };
 
   const handleSave: SubmitHandler<FormValues> = async (data) => {
-    const nodes = toTemplateNodes(data.posts);
+    const nodes = toTemplateNodes(fields);
     const input = {
       type: TemplateType.NewsletterPost,
       name: data.name,

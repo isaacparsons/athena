@@ -15,8 +15,9 @@ import {
   Newsletters,
   Templates,
   Template,
+  NewsletterRoute,
 } from './pages';
-import { Appbar } from '@frontend/components';
+import { Appbar, WithIdParamRoute } from '@frontend/components';
 import { useUser } from '@frontend/store';
 
 export enum RoutePaths {
@@ -104,7 +105,10 @@ const routerConfig: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <WithOutlet>
-          <Newsletter />
+          <WithIdParamRoute
+            k="newsletterId"
+            render={(id) => <NewsletterRoute id={id} />}
+          />
         </WithOutlet>
       </ProtectedRoute>
     ),

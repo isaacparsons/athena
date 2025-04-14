@@ -16,3 +16,4 @@ export * from './Location';
 export * from './SelectableList';
 export * from './FileSelection';
 export * from './Template';
+export * from './WithIdParamRoute';

@@ -5,7 +5,6 @@ import { useSelectItems } from '@frontend/hooks';
 import {
   CustomCardHeader,
   StyledDialog,
-  StyledFab,
   AddNewsletterPostButton,
   NewsletterPostsList,
   NewsletterPostsListItem,
@@ -14,65 +13,49 @@ import {
   CreateTemplateIcon,
   BackButtonIcon,
 } from '@frontend/components';
-import { CheckIcon } from '@frontend/icons';
-import { useNewsletterPostsForm } from '@frontend/hooks';
-import { NewsletterPostForm } from '@frontend/types';
+import {
+  CreateNewsletterPostForm,
+  NewsletterPostForm,
+  UpdateNewsletterPostForm,
+} from '@frontend/types';
 import { getChildPosts } from '@athena/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 interface NewsletterPostsControllerProps {
   newsletterId: number;
-  posts: NewsletterPostForm[];
-  onSave?: (data: { posts: NewsletterPostForm[] }) => void;
+  parent: null | NewsletterPostForm;
+  setParent: (parent: null | NewsletterPostForm) => void;
+  fields: NewsletterPostForm[];
+  insert: (input: CreateNewsletterPostForm) => void;
+  update: (input: UpdateNewsletterPostForm) => void;
+  remove: (id: string) => void;
   editing?: boolean;
   setCreateTemplatePosts: (posts: NewsletterPostForm[]) => void;
 }
 
 export function NewsletterPostsController(props: NewsletterPostsControllerProps) {
-  const { posts, newsletterId, editing, onSave, setCreateTemplatePosts } = props;
-
-  const [parent, setParent] = useState<null | NewsletterPostForm>(null);
-
   const {
-    control,
-    handleSubmit,
-    reset,
-    // formState: { errors, isValid, isSubmitting },
-  } = useForm<{ posts: NewsletterPostForm[] }>({
-    // resolver: zodResolver(z.object({ posts: z.array(newsletterPostFormSchema) })),
-    defaultValues: { posts: posts },
-    values: { posts },
-    mode: 'onSubmit',
-  });
-
-  const { fields, insert, update, remove } = useNewsletterPostsForm(
-    control,
+    newsletterId,
+    editing,
+    setCreateTemplatePosts,
     parent,
-    posts
-  );
+    fields,
+    setParent,
+    insert,
+    update,
+    remove,
+  } = props;
 
   const { selected, handleSelect, allSelected, handleSelectAll } = useSelectItems(
     fields,
     'tempPosition.id'
   );
 
-  const hasChanged = useMemo(
-    () =>
-      JSON.stringify(posts) !==
-      JSON.stringify(fields.map((f) => _.omit(f, 'postId'))),
-    [fields, posts]
-  );
-
   const handleOpenPostDetails = (post: NewsletterPostForm) => {
     if ((!editing && _.get(post, 'id') !== undefined) || editing) {
       setParent(post);
     }
-  };
-
-  const handleSave: SubmitHandler<{ posts: NewsletterPostForm[] }> = (data) => {
-    if (onSave) onSave(data);
-    reset();
   };
 
   const handleBack = () => {
@@ -116,14 +99,10 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           allSelected={allSelected}
           handleSelectAll={handleSelectAll}
         >
-          <>
-            {/* <Delete 
-            sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} /> */}
-            <CreateTemplateIcon
-              onClick={handleCreateTemplate}
-              sx={{ m: 0.3, height: 35, width: 35, borderRadius: 17.5 }}
-            />
-          </>
+          <CreateTemplateIcon
+            onClick={handleCreateTemplate}
+            sx={{ m: 0.3, height: 35, width: 35, borderRadius: 17.5 }}
+          />
         </EditingHeader>
         <NewsletterPostsList
           posts={fields}
@@ -142,11 +121,6 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
         />
         {editing && (
           <AddNewsletterPostButton newsletterId={newsletterId} insert={insert} />
-        )}
-        {editing && (
-          <StyledFab disabled={!hasChanged} onClick={handleSubmit(handleSave)}>
-            <CheckIcon sx={{ color: 'white' }} />
-          </StyledFab>
         )}
       </>
     </WithDialog>
