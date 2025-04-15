@@ -36,11 +36,13 @@ import {
   createUserSchema,
   createFederatedCredentialSchema,
   federatedCredentialSchema,
+  updateNewsletterMemberSchema,
 } from './lib';
 import {
   createManyNewsletterPostsSchema,
   createNewsletterPostSchema,
   metaSchema,
+  readNewsletterMemberSchema,
   updateManyNewsletterPostsSchema,
   updateNewsletterPostSchema,
 } from './entity';
@@ -79,29 +81,31 @@ export type Meta = z.infer<typeof metaSchema>;
 export type Entity = { id: number; meta: Meta };
 export type WithEntity<T> = T & Entity;
 
+export type ReadUser = User & {
+  newsletters: Newsletter[];
+  templates: Template[];
+};
+
 /**
  * Newsletter
  */
 
 export type Newsletter = WithEntity<z.infer<typeof newsletterSchema.base>>;
+export type NewsletterMember = z.infer<typeof readNewsletterMemberSchema>;
 
 export type ReadNewsletter = Newsletter & {
-  members: User[];
+  members: NewsletterMember[];
   posts: ReadNewsletterPost[];
-  owner: User;
+  owner: NewsletterMember;
   children?: Newsletter;
 };
 
 export type CreateNewsletter = z.infer<typeof createNewsletterSchema>;
 export type UpdateNewsletter = z.infer<typeof updateNewsletterSchema>;
 
-export type ReadUser = User & {
-  newsletters: Newsletter[];
-  templates: Template[];
-};
-
 export type InviteNewsletterUser = z.infer<typeof inviteNewsletterUserSchema>;
 export type RemoveNewsletterMember = z.infer<typeof removeNewsletterMemberSchema>;
+export type UpdateNewsletterMember = z.infer<typeof updateNewsletterMemberSchema>;
 
 /**
  * Newsletter Post

@@ -43,3 +43,9 @@ export const removeNewsletterMemberSchema = z.object({
   newsletterId: z.coerce.number(),
   userId: z.coerce.number(),
 });
+
+export const updateNewsletterMemberSchema = z.object({
+  newsletterId: z.coerce.number(),
+  userId: z.coerce.number(),
+  role: newsletterRole,
+});

@@ -13,6 +13,7 @@ import {
   ReadNewsletterPost,
   ReadTemplate,
   RemoveNewsletterMember,
+  UpdateNewsletterMember,
 } from '@athena/common';
 import { createContext, trpc } from '../trpc';
 import { appRouter as router } from '../trpc/routes';
@@ -83,6 +84,13 @@ export async function removeNewsletterMember(
   input: RemoveNewsletterMember
 ) {
   return testCaller(userId).newsletters.removeMember(input);
+}
+
+export async function updateNewsletterMember(
+  userId: number,
+  input: UpdateNewsletterMember
+) {
+  return testCaller(userId).newsletters.updateMember(input);
 }
 
 export async function getNewsletterPost(userId: number, newsletterPostId: number) {

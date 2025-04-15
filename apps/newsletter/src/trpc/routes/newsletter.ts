@@ -8,6 +8,7 @@ import {
   NewsletterRole,
   inviteNewsletterUserSchema,
   removeNewsletterMemberSchema,
+  updateNewsletterMemberSchema,
 } from '@athena/common';
 
 const router = trpc.router({
@@ -68,7 +69,20 @@ const router = trpc.router({
         throw new Error('Invalid permissions');
       return ctx.dao.newsletter.removeMember(input);
     }),
-  // updateMember:
+  updateMember: loggedInProcedure
+    .input(updateNewsletterMemberSchema)
+    .mutation(async ({ ctx, input }) => {
+      const member = await ctx.dao.newsletter.readMember(
+        ctx.user.userId,
+        input.newsletterId
+      );
+      const valid = ctx.auth.newsletter.validatePermissions(
+        member.role as NewsletterRole,
+        NewsletterPermissions.EDIT_MEMBER
+      );
+      if (!valid) throw new Error('Invalid permissions');
+      return ctx.dao.newsletter.updateMember(input);
+    }),
 });
 
 export default router;

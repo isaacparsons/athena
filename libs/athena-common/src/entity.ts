@@ -4,7 +4,7 @@ import {
   updateNewsletterPostDetailsSchema,
 } from './lib/newsletter-post';
 import { createPostDetailsSchema } from './lib/newsletter-post';
-import { locationSchema, userSchema, withTempPosition } from './lib';
+import { locationSchema, newsletterRole, userSchema, withTempPosition } from './lib';
 
 export const metaSchema = z.object({
   creator: userSchema,
@@ -38,3 +38,7 @@ export const createManyNewsletterPostsSchema = z.object({
 });
 
 export const updateManyNewsletterPostsSchema = z.array(updateNewsletterPostSchema);
+
+export const readNewsletterMemberSchema = userSchema.extend({
+  role: newsletterRole,
+});

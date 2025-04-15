@@ -1,9 +1,34 @@
 import {
+  DB,
   DBConnection,
   EntityTableName,
   Expression,
   jsonObjectFrom,
 } from '@backend/types';
+import { expressionBuilder, RawBuilder } from 'kysely';
+import { NewsletterMember } from '@athena/common';
+
+export const newsletterMember = (
+  newsletterId: Expression<number>,
+  userId: Expression<number>
+) => {
+  const eb = expressionBuilder<DB, 'user_newsletter' | 'user'>();
+  return jsonObjectFrom(
+    eb
+      .selectFrom('user_newsletter as un')
+      .where(({ and, eb }) =>
+        and([eb('un.newsletterId', '=', newsletterId), eb('un.userId', '=', userId)])
+      )
+      .innerJoin('user', 'user.id', 'un.userId')
+      .select([
+        'un.role',
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.email',
+      ])
+  ).$notNull() as RawBuilder<NewsletterMember>;
+};
 
 export const newsletterPostDetailsMedia = (
   db: DBConnection,

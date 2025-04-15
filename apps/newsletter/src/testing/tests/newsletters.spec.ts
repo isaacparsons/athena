@@ -7,11 +7,24 @@ import {
   inviteNewsletterUser,
   removeNewsletterMember,
   updateNewsletter,
+  updateNewsletterMember,
 } from '../test-util';
 import { DBManagerClient } from '@backend/db';
-import { SelectNewsletter, SelectUser } from '@backend/types';
+import { SelectNewsletter, SelectUser, SelectUserNewsletter } from '@backend/types';
 import { NewsletterRole, CreateNewsletter } from '@athena/common';
 const dbClient = new DBManagerClient();
+
+const getNewsletterMember = (entities: Record<string, object>, num: number) => {
+  const member = _.get(entities, ['user_newsletter', num]) as SelectUserNewsletter;
+  const user = _.get(entities, ['user', num]) as SelectUser;
+  return {
+    user,
+    member: {
+      ...user,
+      role: member.role,
+    },
+  };
+};
 
 describe('newsletter routes', () => {
   afterAll(async () => {
@@ -21,7 +34,7 @@ describe('newsletter routes', () => {
   });
   test('get', async () => {
     const entities = await createFixture('newsletter.yaml');
-    const user = _.get(entities, ['user', 0]) as SelectUser;
+    const { user, member } = getNewsletterMember(entities, 0);
     const newsletter = _.get(entities, ['newsletter', 0]) as SelectNewsletter;
 
     const createdNewsletter = await getNewsletter(user.id, newsletter.id);
@@ -39,14 +52,15 @@ describe('newsletter routes', () => {
         start: expect.any(String),
         end: expect.any(String),
       },
-      owner: user,
-      members: expect.arrayContaining([user]),
+      owner: member,
+      members: expect.arrayContaining([member]),
       posts: [],
     });
   });
   test('post', async () => {
     const entities = await createFixture('user.yaml');
     const user = _.get(entities, ['user', 0]) as SelectUser;
+    const member = { ...user, role: NewsletterRole.OWNER };
 
     const newsletterInput: CreateNewsletter = {
       name: 'test newsletter 2',
@@ -68,15 +82,16 @@ describe('newsletter routes', () => {
         modifier: null,
       },
       ...newsletterInput,
-      owner: user,
-      members: expect.arrayContaining([user]),
+      owner: member,
+      members: expect.arrayContaining([member]),
       posts: [],
     });
   });
   describe('update', () => {
     test('update name and date', async () => {
       const entities = await createFixture('newsletter.yaml');
-      const user = _.get(entities, ['user', 0]) as SelectUser;
+      const { member, user } = getNewsletterMember(entities, 0);
+
       const existingNewsletter = _.get(entities, [
         'newsletter',
         0,
@@ -105,14 +120,15 @@ describe('newsletter routes', () => {
           modifier: user,
         },
         ...newsletterInput,
-        owner: user,
-        members: expect.arrayContaining([user]),
+        owner: member,
+        members: expect.arrayContaining([member]),
         posts: [],
       });
     });
     test('should not update newsletter if user is not an owner or editor', async () => {
       const entities = await createFixture('newsletter-with-read-only-member.yaml');
-      const user = _.get(entities, ['user', 1]) as SelectUser;
+      const { user } = getNewsletterMember(entities, 1);
+
       const existingNewsletter = _.get(entities, [
         'newsletter',
         0,
@@ -140,7 +156,8 @@ describe('newsletter routes', () => {
   describe('delete', () => {
     test('should delete newsletter if user is owner', async () => {
       const entities = await createFixture('newsletter.yaml');
-      const user = _.get(entities, ['user', 0]) as SelectUser;
+      const { user } = getNewsletterMember(entities, 0);
+
       const existingNewsletter = _.get(entities, [
         'newsletter',
         0,
@@ -154,7 +171,8 @@ describe('newsletter routes', () => {
     });
     test('should not delete newsletter if user is not an owner', async () => {
       const entities = await createFixture('newsletter-with-read-only-member.yaml');
-      const user = _.get(entities, ['user', 1]) as SelectUser;
+      const { user } = getNewsletterMember(entities, 1);
+
       const existingNewsletter = _.get(entities, [
         'newsletter',
         0,
@@ -173,8 +191,13 @@ describe('newsletter routes', () => {
     test('invite user', async () => {
       const entities1 = await createFixture('newsletter.yaml');
       const entities2 = await createFixture('user.yaml');
-      const user1 = _.get(entities1, ['user', 0]) as SelectUser;
-      const user2 = _.get(entities2, ['user', 0]) as SelectUser;
+
+      const { user: user1, member: member1 } = getNewsletterMember(entities1, 0);
+
+      const member2 = {
+        ...(_.get(entities2, ['user', 0]) as SelectUser),
+        role: NewsletterRole.READ_ONLY,
+      };
 
       const existingNewsletter = _.get(entities1, [
         'newsletter',
@@ -183,31 +206,36 @@ describe('newsletter routes', () => {
 
       await inviteNewsletterUser(user1.id, {
         newsletterId: existingNewsletter.id,
-        email: user2.email,
+        email: member2.email,
         role: NewsletterRole.READ_ONLY,
       });
       const newsletter = await getNewsletter(user1.id, existingNewsletter.id);
-      expect(newsletter.members).toEqual(expect.arrayContaining([user1, user2]));
+      expect(newsletter.members).toEqual(expect.arrayContaining([member1, member2]));
     });
     test('throw error if a user with invalid permissions tries to invite a user', async () => {
       const entities = await createFixture('newsletter-with-read-only-member.yaml');
       const entities2 = await createFixture('user.yaml');
-      const user1 = _.get(entities, ['user', 0]) as SelectUser;
-      const user2 = _.get(entities, ['user', 1]) as SelectUser;
-      const user3 = _.get(entities2, ['user', 0]) as SelectUser;
+
+      const { user: user1, member: member1 } = getNewsletterMember(entities, 0);
+      const { user: user2, member: member2 } = getNewsletterMember(entities, 1);
+
+      const member3 = {
+        ...(_.get(entities2, ['user', 0]) as SelectUser),
+        role: NewsletterRole.READ_ONLY,
+      };
 
       const newsletter = _.get(entities, ['newsletter', 0]) as SelectNewsletter;
 
       const invite = inviteNewsletterUser(user2.id, {
         newsletterId: newsletter.id,
-        email: user3.email,
+        email: member3.email,
         role: NewsletterRole.READ_ONLY,
       });
       await expect(invite).rejects.toEqual(new Error('Invalid permissions'));
     });
   });
 
-  describe.only('remove member', () => {
+  describe('remove member', () => {
     test('a member should be able to remove them self', async () => {
       const entities = await createFixture('newsletter-with-read-only-member.yaml');
       const user = _.get(entities, ['user', 1]) as SelectUser;
@@ -241,7 +269,7 @@ describe('newsletter routes', () => {
         false
       );
     });
-    test.only('a non owner should not be able to remove members', async () => {
+    test('a non owner should not be able to remove members', async () => {
       const entities = await createFixture('newsletter-with-read-only-member.yaml');
       const member1 = _.get(entities, ['user', 1]) as SelectUser;
       const member2 = _.get(entities, ['user', 2]) as SelectUser;
@@ -253,6 +281,48 @@ describe('newsletter routes', () => {
           userId: member2.id,
         })
       ).rejects.toEqual(new Error('Invalid permissions'));
+    });
+  });
+
+  describe('edit member', () => {
+    test('an owner should be able to edit a members role', async () => {
+      const entities = await createFixture('newsletter-with-read-only-member.yaml');
+      const owner = _.get(entities, ['user', 0]) as SelectUser;
+      const readOnlyMember = _.get(entities, ['user', 1]) as SelectUser;
+      const newsletter = _.get(entities, ['newsletter', 0]) as SelectNewsletter;
+
+      await expect(
+        updateNewsletterMember(owner.id, {
+          newsletterId: newsletter.id,
+          userId: readOnlyMember.id,
+          role: NewsletterRole.EDITOR,
+        })
+      ).resolves.toEqual(undefined);
+
+      const newsletterAfter = await getNewsletter(owner.id, newsletter.id);
+      const member = newsletterAfter.members.find((m) => m.id === readOnlyMember.id);
+      expect(member?.role).toEqual(NewsletterRole.EDITOR);
+    });
+    test('a non owner should not be able to edit a members role', async () => {
+      const entities = await createFixture('newsletter-with-read-only-member.yaml');
+      const owner = _.get(entities, ['user', 0]) as SelectUser;
+      const readOnlyMember1 = _.get(entities, ['user', 1]) as SelectUser;
+      const readOnlyMember2 = _.get(entities, ['user', 2]) as SelectUser;
+      const newsletter = _.get(entities, ['newsletter', 0]) as SelectNewsletter;
+
+      await expect(
+        updateNewsletterMember(readOnlyMember1.id, {
+          newsletterId: newsletter.id,
+          userId: readOnlyMember2.id,
+          role: NewsletterRole.EDITOR,
+        })
+      ).rejects.toEqual(new Error('Invalid permissions'));
+
+      const newsletterAfter = await getNewsletter(owner.id, newsletter.id);
+      const member = newsletterAfter.members.find(
+        (m) => m.id === readOnlyMember2.id
+      );
+      expect(member?.role).toEqual(NewsletterRole.READ_ONLY);
     });
   });
 });

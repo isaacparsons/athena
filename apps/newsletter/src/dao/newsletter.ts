@@ -8,8 +8,10 @@ import {
   NewsletterRole,
   ReadNewsletter,
   RemoveNewsletterMember,
+  UpdateNewsletterMember,
+  NewsletterMember,
 } from '@athena/common';
-import { creator, modifier, owner } from '@backend/db';
+import { creator, modifier, newsletterMember } from '@backend/db';
 import {
   TYPES,
   DBConnection,
@@ -21,9 +23,9 @@ import {
   INewsletterPostDAO,
   IGCSManager,
 } from '@backend/types';
-import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
+import { mapDateRange, mapMeta } from './mapping';
 import { EntityDAO } from './entity';
-import { Expression, expressionBuilder } from 'kysely';
+import { AliasedRawBuilder, Expression, expressionBuilder } from 'kysely';
 
 @injectable()
 @injectFromBase()
@@ -47,8 +49,8 @@ export class NewsletterDAO
       meta: mapMeta(row),
       name: row.name,
       dateRange: mapDateRange(row),
-      owner: mapUser(row.owner),
-      members: mapUsers(row.members),
+      owner: row.owner,
+      members: row.members,
       posts: row.posts,
     };
   }
@@ -60,8 +62,14 @@ export class NewsletterDAO
         .selectFrom('user_newsletter as un')
         .where('un.newsletterId', '=', newsletterId)
         .innerJoin('user', 'user.id', 'un.userId')
-        .selectAll('user')
-    ).as('members');
+        .select([
+          'un.role',
+          'user.id',
+          'user.firstName',
+          'user.lastName',
+          'user.email',
+        ])
+    ).as('members') as AliasedRawBuilder<NewsletterMember[], 'members'>;
   }
 
   async readMember(userId: number, newsletterId: number) {
@@ -81,7 +89,7 @@ export class NewsletterDAO
           'name',
           'startDate',
           'endDate',
-          owner(trx, eb.ref('ownerId')).as('owner'),
+          newsletterMember(eb.val(id), eb.ref('ownerId')).as('owner'),
           this.members(eb.ref('newsletter.id')),
         ])
         .where('id', '=', id)
@@ -108,7 +116,7 @@ export class NewsletterDAO
           'n.endDate',
           modifier(trx, eb.ref('n.modifierId')).as('modifier'),
           creator(trx, eb.ref('n.creatorId')).as('creator'),
-          owner(trx, eb.ref('n.ownerId')).as('owner'),
+          newsletterMember(eb.val(id), eb.ref('n.ownerId')).as('owner'),
         ])
         .execute();
 
@@ -184,12 +192,23 @@ export class NewsletterDAO
 
   async removeMember(input: RemoveNewsletterMember) {
     const { userId, newsletterId } = input;
-    this.db
+    await this.db
       .deleteFrom('user_newsletter')
       .where('userId', '=', userId)
       .where('newsletterId', '=', newsletterId)
       .executeTakeFirstOrThrow();
   }
 
-  // async editPermissions(){}
+  async updateMember(input: UpdateNewsletterMember) {
+    await this.db
+      .updateTable('user_newsletter')
+      .where(({ and, eb }) =>
+        and([
+          eb('newsletterId', '=', input.newsletterId),
+          eb('userId', '=', input.userId),
+        ])
+      )
+      .set('role', input.role)
+      .executeTakeFirstOrThrow();
+  }
 }

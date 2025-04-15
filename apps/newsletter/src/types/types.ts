@@ -65,6 +65,7 @@ import {
   NewsletterPost,
   NewsletterPostMedia,
   NewsletterPostText,
+  NewsletterRole,
   Template,
   TemplateNode,
   User,
@@ -282,8 +283,8 @@ export type INewsletterPostDAO = {
 export type NewsletterRow = EntityMetaRow &
   Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
     posts: Omit<common.ReadNewsletterPost, 'children'>[];
-    owner: SelectUser;
-    members: SelectUser[];
+    owner: common.NewsletterMember;
+    members: common.NewsletterMember[];
   };
 
 export type INewsletterDAO = IEntityDAO<NewsletterRow, common.Newsletter> & {
@@ -295,6 +296,7 @@ export type INewsletterDAO = IEntityDAO<NewsletterRow, common.Newsletter> & {
   inviteUser(userId: number, input: common.InviteNewsletterUser): Promise<void>;
   readMember(userId: number, newsletterId: number): Promise<UserNewsletter>;
   removeMember(input: common.RemoveNewsletterMember): Promise<void>;
+  updateMember(input: common.UpdateNewsletterMember): Promise<void>;
 };
 
 export type TemplateNodeRow = EntityMetaRow &
