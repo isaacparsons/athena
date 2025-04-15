@@ -58,6 +58,16 @@ export class TemplateDAO
     ).as('members');
   }
 
+  async readMember(userId: number, templateId: number) {
+    return this.db
+      .selectFrom('user_template')
+      .where(({ and, eb }) =>
+        and([eb('userId', '=', userId), eb('templateId', '=', templateId)])
+      )
+      .selectAll()
+      .executeTakeFirstOrThrow();
+  }
+
   async read(id: number): Promise<ReadTemplate> {
     return this.db.transaction().execute(async (trx: Transaction) => {
       const template = await this.selectEntity(trx)

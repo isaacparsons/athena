@@ -323,6 +323,7 @@ export type ITemplateDAO = IEntityDAO<TemplateRow, common.Template> & {
   create(userId: number, input: common.CreateTemplate): Promise<number>;
   update(userId: number, input: common.UpdateTemplate): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
+  readMember(userId: number, templateId: number): Promise<UserTemplate>;
 };
 
 export interface IUserDAO {

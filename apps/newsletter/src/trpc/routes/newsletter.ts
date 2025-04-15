@@ -13,6 +13,7 @@ import {
 
 const router = trpc.router({
   read: loggedInProcedure.input(readSchema).query(async ({ input, ctx }) => {
+    await ctx.dao.newsletter.readMember(ctx.user.userId, input.id);
     return await ctx.dao.newsletter.read(input.id);
   }),
   create: loggedInProcedure
