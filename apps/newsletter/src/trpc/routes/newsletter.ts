@@ -3,8 +3,11 @@ import {
   createNewsletterSchema,
   deleteSchema,
   readSchema,
-  inviteNewsletterUser,
   updateNewsletterSchema,
+  NewsletterPermissions,
+  NewsletterRole,
+  inviteNewsletterUserSchema,
+  removeNewsletterMemberSchema,
 } from '@athena/common';
 
 const router = trpc.router({
@@ -19,16 +22,53 @@ const router = trpc.router({
   update: loggedInProcedure
     .input(updateNewsletterSchema)
     .mutation(async ({ ctx, input }) => {
+      const member = await ctx.dao.newsletter.readMember(ctx.user.userId, input.id);
+      const valid = ctx.auth.newsletter.validatePermissions(
+        member.role as NewsletterRole,
+        NewsletterPermissions.UPDATE
+      );
+      if (!valid) throw new Error('Invalid permissions');
       return await ctx.dao.newsletter.update(ctx.user.userId, input);
     }),
   delete: loggedInProcedure.input(deleteSchema).mutation(async ({ ctx, input }) => {
+    const member = await ctx.dao.newsletter.readMember(ctx.user.userId, input.id);
+    const valid = ctx.auth.newsletter.validatePermissions(
+      member.role as NewsletterRole,
+      NewsletterPermissions.DELETE
+    );
+    if (!valid) throw new Error('Invalid permissions');
     return await ctx.dao.newsletter.delete(ctx.user.userId, input.id);
   }),
   inviteUser: loggedInProcedure
-    .input(inviteNewsletterUser)
+    .input(inviteNewsletterUserSchema)
     .mutation(async ({ ctx, input }) => {
+      const member = await ctx.dao.newsletter.readMember(
+        ctx.user.userId,
+        input.newsletterId
+      );
+      const valid = ctx.auth.newsletter.validatePermissions(
+        member.role as NewsletterRole,
+        NewsletterPermissions.INVITE
+      );
+      if (!valid) throw new Error('Invalid permissions');
       return ctx.dao.newsletter.inviteUser(ctx.user.userId, input);
     }),
+  removeMember: loggedInProcedure
+    .input(removeNewsletterMemberSchema)
+    .mutation(async ({ ctx, input }) => {
+      const member = await ctx.dao.newsletter.readMember(
+        ctx.user.userId,
+        input.newsletterId
+      );
+      const valid = ctx.auth.newsletter.validatePermissions(
+        member.role as NewsletterRole,
+        NewsletterPermissions.EDIT_MEMBER
+      );
+      if (!valid && input.userId !== ctx.user.userId)
+        throw new Error('Invalid permissions');
+      return ctx.dao.newsletter.removeMember(input);
+    }),
+  // updateMember:
 });
 
 export default router;

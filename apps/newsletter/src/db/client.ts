@@ -23,7 +23,9 @@ import {
   INewsletterPostDAO,
 } from '@backend/types';
 import { UserTemplateTableClient } from './user-template';
+import { NewsletterRole } from '@athena/common';
 // import { nanoid } from 'nanoid';
+import _ from 'lodash';
 
 export class DBManagerClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,6 +88,11 @@ export class DBManagerClient {
     await this.client.schema
       .createType('template_type')
       .asEnum(['newsletter', 'newsletter-post'])
+      .execute();
+
+    await this.client.schema
+      .createType('newsletter_role')
+      .asEnum(Object.keys(NewsletterRole).map((k) => _.get(NewsletterRole, k)))
       .execute();
   }
 

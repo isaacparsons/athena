@@ -6,7 +6,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { faker } from '@faker-js/faker';
 import { DBConnection } from '@backend/types';
-import { Container } from 'inversify';
 import { container } from '../inversify.config';
 import { TYPES } from '../types/types';
 
@@ -18,21 +17,6 @@ type GenerateType = keyof typeof generateTypeMap;
 
 const fixturesDir = path.join(__dirname, 'fixtures');
 
-// const container = new Container();
-// container.bind(TYPES.DBClient).toConstantValue(
-//   new DB<Database>({
-//     dialect: new PostgresDialect({
-//       pool: new Pool({
-//         database: 'newsletter',
-//         host: 'localhost',
-//         user: 'postgres',
-//         password: 'postgres',
-//         port: 5432,
-//         max: 10,
-//       }),
-//     }),
-//   })
-// );
 const db = container.get<DBConnection>(TYPES.DBClient);
 
 export const parseFixture = async (fileName: string) => {

@@ -9,7 +9,7 @@ export const loggedInProcedure = publicProcedure.use(async (opts) => {
   const { ctx } = opts;
 
   const adminSecret = _.get(ctx, ['req', 'headers', 'admin-secret']);
-  if (adminSecret === config.app.adminSecret) {
+  if (!_.isUndefined(adminSecret) && adminSecret === config.app.adminSecret) {
     const admin = await ctx.db
       .selectFrom('user')
       .where('firstName', '=', 'SUPER')

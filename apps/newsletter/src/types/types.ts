@@ -293,6 +293,8 @@ export type INewsletterDAO = IEntityDAO<NewsletterRow, common.Newsletter> & {
   update(userId: number, input: common.UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
   inviteUser(userId: number, input: common.InviteNewsletterUser): Promise<void>;
+  readMember(userId: number, newsletterId: number): Promise<UserNewsletter>;
+  removeMember(input: common.RemoveNewsletterMember): Promise<void>;
 };
 
 export type TemplateNodeRow = EntityMetaRow &

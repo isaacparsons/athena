@@ -1,10 +1,7 @@
 import {
   CreateNewsletter,
-  NewsletterPost,
   UpdateNewsletter,
   InviteNewsletterUser,
-  Newsletter,
-  CreateNewsletterPost,
   CreateManyNewsletterPosts,
   CreateTemplate,
   Template,
@@ -15,138 +12,119 @@ import {
   ReadNewsletter,
   ReadNewsletterPost,
   ReadTemplate,
-  // CreateNewsletterPostsBatch,
+  RemoveNewsletterMember,
 } from '@athena/common';
-import { createContext } from '../trpc';
+import { createContext, trpc } from '../trpc';
+import { appRouter as router } from '../trpc/routes';
+import { container } from '../inversify.config';
+import { Kysely } from 'kysely';
 import {
-  AppRouter,
-  appRouter as router,
-  RouterEndpoint,
-  RouterEndpointType,
-} from '../trpc/routes';
+  DB,
+  IGCSManager,
+  ILocationDAO,
+  INewsletterDAO,
+  INewsletterPostDAO,
+  ITemplateDAO,
+  IUserDAO,
+  TYPES,
+} from '@backend/types';
 
-export const createMockRequest =
-  <R extends RouterEndpoint>(entityType: R) =>
-  (endpointType: RouterEndpointType<R>) =>
-  (userId: number, input: object) => {
-    const type = (router[entityType][endpointType] as any)._type;
-    return {
-      ctx: createContext({
-        req: {
-          user: { userId },
-          isAuthenticated: () => true,
-        } as any,
-        res: {} as any,
-      } as any),
-      path: '',
-      rawInput: input,
-      type,
-    } as any;
-  };
+const createCaller = trpc.createCallerFactory(router);
 
-const newsletterMockRequest = createMockRequest('newsletters');
-const newsletterPostMockRequest = createMockRequest('newsletterPosts');
-const userMockRequest = createMockRequest('users');
-const templateMockRequest = createMockRequest('templates');
+const testCaller = (userId: number) =>
+  createCaller(
+    createContext({
+      req: {
+        db: container.get<Kysely<DB>>(TYPES.DBClient),
+        dao: {
+          user: container.get<IUserDAO>(TYPES.IUserDAO),
+          newsletter: container.get<INewsletterDAO>(TYPES.INewsletterDAO),
+          location: container.get<ILocationDAO>(TYPES.ILocationDAO),
+          newsletterPost: container.get<INewsletterPostDAO>(
+            TYPES.INewsletterPostDAO
+          ),
+          template: container.get<ITemplateDAO>(TYPES.ITemplateDAO),
+        },
+        gcs: container.get<IGCSManager>(TYPES.IGCSManager),
+        user: { userId },
+        isAuthenticated: () => true,
+      } as any,
+      res: {} as any,
+    } as any)
+  );
 
 export async function getNewsletter(userId: number, newsletterId: number) {
-  return router.newsletters.read(
-    newsletterMockRequest('read')(userId, { id: newsletterId })
-  ) as Promise<ReadNewsletter>;
+  return testCaller(userId).newsletters.read({
+    id: newsletterId,
+  }) as Promise<ReadNewsletter>;
 }
 
 export async function createNewsletter(userId: number, input: CreateNewsletter) {
-  return router.newsletters.create(
-    newsletterMockRequest('create')(userId, input)
-  ) as Promise<number>;
+  return testCaller(userId).newsletters.create(input) as Promise<number>;
 }
 
 export async function updateNewsletter(userId: number, input: UpdateNewsletter) {
-  return router.newsletters.update(
-    newsletterMockRequest('update')(userId, input)
-  ) as Promise<number>;
+  return testCaller(userId).newsletters.update(input) as Promise<number>;
 }
 
 export async function deleteNewsletter(userId: number, id: number) {
-  return router.newsletters.delete(
-    newsletterMockRequest('delete')(userId, { id })
-  ) as Promise<number>;
+  return testCaller(userId).newsletters.delete({ id }) as Promise<number>;
 }
 
 export async function inviteNewsletterUser(
   userId: number,
   input: InviteNewsletterUser
 ) {
-  return router.newsletters.inviteUser(
-    newsletterMockRequest('inviteUser')(userId, input)
-  );
+  return testCaller(userId).newsletters.inviteUser(input);
+}
+
+export async function removeNewsletterMember(
+  userId: number,
+  input: RemoveNewsletterMember
+) {
+  return testCaller(userId).newsletters.removeMember(input);
 }
 
 export async function getNewsletterPost(userId: number, newsletterPostId: number) {
-  return router.newsletterPosts.read(
-    newsletterPostMockRequest('read')(userId, { id: newsletterPostId })
-  ) as Promise<ReadNewsletterPost>;
+  return testCaller(userId).newsletterPosts.read({
+    id: newsletterPostId,
+  }) as Promise<ReadNewsletterPost>;
 }
 
 export async function deleteNewsletterPosts(userId: number, ids: number[]) {
-  return router.newsletterPosts.deleteMany(
-    newsletterPostMockRequest('deleteMany')(userId, { ids })
-  );
+  return testCaller(userId).newsletterPosts.deleteMany({ ids });
 }
 
 export async function updateManyNewsletterPosts(
   userId: number,
   input: UpdateManyNewsletterPosts
 ) {
-  return router.newsletterPosts.updateMany(
-    newsletterPostMockRequest('updateMany')(userId, input)
-  );
+  return testCaller(userId).newsletterPosts.updateMany(input);
 }
 
 export async function createNewsletterPosts(
   userId: number,
   input: CreateManyNewsletterPosts
 ) {
-  return router.newsletterPosts.createMany(
-    newsletterPostMockRequest('createMany')(userId, input)
-  ) as Promise<number[]>;
+  return testCaller(userId).newsletterPosts.createMany(input) as Promise<number[]>;
 }
 
-// export async function createNewsletterPostsBatch(
-//   userId: number,
-//   input: CreateNewsletterPostsBatch
-// ) {
-//   return router.newsletterPosts.createBatch(
-//     newsletterPostMockRequest('createBatch')(userId, input)
-//   ) as Promise<number[]>;
-// }
-
 export async function createTemplate(userId: number, input: CreateTemplate) {
-  return router.templates.create(
-    templateMockRequest('create')(userId, input)
-  ) as Promise<number>;
+  return testCaller(userId).templates.create(input) as Promise<number>;
 }
 
 export async function getTemplate(userId: number, input: Read) {
-  return router.templates.read(
-    templateMockRequest('read')(userId, input)
-  ) as Promise<ReadTemplate>;
+  return testCaller(userId).templates.read(input) as Promise<ReadTemplate>;
 }
 
 export async function getTemplatesByUserId(userId: number) {
-  return router.users.templates(userMockRequest('templates')(userId, {})) as Promise<
-    Template[]
-  >;
+  return testCaller(userId).users.templates() as Promise<Template[]>;
 }
 
 export async function updateTemplate(userId: number, input: UpdateTemplate) {
-  return router.templates.update(
-    templateMockRequest('update')(userId, input)
-  ) as Promise<number>;
+  return testCaller(userId).templates.update(input) as Promise<number>;
 }
 
 export async function deleteTemplate(userId: number, input: Delete) {
-  return router.templates.delete(
-    templateMockRequest('delete')(userId, input)
-  ) as Promise<number>;
+  return testCaller(userId).templates.delete(input) as Promise<number>;
 }

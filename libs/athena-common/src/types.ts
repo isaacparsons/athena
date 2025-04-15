@@ -9,7 +9,8 @@ import {
   createTemplateSchema,
   createTextPostDetailsSchema,
   readPostUploadLinksSchema,
-  inviteNewsletterUser,
+  inviteNewsletterUserSchema,
+  removeNewsletterMemberSchema,
   locationSchema,
   mediaPostDetailsSchema,
   newsletterPostSchema,
@@ -99,7 +100,8 @@ export type ReadUser = User & {
   templates: Template[];
 };
 
-export type InviteNewsletterUser = z.infer<typeof inviteNewsletterUser>;
+export type InviteNewsletterUser = z.infer<typeof inviteNewsletterUserSchema>;
+export type RemoveNewsletterMember = z.infer<typeof removeNewsletterMemberSchema>;
 
 /**
  * Newsletter Post

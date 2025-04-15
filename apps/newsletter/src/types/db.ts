@@ -21,6 +21,8 @@ export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
+export type NewsletterRole = "commentor" | "editor" | "owner" | "read-only";
+
 export type TemplateType = "newsletter" | "newsletter-post";
 
 export interface Country {
@@ -125,7 +127,7 @@ export interface User {
 
 export interface UserNewsletter {
   newsletterId: number;
-  role: string;
+  role: NewsletterRole;
   userId: number;
 }
 

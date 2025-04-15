@@ -33,8 +33,13 @@ export enum NewsletterPermissions {
 export const newsletterRole = z.nativeEnum(NewsletterRole);
 export const newsletterPermissions = z.nativeEnum(NewsletterPermissions);
 
-export const inviteNewsletterUser = z.object({
+export const inviteNewsletterUserSchema = z.object({
   newsletterId: z.coerce.number(),
   email: z.coerce.string(),
   role: newsletterRole,
+});
+
+export const removeNewsletterMemberSchema = z.object({
+  newsletterId: z.coerce.number(),
+  userId: z.coerce.number(),
 });

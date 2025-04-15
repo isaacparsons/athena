@@ -6,8 +6,8 @@ import {
   UpdateNewsletter,
   InviteNewsletterUser,
   NewsletterRole,
-  NewsletterPermissions,
   ReadNewsletter,
+  RemoveNewsletterMember,
 } from '@athena/common';
 import { creator, modifier, owner } from '@backend/db';
 import {
@@ -24,35 +24,6 @@ import {
 import { mapDateRange, mapMeta, mapUser, mapUsers } from './mapping';
 import { EntityDAO } from './entity';
 import { Expression, expressionBuilder } from 'kysely';
-
-export const newsletterRolePermissionsMap: Record<
-  NewsletterRole,
-  NewsletterPermissions[]
-> = {
-  [NewsletterRole.READ_ONLY]: [NewsletterPermissions.READ],
-  [NewsletterRole.OWNER]: [
-    NewsletterPermissions.READ,
-    NewsletterPermissions.WRITE,
-    NewsletterPermissions.UPDATE,
-    NewsletterPermissions.DELETE,
-    NewsletterPermissions.COMMENT,
-    NewsletterPermissions.EDIT_MEMBER,
-    NewsletterPermissions.SHARE,
-    NewsletterPermissions.INVITE,
-  ],
-  [NewsletterRole.EDITOR]: [
-    NewsletterPermissions.READ,
-    NewsletterPermissions.WRITE,
-    NewsletterPermissions.UPDATE,
-    NewsletterPermissions.DELETE,
-    NewsletterPermissions.COMMENT,
-    NewsletterPermissions.SHARE,
-  ],
-  [NewsletterRole.COMMENTOR]: [
-    NewsletterPermissions.READ,
-    NewsletterPermissions.COMMENT,
-  ],
-};
 
 @injectable()
 @injectFromBase()
@@ -91,6 +62,16 @@ export class NewsletterDAO
         .innerJoin('user', 'user.id', 'un.userId')
         .selectAll('user')
     ).as('members');
+  }
+
+  async readMember(userId: number, newsletterId: number) {
+    return this.db
+      .selectFrom('user_newsletter')
+      .where(({ and, eb }) =>
+        and([eb('userId', '=', userId), eb('newsletterId', '=', newsletterId)])
+      )
+      .selectAll()
+      .executeTakeFirstOrThrow();
   }
 
   async read(id: number): Promise<ReadNewsletter> {
@@ -189,28 +170,8 @@ export class NewsletterDAO
     return res.id;
   }
 
-  private validPermissions(
-    role: NewsletterRole,
-    permissions: NewsletterPermissions[]
-  ) {
-    const rolePermissions = newsletterRolePermissionsMap[role];
-    return permissions.every((permission) => rolePermissions.includes(permission));
-  }
-
   async inviteUser(userId: number, input: InviteNewsletterUser) {
     const { newsletterId, email } = input;
-    const { role } = await this.db
-      .selectFrom('user_newsletter')
-      .select('role')
-      .where(({ and, eb }) =>
-        and([eb('userId', '=', userId), eb('newsletterId', '=', newsletterId)])
-      )
-      .executeTakeFirstOrThrow();
-    if (
-      !this.validPermissions(role as NewsletterRole, [NewsletterPermissions.INVITE])
-    )
-      throw new Error(`Do not have permissions`);
-
     await this.db
       .insertInto('user_newsletter')
       .values({
@@ -221,7 +182,14 @@ export class NewsletterDAO
       .executeTakeFirstOrThrow();
   }
 
-  // async removeMember() {}
+  async removeMember(input: RemoveNewsletterMember) {
+    const { userId, newsletterId } = input;
+    this.db
+      .deleteFrom('user_newsletter')
+      .where('userId', '=', userId)
+      .where('newsletterId', '=', newsletterId)
+      .executeTakeFirstOrThrow();
+  }
 
   // async editPermissions(){}
 }

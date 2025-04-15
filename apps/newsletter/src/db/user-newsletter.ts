@@ -1,4 +1,4 @@
-import { CreateTableBuilder } from 'kysely';
+import { CreateTableBuilder, sql } from 'kysely';
 import { DBConnection, Table } from '@backend/types';
 
 export class UserNewsletterTableClient extends Table<
@@ -17,5 +17,5 @@ export class UserNewsletterTableClient extends Table<
       .addColumn('newsletterId', 'integer', (col) =>
         col.references('newsletter.id').onDelete('cascade').notNull()
       )
-      .addColumn('role', 'text', (cb) => cb.notNull());
+      .addColumn('role', sql`newsletter_role`, (cb) => cb.notNull());
 }
