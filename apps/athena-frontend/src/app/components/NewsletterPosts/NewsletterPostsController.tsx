@@ -1,7 +1,4 @@
 import _ from 'lodash';
-import { useMemo, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { useSelectItems } from '@frontend/hooks';
 import {
   CustomCardHeader,
   StyledDialog,
@@ -12,45 +9,34 @@ import {
   NewsletterPostProperties,
   CreateTemplateIcon,
   BackButtonIcon,
+  useNewsletterPostsContext,
 } from '@frontend/components';
-import {
-  CreateNewsletterPostForm,
-  NewsletterPostForm,
-  UpdateNewsletterPostForm,
-} from '@frontend/types';
-import { getChildPosts } from '@athena/common';
+import { CreateNewsletterPostForm, NewsletterPostForm } from '@frontend/types';
+import { NewsletterPost } from '@athena/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 interface NewsletterPostsControllerProps {
   newsletterId: number;
-  parent: null | NewsletterPostForm;
-  setParent: (parent: null | NewsletterPostForm) => void;
-  fields: NewsletterPostForm[];
-  insert: (input: CreateNewsletterPostForm) => void;
-  update: (input: UpdateNewsletterPostForm) => void;
-  remove: (id: string) => void;
-  editing?: boolean;
-  setCreateTemplatePosts: (posts: NewsletterPostForm[]) => void;
+  onCreateTemplatePosts: (posts: NewsletterPostForm[]) => void;
 }
 
 export function NewsletterPostsController(props: NewsletterPostsControllerProps) {
-  const {
-    newsletterId,
-    editing,
-    setCreateTemplatePosts,
-    parent,
-    fields,
-    setParent,
-    insert,
-    update,
-    remove,
-  } = props;
+  const { newsletterId, onCreateTemplatePosts } = props;
 
-  const { selected, handleSelect, allSelected, handleSelectAll } = useSelectItems(
-    fields,
-    'tempPosition.id'
-  );
+  const {
+    parent,
+    setParent,
+    insertPost: insert,
+    updatePost: update,
+    deletePost: remove,
+    posts,
+    selected,
+    handleSelect,
+    allSelected,
+    handleSelectAll,
+    editing,
+  } = useNewsletterPostsContext();
 
   const handleOpenPostDetails = (post: NewsletterPostForm) => {
     if ((!editing && _.get(post, 'id') !== undefined) || editing) {
@@ -60,23 +46,17 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
 
   const handleBack = () => {
     const newParent =
-      fields.find((p) => p.tempPosition.id === parent?.tempPosition.parentId) ??
-      null;
+      posts.find((p) => p.tempPosition.id === parent?.tempPosition.parentId) ?? null;
     if (newParent !== undefined) setParent(newParent);
   };
 
+  const handleInsert = (input: CreateNewsletterPostForm) => {
+    insert(parent, input);
+  };
+
   const handleCreateTemplate = () => {
-    const posts = fields
-      .filter((p) => selected.has(p.tempPosition.id))
-      .reduce(
-        (prev, curr) => [
-          ...prev,
-          curr,
-          ...getChildPosts(curr.tempPosition.id, fields),
-        ],
-        [] as NewsletterPostForm[]
-      );
-    setCreateTemplatePosts(posts);
+    const selectedPosts = posts.filter((p) => selected.has(p.tempPosition.id));
+    onCreateTemplatePosts(selectedPosts);
   };
 
   return (
@@ -93,7 +73,7 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           />
         )}
         <EditingHeader
-          enabled={fields.length > 0}
+          enabled={posts.length > 0}
           editing={Boolean(editing)}
           selected={selected}
           allSelected={allSelected}
@@ -105,7 +85,7 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           />
         </EditingHeader>
         <NewsletterPostsList
-          posts={fields}
+          posts={posts}
           parent={parent}
           render={(value) => (
             <NewsletterPostsListItem
@@ -120,7 +100,10 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           )}
         />
         {editing && (
-          <AddNewsletterPostButton newsletterId={newsletterId} insert={insert} />
+          <AddNewsletterPostButton
+            newsletterId={newsletterId}
+            insert={handleInsert}
+          />
         )}
       </>
     </WithDialog>

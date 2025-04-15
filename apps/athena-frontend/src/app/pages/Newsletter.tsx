@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CircularProgress, IconButton, Skeleton } from '@mui/material';
 import {
   NewsletterProperties,
@@ -15,6 +15,8 @@ import {
   NewsletterPostMenu,
   StyledFab,
   IdParamRouteProps,
+  NewsletterPostsProvider,
+  useNewsletterPostsContext,
 } from '@frontend/components';
 import { CheckIcon, CloseIcon, MoreVertIcon } from '@frontend/icons';
 import {
@@ -29,7 +31,9 @@ import {
   CreateManyNewsletterPosts,
   CreateTemplate,
   DeleteMany,
+  NewsletterPost,
   ReadNewsletter,
+  ReadNewsletterPost,
   UpdateManyNewsletterPosts,
 } from '@athena/common';
 import {
@@ -43,59 +47,37 @@ import { RoutePaths } from '../AppRoutes';
 
 export function NewsletterRoute({ id }: IdParamRouteProps) {
   const { loading: loadingNewsletter, newsletter } = useNewsletter(id);
-  const {
-    posts,
-    createPosts,
-    updatePosts,
-    deletePosts,
-    loading: loadingPosts,
-  } = useNewsletterPosts(id);
 
-  const existingPosts = useMemo(() => addTempPositionToItems(posts), [posts]);
-
-  if (loadingNewsletter || loadingPosts || !newsletter) return <CircularProgress />;
+  if (loadingNewsletter || !newsletter) return <CircularProgress />;
   return (
-    <Newsletter
-      newsletter={newsletter}
-      posts={existingPosts}
-      createPosts={createPosts}
-      updatePosts={updatePosts}
-      deletePosts={deletePosts}
-    />
+    <NewsletterPostsProvider newsletterId={newsletter.id}>
+      <Newsletter newsletter={newsletter} />
+    </NewsletterPostsProvider>
   );
 }
 
 interface NewsletterProps {
   newsletter: ReadNewsletter;
-  posts: NewsletterPostForm[];
-  createPosts: (
-    input: CreateManyNewsletterPosts,
-    files?: [string, File][]
-  ) => Promise<void>;
-  updatePosts: (
-    newsletterId: number,
-    input: UpdateManyNewsletterPosts,
-    files?: [string, File][]
-  ) => Promise<void>;
-  deletePosts: (newsletterId: number, input: DeleteMany) => Promise<void>;
 }
 
 export function Newsletter(props: NewsletterProps) {
+  const { newsletter } = props;
   const {
-    newsletter,
-    posts: existingPosts,
-    createPosts,
-    updatePosts,
-    deletePosts,
-  } = props;
-  const [editing, setEditing] = useState(false);
+    reset,
+    save: savePosts,
+    editing,
+    setEditing,
+    created,
+    updated,
+    deleted,
+  } = useNewsletterPostsContext();
+
   const [settingsMenuAnchorEl, setSettingsMenuAnchorEl] =
     useState<null | HTMLElement>(null);
 
   const [createTemplatePosts, setCreateTemplatePosts] = useState<
     NewsletterPostForm[]
   >([]);
-  const [parent, setParent] = useState<null | NewsletterPostForm>(null);
 
   const promiseWithNotifications = usePromiseWithNotification();
 
@@ -110,21 +92,15 @@ export function Newsletter(props: NewsletterProps) {
     formState: newsletterFormState,
   } = useUpdateNewsletterForm(newsletter);
 
-  const {
-    fields,
-    insert,
-    update,
-    remove,
-    reset,
-    formState: newsletterPostsFormState,
-  } = useNewsletterPostsForm(parent, existingPosts);
-
   const saveable = useMemo(
-    () => newsletterFormState.isDirty || newsletterPostsFormState.isDirty,
-    [newsletterFormState.isDirty, newsletterPostsFormState.isDirty]
+    () =>
+      newsletterFormState.isDirty ||
+      created.length > 0 ||
+      updated.length > 0 ||
+      deleted.length > 0,
+    [newsletterFormState.isDirty, created, updated, deleted]
   );
 
-  const toggleEditing = () => setEditing((editing) => !editing);
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setSettingsMenuAnchorEl(event.currentTarget);
   };
@@ -133,46 +109,11 @@ export function Newsletter(props: NewsletterProps) {
   };
 
   const handleSaveNewsletter = async () => {
-    await handleSavePosts(fields);
+    await savePosts();
     if (updatedNewsletter !== undefined) {
       await updateNewsletter(updatedNewsletter);
     }
     reset();
-  };
-
-  const handleSavePosts = async (postsWithPostId: NewsletterPostForm[]) => {
-    const posts = postsWithPostId.map((p) => _.omit(p, 'postId'));
-    const files = posts.reduce((prev, curr) => {
-      const file = _.get(curr, ['details', 'file']) as File | undefined;
-      if (file !== undefined)
-        return [...prev, [curr.tempPosition.id, file] as [string, File]];
-      return prev;
-    }, [] as [string, File][]);
-
-    const created = formatCreatedPosts(newsletter.id, posts);
-    const updated = formatUpdatedPosts(newsletter.id, existingPosts, posts);
-    const deleted = formatDeletedPosts(existingPosts, posts);
-
-    console.log(created);
-    if (created && created.posts.length > 0) {
-      promiseWithNotifications.execute(createPosts(created, files), {
-        successMsg: 'Items created!',
-        errorMsg: 'Unable to create items :(',
-      });
-    }
-    if (deleted && deleted.ids.length > 0) {
-      promiseWithNotifications.execute(deletePosts(newsletter.id, deleted), {
-        successMsg: 'Items deleted!',
-        errorMsg: 'Unable to delete items :(',
-      });
-    }
-    if (updated.length > 0) {
-      promiseWithNotifications.execute(updatePosts(newsletter.id, updated, files), {
-        successMsg: 'Items updated!',
-        errorMsg: 'Unable to update items :(',
-      });
-    }
-    toggleEditing();
   };
 
   const handleCloseTemplateDialog = () => {
@@ -193,7 +134,7 @@ export function Newsletter(props: NewsletterProps) {
       errorMsg: 'Unable to create template :(',
     });
     setCreateTemplatePosts([]);
-    toggleEditing();
+    setEditing(false);
   };
 
   return (
@@ -211,25 +152,14 @@ export function Newsletter(props: NewsletterProps) {
         onMenuClose={handleMenuClose}
         settingsMenuAnchorEl={settingsMenuAnchorEl}
         onDeleteNewsletter={handleDeleteNewsletter}
-        onEdit={toggleEditing}
+        onEdit={() => setEditing(true)}
       />
       <CustomContainer>
-        <NewsletterProperties
-          control={control}
-          // data={newsletter}
-          editing={editing}
-        />
+        <NewsletterProperties control={control} editing={editing} />
         <NewsletterMembers data={newsletter.members} />
         <NewsletterPostsController
-          fields={fields}
-          parent={parent}
-          setParent={setParent}
-          insert={insert}
-          update={update}
-          remove={remove}
-          editing={editing}
           newsletterId={newsletter.id}
-          setCreateTemplatePosts={(p) => setCreateTemplatePosts(p)}
+          onCreateTemplatePosts={(p) => setCreateTemplatePosts(p)}
         />
         {editing && (
           <StyledFab disabled={!saveable} onClick={handleSaveNewsletter}>

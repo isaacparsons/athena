@@ -134,15 +134,17 @@ export const createNewsletterPostsSlice: StateCreator<
 });
 
 export const useNewsletterPosts = (newsletterId: number) => {
-  const { posts, createPosts, updatePosts, deletePosts, loading } = useStore(
-    useShallow((state) => ({
-      posts: state.newsletterPosts.data,
-      loading: state.newsletterPosts.loading,
-      createPosts: state.newsletterPosts.create,
-      updatePosts: state.newsletterPosts.update,
-      deletePosts: state.newsletterPosts.delete,
-    }))
-  );
+  const { posts, createPosts, updatePosts, deletePosts, loading, fetchPosts } =
+    useStore(
+      useShallow((state) => ({
+        fetchPosts: state.newsletterPosts.fetch,
+        posts: state.newsletterPosts.data,
+        loading: state.newsletterPosts.loading,
+        createPosts: state.newsletterPosts.create,
+        updatePosts: state.newsletterPosts.update,
+        deletePosts: state.newsletterPosts.delete,
+      }))
+    );
   return {
     loading,
     posts: Object.values(posts).filter(
@@ -151,5 +153,6 @@ export const useNewsletterPosts = (newsletterId: number) => {
     createPosts,
     updatePosts,
     deletePosts,
+    fetchPosts,
   };
 };

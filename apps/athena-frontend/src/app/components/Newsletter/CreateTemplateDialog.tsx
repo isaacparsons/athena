@@ -1,5 +1,5 @@
 import { CreateTemplate, TemplateType } from '@athena/common';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNewsletterPostsForm, useSelectItems } from '@frontend/hooks';
 import {
@@ -18,7 +18,8 @@ import {
 import { CheckIcon } from '@frontend/icons';
 
 import { toTemplateNodes } from '@frontend/util';
-import { NewsletterPostForm } from '@frontend/types';
+import { CreateNewsletterPostForm, NewsletterPostForm } from '@frontend/types';
+import _ from 'lodash';
 
 interface CreateTemplateDialogProps {
   newsletterId: number;
@@ -32,7 +33,7 @@ type FormValues = {
 };
 
 export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
-  const { posts, newsletterId, onSave, onClose } = props;
+  const { posts: incomingPosts, newsletterId, onSave, onClose } = props;
 
   const [parent, setParent] = useState<null | NewsletterPostForm>(null);
 
@@ -46,10 +47,30 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
     // mode: 'onChange',
   });
 
-  const { fields, insert, update, remove } = useNewsletterPostsForm(parent, posts);
+  const { formPosts, reset, insertPost, updatePost, deletePost } =
+    useNewsletterPostsForm({
+      storePosts: [],
+    });
+
+  useEffect(() => {
+    incomingPosts.forEach((p) => {
+      const parent =
+        p.tempPosition.parentId === null
+          ? null
+          : incomingPosts.find(
+              (ip) => ip.tempPosition.id === p.tempPosition.parentId
+            );
+      const existing = formPosts.find(
+        (fp) => fp.tempPosition.id === p.tempPosition.id
+      );
+      if (!_.isUndefined(parent) && !existing) {
+        insertPost(parent, p);
+      }
+    });
+  }, [incomingPosts, insertPost, formPosts]);
 
   const { selected, handleSelect, allSelected, handleSelectAll } = useSelectItems(
-    fields,
+    formPosts,
     'tempPosition.id'
   );
 
@@ -58,7 +79,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
   };
 
   const handleSave: SubmitHandler<FormValues> = async (data) => {
-    const nodes = toTemplateNodes(fields);
+    const nodes = toTemplateNodes(formPosts);
     const input = {
       type: TemplateType.NewsletterPost,
       name: data.name,
@@ -66,17 +87,22 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
       nodes,
     };
     onSave(input);
+    reset();
   };
 
   const handleBack = () => {
     const newParent =
-      fields.find((p) => p.tempPosition.id === parent?.tempPosition.parentId) ??
+      formPosts.find((p) => p.tempPosition.id === parent?.tempPosition.parentId) ??
       null;
     if (newParent !== undefined) setParent(newParent);
   };
 
+  const handleInsert = (input: CreateNewsletterPostForm) => {
+    insertPost(parent, input);
+  };
+
   return (
-    <StyledDialog fullScreen open={posts.length > 0}>
+    <StyledDialog fullScreen open={formPosts.length > 0}>
       <>
         <CustomCardHeader
           left={parent === null ? null : <BackButtonIcon onClick={handleBack} />}
@@ -90,7 +116,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
           {...register('name')}
         />
         <EditingHeader
-          enabled={fields.length > 0}
+          enabled={formPosts.length > 0}
           editing={true}
           selected={selected}
           allSelected={allSelected}
@@ -99,7 +125,7 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
           <DeleteIcon sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
         </EditingHeader>
         <NewsletterPostsList
-          posts={fields}
+          posts={formPosts}
           parent={parent}
           render={(value) => (
             <NewsletterPostsListItem
@@ -107,13 +133,13 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
               editing={true}
               handleSelect={handleSelect}
               selected={selected}
-              handleRemove={remove}
-              handleUpdate={update}
+              handleRemove={deletePost}
+              handleUpdate={updatePost}
               handleOpenPostDetails={handleOpenPostDetails}
             />
           )}
         />
-        <AddNewsletterPostButton newsletterId={newsletterId} insert={insert} />
+        <AddNewsletterPostButton newsletterId={newsletterId} insert={handleInsert} />
         <StyledFab onClick={handleSubmit(handleSave)}>
           <CheckIcon sx={{ color: 'white' }} />
         </StyledFab>

@@ -107,14 +107,14 @@ export const addPropertyToItems = <T, P extends string, V>(
   transformFn: (item: T) => T & { [key in P]: V }
 ): (T & { [key in P]: V })[] => items.map(transformFn);
 
-const getId = <K, V>(map: Map<K, V>, key: K): V => {
+export const getId = <K, V>(map: Map<K, V>, key: K): V => {
   const val = map.get(key);
   if (val === undefined) throw new Error('Not found');
   return val;
 };
 
 export const addTempPositionToItems = <
-  T extends { id: number; position: NodePosition }
+  T extends { id: number; position: NodePosition; tempPosition?: TempNodePosition }
 >(
   items: T[]
 ) => {
@@ -159,7 +159,6 @@ export const fromItemsWithTempPosition = <
 
 // type Id = string | number;
 
-// type WithTempPosition<T> = T & { tempPosition: TempNodePosition };
 // type WithPosition<T> = T & { position: NodePosition };
 
 // const makeIdMap = <K extends Id>(keys: K[]): Record<K, string> =>

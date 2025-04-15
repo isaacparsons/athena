@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Control, useFieldArray, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import {
   CreateNewsletterPostForm,
   NewsletterPostForm,
@@ -7,121 +7,203 @@ import {
 } from '@frontend/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  CreateManyNewsletterPosts,
   CreateNewsletter,
   createNewsletterSchema,
+  getId,
   Newsletter,
+  NewsletterPost,
   UpdateNewsletter,
   updateNewsletterSchema,
+  WithTempPosition,
+  UpdateNewsletterPost,
 } from '@athena/common';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { nanoid } from 'nanoid';
 
-export const useNewsletterPostsForm = <T extends { posts: NewsletterPostForm[] }>(
-  parent: NewsletterPostForm | null,
-  posts: NewsletterPostForm[]
-) => {
-  const { control, handleSubmit, reset, formState } = useForm<{
-    posts: NewsletterPostForm[];
-  }>({
-    // resolver: zodResolver(z.object({ posts: z.array(newsletterPostFormSchema) })),
-    defaultValues: { posts },
-    // values: { posts },
-  });
-
-  const { fields, remove, insert, update } = useFieldArray<
-    { posts: NewsletterPostForm[] },
-    'posts',
-    'postId'
-  >({
-    name: 'posts',
-    control: control as unknown as Control<{ posts: NewsletterPostForm[] }>,
-    keyName: 'postId',
-  });
-
-  // const handleRemove = (id: string) => {
-  //   const postIdx = fields.findIndex((p) => p.tempPosition.id === id);
-  //   if (postIdx > -1) remove(postIdx);
-  // };
-
-  const handleRemove = useCallback(
-    (id: string) => {
-      const postIdx = fields.findIndex((p) => p.tempPosition.id === id);
-      if (postIdx > -1) remove(postIdx);
-    },
-    [fields, remove]
-  );
-
-  // const handleUpdate = (input: UpdateNewsletterPostForm) => {
-  //   const { id, change } = input;
-  //   const postIdx = fields.findIndex((p) => p.tempPosition.id === id);
-  //   if (postIdx > -1) update(postIdx, _.merge(fields[postIdx], change));
-  // };
-  const handleUpdate = useCallback(
-    (input: UpdateNewsletterPostForm) => {
-      const { id, change } = input;
-      const postIdx = fields.findIndex((p) => p.tempPosition.id === id);
-      if (postIdx > -1) update(postIdx, _.merge(fields[postIdx], change));
-    },
-    [fields, update]
-  );
-
-  const handleInsert = useCallback(
-    (post: CreateNewsletterPostForm) => {
-      const parentId = parent?.tempPosition.id ?? null;
-      const prev = fields.find(
-        (p) => p.tempPosition.nextId === null && p.tempPosition.parentId === parentId
-      );
-      const inputParentId = _.get(post, ['tempPosition', 'parentId']);
-      const inputId = _.get(post, ['tempPosition', 'id']);
-      const inputNextId = _.get(post, ['tempPosition', 'nextId']);
-      const inputPrevId = _.get(post, ['tempPosition', 'prevId']);
-
-      insert(fields.length, {
-        ...post,
-        tempPosition: {
-          parentId: inputParentId === undefined ? parentId : inputParentId,
-          id: inputId === undefined ? fields.length.toString() : inputId,
-          nextId: inputNextId === undefined ? null : inputNextId,
-          prevId:
-            inputPrevId === undefined ? prev?.tempPosition.id ?? null : inputPrevId,
-        },
-      });
-    },
-    [fields, parent, insert]
-  );
-
-  // const handleInsert = (post: CreateNewsletterPostForm) => {
-  //   const parentId = parent?.tempPosition.id ?? null;
-  //   const prev = fields.find(
-  //     (p) => p.tempPosition.nextId === null && p.tempPosition.parentId === parentId
-  //   );
-  //   const inputParentId = _.get(post, ['tempPosition', 'parentId']);
-  //   const inputId = _.get(post, ['tempPosition', 'id']);
-  //   const inputNextId = _.get(post, ['tempPosition', 'nextId']);
-  //   const inputPrevId = _.get(post, ['tempPosition', 'prevId']);
-
-  //   insert(fields.length, {
-  //     ...post,
-  //     tempPosition: {
-  //       parentId: inputParentId === undefined ? parentId : inputParentId,
-  //       id: inputId === undefined ? fields.length.toString() : inputId,
-  //       nextId: inputNextId === undefined ? null : inputNextId,
-  //       prevId:
-  //         inputPrevId === undefined ? prev?.tempPosition.id ?? null : inputPrevId,
-  //     },
-  //   });
-  // };
-
-  return {
-    fields,
-    formState,
-    reset,
-    handleSubmit,
-    remove: handleRemove,
-    update: handleUpdate,
-    insert: handleInsert,
-  };
+export type NewsletterPostFormGroupedByAction = {
+  existing: WithTempPosition<NewsletterPost>[];
+  created: CreateManyNewsletterPosts['posts'][number][];
+  updated: WithTempPosition<UpdateNewsletterPost>[];
+  deleted: WithTempPosition<NewsletterPost>[];
 };
 
+export function useNewsletterPostsForm({
+  storePosts,
+  defaultPosts,
+}: {
+  storePosts: NewsletterPost[];
+  defaultPosts?: NewsletterPostFormGroupedByAction;
+}) {
+  const [posts, setPosts] = useState<NewsletterPostFormGroupedByAction>(
+    defaultPosts ?? {
+      existing: [],
+      created: [],
+      updated: [],
+      deleted: [],
+    }
+  );
+
+  useEffect(() => {
+    const { existing } = posts;
+    const newPosts = storePosts.filter(
+      (p) => !existing.find((ep) => ep.id === p.id)
+    );
+
+    if (newPosts.length === 0) return;
+    const idMap = new Map([
+      ...(newPosts.map((p) => [p.id, nanoid()]) as [number, string][]),
+      ...(existing.map((p) => [p.id, p.tempPosition.id]) as [number, string][]),
+    ]);
+
+    const formPosts = [
+      ...existing,
+      ...newPosts.map((p) => ({
+        ...p,
+        tempPosition: {
+          id: getId(idMap, p.id),
+          parentId:
+            p.position.parentId === null ? null : getId(idMap, p.position.parentId),
+          nextId:
+            p.position.nextId === null ? null : getId(idMap, p.position.nextId),
+          prevId:
+            p.position.prevId === null ? null : getId(idMap, p.position.prevId),
+        },
+      })),
+    ];
+    setPosts((posts) => ({
+      ...posts,
+      existing: formPosts,
+    }));
+  }, [posts, setPosts, storePosts]);
+
+  const formPosts = useMemo(() => {
+    const { created, updated, deleted } = posts;
+    const untouchedPosts = posts.existing.filter((p) => {
+      const isCreated = created.find(
+        (cp) => cp.tempPosition.id === p.tempPosition.id
+      );
+      if (isCreated) return false;
+      const isUpdated = updated.find(
+        (cp) => cp.tempPosition.id === p.tempPosition.id
+      );
+      if (isUpdated) return false;
+      const isDeleted = deleted.find(
+        (cp) => cp.tempPosition.id === p.tempPosition.id
+      );
+      if (isDeleted) return false;
+      return true;
+    });
+    return [...untouchedPosts, ...created, ...updated] as NewsletterPostForm[];
+  }, [posts]);
+
+  const handleReset = () => {
+    setPosts((posts) => ({
+      ...posts,
+      created: [],
+      updated: [],
+      deleted: [],
+    }));
+  };
+
+  const handleRemove = (id: string) => {
+    const post = posts.existing.find((p) => p.tempPosition.id === id);
+    const created = posts.created.find((p) => p.tempPosition.id === id);
+    const updated = posts.updated.find((p) => p.tempPosition.id === id);
+    if (post || created || updated) {
+      setPosts((posts) => ({
+        ...posts,
+        created: posts.created.filter((p) => p.tempPosition.id !== id),
+        updated: posts.updated.filter((p) => p.tempPosition.id !== id),
+        deleted: post ? [...posts.deleted, post] : posts.deleted,
+      }));
+    }
+  };
+
+  const handleUpdate = (input: UpdateNewsletterPostForm) => {
+    const { id, change } = input;
+    const updatedPost = posts.updated.find((p) => p.tempPosition.id === id);
+
+    if (updatedPost) {
+      setPosts((posts) => ({
+        ...posts,
+        updated: posts.updated.map((p) =>
+          p.tempPosition.id === id ? { ...p, ...change } : p
+        ),
+      }));
+      return;
+    }
+    const createdPost = posts.created.find((p) => p.tempPosition.id === id);
+    if (createdPost) {
+      setPosts((posts) => ({
+        ...posts,
+        created: posts.created.map((p) =>
+          p.tempPosition.id === id ? { ...p, ...change } : p
+        ),
+      }));
+      return;
+    }
+    const post = posts.existing.find((p) => p.tempPosition.id === id);
+    if (post) {
+      setPosts((posts) => ({
+        ...posts,
+        updated: [...posts.updated, { ...post, ...change }],
+      }));
+    }
+  };
+
+  const handleInsert = (
+    parent: NewsletterPostForm | null,
+    post: CreateNewsletterPostForm
+  ) => {
+    const parentId = parent?.tempPosition.id ?? null;
+    const prev = posts.existing.find(
+      (p) => p.tempPosition.nextId === null && p.tempPosition.parentId === parentId
+    );
+
+    const position = _.isUndefined(parent?.id)
+      ? undefined
+      : {
+          parentId: parent.id,
+          nextId: null,
+          prevId: prev?.id ?? null,
+        };
+
+    const inputParentId = _.get(post, ['tempPosition', 'parentId']);
+    const inputId = _.get(post, ['tempPosition', 'id']);
+    const inputNextId = _.get(post, ['tempPosition', 'nextId']);
+    const inputPrevId = _.get(post, ['tempPosition', 'prevId']);
+
+    setPosts((posts) => ({
+      ...posts,
+      created: [
+        ...posts.created,
+        {
+          ...post,
+          position,
+          tempPosition: {
+            parentId: inputParentId === undefined ? parentId : inputParentId,
+            id: inputId === undefined ? posts.created.length.toString() : inputId,
+            nextId: inputNextId === undefined ? null : inputNextId,
+            prevId:
+              inputPrevId === undefined
+                ? prev?.tempPosition.id ?? null
+                : inputPrevId,
+          },
+        },
+      ],
+    }));
+  };
+
+  return {
+    posts,
+    formPosts,
+    reset: handleReset,
+    insertPost: handleInsert,
+    updatePost: handleUpdate,
+    deletePost: handleRemove,
+  };
+}
 export const useUpdateNewsletterForm = (newsletter: Newsletter) => {
   const { trigger, watch, reset, formState, control, setValue } =
     useForm<UpdateNewsletter>({
@@ -130,12 +212,6 @@ export const useUpdateNewsletterForm = (newsletter: Newsletter) => {
       defaultValues: newsletter,
     });
 
-  // useEffect(() => {
-  //   if (newsletter) {
-  //     setValue('name', newsletter.name);
-  //     setValue('dateRange', newsletter.dateRange);
-  //   }
-  // }, [newsletter, setValue]);
   const formValues = watch();
 
   const updatedNewsletter = useMemo(() => {

@@ -7,3 +7,4 @@ export * from './NewsletterPostsListItem';
 export * from './EditingHeader';
 export * from './NewsletterPostProperties';
 export * from './NewsletterPostMenu';
+export * from './NewsletterPostsContext';

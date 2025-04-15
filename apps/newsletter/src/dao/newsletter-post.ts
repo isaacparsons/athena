@@ -379,40 +379,39 @@ export class NewsletterPostDAO
 
   async deleteMany(userId: number, input: DeleteMany) {
     const { ids } = input;
-    await this.db.transaction().execute(async (trx: Transaction) => {
-      const deletedPosts = await trx
-        .deleteFrom('newsletter_post')
-        .where('id', 'in', ids)
-        .returning(['id', 'nextId', 'prevId', 'parentId', 'newsletterId'])
-        .execute();
 
-      await Promise.all(
-        deletedPosts.map(async (p) => {
-          await trx
-            .updateTable('newsletter_post')
-            .set({ nextId: p.nextId })
-            .where(({ and, eb }) =>
-              and([
-                eb('nextId', '=', p.id),
-                eb('parentId', p.parentId === null ? 'is' : '=', p.parentId),
-                eb('newsletterId', '=', p.newsletterId),
-              ])
-            )
-            .execute();
+    for (const id of ids) {
+      await this.db.transaction().execute(async (trx: Transaction) => {
+        const { nextId, prevId, parentId, newsletterId } = await trx
+          .deleteFrom('newsletter_post')
+          .where('id', '=', id)
+          .returning(['id', 'nextId', 'prevId', 'parentId', 'newsletterId'])
+          .executeTakeFirstOrThrow();
 
-          await trx
-            .updateTable('newsletter_post')
-            .set({ prevId: p.prevId })
-            .where(({ and, eb }) =>
-              and([
-                eb('prevId', '=', p.id),
-                eb('parentId', p.parentId === null ? 'is' : '=', p.parentId),
-                eb('newsletterId', '=', p.newsletterId),
-              ])
-            )
-            .execute();
-        })
-      );
-    });
+        await trx
+          .updateTable('newsletter_post')
+          .set({ nextId })
+          .where(({ and, eb }) =>
+            and([
+              eb('nextId', '=', id),
+              eb('parentId', parentId === null ? 'is' : '=', parentId),
+              eb('newsletterId', '=', newsletterId),
+            ])
+          )
+          .execute();
+
+        await trx
+          .updateTable('newsletter_post')
+          .set({ prevId })
+          .where(({ and, eb }) =>
+            and([
+              eb('prevId', '=', id),
+              eb('parentId', parentId === null ? 'is' : '=', parentId),
+              eb('newsletterId', '=', newsletterId),
+            ])
+          )
+          .execute();
+      });
+    }
   }
 }

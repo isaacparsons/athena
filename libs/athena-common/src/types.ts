@@ -174,3 +174,5 @@ export type UpdateLocation = z.infer<typeof updateLocationSchema>;
  * Country
  */
 export type Country = z.infer<typeof countrySchema>;
+
+export type WithTempPosition<T> = T & { tempPosition: TempNodePosition };
