@@ -1,9 +1,4 @@
-import {
-  createCustomFab,
-  CustomContainer,
-  CustomList,
-  CustomListItem,
-} from '@frontend/components';
+import { CustomContainer } from '@frontend/components';
 import { useParamId } from '@frontend/hooks';
 import { useTemplate } from '@frontend/store';
 import { AddIcon } from '@frontend/icons';

@@ -8,7 +8,7 @@ import {
 } from '@toolpad/core';
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { RoutePaths } from '../AppRoutes';
+import { RoutePaths } from '@frontend/config';
 
 const config = getConfig();
 const googleId = 'google' as SupportedAuthProvider;

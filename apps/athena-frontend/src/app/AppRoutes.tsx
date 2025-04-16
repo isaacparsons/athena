@@ -19,17 +19,7 @@ import {
 } from './pages';
 import { Appbar, WithIdParamRoute } from '@frontend/components';
 import { useUser } from '@frontend/store';
-
-export enum RoutePaths {
-  home = '/',
-  newsletters = '/newsletters',
-  newsletter = '/newsletters/:newsletterId',
-  login = '/login',
-  templates = '/templates',
-  template = '/templates/:templateId',
-  account = '/account',
-  // settings="/settings"
-}
+import { RoutePaths } from '@frontend/config';
 
 interface WithOutletProps {
   children: React.ReactNode;

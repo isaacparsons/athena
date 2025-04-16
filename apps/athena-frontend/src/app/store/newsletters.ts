@@ -2,7 +2,13 @@ import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { Slices, useStore } from '@frontend/store';
-import { CreateNewsletter, ReadNewsletter, UpdateNewsletter } from '@athena/common';
+import {
+  CreateNewsletter,
+  InviteNewsletterUsers,
+  ReadNewsletter,
+  UpdateNewsletter,
+  UpdateNewsletterMember,
+} from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect, useMemo } from 'react';
@@ -15,6 +21,8 @@ export interface NewslettersSlice {
     create: (input: CreateNewsletter) => Promise<number>;
     update: (input: UpdateNewsletter) => Promise<number>;
     delete: (id: number) => Promise<number>;
+    updateMember: (input: UpdateNewsletterMember) => Promise<void>;
+    inviteUsers: (input: InviteNewsletterUsers) => Promise<void>;
   };
 }
 
@@ -75,6 +83,14 @@ export const createNewslettersSlice: StateCreator<
       await get().user.fetch();
       return deletedId;
     },
+    updateMember: async (input: UpdateNewsletterMember) => {
+      await asyncTrpcClient.newsletters.updateMember.mutate(input);
+      await get().newsletters.fetch(input.newsletterId);
+    },
+    inviteUsers: async (input: InviteNewsletterUsers) => {
+      await asyncTrpcClient.newsletters.inviteUsers.mutate(input);
+      await get().newsletters.fetch(input.newsletterId);
+    },
   },
 });
 
@@ -87,6 +103,8 @@ export const useNewsletters = () => {
       update: state.newsletters.update,
       newsletters: state.newsletters.data,
       loading: state.newsletters.loading,
+      updateMember: state.newsletters.updateMember,
+      inviteUsers: state.newsletters.inviteUsers,
     }))
   );
 };

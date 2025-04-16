@@ -2,8 +2,8 @@ import {
   CustomCardFooter,
   CustomCardHeader,
   NewsletterPostDetailsContent,
-  DetailsCardIcon,
-  CloseIcon,
+  StyledDetailsCardIcon,
+  StyledCloseIcon,
   StyledCard,
 } from '@frontend/components';
 import { Checkbox } from '@mui/material';
@@ -53,7 +53,7 @@ export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
             />
           ) : null
         }
-        right={editing ? <CloseIcon onClick={handleRemovePost} /> : null}
+        right={editing ? <StyledCloseIcon onClick={handleRemovePost} /> : null}
       />
       {value && value.details && (
         <NewsletterPostDetailsContent
@@ -67,7 +67,7 @@ export function NewsletterPostsListItem(props: NewsletterPostsListItemProps) {
           }}
         />
       )}
-      <CustomCardFooter right={<DetailsCardIcon />} />
+      <CustomCardFooter right={<StyledDetailsCardIcon />} />
     </StyledCard>
   );
 }

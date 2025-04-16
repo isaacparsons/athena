@@ -1,8 +1,3 @@
-// import {
-//   createTRPCProxyClient,
-//   createTRPCReact,
-//   httpBatchLink,
-// } from '@trpc/react-query';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import type { AppRouter } from '@backend/trpc';
@@ -15,7 +10,6 @@ const headers = config.ADMIN_SECRET
     }
   : {};
 
-console.log(`${process.env.NODE_ENV}`);
 export const asyncTrpcClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
@@ -26,23 +20,9 @@ export const asyncTrpcClient = createTRPCProxyClient<AppRouter>({
       async fetch(url, options) {
         return fetch(url, {
           ...options,
-          // credentials: 'include',
+          ...(config.ENV === 'prod' ? { credentials: 'include' } : {}),
         });
       },
     }),
   ],
 });
-
-// export const trpc = createTRPCReact<AppRouter>();
-// export const trpcClient = trpc.createClient({
-//   links: [
-//     httpBatchLink({
-//       url: apiUrl,
-//       async headers() {
-//         return {
-//           'admin-secret': '123456',
-//         };
-//       },
-//     }),
-//   ],
-// });

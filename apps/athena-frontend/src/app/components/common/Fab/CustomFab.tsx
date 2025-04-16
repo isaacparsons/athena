@@ -1,5 +1,6 @@
 import { Fab } from '@mui/material';
 import { SvgIconComponent } from '../Styled';
+import { AddIcon } from '@frontend/icons';
 
 interface CustomFabProps {
   // Icon: SvgIconComponent;
@@ -33,3 +34,5 @@ export const createCustomFab =
       </Fab>
     );
   };
+
+export const AddFab = createCustomFab(AddIcon);

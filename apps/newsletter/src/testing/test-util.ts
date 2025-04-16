@@ -1,7 +1,6 @@
 import {
   CreateNewsletter,
   UpdateNewsletter,
-  InviteNewsletterUser,
   CreateManyNewsletterPosts,
   CreateTemplate,
   Template,
@@ -14,6 +13,7 @@ import {
   ReadTemplate,
   RemoveNewsletterMember,
   UpdateNewsletterMember,
+  InviteNewsletterUsers,
 } from '@athena/common';
 import { createContext, trpc } from '../trpc';
 import { appRouter as router } from '../trpc/routes';
@@ -74,9 +74,9 @@ export async function deleteNewsletter(userId: number, id: number) {
 
 export async function inviteNewsletterUser(
   userId: number,
-  input: InviteNewsletterUser
+  input: InviteNewsletterUsers
 ) {
-  return testCaller(userId).newsletters.inviteUser(input);
+  return testCaller(userId).newsletters.inviteUsers(input);
 }
 
 export async function removeNewsletterMember(

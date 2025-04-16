@@ -7,8 +7,8 @@ import {
   NewsletterPostsListItem,
   EditingHeader,
   NewsletterPostProperties,
-  CreateTemplateIcon,
-  BackButtonIcon,
+  StyledCreateTemplateIcon,
+  StyledBackButtonIcon,
   useNewsletterPostsContext,
 } from '@frontend/components';
 import { CreateNewsletterPostForm, NewsletterPostForm } from '@frontend/types';
@@ -63,7 +63,9 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
     <WithDialog parent={parent}>
       <>
         <CustomCardHeader
-          left={parent === null ? null : <BackButtonIcon onClick={handleBack} />}
+          left={
+            parent === null ? null : <StyledBackButtonIcon onClick={handleBack} />
+          }
         />
         {parent !== null && (
           <NewsletterPostProperties
@@ -79,7 +81,7 @@ export function NewsletterPostsController(props: NewsletterPostsControllerProps)
           allSelected={allSelected}
           handleSelectAll={handleSelectAll}
         >
-          <CreateTemplateIcon
+          <StyledCreateTemplateIcon
             onClick={handleCreateTemplate}
             sx={{ m: 0.3, height: 35, width: 35, borderRadius: 17.5 }}
           />

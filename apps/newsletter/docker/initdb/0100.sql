@@ -368,40 +368,40 @@
 -- ALTER SEQUENCE public.template_node_id_seq OWNED BY public.template_node.id;
 
 
--- --
--- -- Name: user; Type: TABLE; Schema: public; Owner: postgres
--- --
+--
+-- Name: user; Type: TABLE; Schema: public; Owner: postgres
+--
 
--- CREATE TABLE public."user" (
---     id integer NOT NULL,
---     "firstName" character varying,
---     "lastName" character varying,
---     email character varying NOT NULL
--- );
-
-
--- ALTER TABLE public."user" OWNER TO postgres;
-
--- --
--- -- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
--- --
-
--- CREATE SEQUENCE public.user_id_seq
---     AS integer
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
+CREATE TABLE public."user" (
+    id integer NOT NULL,
+    "firstName" character varying,
+    "lastName" character varying,
+    email character varying NOT NULL
+);
 
 
--- ALTER SEQUENCE public.user_id_seq OWNER TO postgres;
+ALTER TABLE public."user" OWNER TO postgres;
 
--- --
--- -- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
--- --
+--
+-- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
 
--- ALTER SEQUENCE public.user_id_seq OWNED BY public."user".id;
+CREATE SEQUENCE public.user_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.user_id_seq OWNER TO postgres;
+
+--
+-- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.user_id_seq OWNED BY public."user".id;
 
 
 -- --
@@ -504,9 +504,9 @@
 -- -- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: postgres
 -- --
 
--- COPY public."user" (id, "firstName", "lastName", email) FROM stdin;
--- 1	SUPER	USER	isaac.2962@gmail.com
--- \.
+COPY public."user" (id, "firstName", "lastName", email) FROM stdin;
+1	SUPER	USER	isaac.2962@gmail.com
+\.
 
 
 -- --

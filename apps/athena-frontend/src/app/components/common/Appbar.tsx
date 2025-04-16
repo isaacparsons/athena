@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import {
   AppBar,
   Toolbar,
@@ -23,7 +22,7 @@ import {
   HomeIcon,
 } from '@frontend/icons';
 import { useNavigate } from 'react-router-dom';
-import { RoutePaths } from '../../AppRoutes';
+import { RoutePaths } from '@frontend/config';
 import { useUser } from '@frontend/store';
 
 interface AppbarProps {

@@ -17,6 +17,9 @@ import {
   updateNewsletterSchema,
   WithTempPosition,
   UpdateNewsletterPost,
+  UpdateNewsletterMember,
+  updateNewsletterMemberSchema,
+  NewsletterMember,
 } from '@athena/common';
 import { useEffect, useMemo, useState } from 'react';
 import { nanoid } from 'nanoid';

@@ -10,6 +10,7 @@ import {
   RemoveNewsletterMember,
   UpdateNewsletterMember,
   NewsletterMember,
+  InviteNewsletterUsers,
 } from '@athena/common';
 import { creator, modifier, newsletterMember } from '@backend/db';
 import {
@@ -178,16 +179,21 @@ export class NewsletterDAO
     return res.id;
   }
 
-  async inviteUser(userId: number, input: InviteNewsletterUser) {
-    const { newsletterId, email } = input;
-    await this.db
-      .insertInto('user_newsletter')
-      .values({
-        userId: this.db.selectFrom('user').select('id').where('email', '=', email),
-        newsletterId,
-        role: input.role,
-      })
-      .executeTakeFirstOrThrow();
+  async inviteUsers(userId: number, input: InviteNewsletterUsers) {
+    const { newsletterId, users } = input;
+
+    await Promise.all(
+      users.map((u) =>
+        this.db
+          .insertInto('user_newsletter')
+          .values(({ selectFrom }) => ({
+            userId: selectFrom('user').select('id').where('email', '=', u.email),
+            newsletterId,
+            role: u.role,
+          }))
+          .executeTakeFirstOrThrow()
+      )
+    );
   }
 
   async removeMember(input: RemoveNewsletterMember) {

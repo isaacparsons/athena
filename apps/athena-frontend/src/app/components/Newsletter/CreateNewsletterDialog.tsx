@@ -51,7 +51,7 @@ export function CreateNewsletterDialog(props: CreateNewsletterDialogProps) {
       <DialogContent>
         <Controller
           control={control}
-          name="dateRange"
+          name="name"
           render={({ field: { onChange, value } }) => (
             <TextField
               margin="dense"

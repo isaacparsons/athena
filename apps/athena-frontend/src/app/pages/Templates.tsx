@@ -1,13 +1,6 @@
-import {
-  createCustomFab,
-  CustomContainer,
-  UserTemplates,
-} from '@frontend/components';
-import { AddIcon } from '@frontend/icons';
+import { CustomContainer, UserTemplates } from '@frontend/components';
 import { CircularProgress } from '@mui/material';
 import { useUser } from '@frontend/store';
-
-const AddFab = createCustomFab(AddIcon);
 
 export function Templates() {
   const { templates, loading } = useUser();

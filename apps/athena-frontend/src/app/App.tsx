@@ -3,8 +3,6 @@ import { useCallback, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material';
 import { NotificationsProvider } from '@frontend/hooks';
 import { theme } from '@frontend/theme';
-// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { trpc, trpcClient } from '../trpc';
 import { router } from './AppRoutes';
 import { RouterProvider, useNavigate } from 'react-router-dom';
 import { LocationProvider } from './components';
@@ -40,11 +38,7 @@ export const App = () => {
     <ThemeProvider theme={theme}>
       <NotificationsProvider>
         <LocationProvider>
-          {/* <trpc.Provider client={trpcClient} queryClient={queryClient}>
-          <QueryClientProvider client={queryClient}> */}
           <RouterProvider router={router} />
-          {/* </QueryClientProvider>
-        </trpc.Provider> */}
         </LocationProvider>
       </NotificationsProvider>
     </ThemeProvider>

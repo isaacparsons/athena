@@ -37,6 +37,7 @@ import {
   createFederatedCredentialSchema,
   federatedCredentialSchema,
   updateNewsletterMemberSchema,
+  invteNewsletterUsersSchema,
 } from './lib';
 import {
   createManyNewsletterPostsSchema,
@@ -104,6 +105,8 @@ export type CreateNewsletter = z.infer<typeof createNewsletterSchema>;
 export type UpdateNewsletter = z.infer<typeof updateNewsletterSchema>;
 
 export type InviteNewsletterUser = z.infer<typeof inviteNewsletterUserSchema>;
+export type InviteNewsletterUsers = z.infer<typeof invteNewsletterUsersSchema>;
+
 export type RemoveNewsletterMember = z.infer<typeof removeNewsletterMemberSchema>;
 export type UpdateNewsletterMember = z.infer<typeof updateNewsletterMemberSchema>;
 

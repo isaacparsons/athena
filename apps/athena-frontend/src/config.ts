@@ -10,6 +10,17 @@ export const errorNotificationOptions: ShowNotificationOptions = {
   severity: 'error',
 };
 
+export enum RoutePaths {
+  home = '/',
+  newsletters = '/newsletters',
+  newsletter = '/newsletters/:newsletterId',
+  login = '/login',
+  templates = '/templates',
+  template = '/templates/:templateId',
+  account = '/account',
+  // settings="/settings"
+}
+
 export function getConfig() {
   const BASE_URL = `http://${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}/v1`;
   return {
@@ -19,5 +30,6 @@ export function getConfig() {
     API_URL: `${BASE_URL}/api/trpc`,
     ADMIN_SECRET: `${process.env.REACT_APP_ADMIN_SECRET}`,
     SESSION_COOKIE_NAME: `${process.env.REACT_APP_SESSION_COOKIE_NAME}`,
+    ENV: `${process.env.REACT_APP_ENV}`,
   };
 }

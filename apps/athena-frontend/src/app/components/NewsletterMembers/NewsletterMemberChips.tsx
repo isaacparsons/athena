@@ -1,17 +1,17 @@
 import _ from 'lodash';
 import { Chip, Stack, Avatar } from '@mui/material';
-import { User } from '@athena/common';
+import { NewsletterMember } from '@athena/common';
 
-interface MembersProps {
-  data: User[];
+interface NewsletterMemberChipsProps {
+  onClick: () => void;
+  data: NewsletterMember[];
 }
 
-export function NewsletterMembers(props: MembersProps) {
-  const { data } = props;
+export function NewsletterMemberChips(props: NewsletterMemberChipsProps) {
+  const { onClick, data } = props;
 
   return (
-    // sx={{ pb: 1 }}
-    <Stack spacing={1} direction="row">
+    <Stack onClick={onClick} spacing={1} direction="row">
       {data.map((member) => (
         <Stack direction="row" spacing={1} key={member.id.toString()}>
           <Chip

@@ -6,7 +6,7 @@ import {
   updateNewsletterSchema,
   NewsletterPermissions,
   NewsletterRole,
-  inviteNewsletterUserSchema,
+  invteNewsletterUsersSchema,
   removeNewsletterMemberSchema,
   updateNewsletterMemberSchema,
 } from '@athena/common';
@@ -41,8 +41,8 @@ const router = trpc.router({
     if (!valid) throw new Error('Invalid permissions');
     return await ctx.dao.newsletter.delete(ctx.user.userId, input.id);
   }),
-  inviteUser: loggedInProcedure
-    .input(inviteNewsletterUserSchema)
+  inviteUsers: loggedInProcedure
+    .input(invteNewsletterUsersSchema)
     .mutation(async ({ ctx, input }) => {
       const member = await ctx.dao.newsletter.readMember(
         ctx.user.userId,
@@ -53,7 +53,7 @@ const router = trpc.router({
         NewsletterPermissions.INVITE
       );
       if (!valid) throw new Error('Invalid permissions');
-      return ctx.dao.newsletter.inviteUser(ctx.user.userId, input);
+      return ctx.dao.newsletter.inviteUsers(ctx.user.userId, input);
     }),
   removeMember: loggedInProcedure
     .input(removeNewsletterMemberSchema)

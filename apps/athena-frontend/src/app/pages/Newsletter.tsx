@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CircularProgress, IconButton, Skeleton } from '@mui/material';
 import {
   NewsletterProperties,
@@ -7,9 +6,6 @@ import {
   ActionBar,
   BackButton,
   CustomContainer,
-  formatCreatedPosts,
-  formatDeletedPosts,
-  formatUpdatedPosts,
   NewsletterPostsController,
   CreateTemplateDialog,
   NewsletterPostMenu,
@@ -20,30 +16,15 @@ import {
 } from '@frontend/components';
 import { CheckIcon, CloseIcon, MoreVertIcon } from '@frontend/icons';
 import {
-  useNewsletterPostsForm,
   usePromiseWithNotification,
   useUpdateNewsletterForm,
 } from '@frontend/hooks';
 
 import { NewsletterPostForm } from '@frontend/types';
-import {
-  addTempPositionToItems,
-  CreateManyNewsletterPosts,
-  CreateTemplate,
-  DeleteMany,
-  NewsletterPost,
-  ReadNewsletter,
-  ReadNewsletterPost,
-  UpdateManyNewsletterPosts,
-} from '@athena/common';
-import {
-  useNewsletter,
-  useNewsletterPosts,
-  useNewsletters,
-  useTemplates,
-} from '@frontend/store';
+import { CreateTemplate, ReadNewsletter } from '@athena/common';
+import { useNewsletter, useNewsletters, useTemplates } from '@frontend/store';
 import { useNavigate } from 'react-router-dom';
-import { RoutePaths } from '../AppRoutes';
+import { RoutePaths } from '@frontend/config';
 
 export function NewsletterRoute({ id }: IdParamRouteProps) {
   const { loading: loadingNewsletter, newsletter } = useNewsletter(id);
@@ -156,7 +137,7 @@ export function Newsletter(props: NewsletterProps) {
       />
       <CustomContainer>
         <NewsletterProperties control={control} editing={editing} />
-        <NewsletterMembers data={newsletter.members} />
+        <NewsletterMembers newsletterId={newsletter.id} data={newsletter.members} />
         <NewsletterPostsController
           newsletterId={newsletter.id}
           onCreateTemplatePosts={(p) => setCreateTemplatePosts(p)}

@@ -1,7 +1,7 @@
 import { Box, Checkbox, Stack } from '@mui/material';
 import { useMemo } from 'react';
 import _ from 'lodash';
-import { CloseIcon, EditIcon } from '@frontend/components';
+import { StyledCloseIcon, StyledEditIcon } from '@frontend/components';
 
 interface SelectableListHeaderProps<U, T extends { id: NonNullable<U> }> {
   data: T[];
@@ -46,12 +46,12 @@ export function SelectableListHeader<U, T extends { id: NonNullable<U> }>(
             onChange={() => handleSelectAll()}
             checked={allSelected}
           />
-          <CloseIcon onClick={handleClose} />
+          <StyledCloseIcon onClick={handleClose} />
         </>
       ) : (
         <>
           <Box></Box>
-          <EditIcon onClick={handleEdit} />
+          <StyledEditIcon onClick={handleEdit} />
         </>
       )}
     </Stack>

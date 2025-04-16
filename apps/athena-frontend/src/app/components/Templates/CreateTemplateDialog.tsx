@@ -11,9 +11,9 @@ import {
   NewsletterPostsListItem,
   EditingHeader,
   StyledTextField,
-  DeleteIcon,
-  CloseIcon,
-  BackButtonIcon,
+  StyledDeleteIcon,
+  StyledCloseIcon,
+  StyledBackButtonIcon,
 } from '@frontend/components';
 import { CheckIcon } from '@frontend/icons';
 
@@ -105,8 +105,10 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
     <StyledDialog fullScreen open={formPosts.length > 0}>
       <>
         <CustomCardHeader
-          left={parent === null ? null : <BackButtonIcon onClick={handleBack} />}
-          right={<CloseIcon onClick={onClose} />}
+          left={
+            parent === null ? null : <StyledBackButtonIcon onClick={handleBack} />
+          }
+          right={<StyledCloseIcon onClick={onClose} />}
         />
         <StyledTextField
           required
@@ -122,7 +124,9 @@ export function CreateTemplateDialog(props: CreateTemplateDialogProps) {
           allSelected={allSelected}
           handleSelectAll={handleSelectAll}
         >
-          <DeleteIcon sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }} />
+          <StyledDeleteIcon
+            sx={{ m: 0.3, height: 30, width: 30, borderRadius: 15 }}
+          />
         </EditingHeader>
         <NewsletterPostsList
           posts={formPosts}

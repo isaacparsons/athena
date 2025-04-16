@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import {
   CustomContainer,
-  createCustomFab,
+  AddFab,
   CreateNewsletterDialog,
   UserNewsletters,
 } from '@frontend/components';
 import { CircularProgress } from '@mui/material';
-import { AddIcon } from '@frontend/icons';
 import { useUser } from '@frontend/store';
-
-const AddFab = createCustomFab(AddIcon);
 
 export function Newsletters() {
   const { newsletters, loading } = useUser();

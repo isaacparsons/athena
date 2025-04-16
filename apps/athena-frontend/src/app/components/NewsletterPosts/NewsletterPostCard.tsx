@@ -4,7 +4,7 @@ import {
   CustomCardFooter,
   ImageCard,
   StyledTextField,
-  DetailsCardIcon,
+  StyledDetailsCardIcon,
 } from '@frontend/components';
 import { Box, Typography } from '@mui/material';
 import ReactPlayer from 'react-player';
@@ -27,7 +27,7 @@ export function NewsletterPostCard(props: NewsletterPostCardProps) {
   return (
     <CustomCard>
       {children}
-      <CustomCardFooter right={<DetailsCardIcon />} />
+      <CustomCardFooter right={<StyledDetailsCardIcon />} />
     </CustomCard>
   );
 }

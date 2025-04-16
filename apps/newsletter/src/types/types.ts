@@ -293,7 +293,7 @@ export type INewsletterDAO = IEntityDAO<NewsletterRow, common.Newsletter> & {
   create(userId: number, input: common.CreateNewsletter): Promise<number>;
   update(userId: number, input: common.UpdateNewsletter): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
-  inviteUser(userId: number, input: common.InviteNewsletterUser): Promise<void>;
+  inviteUsers(userId: number, input: common.InviteNewsletterUsers): Promise<void>;
   readMember(userId: number, newsletterId: number): Promise<UserNewsletter>;
   removeMember(input: common.RemoveNewsletterMember): Promise<void>;
   updateMember(input: common.UpdateNewsletterMember): Promise<void>;
