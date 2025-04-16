@@ -5,7 +5,7 @@ import React from 'react';
 
 interface NewsletterMemberListItemProps {
   data: NewsletterMember;
-  onClick?: (member: NewsletterMember | null) => void;
+  onClick?: (member: NewsletterMember) => void;
   right?: React.ReactNode;
 }
 

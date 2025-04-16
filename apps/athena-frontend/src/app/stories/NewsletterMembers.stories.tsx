@@ -77,3 +77,9 @@ export const Primary = {
     data: [owner, readOnly, editor],
   },
 };
+
+export const Overflow = {
+  args: {
+    data: [owner, readOnly, editor, readOnly, editor],
+  },
+};

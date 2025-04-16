@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Chip, Stack, Avatar } from '@mui/material';
+import { Avatar, AvatarGroup } from '@mui/material';
 import { NewsletterMember } from '@athena/common';
 
 interface NewsletterMemberChipsProps {
@@ -7,25 +7,21 @@ interface NewsletterMemberChipsProps {
   data: NewsletterMember[];
 }
 
+function formatAvatarLabel(data: NewsletterMember) {
+  const { firstName, lastName, email } = data;
+  return firstName
+    ? _.upperCase(firstName[0]) + (lastName ? _.upperCase(lastName[0]) : '')
+    : _.upperCase(email[0]);
+}
+
 export function NewsletterMemberChips(props: NewsletterMemberChipsProps) {
   const { onClick, data } = props;
 
   return (
-    <Stack onClick={onClick} spacing={1} direction="row">
+    <AvatarGroup max={4} onClick={onClick}>
       {data.map((member) => (
-        <Stack direction="row" spacing={1} key={member.id.toString()}>
-          <Chip
-            avatar={
-              <Avatar>
-                {_.upperCase(
-                  member.firstName ? member.firstName[0] : member.email[0]
-                )}
-              </Avatar>
-            }
-            label={member.firstName ? member.firstName : member.email}
-          />
-        </Stack>
+        <Avatar sx={{ bgcolor: 'primary.main' }}>{formatAvatarLabel(member)}</Avatar>
       ))}
-    </Stack>
+    </AvatarGroup>
   );
 }

@@ -1,11 +1,10 @@
-import { DialogContent, List, Dialog, Stack } from '@mui/material';
 import { NewsletterMember } from '@athena/common';
 import {
-  InviteMembers,
   NewsletterMemberChips,
-  NewsletterMemberDetails,
-  NewsletterMemberListItem,
-  StyledAddIcon,
+  NewsletterMembersDialog,
+  NewsletterMembersDialogDetailsScreen,
+  NewsletterMembersDialogDisplayScreen,
+  NewsletterMembersDialogInviteScreen,
 } from '@frontend/components';
 import { useState } from 'react';
 
@@ -14,11 +13,61 @@ interface MembersProps {
   data: NewsletterMember[];
 }
 
+type DisplayScreen = {
+  type: 'display';
+};
+
+type DetailsScreen = {
+  type: 'details';
+  member: NewsletterMember;
+};
+
+type InviteScreen = {
+  type: 'invite';
+};
+
+type ScreenState = DisplayScreen | DetailsScreen | InviteScreen;
+
+const isDisplayScreen = (screen: ScreenState): screen is DisplayScreen => {
+  return screen.type === 'display';
+};
+
+const isDetailsScreen = (screen: ScreenState): screen is DetailsScreen => {
+  return screen.type === 'details';
+};
+
+const isInviteScreen = (screen: ScreenState): screen is InviteScreen => {
+  return screen.type === 'invite';
+};
+
 export function NewsletterMembers(props: MembersProps) {
   const { data, newsletterId } = props;
   const [dialogOpen, setDialogOpen] = useState(true);
-  const [memberDetails, setMemberDetails] = useState<NewsletterMember | null>(null);
-  const [inviteUsersOpen, setInviteUsersOpen] = useState(true);
+  const [screenState, setScreenState] = useState<{
+    prev: ScreenState | null;
+    curr: ScreenState;
+  }>({
+    prev: null,
+    curr: { type: 'display' },
+  });
+
+  const handleSetScreenState = (newState: ScreenState) => {
+    setScreenState((state) => ({
+      prev: state.curr,
+      curr: newState,
+    }));
+  };
+
+  const handleSetScreenStateToPrev = () => {
+    setScreenState((state) =>
+      state.prev
+        ? {
+            prev: state.curr,
+            curr: state.prev,
+          }
+        : state
+    );
+  };
 
   const handleOpenDialog = () => {
     setDialogOpen(true);
@@ -28,39 +77,31 @@ export function NewsletterMembers(props: MembersProps) {
     setDialogOpen(false);
   };
 
+  const { curr } = screenState;
+
   return (
     <>
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <DialogContent sx={{ minWidth: 300, minHeight: 300 }}>
-          {inviteUsersOpen ? (
-            <InviteMembers
-              newsletterId={newsletterId}
-              onBackClick={() => setInviteUsersOpen(false)}
-            />
-          ) : memberDetails === null ? (
-            <Stack direction="column">
-              <StyledAddIcon
-                sx={{ alignSelf: 'flex-end' }}
-                onClick={() => setInviteUsersOpen(true)}
-              />
-              <List>
-                {data.map((member) => (
-                  <NewsletterMemberListItem
-                    data={member}
-                    onClick={setMemberDetails}
-                  />
-                ))}
-              </List>
-            </Stack>
-          ) : (
-            <NewsletterMemberDetails
-              data={memberDetails}
-              newsletterId={newsletterId}
-              onClose={() => setMemberDetails(null)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <NewsletterMembersDialog open={dialogOpen} onClose={handleCloseDialog}>
+        {isDisplayScreen(curr) ? (
+          <NewsletterMembersDialogDisplayScreen
+            data={data}
+            onInvite={() => handleSetScreenState({ type: 'invite' })}
+            onClick={(member) => handleSetScreenState({ type: 'details', member })}
+          />
+        ) : isDetailsScreen(curr) ? (
+          <NewsletterMembersDialogDetailsScreen
+            data={curr.member}
+            newsletterId={newsletterId}
+            onBack={handleSetScreenStateToPrev}
+          />
+        ) : (
+          <NewsletterMembersDialogInviteScreen
+            newsletterId={newsletterId}
+            onBack={handleSetScreenStateToPrev}
+          />
+        )}
+      </NewsletterMembersDialog>
+
       <NewsletterMemberChips data={data} onClick={handleOpenDialog} />
     </>
   );
