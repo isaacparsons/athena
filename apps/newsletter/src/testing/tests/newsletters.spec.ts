@@ -187,7 +187,7 @@ describe('newsletter routes', () => {
     });
   });
 
-  describe.only('invite user', () => {
+  describe('invite user', () => {
     test('invite user', async () => {
       const entities1 = await createFixture('newsletter.yaml');
       const entities2 = await createFixture('user.yaml');

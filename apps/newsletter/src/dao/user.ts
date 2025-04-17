@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {
   CreateFederatedCredential,
   CreateUser,
+  FederatedCredential,
   Newsletter,
   ReadUser,
   Template,
@@ -67,6 +68,13 @@ export class UserDAO implements IUserDAO {
           .insertInto('user')
           .values({ firstName, lastName, email })
           .returningAll()
+          .executeTakeFirstOrThrow();
+      }
+      if (user.firstName !== firstName || user.lastName !== lastName) {
+        await trx
+          .updateTable('user')
+          .set({ firstName, lastName })
+          .where('id', '=', user.id)
           .executeTakeFirstOrThrow();
       }
 
