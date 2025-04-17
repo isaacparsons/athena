@@ -1,5 +1,4 @@
 import { Container } from 'inversify';
-import { GCSConfig, TYPES } from './types/types';
 import {
   NewsletterDAO,
   NewsletterPostDAO,
@@ -9,7 +8,7 @@ import {
   TemplateDAO,
   TemplateNodeDAO,
 } from './dao';
-import { GCSManager } from './services';
+import { GCSManager, NotificationsManager } from './services';
 import {
   DB,
   Pool,
@@ -22,6 +21,10 @@ import {
   ITemplateDAO,
   ITemplateNodeDAO,
   IGCSManager,
+  GCSConfig,
+  INotificationsManager,
+  SystemAccountConfig,
+  TYPES,
 } from '@backend/types';
 import { getConfig } from './util';
 import { Kysely } from 'kysely';
@@ -30,6 +33,10 @@ const config = getConfig();
 
 const container = new Container();
 container.bind<GCSConfig>(TYPES.gcsConfig).toConstantValue(config.gcs);
+container
+  .bind<SystemAccountConfig>(TYPES.systemAccountConfig)
+  .toConstantValue(config.systemAccount);
+
 container.bind(TYPES.DBClient).toConstantValue(
   new Kysely<DB>({
     dialect: new PostgresDialect({
@@ -64,5 +71,9 @@ container
   .to(TemplateNodeDAO)
   .inSingletonScope();
 container.bind<IGCSManager>(TYPES.IGCSManager).to(GCSManager).inSingletonScope();
+container
+  .bind<INotificationsManager>(TYPES.INotificationsManager)
+  .to(NotificationsManager)
+  .inSingletonScope();
 
 export { container };

@@ -53,7 +53,31 @@ const router = trpc.router({
         NewsletterPermissions.INVITE
       );
       if (!valid) throw new Error('Invalid permissions');
-      return ctx.dao.newsletter.inviteUsers(ctx.user.userId, input);
+      // create user if they dont already exist
+      const resolvedUsers = await Promise.all(
+        input.users.map(async (user) => {
+          const u = await ctx.dao.user.upsert({
+            email: user.email,
+            firstName: null,
+            lastName: null,
+          });
+          return { email: u.email, role: user.role };
+        })
+      );
+      const result = ctx.dao.newsletter.inviteUsers(ctx.user.userId, {
+        ...input,
+        users: resolvedUsers,
+      });
+
+      resolvedUsers.map((u) =>
+        ctx.notifications.sendMail({
+          to: u.email,
+          subject: 'Join newsletter',
+          text: 'you have been invited to newsletter. visit link xxxxxx',
+        })
+      );
+
+      return result;
     }),
   removeMember: loggedInProcedure
     .input(removeNewsletterMemberSchema)

@@ -14,6 +14,7 @@ export function getConfig(): Config {
     google: config.util.toObject(config.get('google')),
     gcs: config.util.toObject(config.get('gcs')),
     client: config.util.toObject(config.get('client')),
+    systemAccount: config.util.toObject(config.get('systemAccount')),
   };
 }
 

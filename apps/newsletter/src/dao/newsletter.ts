@@ -4,7 +4,6 @@ import {
   Newsletter,
   CreateNewsletter,
   UpdateNewsletter,
-  InviteNewsletterUser,
   NewsletterRole,
   ReadNewsletter,
   RemoveNewsletterMember,

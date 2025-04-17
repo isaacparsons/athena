@@ -21,3 +21,9 @@ gcs:
 client:
   host: localhost
   port: 4200
+
+systemAccount:
+  email: idella.littel@ethereal.email
+  password: eMseKrvEwJbwA4KXh9
+  host: smtp.ethereal.email
+  port: 587

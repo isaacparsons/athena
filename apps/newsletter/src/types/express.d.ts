@@ -1,6 +1,6 @@
 import { Kysely } from 'kysely';
 import { Database } from '../src/db/db';
-import { DAO } from './types';
+import { DAO, INotificationsManager } from './types';
 import { IGCSManager } from '@backend/services';
 
 declare global {
@@ -15,6 +15,7 @@ declare global {
       db: Kysely<Database>;
       dao: DAO;
       gcs: IGCSManager;
+      notifications: INotificationsManager;
       user?: UserSession;
       isAuthenticated(): this is AuthenticatedRequest;
     }

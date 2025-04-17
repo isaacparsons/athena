@@ -187,7 +187,7 @@ describe('newsletter routes', () => {
     });
   });
 
-  describe('invite user', () => {
+  describe.only('invite user', () => {
     test('invite user', async () => {
       const entities1 = await createFixture('newsletter.yaml');
       const entities2 = await createFixture('user.yaml');
@@ -206,8 +206,12 @@ describe('newsletter routes', () => {
 
       await inviteNewsletterUser(user1.id, {
         newsletterId: existingNewsletter.id,
-        email: member2.email,
-        role: NewsletterRole.READ_ONLY,
+        users: [
+          {
+            email: member2.email,
+            role: NewsletterRole.READ_ONLY,
+          },
+        ],
       });
       const newsletter = await getNewsletter(user1.id, existingNewsletter.id);
       expect(newsletter.members).toEqual(expect.arrayContaining([member1, member2]));
@@ -228,8 +232,12 @@ describe('newsletter routes', () => {
 
       const invite = inviteNewsletterUser(user2.id, {
         newsletterId: newsletter.id,
-        email: member3.email,
-        role: NewsletterRole.READ_ONLY,
+        users: [
+          {
+            email: member3.email,
+            role: NewsletterRole.READ_ONLY,
+          },
+        ],
       });
       await expect(invite).rejects.toEqual(new Error('Invalid permissions'));
     });

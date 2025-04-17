@@ -497,7 +497,7 @@ ALTER SEQUENCE public.user_id_seq OWNED BY public."user".id;
 -- -- Name: user id; Type: DEFAULT; Schema: public; Owner: postgres
 -- --
 
--- ALTER TABLE ONLY public."user" ALTER COLUMN id SET DEFAULT nextval('public.user_id_seq'::regclass);
+ALTER TABLE ONLY public."user" ALTER COLUMN id SET DEFAULT nextval('public.user_id_seq'::regclass);
 
 
 -- --
@@ -651,20 +651,20 @@ COPY public."user" (id, "firstName", "lastName", email) FROM stdin;
 --     ADD CONSTRAINT template_pkey PRIMARY KEY (id);
 
 
--- --
--- -- Name: user user_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
--- --
+--
+-- Name: user user_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
 
--- ALTER TABLE ONLY public."user"
---     ADD CONSTRAINT user_email_key UNIQUE (email);
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_email_key UNIQUE (email);
 
 
--- --
--- -- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
--- --
+--
+-- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
 
--- ALTER TABLE ONLY public."user"
---     ADD CONSTRAINT user_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_pkey PRIMARY KEY (id);
 
 
 -- --

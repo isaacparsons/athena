@@ -23,3 +23,11 @@ google:
 
 gcs:
   bucketName: GCS_BUCKET_NAME
+
+systemAccount:
+  service: SYSTEM_ACCOUNT_SERVICE
+  host: SYSTEM_ACCOUNT_HOST
+  port: SYSTEM_ACCOUNT_PORT
+  email: SYSTEM_ACCOUNT_EMAIL
+  password: SYSTEM_ACCOUNT_PASSWORD
+  secure: SYSTEM_ACCOUNT_SECURE

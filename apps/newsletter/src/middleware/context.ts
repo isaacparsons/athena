@@ -7,12 +7,12 @@ import {
   ITemplateDAO,
   IUserDAO,
   IGCSManager,
+  INotificationsManager,
 } from '@backend/types';
 import { NextFunction, Request, Response } from 'express';
 import { Kysely } from 'kysely';
 import { container } from '../inversify.config';
 
-container;
 export const contextMiddleware = (
   req: Request,
   res: Response,
@@ -27,5 +27,8 @@ export const contextMiddleware = (
     template: container.get<ITemplateDAO>(TYPES.ITemplateDAO),
   };
   req.gcs = container.get<IGCSManager>(TYPES.IGCSManager);
+  req.notifications = container.get<INotificationsManager>(
+    TYPES.INotificationsManager
+  );
   next();
 };

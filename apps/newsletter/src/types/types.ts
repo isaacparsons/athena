@@ -1,51 +1,3 @@
-export const TYPES = {
-  ILocationDAO: Symbol.for('ILocationDAO'),
-  IUserDAO: Symbol.for('IUserDAO'),
-  INewsletterDAO: Symbol.for('INewsletterDAO'),
-  INewsletterPostDAO: Symbol.for('INewsletterPostDAO'),
-  INewsletterPostDetailsDAO: Symbol.for('INewsletterPostDetailsDAO'),
-  ITemplateDAO: Symbol.for('ITemplateDAO'),
-  ITemplateNodeDAO: Symbol.for('ITemplateNodeDAO'),
-  IGCSManager: Symbol.for('IGCSManager'),
-  DBClient: Symbol.for('DBClient'),
-  gcsConfig: Symbol.for('gcsConfig'),
-};
-
-export type Config = {
-  app: {
-    host: string;
-    port: number;
-    sessionSecret: string;
-    sessionCookieName: string;
-    adminSecret: string;
-  };
-  db: {
-    host: string;
-    port: number;
-    name: string;
-    username: string;
-    password: string;
-  };
-  google: {
-    clientId: string;
-    clientSecret: string;
-    callbackUrl: string;
-  };
-  gcs: {
-    bucketName: string;
-  };
-  client: {
-    host: string;
-    port: number;
-  };
-};
-
-export type AppConfig = Config['app'];
-export type DbConfig = Config['db'];
-export type GoogleConfig = Config['google'];
-export type GCSConfig = Config['gcs'];
-export type ClientConfig = Config['client'];
-
 import {
   Kysely,
   Transaction as KyselyTransaction,
@@ -73,6 +25,66 @@ import {
   UserTemplate,
 } from './db';
 import * as common from '@athena/common';
+import { EmailNotification } from '../services/notifications';
+
+export const TYPES = {
+  ILocationDAO: Symbol.for('ILocationDAO'),
+  IUserDAO: Symbol.for('IUserDAO'),
+  INewsletterDAO: Symbol.for('INewsletterDAO'),
+  INewsletterPostDAO: Symbol.for('INewsletterPostDAO'),
+  INewsletterPostDetailsDAO: Symbol.for('INewsletterPostDetailsDAO'),
+  ITemplateDAO: Symbol.for('ITemplateDAO'),
+  ITemplateNodeDAO: Symbol.for('ITemplateNodeDAO'),
+  IGCSManager: Symbol.for('IGCSManager'),
+  DBClient: Symbol.for('DBClient'),
+  gcsConfig: Symbol.for('gcsConfig'),
+  INotificationsManager: Symbol.for('INotificationsManager'),
+  systemAccountConfig: Symbol.for('systemAccountConfig'),
+};
+
+export type Config = {
+  app: {
+    host: string;
+    port: number;
+    sessionSecret: string;
+    sessionCookieName: string;
+    adminSecret: string;
+  };
+  db: {
+    host: string;
+    port: number;
+    name: string;
+    username: string;
+    password: string;
+  };
+  google: {
+    clientId: string;
+    clientSecret: string;
+    callbackUrl: string;
+  };
+  gcs: {
+    bucketName: string;
+  };
+  systemAccount: {
+    service?: string;
+    host?: string;
+    port?: number;
+    email: string;
+    password: string;
+    secure?: boolean;
+  };
+  client: {
+    host: string;
+    port: number;
+  };
+};
+
+export type AppConfig = Config['app'];
+export type DbConfig = Config['db'];
+export type GoogleConfig = Config['google'];
+export type GCSConfig = Config['gcs'];
+export type ClientConfig = Config['client'];
+export type SystemAccountConfig = Config['systemAccount'];
 
 export { jsonObjectFrom, jsonArrayFrom } from 'kysely/helpers/postgres';
 export { Pool } from 'pg';
@@ -244,11 +256,18 @@ export interface IEntityDAO<R, E extends common.Entity> {
   toEntity: (row: R) => E;
 }
 
+/**
+ * Location
+ */
+
 export interface ILocationDAO {
   create(input: common.CreateLocation): Promise<number>;
   update(input: common.UpdateLocation): Promise<number>;
 }
 
+/**
+ * Newsletter Post
+ */
 export interface INewsletterPostDetailsDAO {
   read(newsletterItemId: number): Promise<common.NewsletterPostDetails>;
   create(
@@ -280,6 +299,10 @@ export type INewsletterPostDAO = {
   ): Promise<number[]>;
 };
 
+/**
+ * Newsletter
+ */
+
 export type NewsletterRow = EntityMetaRow &
   Omit<SelectNewsletter, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'> & {
     posts: Omit<common.ReadNewsletterPost, 'children'>[];
@@ -299,6 +322,9 @@ export type INewsletterDAO = IEntityDAO<NewsletterRow, common.Newsletter> & {
   updateMember(input: common.UpdateNewsletterMember): Promise<void>;
 };
 
+/**
+ * Template
+ */
 export type TemplateNodeRow = EntityMetaRow &
   Omit<SelectTemplateNode, 'modifierId' | 'creatorId' | 'locationId' | 'ownerId'>;
 
@@ -326,13 +352,16 @@ export type ITemplateDAO = IEntityDAO<TemplateRow, common.Template> & {
   readMember(userId: number, templateId: number): Promise<UserTemplate>;
 };
 
+/**
+ * User
+ */
 export interface IUserDAO {
   read(id: number): Promise<common.ReadUser>;
   newsletters: (userId: number) => Promise<common.Newsletter[]>;
   templates: (userId: number) => Promise<common.Template[]>;
   upsert(
     input: common.CreateUser,
-    federatedCredential: Omit<common.CreateFederatedCredential, 'userId'>
+    federatedCredential?: Omit<common.CreateFederatedCredential, 'userId'>
   ): Promise<common.User>;
 }
 
@@ -349,4 +378,8 @@ export interface IGCSManager {
     fileName: string,
     action: 'read' | 'write' | 'delete' | 'resumable'
   ): Promise<string>;
+}
+
+export interface INotificationsManager {
+  sendMail: <T>(notification: EmailNotification) => Promise<T>;
 }

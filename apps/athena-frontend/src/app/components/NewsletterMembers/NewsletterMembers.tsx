@@ -6,6 +6,7 @@ import {
   NewsletterMembersDialogDisplayScreen,
   NewsletterMembersDialogInviteScreen,
 } from '@frontend/components';
+import { Box } from '@mui/material';
 import { useState } from 'react';
 
 interface MembersProps {
@@ -42,7 +43,7 @@ const isInviteScreen = (screen: ScreenState): screen is InviteScreen => {
 
 export function NewsletterMembers(props: MembersProps) {
   const { data, newsletterId } = props;
-  const [dialogOpen, setDialogOpen] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [screenState, setScreenState] = useState<{
     prev: ScreenState | null;
     curr: ScreenState;
@@ -80,7 +81,7 @@ export function NewsletterMembers(props: MembersProps) {
   const { curr } = screenState;
 
   return (
-    <>
+    <Box width={'100%'} display="flex" alignItems={'flex-start'}>
       <NewsletterMembersDialog open={dialogOpen} onClose={handleCloseDialog}>
         {isDisplayScreen(curr) ? (
           <NewsletterMembersDialogDisplayScreen
@@ -103,6 +104,6 @@ export function NewsletterMembers(props: MembersProps) {
       </NewsletterMembersDialog>
 
       <NewsletterMemberChips data={data} onClick={handleOpenDialog} />
-    </>
+    </Box>
   );
 }
