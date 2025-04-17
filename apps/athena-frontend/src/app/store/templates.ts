@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { StateCreator } from 'zustand';
 import type {} from '@redux-devtools/extension';
 import { Slices, useStore } from '@frontend/store';
-import { CreateTemplate, ReadTemplate } from '@athena/common';
+import { CreateTemplate, ReadTemplate, UpdateTemplate } from '@athena/common';
 import { asyncTrpcClient } from '../../trpc';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect, useMemo } from 'react';
@@ -13,6 +13,7 @@ export interface TemplatesSlice {
     data: Record<number, ReadTemplate>;
     fetch: (id: number) => Promise<ReadTemplate>;
     create: (template: CreateTemplate) => Promise<number>;
+    update: (input: UpdateTemplate) => Promise<number>;
   };
 }
 
@@ -44,6 +45,12 @@ export const createTemplatesSlice: StateCreator<
       await get().user.fetch();
       return id;
     },
+    update: async (input: UpdateTemplate) => {
+      const id = await asyncTrpcClient.templates.update.mutate(input);
+      await get().templates.fetch(id);
+      await get().user.fetch();
+      return id;
+    },
   },
 });
 
@@ -51,6 +58,7 @@ export const useTemplates = () => {
   return useStore(
     useShallow((state) => ({
       createTemplate: state.templates.create,
+      updateTemplate: state.templates.update,
     }))
   );
 };

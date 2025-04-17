@@ -21,10 +21,20 @@ import {
 } from '@frontend/hooks';
 
 import { NewsletterPostForm } from '@frontend/types';
-import { CreateTemplate, ReadNewsletter } from '@athena/common';
-import { useNewsletter, useNewsletters, useTemplates } from '@frontend/store';
+import {
+  CreateTemplate,
+  ReadNewsletter,
+  fromPostsWithTempPosition,
+} from '@athena/common';
+import {
+  useNewsletter,
+  useNewsletterPosts,
+  useNewsletters,
+  useTemplates,
+} from '@frontend/store';
 import { useNavigate } from 'react-router-dom';
 import { RoutePaths } from '@frontend/config';
+import _ from 'lodash';
 
 export function NewsletterRoute({ id }: IdParamRouteProps) {
   const { loading: loadingNewsletter, newsletter } = useNewsletter(id);
@@ -43,15 +53,8 @@ interface NewsletterProps {
 
 export function Newsletter(props: NewsletterProps) {
   const { newsletter } = props;
-  const {
-    reset,
-    save: savePosts,
-    editing,
-    setEditing,
-    created,
-    updated,
-    deleted,
-  } = useNewsletterPostsContext();
+  const { posts, reset, editing, setEditing, created, updated, deleted, existing } =
+    useNewsletterPostsContext();
 
   const [settingsMenuAnchorEl, setSettingsMenuAnchorEl] =
     useState<null | HTMLElement>(null);
@@ -63,6 +66,10 @@ export function Newsletter(props: NewsletterProps) {
   const promiseWithNotifications = usePromiseWithNotification();
 
   const navigate = useNavigate();
+
+  const { createPosts, updatePosts, deletePosts } = useNewsletterPosts(
+    newsletter.id
+  );
 
   const { createTemplate } = useTemplates();
   const { deleteNewsletter, update: updateNewsletter } = useNewsletters();
@@ -90,7 +97,7 @@ export function Newsletter(props: NewsletterProps) {
   };
 
   const handleSaveNewsletter = async () => {
-    await savePosts();
+    await handleSavePosts();
     if (updatedNewsletter !== undefined) {
       await updateNewsletter(updatedNewsletter);
     }
@@ -116,6 +123,52 @@ export function Newsletter(props: NewsletterProps) {
     });
     setCreateTemplatePosts([]);
     setEditing(false);
+  };
+
+  const handleSavePosts = async () => {
+    const allPosts = posts.map((p) => _.omit(p, 'postId'));
+    const files = allPosts.reduce((prev, curr) => {
+      const file = _.get(curr, ['details', 'file']) as File | undefined;
+      if (file !== undefined)
+        return [...prev, [curr.tempPosition.id, file] as [string, File]];
+      return prev;
+    }, [] as [string, File][]);
+
+    const createdWithTempPosition = fromPostsWithTempPosition(existing, created);
+    const deletedIds = deleted.map((p) => p.id);
+
+    if (created.length > 0) {
+      promiseWithNotifications.execute(
+        createPosts(
+          {
+            newsletterId: newsletter.id,
+            posts: createdWithTempPosition,
+          },
+          files
+        ),
+        {
+          successMsg: 'Items created!',
+          errorMsg: 'Unable to create items :(',
+        }
+      );
+    }
+    if (updated.length > 0) {
+      promiseWithNotifications.execute(updatePosts(newsletter.id, updated, files), {
+        successMsg: 'Items updated!',
+        errorMsg: 'Unable to update items :(',
+      });
+    }
+    if (deleted.length > 0) {
+      promiseWithNotifications.execute(
+        deletePosts(newsletter.id, {
+          ids: deletedIds,
+        }),
+        {
+          successMsg: 'Items deleted!',
+          errorMsg: 'Unable to delete items :(',
+        }
+      );
+    }
   };
 
   return (

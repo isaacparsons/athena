@@ -22,9 +22,8 @@ export function ToggleListHeader(props: ToggleListHeaderProps) {
             onClick={onToggleSelectAll}
           />
         }
-      >
-        <Typography>Select all</Typography>
-      </CustomCardHeader>
+        center={<Typography>Select all</Typography>}
+      />
     </Box>
   );
 }

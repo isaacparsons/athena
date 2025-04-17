@@ -5,8 +5,8 @@ import { expect } from '@storybook/jest';
 import { ThemeProvider } from '@mui/material';
 import { theme } from '@frontend/theme';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { UserTemplates } from '../pages';
 import { createMockTemplateBase } from '../../util/test-data';
+import { UserTemplates } from '@frontend/components';
 
 const meta: Meta<typeof UserTemplates> = {
   component: UserTemplates,

@@ -16,6 +16,7 @@ import {
   Templates,
   Template,
   NewsletterRoute,
+  TemplateRoute,
 } from './pages';
 import { Appbar, WithIdParamRoute } from '@frontend/components';
 import { useUser } from '@frontend/store';
@@ -120,7 +121,10 @@ const routerConfig: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <WithAppbar>
-          <Template />
+          <WithIdParamRoute
+            k="templateId"
+            render={(id) => <TemplateRoute id={id} />}
+          />
         </WithAppbar>
       </ProtectedRoute>
     ),

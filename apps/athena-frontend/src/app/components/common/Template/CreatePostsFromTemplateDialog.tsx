@@ -12,7 +12,7 @@ import {
   List,
   ListItem,
 } from '@mui/material';
-import { TemplateCard, TemplateCardContent } from '@frontend/components';
+import { CustomCard, TemplateCardContent } from '@frontend/components';
 import { templateToPosts } from '@frontend/util';
 
 interface CreatePostsFromTemplateDialogProps {
@@ -58,9 +58,10 @@ export function CreatePostsFromTemplateDialog(
         <List>
           {data.map((template) => (
             <ListItem sx={{ opacity: selected?.id === template.id ? 1 : 0.5 }}>
-              <TemplateCard onClick={() => handleSelected(template)}>
-                <TemplateCardContent data={template} />
-              </TemplateCard>
+              <CustomCard
+                onClick={() => handleSelected(template)}
+                content={<TemplateCardContent data={template} />}
+              />
             </ListItem>
           ))}
         </List>

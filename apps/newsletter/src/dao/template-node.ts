@@ -117,6 +117,7 @@ export class TemplateNodeDAO
       return [id, ...ids];
     });
   }
+
   private async createChildNodes(
     db: DBConnection,
     userId: number,

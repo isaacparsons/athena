@@ -19,32 +19,41 @@ export function NewsletterCard(props: NewsletterCardProps) {
   const formattedLastModifiedDate = meta.modified ? formatDate(meta.modified) : '';
 
   return (
-    <CustomCard onClick={onClick}>
-      <Stack direction={'column'} sx={{ alignItems: 'flex-start' }}>
-        <Typography sx={{ color: 'primary.main', fontSize: 25 }}>{name}</Typography>
-        <Stack direction="row">
-          {formattedDateRange && (
-            <CalendarMonthIcon sx={{ color: 'primary.main' }} />
-          )}
-          <Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
-            {formattedDateRange}
+    <CustomCard
+      onClick={onClick}
+      content={
+        <Stack direction={'column'} sx={{ alignItems: 'flex-start' }}>
+          <Typography sx={{ color: 'primary.main', fontSize: 25 }}>
+            {name}
           </Typography>
-        </Stack>
-        {formattedLastModifiedDate && (
-          <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-            <Typography variant="subtitle2">{`last modified `}</Typography>
-            <Typography variant="subtitle2">{formattedLastModifiedDate}</Typography>
+          <Stack direction="row">
+            {formattedDateRange && (
+              <CalendarMonthIcon sx={{ color: 'primary.main' }} />
+            )}
+            <Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
+              {formattedDateRange}
+            </Typography>
           </Stack>
-        )}
-      </Stack>
-      <CustomCardFooter
-        right={
-          <CustomIconButton
-            onClick={onClick}
-            icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />}
-          />
-        }
-      />
-    </CustomCard>
+          {formattedLastModifiedDate && (
+            <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+              <Typography variant="subtitle2">{`last modified `}</Typography>
+              <Typography variant="subtitle2">
+                {formattedLastModifiedDate}
+              </Typography>
+            </Stack>
+          )}
+        </Stack>
+      }
+      footer={
+        <CustomCardFooter
+          right={
+            <CustomIconButton
+              onClick={onClick}
+              icon={<ArrowForwardIcon sx={{ fontSize: 25, color: 'white' }} />}
+            />
+          }
+        />
+      }
+    />
   );
 }

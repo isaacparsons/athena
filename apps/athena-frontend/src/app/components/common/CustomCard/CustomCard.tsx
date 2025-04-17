@@ -1,10 +1,13 @@
-import { Box, ButtonBase, Grid2 as Grid } from '@mui/material';
+import { Box, Stack } from '@mui/material';
+import { CustomCardHeader, CustomCardFooter } from '@frontend/components';
 
 interface CustomCardProps {
-  children?: React.ReactNode;
   src?: string;
   onClick?: () => void;
   bgColor?: string;
+  header?: React.ReactElement<typeof CustomCardHeader>;
+  content: React.ReactNode;
+  footer?: React.ReactElement<typeof CustomCardFooter>;
 }
 
 const imageStyles = (src: string) => ({
@@ -13,9 +16,16 @@ const imageStyles = (src: string) => ({
   backgroundSize: 'cover',
 });
 
-export function CustomCard({ children, src, onClick, bgColor }: CustomCardProps) {
+export function CustomCard({
+  header,
+  content,
+  footer,
+  src,
+  onClick,
+  bgColor,
+}: CustomCardProps) {
   return (
-    <Box
+    <Stack
       // color={'secondary.light'}
       sx={{
         bgcolor: bgColor ?? 'white',
@@ -28,16 +38,11 @@ export function CustomCard({ children, src, onClick, bgColor }: CustomCardProps)
         borderRadius: 5,
         ...(src ? imageStyles(src) : {}),
       }}
+      onClick={onClick}
     >
-      <ButtonBase sx={{ width: '100%' }} onClick={onClick}>
-        <Grid
-          container
-          direction={'column'}
-          sx={{ justifyContent: 'space-between', width: '100%', height: '100%' }}
-        >
-          {children}
-        </Grid>
-      </ButtonBase>
-    </Box>
+      {header}
+      <Box sx={{ flex: 1 }}>{content}</Box>
+      {footer}
+    </Stack>
   );
 }

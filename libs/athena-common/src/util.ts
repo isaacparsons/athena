@@ -10,6 +10,7 @@ import {
   TempNodePosition,
   NodePosition,
 } from './types';
+import { WithTempPosition } from '@athena/common';
 
 import { pipe, flow } from 'fp-ts/function';
 import * as A from 'fp-ts/Array';
@@ -156,6 +157,51 @@ export const fromItemsWithTempPosition = <
     };
   });
 };
+
+export function fromPostsWithTempPosition<
+  T extends WithTempPosition<{ id: number }>,
+  U extends { tempPosition: TempNodePosition }
+>(existingPosts: T[], posts: U[]) {
+  function getId<T>(id: string | null, map: Map<string, T>) {
+    if (id === null) return null;
+    const item = map.get(id);
+    if (item === undefined) return null;
+    return item;
+  }
+
+  const allPostsIdMap = makeIdMap(existingPosts, (p) => [p.tempPosition.id, p]);
+
+  const idMap = new Set(posts.map((p) => p.tempPosition.id));
+  return posts.map((p) => {
+    const { id, parentId, nextId, prevId } = p.tempPosition;
+    const exisitingParent = _.get(getId(parentId, allPostsIdMap), 'id', null) as
+      | number
+      | null;
+    const exisitingNext = _.get(getId(nextId, allPostsIdMap), 'id', null) as
+      | number
+      | null;
+    const exisitingPrev = _.get(getId(prevId, allPostsIdMap), 'id', null) as
+      | number
+      | null;
+
+    const position = {
+      parentId:
+        parentId === null ? null : idMap.has(parentId) ? null : exisitingParent,
+      nextId: nextId === null ? null : idMap.has(nextId) ? null : exisitingNext,
+      prevId: prevId === null ? null : idMap.has(prevId) ? null : exisitingPrev,
+    };
+    return {
+      ...p,
+      position,
+      tempPosition: {
+        id: id,
+        nextId: exisitingNext === null ? nextId : null,
+        prevId: exisitingPrev === null ? prevId : null,
+        parentId: exisitingParent === null ? parentId : null,
+      },
+    };
+  });
+}
 
 // type Id = string | number;
 

@@ -25,10 +25,10 @@ export function NewsletterPostCard(props: NewsletterPostCardProps) {
   const { children, onClick } = props;
 
   return (
-    <CustomCard>
-      {children}
-      <CustomCardFooter right={<StyledDetailsCardIcon />} />
-    </CustomCard>
+    <CustomCard
+      content={children}
+      footer={<CustomCardFooter right={<StyledDetailsCardIcon />} />}
+    />
   );
 }
 

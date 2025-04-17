@@ -3,36 +3,24 @@ import React from 'react';
 
 interface CustomCardHeaderProps {
   left?: React.ReactNode;
+  center?: React.ReactNode;
   right?: React.ReactNode;
-  children?: React.ReactNode;
 }
 
-export function CustomCardHeader({ left, right, children }: CustomCardHeaderProps) {
+export function CustomCardHeader({ left, right, center }: CustomCardHeaderProps) {
   return (
-    <Grid
-      container
-      spacing={3}
-      direction="row"
-      sx={{ justifyContent: 'center', alignItems: 'center' }}
-    >
-      <Grid size={1} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-        {left}
-      </Grid>
-      <Grid
-        size="grow"
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-        }}
-      >
-        {children}
-      </Grid>
-      <Grid size={1} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        {right}
-      </Grid>
+    <Grid container>
+      {left && (
+        <Grid display="flex" justifyContent="flex-start" size={2}>
+          {left}
+        </Grid>
+      )}
+      <Grid size="grow">{center}</Grid>
+      {right && (
+        <Grid display="flex" justifyContent="flex-end" size={2}>
+          {right}
+        </Grid>
+      )}
     </Grid>
   );
 }
