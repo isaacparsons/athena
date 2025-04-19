@@ -125,6 +125,10 @@ export type EntityTableName = Extract<
   TableName,
   'newsletter' | 'newsletter_post' | 'template' | 'template_node'
 >;
+export type NodeEntityTableName = Extract<
+  TableName,
+  'newsletter_post' | 'template_node'
+>;
 
 export type DBConnection = Kysely<DB>;
 export type Transaction = KyselyTransaction<DB>;
@@ -330,11 +334,16 @@ export type TemplateNodeRow = EntityMetaRow &
 
 export type ITemplateNodeDAO = IEntityDAO<TemplateNodeRow, common.TemplateNode> & {
   readByTemplateId(id: number): Promise<common.TemplateNode[]>;
-  createMany(
+  // createMany(
+  //   userId: number,
+  //   input: common.CreateManyTemplateNodes
+  // ): Promise<number[]>;
+  // updateMany(userId: number, input: common.UpdateTemplateNode[]): Promise<number[]>;
+  save(
     userId: number,
-    input: common.CreateManyTemplateNodes
-  ): Promise<number[]>;
-  updateMany(userId: number, input: common.UpdateTemplateNode[]): Promise<number[]>;
+    templateId: number,
+    input: common.SaveTemplateNodes
+  ): Promise<void>;
 };
 
 export type TemplateRow = EntityMetaRow &
@@ -350,6 +359,7 @@ export type ITemplateDAO = IEntityDAO<TemplateRow, common.Template> & {
   update(userId: number, input: common.UpdateTemplate): Promise<number>;
   delete(userId: number, id: number): Promise<number>;
   readMember(userId: number, templateId: number): Promise<UserTemplate>;
+  // save(userId: number, input: common.SaveTemplate): Promise<void>;
 };
 
 /**

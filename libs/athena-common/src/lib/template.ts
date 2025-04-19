@@ -11,34 +11,28 @@ export enum TemplateType {
 }
 const templateType = z.nativeEnum(TemplateType);
 
-export const templateNodeSchema = makeEntitySchemas({
+const templateNodeInput = {
   position: nodePositionSchema,
-  templateId: z.coerce.number(),
   data: z.record(z.string(), z.string()),
-});
+};
 
-export const createTemplateNodeSchema = templateNodeSchema.create
-  .extend({ tempPosition: tempNodePositionSchema })
-  .omit({ templateId: true, position: true });
+export const templateNodeInputSchema = z.object(templateNodeInput);
 
-export const createManyTemplateNodesSchema = z.object({
+export const templateNodeSchema = makeEntitySchemas({
+  ...templateNodeInput,
   templateId: z.coerce.number(),
-  position: nodePositionSchema,
-  nodes: z.array(createTemplateNodeSchema),
 });
 
-export const updateTemplateNodeSchema = templateNodeSchema.update;
+export const updateTemplateNodeSchema = templateNodeSchema.update.omit({ id: true });
+
+const templateInput = {
+  name: z.coerce.string(),
+  config: z.record(z.string(), z.string()),
+};
+
+export const templateInputSchema = z.object(templateInput);
 
 export const templateSchema = makeEntitySchemas({
-  name: z.coerce.string(),
+  ...templateInput,
   type: templateType,
-  config: z.record(z.string(), z.string()),
-});
-
-export const createTemplateSchema = templateSchema.create.extend({
-  nodes: z.array(createTemplateNodeSchema),
-});
-
-export const updateTemplateSchema = templateSchema.update.extend({
-  nodes: z.array(updateTemplateNodeSchema),
 });

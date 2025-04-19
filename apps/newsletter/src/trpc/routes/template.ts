@@ -26,5 +26,11 @@ const router = trpc.router({
     await ctx.dao.template.readMember(ctx.user.userId, input.id);
     return ctx.dao.template.delete(ctx.user.userId, input.id);
   }),
+  // save: loggedInProcedure
+  //   .input(saveTemplateSchema)
+  //   .mutation(async ({ input, ctx }) => {
+  //     await ctx.dao.template.readMember(ctx.user.userId, input.id);
+  //     return ctx.dao.template.save(ctx.user.userId, input);
+  //   }),
 });
 export default router;

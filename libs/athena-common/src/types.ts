@@ -2,11 +2,8 @@ import { z } from 'zod';
 import {
   countrySchema,
   createLocationSchema,
-  createManyTemplateNodesSchema,
   createMediaPostDetailsSchema,
   createNewsletterSchema,
-  createTemplateNodeSchema,
-  createTemplateSchema,
   createTextPostDetailsSchema,
   readPostUploadLinksSchema,
   inviteNewsletterUserSchema,
@@ -22,7 +19,6 @@ import {
   updateMediaPostDetailsSchema,
   updateNewsletterSchema,
   updateTemplateNodeSchema,
-  updateTemplateSchema,
   updateTextPostDetailsSchema,
   userSchema,
   geoPositionSchema,
@@ -38,14 +34,21 @@ import {
   federatedCredentialSchema,
   updateNewsletterMemberSchema,
   invteNewsletterUsersSchema,
+  templateNodeInputSchema,
+  templateInputSchema,
 } from './lib';
 import {
   createManyNewsletterPostsSchema,
   createNewsletterPostSchema,
   metaSchema,
   readNewsletterMemberSchema,
+  saveTemplateNodesSchema,
   updateManyNewsletterPostsSchema,
   updateNewsletterPostSchema,
+  updateTemplateSchema,
+  createManyTemplateNodesSchema,
+  createTemplateNodeSchema,
+  createTemplateSchema,
 } from './entity';
 /**
  * Common
@@ -62,6 +65,28 @@ export type DateRange = z.infer<typeof dateRangeSchema>;
 export type NodePosition = z.infer<typeof nodePositionSchema>;
 export type TempNodePosition = z.infer<typeof tempNodePositionSchema>;
 export type NodePositionInput = z.infer<typeof nodePositionInputSchema>;
+
+export type Node<T = undefined> = {
+  data: T;
+  id: number;
+  position: NodePosition;
+};
+
+export type CreateNode<T = undefined> = {
+  data: T;
+  tempPosition: TempNodePosition;
+};
+export type UpdateNode<T = undefined> = {
+  data: T;
+  id: number;
+  tempPosition: TempNodePosition;
+};
+
+export type SaveNodeBatch<C = undefined, U = undefined> = {
+  createNodes: CreateNode<C>[];
+  updateNodes: UpdateNode<U>[];
+  deleteNodes: number[];
+};
 
 /**
  * Federated Credential
@@ -162,14 +187,18 @@ export type ReadPostUploadLinksResponse = PostUploadLink[];
  */
 
 export type TemplateNode = WithEntity<z.infer<typeof templateNodeSchema.base>>;
+export type TemplateNodeInput = z.infer<typeof templateNodeInputSchema>;
 export type CreateTemplateNode = z.infer<typeof createTemplateNodeSchema>;
 export type UpdateTemplateNode = z.infer<typeof updateTemplateNodeSchema>;
 export type CreateManyTemplateNodes = z.infer<typeof createManyTemplateNodesSchema>;
+export type SaveTemplateNodes = z.infer<typeof saveTemplateNodesSchema>;
 
 export type Template = WithEntity<z.infer<typeof templateSchema.base>>;
+export type TemplateInput = z.infer<typeof templateInputSchema>;
 export type CreateTemplate = z.infer<typeof createTemplateSchema>;
 export type ReadTemplate = Template & { members: User[]; nodes: TemplateNode[] };
 export type UpdateTemplate = z.infer<typeof updateTemplateSchema>;
+// export type SaveTemplate = z.infer<typeof saveTemplateSchema>;
 
 /**
  * Location

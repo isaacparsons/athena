@@ -7,6 +7,8 @@ import {
   TemplateType,
   UpdateTemplate,
   ReadTemplate,
+  SaveNodeBatch,
+  TemplateNodeInput,
 } from '@athena/common';
 import {
   TYPES,
@@ -132,14 +134,10 @@ export class TemplateDAO
         })
         .executeTakeFirstOrThrow();
 
-      await new TemplateNodeDAO(trx).createMany(userId, {
-        templateId: template.id,
-        position: {
-          parentId: null,
-          prevId: null,
-          nextId: null,
-        },
-        nodes: input.nodes,
+      await new TemplateNodeDAO(trx).save(userId, template.id, {
+        createNodes: input.nodes,
+        updateNodes: [],
+        deleteNodes: [],
       });
 
       return template.id;
@@ -147,7 +145,6 @@ export class TemplateDAO
   }
 
   async update(userId: number, input: UpdateTemplate) {
-    // TODO: check permissions
     return this.db.transaction().execute(async (trx: Transaction) => {
       const { id } = await this.updateEntity(trx, userId, {
         id: input.id,
@@ -156,7 +153,7 @@ export class TemplateDAO
       })
         .returning('id')
         .executeTakeFirstOrThrow();
-      await new TemplateNodeDAO(trx).updateMany(userId, input.nodes);
+      await new TemplateNodeDAO(trx).save(userId, id, input.nodes);
 
       return id;
     });
@@ -171,4 +168,11 @@ export class TemplateDAO
       .executeTakeFirstOrThrow();
     return templateId;
   }
+
+  // async save(userId: number, input: SaveTemplate) {
+  //   const { id, nodes, template } = input;
+  //   return this.db.transaction().execute(async (trx: Transaction) => {
+  //     if (nodes) await new TemplateNodeDAO(trx).save(userId, id, nodes);
+  //   });
+  // }
 }

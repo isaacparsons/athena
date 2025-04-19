@@ -77,8 +77,12 @@ export abstract class EntityDAO<T extends EntityTableName, R, E extends Entity> 
       .where('id', '=', id as any);
   }
 
-  deleteEntity(db: DBConnection) {
-    return db.deleteFrom(this.tableName);
+  deleteEntity(db: DBConnection, id: number) {
+    return db
+      .deleteFrom(this.tableName)
+      .where('id', '=', id as any)
+      .returning('id')
+      .executeTakeFirstOrThrow();
   }
 
   withTransaction<T>(db: DBConnection, execute: (db: DBConnection) => Promise<T>) {

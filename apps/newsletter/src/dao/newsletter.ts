@@ -170,11 +170,7 @@ export class NewsletterDAO
   }
 
   async delete(userId: number, id: number): Promise<number> {
-    const res = await this.deleteEntity(this.db)
-      .where('id', '=', id)
-      .where('ownerId', '=', userId)
-      .returning('id')
-      .executeTakeFirstOrThrow();
+    const res = await this.deleteEntity(this.db, id);
     return res.id;
   }
 

@@ -6,3 +6,4 @@ export * from './template';
 export * from './template-node';
 export * from './user';
 export * from './entity';
+export * from './node-entity';

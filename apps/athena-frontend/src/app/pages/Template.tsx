@@ -6,14 +6,24 @@ import {
   NewsletterPostsListItem,
   NewsletterPostsProvider,
 } from '@frontend/components';
-import { useNewsletterPostsForm, useParamId, useSelectItems } from '@frontend/hooks';
-import { useTemplate } from '@frontend/store';
+import {
+  useNewsletterPostsForm,
+  useParamId,
+  usePromiseWithNotification,
+  useSelectItems,
+} from '@frontend/hooks';
+import { useTemplate, useTemplates } from '@frontend/store';
 import { AddIcon } from '@frontend/icons';
 import { useStore } from '@frontend/store';
 import { CircularProgress } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { NewsletterPost, ReadTemplate, WithTempPosition } from '@athena/common';
+import {
+  fromPostsWithTempPosition,
+  NewsletterPost,
+  ReadTemplate,
+  WithTempPosition,
+} from '@athena/common';
 import { templateToPosts } from '@frontend/util';
 import { CreateNewsletterPostForm, NewsletterPostForm } from '@frontend/types';
 import _ from 'lodash';
@@ -68,6 +78,9 @@ export function Template(props: TemplateProps) {
   const [editing, setEditing] = useState(true);
   const [parent, setParent] = useState<null | NewsletterPostForm>(null);
 
+  const promiseWithNotifications = usePromiseWithNotification();
+  const { updateTemplate } = useTemplates();
+
   const postsFromTemplate = useMemo(
     () => templateToPosts<WithTempPosition<NewsletterPost>>(0, template),
     [template]
@@ -89,6 +102,49 @@ export function Template(props: TemplateProps) {
 
   const handleInsert = (input: CreateNewsletterPostForm) => {
     insertPost(parent, input);
+  };
+
+  const handleSaveTemplate = async () => {
+    const allPosts = formPosts.map((p) => _.omit(p, 'postId'));
+
+    const createdWithTempPosition = fromPostsWithTempPosition(
+      posts.existing,
+      posts.created
+    );
+    const deletedIds = posts.deleted.map((p) => p.id);
+
+    // if (created.length > 0) {
+    //   promiseWithNotifications.execute(
+    //     createPosts(
+    //       {
+    //         newsletterId: newsletter.id,
+    //         posts: createdWithTempPosition,
+    //       },
+    //       []
+    //     ),
+    //     {
+    //       successMsg: 'Items created!',
+    //       errorMsg: 'Unable to create items :(',
+    //     }
+    //   );
+    // }
+    // if (updated.length > 0) {
+    //   promiseWithNotifications.execute(updatePosts(newsletter.id, updated, files), {
+    //     successMsg: 'Items updated!',
+    //     errorMsg: 'Unable to update items :(',
+    //   });
+    // }
+    // if (deleted.length > 0) {
+    //   promiseWithNotifications.execute(
+    //     deletePosts(newsletter.id, {
+    //       ids: deletedIds,
+    //     }),
+    //     {
+    //       successMsg: 'Items deleted!',
+    //       errorMsg: 'Unable to delete items :(',
+    //     }
+    //   );
+    // }
   };
 
   return (

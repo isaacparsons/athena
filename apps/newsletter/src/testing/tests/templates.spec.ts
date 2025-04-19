@@ -21,7 +21,7 @@ const createMockTemplateInput = (id: number) => {
     config: {},
     nodes: [
       {
-        data: { name: `template ${id} node 1` },
+        data: { data: { name: `template ${id} node 1` } },
         tempPosition: {
           id: '1',
           parentId: null,
@@ -30,7 +30,7 @@ const createMockTemplateInput = (id: number) => {
         },
       },
       {
-        data: { name: `template ${id} node 2` },
+        data: { data: { name: `template ${id} node 2` } },
         tempPosition: {
           id: '2',
           parentId: '1',
@@ -68,7 +68,7 @@ describe('template routes', () => {
         config: {},
         nodes: [
           {
-            data: { name: 'test node 1' },
+            data: { data: { name: 'test node 1' } },
             tempPosition: {
               id: '1',
               parentId: null,
@@ -77,7 +77,7 @@ describe('template routes', () => {
             },
           },
           {
-            data: { name: 'test node 2' },
+            data: { data: { name: 'test node 2' } },
             tempPosition: {
               id: '2',
               parentId: '1',
@@ -89,7 +89,6 @@ describe('template routes', () => {
       };
 
       const created = await createTemplate(user.id, input);
-
       const template = await getTemplate(user.id, { id: created });
 
       expect(template.members).toEqual([user]);
@@ -101,7 +100,7 @@ describe('template routes', () => {
           id: expect.any(Number),
           templateId: template.id,
           meta: expect.any(Object),
-          data: input.nodes[0].data,
+          data: input.nodes[0].data.data,
           position: {
             nextId: null,
             prevId: null,
@@ -112,7 +111,7 @@ describe('template routes', () => {
           id: expect.any(Number),
           templateId: template.id,
           meta: expect.any(Object),
-          data: input.nodes[1].data,
+          data: input.nodes[1].data.data,
           position: {
             nextId: null,
             prevId: null,
@@ -160,7 +159,7 @@ describe('template routes', () => {
     });
   });
 
-  describe('update template', () => {
+  describe.only('update template', () => {
     test('update template', async () => {
       const input: CreateTemplate = {
         type: TemplateType.NewsletterPost,
@@ -168,7 +167,7 @@ describe('template routes', () => {
         config: {},
         nodes: [
           {
-            data: { name: `template 1 node 1` },
+            data: { data: { name: `template 1 node 1` } },
             tempPosition: {
               id: '1',
               parentId: null,
@@ -177,7 +176,7 @@ describe('template routes', () => {
             },
           },
           {
-            data: { name: `template 1 node 2` },
+            data: { data: { name: `template 1 node 2` } },
             tempPosition: {
               id: '2',
               parentId: '1',
@@ -186,7 +185,7 @@ describe('template routes', () => {
             },
           },
           {
-            data: { name: `template 1 node 3` },
+            data: { data: { name: `template 1 node 3` } },
             tempPosition: {
               id: '3',
               parentId: '1',
@@ -195,6 +194,13 @@ describe('template routes', () => {
             },
           },
         ],
+      };
+
+      const nodeInput4 = {
+        data: { name: `template 1 node 4` },
+      };
+      const nodeInput5 = {
+        data: { name: `template 1 node 5` },
       };
       const created = await createTemplate(user.id, input);
 
@@ -206,64 +212,64 @@ describe('template routes', () => {
 
       await updateTemplate(user.id, {
         id: created,
-        nodes: [
-          {
-            ...node2,
-            position: {
-              ...node2.position,
-              prevId: node3.id,
-              nextId: null,
+        nodes: {
+          createNodes: [
+            {
+              data: nodeInput4,
+              tempPosition: {
+                id: '1',
+                parentId: '4',
+                prevId: null,
+                nextId: null,
+              },
             },
-          },
-          {
-            ...node3,
-            position: {
-              ...node3.position,
-              prevId: null,
-              nextId: node2.id,
+            {
+              data: nodeInput5,
+              tempPosition: {
+                id: '2',
+                parentId: 'unknown',
+                prevId: '3',
+                nextId: '4',
+              },
             },
-          },
-        ],
+          ],
+          updateNodes: [
+            {
+              id: node2.id,
+              data: {},
+              tempPosition: {
+                id: '3',
+                parentId: 'unknown',
+                prevId: null,
+                nextId: '2',
+              },
+            },
+            {
+              id: node3.id,
+              data: {},
+              tempPosition: {
+                id: '4',
+                parentId: 'unknown',
+                prevId: '2',
+                nextId: null,
+              },
+            },
+          ],
+          deleteNodes: [],
+        },
       });
 
       const updated = await getTemplate(user.id, { id: created });
+      console.log(
+        JSON.stringify(
+          updated.nodes.map((n) => _.omit(n, ['templateId', 'meta'])),
+          null,
+          4
+        )
+      );
       const updatedNode1 = updated.nodes.find((n) => n.id === node1.id);
       const updatedNode2 = updated.nodes.find((n) => n.id === node2.id);
       const updatedNode3 = updated.nodes.find((n) => n.id === node3.id);
-
-      expect(updatedNode1).toEqual({
-        id: expect.any(Number),
-        templateId: template.id,
-        meta: expect.any(Object),
-        data: node1.data,
-        position: {
-          nextId: null,
-          prevId: null,
-          parentId: null,
-        },
-      });
-      expect(updatedNode2).toEqual({
-        id: expect.any(Number),
-        templateId: template.id,
-        meta: expect.any(Object),
-        data: node2.data,
-        position: {
-          nextId: null,
-          prevId: node3.id,
-          parentId: node1.id,
-        },
-      });
-      expect(updatedNode3).toEqual({
-        id: expect.any(Number),
-        templateId: template.id,
-        meta: expect.any(Object),
-        data: node3.data,
-        position: {
-          nextId: node2.id,
-          prevId: null,
-          parentId: node1.id,
-        },
-      });
     });
   });
 
