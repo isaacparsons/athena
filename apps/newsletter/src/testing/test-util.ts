@@ -14,6 +14,7 @@ import {
   RemoveNewsletterMember,
   UpdateNewsletterMember,
   InviteNewsletterUsers,
+  SaveNewsletterPosts,
 } from '@athena/common';
 import { createContext, trpc } from '../trpc';
 import { appRouter as router } from '../trpc/routes';
@@ -139,6 +140,14 @@ export async function createNewsletterPosts(
 ) {
   const caller = await testCaller(userId);
   return caller.newsletterPosts.createMany(input) as Promise<number[]>;
+}
+
+export async function saveNewsletterPosts(
+  userId: number,
+  input: SaveNewsletterPosts
+) {
+  const caller = await testCaller(userId);
+  return caller.newsletterPosts.save(input);
 }
 
 export async function createTemplate(userId: number, input: CreateTemplate) {

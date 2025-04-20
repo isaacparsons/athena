@@ -301,6 +301,7 @@ export type INewsletterPostDAO = {
     userId: number,
     input: common.UpdateManyNewsletterPosts
   ): Promise<number[]>;
+  save(userId: number, input: common.SaveNewsletterPosts): Promise<void>;
 };
 
 /**

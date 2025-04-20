@@ -7,7 +7,7 @@ import {
   NewsletterPostRow,
   IGCSManager,
 } from '@backend/types';
-import { LocationDAO, NewsletterPostDetailsDAO } from '@backend/dao';
+import { LocationDAO, NewsletterPostDetailsDAO, NodeEntity } from '@backend/dao';
 import {
   NewsletterPost,
   DeleteMany,
@@ -20,6 +20,8 @@ import {
   UpdateLocation,
   CreateLocation,
   NodePositionInput,
+  SaveNewsletterPosts,
+  UpdateNewsletterPost,
 } from '@athena/common';
 import {
   location,
@@ -50,6 +52,12 @@ export class NewsletterPostDAO
   implements INewsletterPostDAO
 {
   tableName = 'newsletter_post' as any;
+  nodeEntity = new NodeEntity<
+    'newsletter_post',
+    CreateNewsletterPost,
+    UpdateNewsletterPost
+  >('newsletter_post');
+
   constructor(
     @inject(TYPES.DBClient) readonly db: DBConnection,
     @inject(TYPES.ILocationDAO) readonly locationDAO: ILocationDAO,
@@ -413,5 +421,68 @@ export class NewsletterPostDAO
           .execute();
       });
     }
+  }
+
+  async save(userId: number, input: SaveNewsletterPosts) {
+    return this.withTransaction(this.db, async (trx) =>
+      this.nodeEntity.save(
+        input,
+        async (node) => {
+          const { location, details } = node;
+          const locationId = location
+            ? await new LocationDAO(trx).create(location)
+            : null;
+          const { id, prevId, nextId, parentId } = await this.postEntities(
+            trx,
+            userId,
+            [
+              {
+                newsletterId: node.newsletterId,
+                title: node.title,
+                date: node.date,
+                parentId: node.position?.parentId ?? null,
+                nextId: node.position?.nextId ?? null,
+                prevId: node.position?.prevId ?? null,
+                locationId,
+              },
+            ]
+          )
+            .returning(['id', 'parentId', 'prevId', 'nextId'])
+            .executeTakeFirstOrThrow();
+          await new NewsletterPostDetailsDAO(trx).create(id, details);
+          return { id, position: { parentId, nextId, prevId } };
+        },
+        async (id, node) => {
+          let locationId = undefined;
+          if (_.get(node.location, 'id') !== undefined) {
+            locationId = await new LocationDAO(trx).create(
+              node.location as CreateLocation
+            );
+          }
+          if (node.location && _.get(node.location, 'id') === undefined) {
+            locationId = await new LocationDAO(trx).update(
+              node.location as UpdateLocation
+            );
+          }
+
+          const { prevId, nextId, parentId } = await this.updateEntity(trx, userId, {
+            id,
+            newsletterId: node.newsletterId,
+            title: node.title,
+            date: node.date,
+            parentId: node.position?.parentId ?? null,
+            nextId: node.position?.nextId ?? null,
+            prevId: node.position?.prevId ?? null,
+            locationId,
+          })
+            .returning(['id', 'parentId', 'prevId', 'nextId'])
+            .executeTakeFirstOrThrow();
+          return { id, position: { parentId, nextId, prevId } };
+        },
+        async (id) => {
+          await this.deleteEntity(trx, id);
+        }
+      )
+    );
   }
 }

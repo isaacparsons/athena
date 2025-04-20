@@ -6,6 +6,7 @@ import {
   readSchema,
   createManyNewsletterPostsSchema,
   updateManyNewsletterPostsSchema,
+  saveNewsletterPostsSchema,
 } from '@athena/common';
 
 const router = trpc.router({
@@ -42,6 +43,11 @@ const router = trpc.router({
     .input(deleteManySchema)
     .mutation(async ({ input, ctx }) => {
       return ctx.dao.newsletterPost.deleteMany(ctx.user.userId, input);
+    }),
+  save: loggedInProcedure
+    .input(saveNewsletterPostsSchema)
+    .mutation(async ({ input, ctx }) => {
+      return ctx.dao.newsletterPost.save(ctx.user.userId, input);
     }),
 });
 export default router;

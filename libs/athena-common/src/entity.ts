@@ -8,7 +8,6 @@ import {
   locationSchema,
   newsletterRole,
   nodePositionSchema,
-  templateInputSchema,
   templateNodeSchema,
   templateSchema,
   tempNodePositionSchema,
@@ -59,11 +58,6 @@ export const createTemplateNodeSchema = templateNodeSchema.create.omit({
   position: true,
 });
 
-// z.object({
-//   data: ,
-//   tempPosition: tempNodePositionSchema,
-// });
-
 export const createManyTemplateNodesSchema = z.object({
   templateId: z.coerce.number(),
   position: nodePositionSchema,
@@ -92,12 +86,6 @@ export const saveTemplateNodesSchema = z.object({
   deleteNodes: z.array(z.number()),
 });
 
-// export const saveTemplateSchema = z.object({
-//   id: z.coerce.number(),
-//   template: templateInputSchema.optional(),
-//   nodes: saveTemplateNodesSchema.optional(),
-// });
-
 export const updateTemplateSchema = templateSchema.update.extend({
   nodes: saveTemplateNodesSchema,
 });
@@ -109,4 +97,21 @@ export const createTemplateSchema = templateSchema.create.extend({
       tempPosition: tempNodePositionSchema,
     })
   ),
+});
+
+export const saveNewsletterPostsSchema = z.object({
+  createNodes: z.array(
+    z.object({
+      data: createNewsletterPostSchema,
+      tempPosition: tempNodePositionSchema,
+    })
+  ),
+  updateNodes: z.array(
+    z.object({
+      data: updateNewsletterPostSchema,
+      id: z.coerce.number(),
+      tempPosition: tempNodePositionSchema,
+    })
+  ),
+  deleteNodes: z.array(z.number()),
 });

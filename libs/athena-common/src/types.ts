@@ -49,6 +49,7 @@ import {
   createManyTemplateNodesSchema,
   createTemplateNodeSchema,
   createTemplateSchema,
+  saveNewsletterPostsSchema,
 } from './entity';
 /**
  * Common
@@ -171,6 +172,8 @@ export type UpdateManyNewsletterPosts = z.infer<
 export type CreateManyNewsletterPosts = z.infer<
   typeof createManyNewsletterPostsSchema
 >;
+
+export type SaveNewsletterPosts = z.infer<typeof saveNewsletterPostsSchema>;
 
 export type ReadPostUploadLinks = z.infer<typeof readPostUploadLinksSchema>;
 

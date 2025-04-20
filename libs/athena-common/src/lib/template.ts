@@ -1,9 +1,5 @@
 import { z } from 'zod';
-import {
-  makeEntitySchemas,
-  nodePositionSchema,
-  tempNodePositionSchema,
-} from './common';
+import { makeEntitySchemas, nodePositionSchema } from './common';
 
 export enum TemplateType {
   Newsletter = 'newsletter',

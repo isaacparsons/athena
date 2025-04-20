@@ -214,9 +214,13 @@ export class TemplateNodeDAO
           return { id, position: { parentId, nextId, prevId } };
         },
         async (id, node) => {
+          const { position, ...rest } = node;
           const { prevId, nextId, parentId } = await this.updateEntity(trx, userId, {
             id,
-            ...node,
+            ...rest,
+            nextId: position?.nextId,
+            parentId: position?.parentId,
+            prevId: position?.prevId,
           })
             .returning(['id', 'parentId', 'prevId', 'nextId'])
             .executeTakeFirstOrThrow();

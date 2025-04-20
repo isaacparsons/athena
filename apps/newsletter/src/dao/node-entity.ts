@@ -42,25 +42,27 @@ export class NodeEntity<N extends NodeEntityTableName, C, U> {
     );
 
     await Promise.all(
-      nodesAfter.map(async (n) => {
-        await update(n.id, {
-          parentId: this.getIdFromIdMap(
-            tempIdRealIdMap,
-            n.tempPosition.parentId,
-            n.position.parentId
-          ),
-          nextId: this.getIdFromIdMap(
-            tempIdRealIdMap,
-            n.tempPosition.nextId,
-            n.position.nextId
-          ),
-          prevId: this.getIdFromIdMap(
-            tempIdRealIdMap,
-            n.tempPosition.prevId,
-            n.position.prevId
-          ),
-        } as U);
-      })
+      nodesAfter.map(async (n) =>
+        update(n.id, {
+          position: {
+            parentId: this.getIdFromIdMap(
+              tempIdRealIdMap,
+              n.tempPosition.parentId,
+              n.position.parentId
+            ),
+            nextId: this.getIdFromIdMap(
+              tempIdRealIdMap,
+              n.tempPosition.nextId,
+              n.position.nextId
+            ),
+            prevId: this.getIdFromIdMap(
+              tempIdRealIdMap,
+              n.tempPosition.prevId,
+              n.position.prevId
+            ),
+          },
+        } as U)
+      )
     );
     await Promise.all(deleteNodes.map(async (id) => remove(id)));
   }

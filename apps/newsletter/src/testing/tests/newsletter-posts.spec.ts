@@ -2,12 +2,18 @@ import { createFixture } from '../setup';
 import _ from 'lodash';
 import {
   CreateManyNewsletterPosts,
+  CreateNewsletterPost,
   NewsletterPostTypeName,
   TempNodePosition,
 } from '@athena/common';
 import { DBManagerClient } from '@backend/db';
 import { SelectNewsletter, SelectUser } from '@backend/types';
-import { createNewsletterPosts, getNewsletterPost } from '../test-util';
+import {
+  createNewsletterPosts,
+  getNewsletter,
+  getNewsletterPost,
+  saveNewsletterPosts,
+} from '../test-util';
 
 const createMockTextPost = (
   newsletterId: number,
@@ -18,6 +24,21 @@ const createMockTextPost = (
   title: name,
   date: null,
   tempPosition,
+  details: {
+    type: NewsletterPostTypeName.Text,
+    name,
+    link: null,
+    description: null,
+  },
+});
+
+const createMockTextPost2 = (
+  newsletterId: number,
+  name: string
+): CreateNewsletterPost => ({
+  newsletterId,
+  title: name,
+  date: null,
   details: {
     type: NewsletterPostTypeName.Text,
     name,
@@ -85,14 +106,62 @@ describe('newsletter post routes', () => {
         newsletterId: newsletter.id,
         posts: [parentNode1, child1Input, child2Input, parentNode2, child3Input],
       };
-      const createdIds = await createNewsletterPosts(user.id, input);
+      // const createdIds = await createNewsletterPosts(user.id, input);
+      await saveNewsletterPosts(user.id, {
+        createNodes: [
+          {
+            data: createMockTextPost2(newsletter.id, 'post 1'),
+            tempPosition: {
+              id: '1',
+              parentId: null,
+              nextId: null,
+              prevId: null,
+            },
+          },
+          {
+            data: createMockTextPost2(newsletter.id, 'post 2'),
+            tempPosition: {
+              id: '2',
+              parentId: '1',
+              nextId: '3',
+              prevId: null,
+            },
+          },
+          {
+            data: createMockTextPost2(newsletter.id, 'post 3'),
+            tempPosition: {
+              id: '3',
+              parentId: '1',
+              nextId: null,
+              prevId: '2',
+            },
+          },
+          {
+            data: createMockTextPost2(newsletter.id, 'post 4'),
+            tempPosition: {
+              id: '4',
+              parentId: null,
+              nextId: null,
+              prevId: null,
+            },
+          },
+          {
+            data: createMockTextPost2(newsletter.id, 'post 5'),
+            tempPosition: {
+              id: '5',
+              parentId: '4',
+              nextId: null,
+              prevId: null,
+            },
+          },
+        ],
+        updateNodes: [],
+        deleteNodes: [],
+      });
 
-      const result = await Promise.all(
-        createdIds.map(async (id) => {
-          return getNewsletterPost(user.id, id);
-        })
-      );
-      console.log(JSON.stringify(result, null, 4));
+      const newsletterAfter = await getNewsletter(user.id, newsletter.id);
+
+      console.log(JSON.stringify(newsletterAfter, null, 4));
 
       // expect(posts).toMatchObject({
       //   position: {
